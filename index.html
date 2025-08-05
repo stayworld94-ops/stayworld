@@ -2,61 +2,134 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StayWorld – Global Booking Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StayWorld - Global Booking</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
 </head>
 <body>
-  <header>
-    <h1>StayWorld</h1>
-    <p>Explore. Book. Travel. Globally.</p>
+  <!-- 상단 내비게이션 -->
+  <header class="navbar">
+    <div class="logo">🌍 StayWorld</div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#explore">Explore</a></li>
+        <li><a href="#compare">Compare</a></li>
+        <li><a href="#planner">Planner</a></li>
+        <li><a href="#weather">Weather</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#level">Levels</a></li>
+        <li><a href="#faq">Support</a></li>
+      </ul>
+    </nav>
+    <button id="toggle-darkmode">🌓</button>
   </header>
-  <main>
-    <section>
-      <h2>🌍 Explore Global Stays</h2>
-      <p>Search and compare verified accommodations in over 190 countries. Filter by rating, price, or amenities.</p>
-    </section>
-    <section>
-      <h2>🛎️ Host Verification</h2>
-      <p>All hosts are verified with official ID and address. StayWorld ensures guest safety with strict checks.</p>
-    </section>
-    <section>
-      <h2>💳 Secure Payments</h2>
-      <p>Stripe-based encrypted payments. Crypto, credit, and wallet supported. Refund policy transparently shown.</p>
-    </section>
-    <section>
-      <h2>📊 Points & Level System</h2>
-      <p>Earn booking points. Level up from Bronze to Elite for exclusive perks and discounts.</p>
-    </section>
-    <section>
-      <h2>📝 Reviews & Reporting</h2>
-      <p>Every guest can leave reviews. Hosts and guests can report issues with built-in support escalation.</p>
-    </section>
-    <section>
-      <h2>🗓️ Travel Planner & Weather</h2>
-      <p>Build trip itineraries, check local weather, and integrate with your booking schedule.</p>
-    </section>
-    <section>
-      <h2>🔐 Automated Security & Monitoring</h2>
-      <p>Real-time error checks (5x daily), login protection, and blacklist tracking for platform abuse.</p>
-    </section>
-    <section>
-      <h2>🌐 Multilingual Support</h2>
-      <p>AI-based auto translation system for 10+ languages. User support center is fully localized.</p>
-    </section>
-    <section>
-      <h2>📲 Mobile & Web Compatibility</h2>
-      <p>Responsive UI for app & browser. Dark/light themes. Optimized for all devices.</p>
-    </section>
-    <section>
-      <h2>📩 Notifications</h2>
-      <p>Receive reservation alerts via email and SMS. Stripe payouts and refunds instantly reported.</p>
-    </section>
-  </main>
+
+  <!-- 홈 배너 -->
+  <section id="home" class="hero-section">
+    <h1>Where will you go next?</h1>
+    <p>Search. Compare. Travel. Earn rewards.</p>
+    <button onclick="location.href='#explore'">Start Now</button>
+  </section>
+
+  <!-- 숙소 검색 -->
+  <section id="explore" class="search-section">
+    <h2>🔍 Search & Book</h2>
+    <input type="text" placeholder="Enter city, place, or keyword..." />
+    <div class="filters">
+      <label><input type="checkbox" /> Verified Hosts</label>
+      <label><input type="checkbox" /> Emergency Discount</label>
+      <label><input type="checkbox" /> Accepts Crypto</label>
+      <label><input type="checkbox" /> High Rating</label>
+    </div>
+    <button>Search</button>
+  </section>
+
+  <!-- 비교 기능 -->
+  <section id="compare" class="compare-section">
+    <h2>🏨 Compare Stays</h2>
+    <p>Compare multiple accommodations by price, location, rating, and perks.</p>
+    <div class="compare-grid">
+      <!-- 숙소 비교 카드 자리 -->
+    </div>
+  </section>
+
+  <!-- 일정 플래너 -->
+  <section id="planner" class="planner-section">
+    <h2>📅 Travel Planner</h2>
+    <p>Create, edit, and share your trip plans. Connect directly with bookings.</p>
+  </section>
+
+  <!-- 날씨 정보 -->
+  <section id="weather" class="weather-section">
+    <h2>🌦️ Weather</h2>
+    <p>Current weather info for your selected destination.</p>
+    <div id="weather-data">Loading...</div>
+  </section>
+
+  <!-- 리뷰 시스템 -->
+  <section id="reviews" class="review-section">
+    <h2>🌟 Reviews & Ratings</h2>
+    <p>Share your experience. Read trusted user reviews.</p>
+    <div class="review-list">
+      <!-- 리뷰 항목 자리 -->
+    </div>
+  </section>
+
+  <!-- 사용자 레벨 -->
+  <section id="level" class="levels-section">
+    <h2>🏅 Your Level</h2>
+    <ul>
+      <li>🥉 Bronze: Newbie (0-4 bookings)</li>
+      <li>🥈 Silver: Traveler (5-14 bookings)</li>
+      <li>🥇 Gold: Frequent Flyer (15+)</li>
+      <li>👑 Elite: VIP Access</li>
+    </ul>
+  </section>
+
+  <!-- 고객센터 -->
+  <section id="faq" class="support-section">
+    <h2>🛎️ Customer Support</h2>
+    <p>Auto-translated live support in all major languages.</p>
+    <ul>
+      <li>Live Chat (24/7)</li>
+      <li>Help Articles</li>
+      <li>Booking Issues</li>
+      <li>Report a Problem</li>
+    </ul>
+  </section>
+
+  <!-- 연락처 -->
+  <section class="contact-section">
+    <h2>📞 Contact</h2>
+    <p>Email: <a href="mailto:stayworld94@gmail.com">stayworld94@gmail.com</a></p>
+    <p>WhatsApp: +82 10 5481 1803</p>
+    <p>Official Site: <a href="https://stayworldbooking.com">stayworldbooking.com</a></p>
+  </section>
+
   <footer>
-    <p>Contact: stayworld94@gmail.com</p>
-    <p>&copy; 2025 StayWorld. All rights reserved.</p>
+    <p>© 2025 StayWorld. All rights reserved.</p>
   </footer>
+
+  <!-- 스크립트: 다크모드, 날씨 API 연동, 자동 점검 -->
+  <script>
+    // 다크모드 토글
+    document.getElementById("toggle-darkmode").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+    });
+
+    // 날씨 API 예시 (도시 고정: Istanbul)
+    async function loadWeather() {
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.01&longitude=28.97&current_weather=true');
+        const data = await res.json();
+        document.getElementById('weather-data').innerText = `🌡️ ${data.current_weather.temperature}°C, 💨 Wind ${data.current_weather.windspeed} km/h`;
+      } catch (e) {
+        document.getElementById('weather-data').innerText = 'Weather info not available.';
+      }
+    }
+    loadWeather();
+  </script>
 </body>
 </html>
