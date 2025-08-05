@@ -1,30 +1,239 @@
-/* StayWorld - Global Style */
-body {
-  font-family: Arial, sans-serif;
+/* 기본 설정 */
+* {
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
-  color: #333;
+  box-sizing: border-box;
 }
-header {
-  background-color: #000;
-  color: #fff;
-  padding: 2rem;
-  text-align: center;
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  background-color: #ffffff;
+  color: #222;
+  transition: all 0.3s ease-in-out;
 }
-main {
-  padding: 2rem;
+
+.dark {
+  background-color: #121212;
+  color: #eeeeee;
 }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 section {
-  background: #fff;
-  margin-bottom: 1.5rem;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: auto;
 }
+
+/* 내비게이션 바 */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #000;
+  color: gold;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.navbar ul {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.navbar a {
+  color: gold;
+  font-weight: 500;
+}
+
+#toggle-darkmode {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: gold;
+}
+
+/* 홈 섹션 */
+.hero-section {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: linear-gradient(to right, #222, #444);
+  color: white;
+}
+
+.hero-section button {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  background: gold;
+  color: black;
+  border: none;
+  border-radius: 10px;
+  margin-top: 2rem;
+  cursor: pointer;
+}
+
+/* 검색 섹션 */
+.search-section input[type="text"] {
+  width: 100%;
+  max-width: 600px;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.search-section .filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-section .filters label {
+  background: #f2f2f2;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.search-section button {
+  padding: 0.7rem 1.5rem;
+  background: black;
+  color: gold;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* 비교 섹션 */
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.compare-grid .card {
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  padding: 1rem;
+  background: #fff;
+  transition: 0.3s;
+}
+
+.dark .compare-grid .card {
+  background: #1e1e1e;
+  border: 1px solid #444;
+}
+
+/* 여행 플래너 */
+.planner-section {
+  background-color: #fafafa;
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+.dark .planner-section {
+  background-color: #1b1b1b;
+}
+
+/* 날씨 */
+.weather-section {
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+#weather-data {
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+/* 리뷰 */
+.review-section .review-list {
+  margin-top: 2rem;
+}
+
+.review-section .review-list .review {
+  border-bottom: 1px solid #ccc;
+  padding: 1rem 0;
+}
+
+.dark .review-section .review-list .review {
+  border-color: #444;
+}
+
+/* 레벨 */
+.levels-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.levels-section li {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.levels-section li::before {
+  content: '⭐';
+  position: absolute;
+  left: 0;
+}
+
+/* 고객센터 */
+.support-section ul {
+  padding-left: 1rem;
+  line-height: 2;
+}
+
+/* 연락처 */
+.contact-section {
+  background-color: #f4f4f4;
+  border-radius: 15px;
+  padding: 2rem;
+}
+
+.dark .contact-section {
+  background-color: #1f1f1f;
+}
+
+/* 푸터 */
 footer {
   text-align: center;
-  padding: 1rem;
-  background-color: #222;
-  color: #fff;
+  background: #000;
+  color: gold;
+  padding: 1.5rem;
+  margin-top: 3rem;
 }
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .navbar ul {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .search-section input[type="text"] {
+    width: 100%;
+  }
+
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
+                                                  }
