@@ -3,136 +3,124 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld - Global Booking</title>
+  <title>StayWorld – Membership & Support</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
 </head>
 <body>
-  <!-- 상단 내비게이션 -->
-  <header class="navbar">
-    <div class="logo">🌍 StayWorld</div>
-    <nav>
-      <ul>
-        <li><a href="#home">Home</a></li>
-        <li><a href="#explore">Explore</a></li>
-        <li><a href="#compare">Compare</a></li>
-        <li><a href="#planner">Planner</a></li>
-        <li><a href="#weather">Weather</a></li>
-        <li><a href="#reviews">Reviews</a></li>
-        <li><a href="#level">Levels</a></li>
-        <li><a href="#faq">Support</a></li>
-      </ul>
-    </nav>
-    <button id="toggle-darkmode">🌓</button>
+  <header>
+    <h1 class="site-title">🏨 StayWorld Loyalty Program</h1>
   </header>
 
-  <!-- 홈 배너 -->
-  <section id="home" class="hero-section">
-    <h1>Where will you go next?</h1>
-    <p>Search. Compare. Travel. Earn rewards.</p>
-    <button onclick="location.href='#explore'">Start Now</button>
-  </section>
+  <main>
+    <section id="rewards" class="section dark">
+      <h2 class="section-title">🏆 StayWorld Membership Levels</h2>
+      <p class="subtitle">상위 레벨일수록 하위 등급의 모든 혜택을 포함합니다.</p>
 
-  <!-- 숙소 검색 -->
-  <section id="explore" class="search-section">
-    <h2>🔍 Search & Book</h2>
-    <input type="text" placeholder="Enter city, place, or keyword..." />
-    <div class="filters">
-      <label><input type="checkbox" /> Verified Hosts</label>
-      <label><input type="checkbox" /> Emergency Discount</label>
-      <label><input type="checkbox" /> Accepts Crypto</label>
-      <label><input type="checkbox" /> High Rating</label>
+      <div class="level-grid">
+        <div class="level-card bronze">
+          <h3>🥉 Bronze</h3>
+          <p class="highlight">가입 시 자동 등급</p>
+          <ul>
+            <li>기본 예약 기능</li>
+          </ul>
+        </div>
+        <div class="level-card silver">
+          <h3>🥈 Silver</h3>
+          <p class="highlight">₩500,000+ 예약</p>
+          <ul>
+            <li>포인트 적립 3%</li>
+            <li>무료 숙박 티켓 1장</li>
+            <li><em>+ 브론즈 혜택 포함</em></li>
+          </ul>
+        </div>
+        <div class="level-card gold">
+          <h3>🥇 Gold</h3>
+          <p class="highlight">₩2,000,000+ 예약</p>
+          <ul>
+            <li>포인트 적립 5%</li>
+            <li>우선 고객 응대</li>
+            <li>시즌 쿠폰</li>
+            <li><em>+ 실버, 브론즈 혜택 포함</em></li>
+          </ul>
+        </div>
+        <div class="level-card platinum">
+          <h3>💎 Platinum</h3>
+          <p class="highlight">₩4,000,000+ 예약</p>
+          <ul>
+            <li>포인트 적립 7%</li>
+            <li>시즌 자동 할인</li>
+            <li><em>+ 골드 이하 혜택 포함</em></li>
+          </ul>
+        </div>
+        <div class="level-card diamond">
+          <h3>🔷 Diamond</h3>
+          <p class="highlight">₩7,500,000+ 예약</p>
+          <ul>
+            <li>포인트 적립 10%</li>
+            <li>VIP 쿠폰</li>
+            <li>프리미엄 숙소 우선권</li>
+            <li><em>+ 플래티넘 이하 혜택 포함</em></li>
+          </ul>
+        </div>
+        <div class="level-card elite">
+          <h3>👑 Elite</h3>
+          <p class="highlight">₩15,000,000+ + 수동승격</p>
+          <ul>
+            <li>포인트 적립 15%</li>
+            <li>비공개 프라이빗 딜</li>
+            <li>긴급지원 우선</li>
+            <li><em>+ 모든 혜택 포함</em></li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="note">※ 60일 이상 미예약 시 자동 1단계 강등됩니다.</p>
+    </section>
+  </main>
+
+  <!-- 실시간 상담 버튼 + 챗봇 -->
+  <div id="support-widget">
+    <button id="chat-toggle">💬 실시간 상담</button>
+  </div>
+
+  <div id="chat-box" class="hidden">
+    <div id="chat-header">StayWorld AI 상담</div>
+    <div id="chat-messages">
+      <div class="bot-message">안녕하세요! 무엇을 도와드릴까요?</div>
     </div>
-    <button>Search</button>
-  </section>
-
-  <!-- 비교 기능 -->
-  <section id="compare" class="compare-section">
-    <h2>🏨 Compare Stays</h2>
-    <p>Compare multiple accommodations by price, location, rating, and perks.</p>
-    <div class="compare-grid">
-      <!-- 숙소 비교 카드 자리 -->
-    </div>
-  </section>
-
-  <!-- 일정 플래너 -->
-  <section id="planner" class="planner-section">
-    <h2>📅 Travel Planner</h2>
-    <p>Create, edit, and share your trip plans. Connect directly with bookings.</p>
-  </section>
-
-  <!-- 날씨 정보 -->
-  <section id="weather" class="weather-section">
-    <h2>🌦️ Weather</h2>
-    <p>Current weather info for your selected destination.</p>
-    <div id="weather-data">Loading...</div>
-  </section>
-
-  <!-- 리뷰 시스템 -->
-  <section id="reviews" class="review-section">
-    <h2>🌟 Reviews & Ratings</h2>
-    <p>Share your experience. Read trusted user reviews.</p>
-    <div class="review-list">
-      <!-- 리뷰 항목 자리 -->
-    </div>
-  </section>
-
-  <!-- 사용자 레벨 -->
-  <section id="level" class="levels-section">
-    <h2>🏅 Your Level</h2>
-    <ul>
-      <li>🥉 Bronze: Newbie (0-4 bookings)</li>
-      <li>🥈 Silver: Traveler (5-14 bookings)</li>
-      <li>🥇 Gold: Frequent Flyer (15+)</li>
-      <li>👑 Elite: VIP Access</li>
-    </ul>
-  </section>
-
-  <!-- 고객센터 -->
-  <section id="faq" class="support-section">
-    <h2>🛎️ Customer Support</h2>
-    <p>Auto-translated live support in all major languages.</p>
-    <ul>
-      <li>Live Chat (24/7)</li>
-      <li>Help Articles</li>
-      <li>Booking Issues</li>
-      <li>Report a Problem</li>
-    </ul>
-  </section>
-
-  <!-- 연락처 -->
-  <section class="contact-section">
-    <h2>📞 Contact</h2>
-    <p>Email: <a href="mailto:stayworld94@gmail.com">stayworld94@gmail.com</a></p>
-    <p>WhatsApp: +82 10 5481 1803</p>
-    <p>Official Site: <a href="https://stayworldbooking.com">stayworldbooking.com</a></p>
-  </section>
+    <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." />
+  </div>
 
   <footer>
-    <p>© 2025 StayWorld. All rights reserved.</p>
+    <p>&copy; 2025 StayWorld. All rights reserved.</p>
   </footer>
 
-  <!-- 스크립트: 다크모드, 날씨 API 연동, 자동 점검 -->
   <script>
-    // 다크모드 토글
-    document.getElementById("toggle-darkmode").addEventListener("click", () => {
-      document.body.classList.toggle("dark");
+    const toggleBtn = document.getElementById('chat-toggle');
+    const chatBox = document.getElementById('chat-box');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+
+    toggleBtn.addEventListener('click', () => {
+      chatBox.style.display = chatBox.style.display === 'none' || !chatBox.style.display ? 'flex' : 'none';
     });
 
-    // 날씨 API 예시 (도시 고정: Istanbul)
-    async function loadWeather() {
-      try {
-        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.01&longitude=28.97&current_weather=true');
-        const data = await res.json();
-        document.getElementById('weather-data').innerText = `🌡️ ${data.current_weather.temperature}°C, 💨 Wind ${data.current_weather.windspeed} km/h`;
-      } catch (e) {
-        document.getElementById('weather-data').innerText = 'Weather info not available.';
+    chatInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        const userMsg = chatInput.value.trim();
+        if (!userMsg) return;
+        const userDiv = document.createElement('div');
+        userDiv.textContent = "👤 " + userMsg;
+        chatMessages.appendChild(userDiv);
+        chatInput.value = "";
+
+        const botReply = document.createElement('div');
+        botReply.className = "bot-message";
+        botReply.textContent = "🤖 답변을 찾고 있어요... (AI 연동 예정)";
+        chatMessages.appendChild(botReply);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
       }
-    }
-    loadWeather();
+    });
   </script>
 </body>
 </html>
-<link rel="icon" type="image/x-icon" href="favicon.ico" />
-<meta property="og:image" content="stayworld_logo_64x64.png" />
-<link rel="apple-touch-icon" href="stayworld_logo_64x64.png" />
