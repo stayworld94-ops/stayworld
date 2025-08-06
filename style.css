@@ -1,239 +1,211 @@
-/* 기본 설정 */
-* {
+               }/* 기본 세팅 */
+body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  line-height: 1.6;
-  background-color: #ffffff;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
   color: #222;
-  transition: all 0.3s ease-in-out;
 }
 
-.dark {
-  background-color: #121212;
-  color: #eeeeee;
+header {
+  text-align: center;
+  padding: 2rem;
+  background-color: #111;
+  color: white;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.site-title {
+  font-size: 2rem;
 }
 
-section {
+.section {
   padding: 3rem 2rem;
   max-width: 1200px;
   margin: auto;
 }
 
-/* 내비게이션 바 */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #000;
+.section.dark {
+  background-color: #222;
+  color: #f2f2f2;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.level-card {
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: #333;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+.level-card:hover {
+  transform: translateY(-5px);
+}
+
+.level-card h3 {
+  margin-top: 0;
+}
+
+.level-card ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+.level-card ul li {
+  margin-bottom: 0.5rem;
+}
+
+.level-card .highlight {
   color: gold;
-  padding: 1rem 2rem;
-  position: sticky;
-  top: 0;
+  font-weight: bold;
+}
+
+.level-card.bronze { border-top: 4px solid #cd7f32; }
+.level-card.silver { border-top: 4px solid #c0c0c0; }
+.level-card.gold { border-top: 4px solid #ffd700; }
+.level-card.platinum { border-top: 4px solid #e5e4e2; }
+.level-card.diamond { border-top: 4px solid #00ffff; }
+.level-card.elite { border-top: 4px solid #ff69b4; }
+
+.note {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 2rem;
+  color: #ccc;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #111;
+  color: #ccc;
+}
+
+/* 상담 버튼 */
+#support-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
   z-index: 999;
 }
 
-.navbar ul {
-  display: flex;
-  gap: 1.5rem;
-  list-style: none;
-}
-
-.navbar a {
-  color: gold;
-  font-weight: 500;
-}
-
-#toggle-darkmode {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: gold;
-}
-
-/* 홈 섹션 */
-.hero-section {
-  text-align: center;
-  padding: 5rem 2rem;
-  background: linear-gradient(to right, #222, #444);
+#chat-toggle {
+  background-color: #007bff;
   color: white;
-}
-
-.hero-section button {
-  padding: 1rem 2rem;
-  font-size: 1rem;
-  background: gold;
-  color: black;
   border: none;
-  border-radius: 10px;
-  margin-top: 2rem;
+  padding: 12px 18px;
+  border-radius: 25px;
   cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* 검색 섹션 */
-.search-section input[type="text"] {
+/* 챗봇 UI */
+#chat-box {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 300px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: none;
+  flex-direction: column;
+  z-index: 999;
+}
+
+#chat-header {
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  font-weight: bold;
+}
+
+#chat-messages {
+  height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  font-size: 14px;
+}
+
+#chat-input {
   width: 100%;
-  max-width: 600px;
-  padding: 0.8rem;
-  margin: 1rem 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.search-section .filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.search-section .filters label {
-  background: #f2f2f2;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.search-section button {
-  padding: 0.7rem 1.5rem;
-  background: black;
-  color: gold;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  font-size: 14px;
 }
 
-/* 비교 섹션 */
-.compare-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
+.bot-message {
+  background: #f1f1f1;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 6px;
 }
 
-.compare-grid .card {
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  padding: 1rem;
-  background: #fff;
-  transition: 0.3s;
+.hidden {
+  display: none;
+}
+/* 부드러운 카드 hover 효과 */
+.level-card {
+  transition: all 0.3s ease-in-out;
+}
+.level-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
-.dark .compare-grid .card {
-  background: #1e1e1e;
-  border: 1px solid #444;
+/* 글로벌 폰트 */
+body {
+  font-family: 'Inter', 'Noto Sans KR', sans-serif;
 }
 
-/* 여행 플래너 */
-.planner-section {
-  background-color: #fafafa;
-  border-radius: 20px;
-  padding: 2rem;
+/* 버튼에 마우스 오버 효과 */
+#chat-toggle:hover {
+  background-color: #0056d2;
+  transform: scale(1.05);
 }
 
-.dark .planner-section {
-  background-color: #1b1b1b;
+/* 배경 그라데이션 추가 가능 (선택사항) */
+/*
+body {
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
 }
+*/
 
-/* 날씨 */
-.weather-section {
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-#weather-data {
-  font-weight: bold;
-  margin-top: 1rem;
-}
-
-/* 리뷰 */
-.review-section .review-list {
-  margin-top: 2rem;
-}
-
-.review-section .review-list .review {
-  border-bottom: 1px solid #ccc;
-  padding: 1rem 0;
-}
-
-.dark .review-section .review-list .review {
-  border-color: #444;
-}
-
-/* 레벨 */
-.levels-section ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.levels-section li {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  padding-left: 1.5rem;
-  position: relative;
-}
-
-.levels-section li::before {
-  content: '⭐';
-  position: absolute;
-  left: 0;
-}
-
-/* 고객센터 */
-.support-section ul {
-  padding-left: 1rem;
-  line-height: 2;
-}
-
-/* 연락처 */
-.contact-section {
-  background-color: #f4f4f4;
-  border-radius: 15px;
-  padding: 2rem;
-}
-
-.dark .contact-section {
-  background-color: #1f1f1f;
-}
-
-/* 푸터 */
-footer {
-  text-align: center;
-  background: #000;
-  color: gold;
-  padding: 1.5rem;
-  margin-top: 3rem;
-}
-
-/* 반응형 */
-@media (max-width: 768px) {
-  .navbar ul {
-    flex-direction: column;
-    gap: 0.5rem;
+/* 미디어 쿼리: 모바일 최적화 */
+@media (max-width: 600px) {
+  .level-card {
+    padding: 1rem;
+    font-size: 14px;
   }
 
-  .hero-section h1 {
-    font-size: 2rem;
+  #chat-box {
+    width: 90%;
+    right: 5%;
   }
 
-  .search-section input[type="text"] {
-    width: 100%;
+  .section-title {
+    font-size: 1.5rem;
   }
-
-  .compare-grid {
-    grid-template-columns: 1fr;
-  }
-                                                  }
+}
