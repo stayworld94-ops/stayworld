@@ -1,126 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld – Membership & Support</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StayWorld 멤버십</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.ico" />
 </head>
 <body>
-  <header>
-    <h1 class="site-title">🏨 StayWorld Loyalty Program</h1>
-  </header>
+  <div class="container">
+    <h1>🏆 StayWorld Loyalty Program</h1>
+    <p class="subtitle">상위 멤버십은 하위 등급의 모든 혜택을 포함합니다.</p>
 
-  <main>
-    <section id="rewards" class="section dark">
-      <h2 class="section-title">🏆 StayWorld Membership Levels</h2>
-      <p class="subtitle">상위 레벨일수록 하위 등급의 모든 혜택을 포함합니다.</p>
-
-      <div class="level-grid">
-        <div class="level-card bronze">
-          <h3>🥉 Bronze</h3>
-          <p class="highlight">가입 시 자동 등급</p>
-          <ul>
-            <li>기본 예약 기능</li>
-          </ul>
-        </div>
-        <div class="level-card silver">
-          <h3>🥈 Silver</h3>
-          <p class="highlight">₩500,000+ 예약</p>
-          <ul>
-            <li>포인트 적립 3%</li>
-            <li>무료 숙박 티켓 1장</li>
-            <li><em>+ 브론즈 혜택 포함</em></li>
-          </ul>
-        </div>
-        <div class="level-card gold">
-          <h3>🥇 Gold</h3>
-          <p class="highlight">₩2,000,000+ 예약</p>
-          <ul>
-            <li>포인트 적립 5%</li>
-            <li>우선 고객 응대</li>
-            <li>시즌 쿠폰</li>
-            <li><em>+ 실버, 브론즈 혜택 포함</em></li>
-          </ul>
-        </div>
-        <div class="level-card platinum">
-          <h3>💎 Platinum</h3>
-          <p class="highlight">₩4,000,000+ 예약</p>
-          <ul>
-            <li>포인트 적립 7%</li>
-            <li>시즌 자동 할인</li>
-            <li><em>+ 골드 이하 혜택 포함</em></li>
-          </ul>
-        </div>
-        <div class="level-card diamond">
-          <h3>🔷 Diamond</h3>
-          <p class="highlight">₩7,500,000+ 예약</p>
-          <ul>
-            <li>포인트 적립 10%</li>
-            <li>VIP 쿠폰</li>
-            <li>프리미엄 숙소 우선권</li>
-            <li><em>+ 플래티넘 이하 혜택 포함</em></li>
-          </ul>
-        </div>
-        <div class="level-card elite">
-          <h3>👑 Elite</h3>
-          <p class="highlight">₩15,000,000+ + 수동승격</p>
-          <ul>
-            <li>포인트 적립 15%</li>
-            <li>비공개 프라이빗 딜</li>
-            <li>긴급지원 우선</li>
-            <li><em>+ 모든 혜택 포함</em></li>
-          </ul>
-        </div>
+    <div class="levels">
+      <!-- Bronze -->
+      <div class="card bronze">
+        <h2>🥉 BRONZE</h2>
+        <p>가입 시 자동 등급</p>
+        <ul>
+          <li>기본 예약 가능</li>
+        </ul>
       </div>
 
-      <p class="note">※ 60일 이상 미예약 시 자동 1단계 강등됩니다.</p>
-    </section>
-  </main>
+      <!-- Silver -->
+      <div class="card silver">
+        <h2>🥈 SILVER</h2>
+        <p>₩500,000+ 예약</p>
+        <ul>
+          <li>포인트 적립 3%</li>
+          <li>무료 숙박 티켓 1장</li>
+          <li>레벨 유지 조건: 60일</li>
+        </ul>
+      </div>
 
-  <!-- 실시간 상담 버튼 + 챗봇 -->
-  <div id="support-widget">
-    <button id="chat-toggle">💬 실시간 상담</button>
-  </div>
+      <!-- Gold -->
+      <div class="card gold">
+        <h2>🏅 GOLD</h2>
+        <p>₩2,000,000+ 예약</p>
+        <ul>
+          <li>포인트 적립 5%</li>
+          <li>우선 고객 응대</li>
+          <li>시즌 쿠폰 자동 적용</li>
+        </ul>
+      </div>
 
-  <div id="chat-box" class="hidden">
-    <div id="chat-header">StayWorld AI 상담</div>
-    <div id="chat-messages">
-      <div class="bot-message">안녕하세요! 무엇을 도와드릴까요?</div>
+      <!-- Platinum -->
+      <div class="card platinum">
+        <h2>💎 PLATINUM</h2>
+        <p>₩4,000,000+ 예약</p>
+        <ul>
+          <li>포인트 적립 7%</li>
+          <li>긴급 지원</li>
+          <li>전용 할인 티켓 지급</li>
+        </ul>
+      </div>
+
+      <!-- Diamond -->
+      <div class="card diamond">
+        <h2>🔷 DIAMOND</h2>
+        <p>₩7,500,000+ 예약</p>
+        <ul>
+          <li>포인트 적립 10%</li>
+          <li>시크릿 전용 쿠폰</li>
+          <li>고객센터 우선권</li>
+        </ul>
+      </div>
+
+      <!-- Elite -->
+      <div class="card elite">
+        <h2>👑 ELITE</h2>
+        <p>₩15,000,000+ & 수동 승격</p>
+        <ul>
+          <li>포인트 적립 15%</li>
+          <li>프라이빗 딜 접근</li>
+          <li>긴급 지원 최우선 처리</li>
+        </ul>
+      </div>
     </div>
-    <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." />
   </div>
-
-  <footer>
-    <p>&copy; 2025 StayWorld. All rights reserved.</p>
-  </footer>
-
-  <script>
-    const toggleBtn = document.getElementById('chat-toggle');
-    const chatBox = document.getElementById('chat-box');
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-
-    toggleBtn.addEventListener('click', () => {
-      chatBox.style.display = chatBox.style.display === 'none' || !chatBox.style.display ? 'flex' : 'none';
-    });
-
-    chatInput.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        const userMsg = chatInput.value.trim();
-        if (!userMsg) return;
-        const userDiv = document.createElement('div');
-        userDiv.textContent = "👤 " + userMsg;
-        chatMessages.appendChild(userDiv);
-        chatInput.value = "";
-
-        const botReply = document.createElement('div');
-        botReply.className = "bot-message";
-        botReply.textContent = "🤖 답변을 찾고 있어요... (AI 연동 예정)";
-        chatMessages.appendChild(botReply);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    });
-  </script>
 </body>
 </html>
