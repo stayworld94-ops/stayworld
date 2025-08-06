@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>실시간 채팅</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>실시간 채팅</h1><nav><a href="index.html">홈</a></nav></header>
+<main>
+  <div id="chatbox" style="height:300px; overflow-y:scroll; border:1px solid #ccc; padding:10px;"></div>
+  <form id="chatForm">
+    <input type="text" id="chatInput" placeholder="메시지 입력..." required>
+    <button type="submit">전송</button>
+  </form>
+</main>
+<footer>&copy; 2025 StayWorld</footer>
+<script type="module" src="realtime-chat.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>관리자 로그인</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>관리자 로그인</h1><nav><a href="index.html">홈</a></nav></header>
+<main>
+  <form onsubmit="return loginAdmin(event)">
+    <input type="email" placeholder="관리자 이메일" required>
+    <input type="password" placeholder="비밀번호" required>
+    <button type="submit">로그인</button>
+  </form>
+</main>
+<footer>&copy; 2025 StayWorld</footer>
+<script>
+  function loginAdmin(e) {
+    e.preventDefault();
+    const email = document.querySelector('input[type=email]').value;
+    const pw = document.querySelector('input[type=password]').value;
+    if (email === "admin@stayworld.com" && pw === "secure123") {
+      window.location.href = "admin.html";
+    } else {
+      alert("접근 거부됨: 관리자 정보가 일치하지 않습니다.");
+    }
+    return false;
+  }
+</script>
+</body>
+</html>

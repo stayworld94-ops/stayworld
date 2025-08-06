@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>후기 목록</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>등록된 후기</h1><nav><a href="admin.html">관리자 홈</a></nav></header>
+<main>
+  <ul id="reviewList"></ul>
+</main>
+<footer>&copy; 2025 StayWorld</footer>
+<script type="module" src="firebase-config.js"></script>
+<script type="module">
+import { db, collection, getDocs } from "./firebase-config.js";
+const reviewList = document.getElementById("reviewList");
+const q = await getDocs(collection(db, "reviews"));
+q.forEach(doc => {
+  const r = doc.data();
+  const li = document.createElement("li");
+  li.innerText = `${r.name} - ${r.rating}점 - ${r.comment}`;
+  reviewList.appendChild(li);
+});
+</script>
+</body>
+</html>

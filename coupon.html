@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>쿠폰 적용</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>할인 쿠폰</h1><nav><a href="index.html">홈</a></nav></header>
+<main>
+  <form id="couponForm">
+    <input type="text" id="couponCode" placeholder="쿠폰 코드 입력" required>
+    <button type="submit">적용</button>
+  </form>
+  <p id="result"></p>
+</main>
+<footer>&copy; 2025 StayWorld</footer>
+<script type="module" src="firebase-config.js"></script>
+<script type="module">
+import { db, collection, getDocs } from "./firebase-config.js";
+const form = document.getElementById("couponForm");
+const result = document.getElementById("result");
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const inputCode = document.getElementById("couponCode").value.trim();
+  const q = await getDocs(collection(db, "coupons"));
+  let valid = false;
+  q.forEach(doc => {
+    if (doc.data().code === inputCode) valid = true;
+  });
+  result.textContent = valid ? "✅ 쿠폰이 적용되었습니다!" : "❌ 유효하지 않은 쿠폰입니다.";
+};
+</script>
+</body>
+</html>

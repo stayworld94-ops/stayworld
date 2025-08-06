@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>예약 승인</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>예약 승인 시스템</h1><nav><a href="admin.html">관리자 홈</a></nav></header>
+<main>
+  <ul id="reservationList"></ul>
+</main>
+<footer>&copy; 2025 StayWorld</footer>
+<script type="module" src="firebase-config.js"></script>
+<script type="module">
+import { db, collection, getDocs, doc, updateDoc } from "./firebase-config.js";
+const list = document.getElementById("reservationList");
+
+const q = await getDocs(collection(db, "reservations"));
+q.forEach(snapshot => {
+  const d = snapshot.data();
+  const li = document.createElement("li");
+  li.innerHTML = `
+    <b>${d.name}</b> (${d.checkin} ~ ${d.checkout})
+    <button onclick="approve('${snapshot.id}', true)">승인</button>
+    <button onclick="approve('${snapshot.id}', false)">거절</button>
+  `;
+  list.appendChild(li);
+});
+
+window.approve = async (id, status) => {
+  const ref = doc(db, "reservations", id);
+  await updateDoc(ref, { approved: status });
+  alert(status ? "승인 완료" : "거절됨");
+  location.reload();
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>사용자 목록</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>가입된 사용자</h1><nav><a href="admin.html">관리자 홈</a></nav></header>
+<main>
+  <ul id="userList"></ul>
+</main>
+<footer>&copy; 2025 StayWorld</footer>
+<script type="module" src="firebase-config.js"></script>
+<script type="module">
+import { db, collection, getDocs } from "./firebase-config.js";
+const userList = document.getElementById("userList");
+const q = await getDocs(collection(db, "users"));
+q.forEach(doc => {
+  const u = doc.data();
+  const li = document.createElement("li");
+  li.innerText = `${u.email}`;
+  userList.appendChild(li);
+});
+</script>
+</body>
+</html>
