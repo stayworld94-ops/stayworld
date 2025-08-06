@@ -1,63 +1,61 @@
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', 'Noto Sans KR', sans-serif;
-  background: #f9f9f9;
-  color: #222;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #222;
 }
 
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #111;
-  color: white;
-  padding: 1rem 2rem;
-}
-header h1 {
-  font-size: 1.5rem;
-}
-nav a {
-  color: white;
-  text-decoration: none;
-  margin-left: 1rem;
-  font-weight: bold;
-}
-nav a:hover {
-  color: #ffd700;
+    background-color: #111;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
 }
 
-main {
-  padding: 2rem;
-  max-width: 900px;
-  margin: auto;
+header .logo {
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 2rem;
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
 }
-input, button {
-  padding: 10px;
-  font-size: 16px;
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
 }
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
+
+header nav ul li a:hover {
+    text-decoration: underline;
 }
-button:hover {
-  background-color: #0056d2;
+
+main.welcome {
+    padding: 40px;
+    background-color: #fff;
+}
+
+main.welcome h1 {
+    font-size: 2em;
+    margin-bottom: 16px;
+}
+
+main.welcome ul {
+    margin-top: 16px;
+    padding-left: 20px;
 }
 
 footer {
-  text-align: center;
-  padding: 1rem;
-  background-color: #111;
-  color: #ccc;
-  margin-top: 3rem;
+    background-color: #111;
+    color: #ccc;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
 }
