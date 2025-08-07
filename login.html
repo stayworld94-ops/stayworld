@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - StayWorld</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="lang.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -14,9 +13,6 @@
     <nav>
       <ul>
         <li><a href="index.html#search">Search</a></li>
-        <li><a href="index.html#map">Map</a></li>
-        <li><a href="index.html#recommendations">Recommended</a></li>
-        <li><a href="index.html#membership">Membership</a></li>
         <li><a href="host-register.html">Host Register</a></li>
         <li><a href="login.html">Login</a></li>
         <li><a href="signup.html">Sign Up</a></li>
@@ -25,42 +21,26 @@
   </header>
 
   <section class="form-section">
-    <form class="form-box">
-      <h2 data-i18n="login_title">Login to Your Account</h2>
-
-      <label for="email" data-i18n="label_email">Email</label>
-      <input type="email" id="email" required />
-
-      <label for="password" data-i18n="label_password">Password</label>
-      <input type="password" id="password" required />
-
-      <button type="submit" data-i18n="btn_login">Login</button>
-
-      <p><span data-i18n="no_account">Don't have an account?</span> <a href="signup.html">Sign up</a></p>
-
-      <!-- Google Login -->
-      <div class="google-login">
-        <p data-i18n="or_login_with">or login with:</p>
-        <div id="g_id_onload"
-             data-client_id="YOUR_GOOGLE_CLIENT_ID"
-             data-context="signin"
-             data-ux_mode="popup"
-             data-callback="handleCredentialResponse">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
+    <div class="form-box">
+      <h2>Login with Google</h2>
+      <div id="g_id_onload"
+          data-client_id="635837328384-o4m1pvqf8od97kud4ep3j9ra6usno3re.apps.googleusercontent.com"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-callback="handleLogin"
+          data-auto_prompt="false">
       </div>
-    </form>
+      <div class="g_id_signin" data-type="standard" data-shape="rectangular"></div>
+    </div>
   </section>
 
-  <footer>
-    <p>&copy; 2025 StayWorld</p>
-  </footer>
+  <footer><p>&copy; 2025 StayWorld</p></footer>
 
   <script>
-    function handleCredentialResponse(response) {
-      console.log("Google ID Token:", response.credential);
-      alert("Google login successful!");
-      // 여기서 토큰 처리 가능
+    function handleLogin(response) {
+      console.log("User logged in with token:", response.credential);
+      alert("✅ Login successful!");
+      window.location.href = "index.html";
     }
   </script>
 </body>
