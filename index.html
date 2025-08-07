@@ -1,177 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StayWorld | Global Stays</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="lang.js" defer></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const langSelect = document.getElementById("languageSelect");
-      const elements = document.querySelectorAll("[data-lang]");
+  function applyTranslations(lang) {
+    const translations = window.translations || {};
+    const selected = translations[lang];
+    if (!selected) return;
+    elements.forEach(el => {
+      const key = el.getAttribute("data-lang");
+      if (selected[key]) el.textContent = selected[key];
+    });
+  }
 
-      function applyTranslations(lang) {
-        const translations = window.translations || {};
-        const selected = translations[lang];
-        if (!selected) return;
-        elements.forEach(el => {
-          const key = el.getAttribute("data-lang");
-          if (selected[key]) el.textContent = selected[key];
-        });
-      }
+  langSelect?.addEventListener("change", () => {
+    applyTranslations(langSelect.value);
+  });
 
-      langSelect?.addEventListener("change", () => {
-        applyTranslations(langSelect.value);
-      });
+  applyTranslations(langSelect?.value || "en");
 
-      applyTranslations(langSelect?.value || "en");
+  document.getElementById("searchBtn")?.addEventListener("click", () => {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    if (input) {
+      window.location.href = `results.html?query=${encodeURIComponent(input)}`;
+    } else {
+      alert("❗ 검색어를 입력하세요");
+    }
+  });
 
-      // 버튼 클릭 동작 연결
-      document.querySelector('[data-lang="search_button"]')?.addEventListener("click", () => {
-        alert("🔍 검색이 실행됩니다 (예시)");
-      });
+  document.getElementById("chatBtn")?.addEventListener("click", () => {
+    alert("💬 AI 챗봇이 곧 연결됩니다 (예시)");
+  });
 
-      document.querySelector('[data-lang="chat_button"]')?.addEventListener("click", () => {
-        alert("💬 AI 챗봇이 곧 연결됩니다 (예시)");
-      });
+  document.querySelector('#login .btn-primary')?.addEventListener("click", () => {
+    alert("🔐 로그인 페이지로 이동합니다 (예시)");
+  });
 
-      document.querySelector('#login .btn-primary')?.addEventListener("click", () => {
-        alert("🔐 로그인 페이지로 이동합니다 (예시)");
-      });
+  document.querySelector('#login .btn-secondary')?.addEventListener("click", () => {
+    alert("📝 회원가입 페이지로 이동합니다 (예시)");
+  });
 
-      document.querySelector('#login .btn-secondary')?.addEventListener("click", () => {
-        alert("📝 회원가입 페이지로 이동합니다 (예시)");
-      });
+  document.getElementById("reserveBtn")?.addEventListener("click", () => {
+    alert("📅 예약이 시작됩니다 (예시)");
+  });
 
-      document.querySelector('[data-lang="reserve_button"]')?.addEventListener("click", () => {
-        alert("📅 예약이 시작됩니다 (예시)");
+  const searchInput = document.getElementById("searchInput");
+  const datalist = document.createElement("datalist");
+  datalist.id = "city-suggestions";
+
+  const suggestions = [
+    "Istanbul", "Paris", "Tokyo", "New York", "Barcelona",
+    "Seoul", "Bangkok", "Dubai", "London", "Berlin",
+    "Rome", "Moscow", "Shanghai", "Los Angeles", "Cape Town"
+  ];
+  suggestions.forEach(city => {
+    const option = document.createElement("option");
+    option.value = city;
+    datalist.appendChild(option);
+  });
+  document.body.appendChild(datalist);
+  searchInput.setAttribute("list", "city-suggestions");
+
+  const recommendBox = document.getElementById("recommended-destinations");
+  if (recommendBox) {
+    recommendBox.innerHTML = suggestions.map(city => `<button class="recommend-city">${city}</button>`).join(" ");
+    document.querySelectorAll(".recommend-city").forEach(btn => {
+      btn.addEventListener("click", () => {
+        window.location.href = `results.html?query=${encodeURIComponent(btn.textContent)}`;
       });
     });
-  </script>
-</head>
-<body>
-  <!-- 헤더 및 로고 -->
-  <header class="header">
-    <div class="container">
-      <img src="images/stayworld-logo.jpg" alt="StayWorld Logo" class="logo" />
-      <nav class="nav">
-        <ul>
-          <li><a href="#search" data-lang="menu_search">Search</a></li>
-          <li><a href="#filter" data-lang="menu_filter">Filter</a></li>
-          <li><a href="#membership" data-lang="menu_membership">Membership</a></li>
-          <li><a href="#reviews" data-lang="menu_reviews">Reviews</a></li>
-          <li><a href="#chat" data-lang="menu_chat">Chat</a></li>
-          <li><a href="#login" data-lang="menu_login">Login</a></li>
-          <li><a href="#reserve" data-lang="menu_reserve">Reserve</a></li>
-        </ul>
-        <select id="languageSelect">
-          <option value="en">EN</option>
-          <option value="ko">KR</option>
-          <option value="fr">FR</option>
-          <option value="tr">TR</option>
-          <option value="ja">JP</option>
-          <option value="es">ES</option>
-          <option value="de">DE</option>
-          <option value="it">IT</option>
-          <option value="ru">RU</option>
-          <option value="zh">CN</option>
-        </select>
-      </nav>
-    </div>
-  </header>
+  }
 
-  <!-- 메인 배너 -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1 data-lang="hero_title">Find Your Perfect Stay Anywhere in the World</h1>
-      <p data-lang="hero_sub">Verified homes, instant booking, and global rewards.</p>
-      <a href="#search" class="btn-primary" data-lang="hero_cta">Start Searching</a>
-    </div>
-  </section>
+  const hotels = ["Seoul Grand Hotel", "Tokyo Bay Resort", "Paris Luxe Suite"];
+  const hotelBox = document.getElementById("recommended-hotels");
+  if (hotelBox) {
+    hotelBox.innerHTML = hotels.map(name => `<div class="recommend-hotel">🏨 ${name}</div>`).join("");
+  }
 
-  <!-- 검색 섹션 -->
-  <section id="search" class="section">
-    <div class="container">
-      <h2 data-lang="search_title">Search Stays</h2>
-      <input type="text" placeholder="City, Region..." />
-      <button class="btn-secondary" data-lang="search_button">Search</button>
-    </div>
-  </section>
+  const levelBox = document.getElementById("level-status");
+  if (levelBox) {
+    const currentPoints = 1800000;
+    const nextLevel = 2000000;
+    const daysSinceLast = 45;
 
-  <!-- 필터 섹션 -->
-  <section id="filter" class="section">
-    <div class="container">
-      <h2 data-lang="filter_title">Filter Options</h2>
-      <div class="filters">
-        <label><input type="checkbox" /> Hotel</label>
-        <label><input type="checkbox" /> Motel</label>
-        <label><input type="checkbox" /> Hostel</label>
-        <label><input type="checkbox" /> Apartment</label>
-        <label><input type="checkbox" /> Pension</label>
-        <label><input type="checkbox" /> Camping</label>
-        <label><input type="checkbox" /> Shared Room</label>
-        <label><input type="checkbox" /> Guesthouse</label>
+    const progress = Math.min(100, Math.floor((currentPoints / nextLevel) * 100));
+    const downgrade = daysSinceLast >= 60 ? "⚠️ 레벨 강등 예정!" : "유지 중";
+
+    levelBox.innerHTML = `
+      <div>🎖️ 현재 포인트: ${currentPoints.toLocaleString()} / ${nextLevel.toLocaleString()}</div>
+      <div>📈 레벨업까지 ${nextLevel - currentPoints}포인트 남음</div>
+      <div>⏳ 최근 활동 후 경과일: ${daysSinceLast}일 (${downgrade})</div>
+      <div style="width:100%;background:#eee;height:10px;border-radius:5px;margin-top:5px;">
+        <div style="width:${progress}%;height:10px;background:#4caf50;border-radius:5px;"></div>
       </div>
-    </div>
-  </section>
+    `;
+  }
 
-  <!-- 멤버십 섹션 -->
-  <section id="membership" class="section dark">
-    <div class="container">
-      <h2 data-lang="membership_title">Membership Levels</h2>
-      <div class="membership-levels">
-        <div class="level">🥉 Bronze</div>
-        <div class="level">🥈 Silver - 3% Points</div>
-        <div class="level">🥇 Gold - 5% + Support</div>
-        <div class="level">💎 Platinum - 7% + Discounts</div>
-        <div class="level">👑 Diamond - 10% + VIP</div>
-        <div class="level">🏆 Elite - 15% + Private Deals</div>
-      </div>
-    </div>
-  </section>
+  fetch('https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=2ad4370f87ea28fc1d3e514b5a6f1603&units=metric')
+    .then(response => response.json())
+    .then(data => {
+      const weatherBox = document.getElementById("weather");
+      if (weatherBox) {
+        const temp = data.main.temp;
+        const icon = data.weather[0].icon;
+        weatherBox.innerHTML = `<img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="weather" /> ${temp}°C`;
+      }
+    });
+});
 
-  <!-- 리뷰 -->
-  <section id="reviews" class="section">
-    <div class="container">
-      <h2 data-lang="reviews_title">Reviews</h2>
-      <div class="review-card">
-        <p>"Amazing view and host! Will book again."</p>
-        <span>⭐⭐⭐⭐⭐</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 챗봇 -->
-  <section id="chat" class="section">
-    <div class="container">
-      <h2 data-lang="chat_title">Chat With Us</h2>
-      <button class="btn-secondary" data-lang="chat_button">Open Chat</button>
-    </div>
-  </section>
-
-  <!-- 로그인 -->
-  <section id="login" class="section dark">
-    <div class="container">
-      <h2 data-lang="login_title">Login / Sign Up</h2>
-      <button class="btn-primary">Login</button>
-      <button class="btn-secondary">Sign Up</button>
-    </div>
-  </section>
-
-  <!-- 예약 -->
-  <section id="reserve" class="section">
-    <div class="container">
-      <h2 data-lang="reserve_title">Make a Reservation</h2>
-      <button class="btn-primary" data-lang="reserve_button">Reserve Now</button>
-    </div>
-  </section>
-
-  <!-- 푸터 -->
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2025 StayWorld. All rights reserved.</p>
-    </div>
-  </footer>
-</body>
-</html>
+function initMap() {
+  const location = { lat: 41.0082, lng: 28.9784 };
+  const map = new google.maps.Map(document.getElementById("googleMap"), {
+    zoom: 10,
+    center: location,
+  });
+  new google.maps.Marker({ position: location, map: map });
+}
