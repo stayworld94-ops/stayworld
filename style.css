@@ -1,51 +1,42 @@
-/* 기본 전체 스타일 */
+/* 전체 레이아웃 */
 body {
   font-family: 'Inter', sans-serif;
+  background: #f7f9fc;
   margin: 0;
   padding: 0;
-  background-color: #f7f9fc;
   color: #333;
 }
 
-h3 {
-  font-size: 1.5em;
-  margin-bottom: 15px;
-}
-
-strong {
-  font-weight: 600;
-}
-
-button {
-  cursor: pointer;
-}
-
-/* 검색창 스타일 */
+/* 검색창 영역 */
 #search {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 25px 10px;
+  padding: 25px 15px;
   gap: 10px;
   background: white;
   border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
 }
 
 #search input {
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
-  width: 260px;
+  width: 300px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  outline: none;
 }
 
 #search button {
   background-color: #ffcc00;
+  color: #000;
   border: none;
-  padding: 10px 18px;
+  padding: 12px 20px;
   font-size: 16px;
   border-radius: 8px;
   font-weight: bold;
+  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
@@ -53,109 +44,113 @@ button {
   background-color: #ffaa00;
 }
 
-/* 추천 도시 */
+/* 추천 도시 버튼 */
 #recommended-destinations {
-  padding: 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   justify-content: center;
+  padding: 15px;
+  gap: 10px;
+  background-color: #fff;
 }
 
 .recommend-city {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 30px;
-  padding: 10px 20px;
-  font-size: 15px;
-  transition: background-color 0.2s ease;
+  padding: 8px 16px;
+  background: #e0f0ff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
 .recommend-city:hover {
-  background-color: #f0f0f0;
+  background: #c0e2ff;
 }
 
 /* 추천 숙소 */
 #recommended-hotels {
+  padding: 15px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  padding: 20px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 16px;
+  text-align: center;
 }
 
-.recommend-hotel {
+/* 날씨 박스 */
+#weather {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* 구글 지도 */
+#googleMap {
+  width: 100%;
+  height: 300px;
+  margin-top: 10px;
+  border: none;
+}
+
+/* 레벨 상태 */
+#level-status {
   background: #fff;
+  padding: 20px;
+  margin: 20px auto;
   border: 1px solid #ddd;
   border-radius: 10px;
-  padding: 20px;
-  min-width: 220px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  font-size: 16px;
-}
-
-/* 지도 */
-#googleMap {
-  margin: 20px auto;
-  max-width: 90%;
-  height: 300px;
-  border-radius: 10px;
-}
-
-/* 날씨 */
-#weather {
-  text-align: center;
-  font-size: 20px;
-  padding: 20px;
-}
-
-/* 레벨 시스템 */
-#level-status {
-  background-color: #fff;
-  margin: 30px auto;
-  padding: 20px;
-  max-width: 90%;
-  border-top: 1px solid #eee;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
 }
 
 #level-status div {
   margin-bottom: 10px;
+  font-size: 15px;
 }
 
-/* 레벨 알림 박스 */
+/* 레벨 경고 알림 */
 #level-alert {
-  max-width: 90%;
-  margin: 30px auto;
+  background: #fff0f0;
   padding: 20px;
-  background: #fff;
-  border: 1px solid #ccc;
+  margin: 20px auto;
+  border: 1px solid #e08e8e;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  width: 90%;
+  max-width: 600px;
+}
+
+#level-alert h3 {
+  margin-top: 0;
 }
 
 #level-alert ul {
-  padding-left: 20px;
+  list-style: none;
+  padding: 0;
 }
 
 #level-alert li {
-  margin-bottom: 10px;
-  line-height: 1.5em;
-}
-
-#level-alert button {
-  margin-top: 15px;
-  padding: 10px 16px;
-  background-color: #000;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  margin: 8px 0;
   font-size: 15px;
-  transition: background-color 0.2s ease;
 }
 
-#level-alert button:hover {
-  background-color: #333;
+/* 버튼 (StayWorld+ 등) */
+button {
+  background-color: #ffcc00;
+  color: #000;
+  border: none;
+  padding: 10px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #ffaa00;
 }
