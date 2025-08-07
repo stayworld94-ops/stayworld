@@ -6,6 +6,7 @@
   <title>StayWorld</title>
   <link rel="stylesheet" href="style.css" />
   <script defer src="lang.js"></script>
+  <script defer src="app.js"></script>
 </head>
 <body>
   <header>
@@ -16,7 +17,9 @@
         <li><a href="#map" data-i18n="menu_map">Map</a></li>
         <li><a href="#recommendations" data-i18n="menu_recommend">Recommended</a></li>
         <li><a href="#membership" data-i18n="menu_membership">Membership</a></li>
-        <li><a href="#contact" data-i18n="menu_contact">Contact</a></li>
+        <li><a href="login.html" data-i18n="menu_login">Login</a></li>
+        <li><a href="signup.html" data-i18n="menu_signup">Sign Up</a></li>
+        <li><a href="host-register.html" data-i18n="menu_host">Host Register</a></li>
       </ul>
     </nav>
     <select id="languageSwitcher">
@@ -35,7 +38,7 @@
 
   <section id="search">
     <h1 data-i18n="search_title">Where do you want to go?</h1>
-    <input type="text" id="searchInput" placeholder="Search cities, hotels..." />
+    <input type="text" id="searchInput" placeholder="Search cities or hotels..." />
     <div id="autocomplete"></div>
     <button id="searchBtn" data-i18n="btn_search">Search</button>
   </section>
@@ -82,18 +85,21 @@
   <section id="contact">
     <h2 data-i18n="contact_title">Contact Us</h2>
     <p>Email: support@stayworldbooking.com</p>
-    <p><button id="startChat" data-i18n="btn_chat">Talk to AI Assistant</button></p>
+    <button id="startChat" data-i18n="btn_chat">Talk to AI Assistant</button>
   </section>
 
   <footer>
     <p>&copy; 2025 StayWorld. All rights reserved.</p>
   </footer>
 
+  <!-- 검색 자동완성 -->
   <script>
-    // 자동검색 기능
-    const suggestions = ['Istanbul', 'Tokyo', 'Paris', 'New York', 'Seoul'];
+    const suggestions = ['Istanbul', 'Tokyo', 'Paris', 'New York', 'London'];
     const searchInput = document.getElementById('searchInput');
     const autocomplete = document.getElementById('autocomplete');
+    document.getElementById('searchBtn').onclick = () => {
+      alert("Search feature coming soon!");
+    };
     searchInput.addEventListener('input', () => {
       const val = searchInput.value.toLowerCase();
       autocomplete.innerHTML = '';
@@ -109,8 +115,10 @@
         });
       }
     });
+  </script>
 
-    // Google 지도
+  <!-- 지도 -->
+  <script>
     function initMap() {
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 2,
@@ -131,15 +139,7 @@
     }
   </script>
   <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
-  </script>
-</body>
-</html>
-...
-  <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbD-TEST-KEY-WILL-BE-LIMITED&callback=initMap">
   </script>
 </body>
 </html>
-<li><a href="login.html" data-i18n="menu_login">Login</a></li>
-<li><a href="signup.html" data-i18n="menu_signup">Sign Up</a></li>
