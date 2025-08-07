@@ -2,110 +2,133 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StayWorld | Global Stays</title>
   <link rel="stylesheet" href="style.css" />
   <script src="lang.js" defer></script>
 </head>
 <body>
-  <!-- 로고 + 네비게이션 -->
+  <!-- 헤더 및 로고 -->
   <header class="header">
-    <div class="logo-container">
+    <div class="container">
       <img src="images/stayworld-logo.jpg" alt="StayWorld Logo" class="logo" />
+      <nav class="nav">
+        <ul>
+          <li><a href="#search" data-lang="menu_search">Search</a></li>
+          <li><a href="#filter" data-lang="menu_filter">Filter</a></li>
+          <li><a href="#membership" data-lang="menu_membership">Membership</a></li>
+          <li><a href="#reviews" data-lang="menu_reviews">Reviews</a></li>
+          <li><a href="#chat" data-lang="menu_chat">Chat</a></li>
+          <li><a href="#login" data-lang="menu_login">Login</a></li>
+          <li><a href="#reserve" data-lang="menu_reserve">Reserve</a></li>
+        </ul>
+        <select id="languageSelect">
+          <option value="en">EN</option>
+          <option value="ko">KR</option>
+          <option value="fr">FR</option>
+          <option value="tr">TR</option>
+          <option value="ja">JP</option>
+          <option value="es">ES</option>
+          <option value="de">DE</option>
+          <option value="it">IT</option>
+          <option value="ru">RU</option>
+          <option value="zh">CN</option>
+        </select>
+      </nav>
     </div>
-    <nav class="navbar">
-      <ul>
-        <li><a href="#search">🔍 Search</a></li>
-        <li><a href="#filter">🎯 Filter</a></li>
-        <li><a href="#membership">🌟 Membership</a></li>
-        <li><a href="#reviews">⭐ Reviews</a></li>
-        <li><a href="#chatbot">🤖 Chat</a></li>
-        <li><a href="#login">👤 Login</a></li>
-        <li><a href="#reserve">📅 Reserve</a></li>
-        <li><select id="languageSelect">
-          <option value="en">🌎 English</option>
-          <option value="ko">🇰🇷 한국어</option>
-          <option value="fr">🇫🇷 Français</option>
-          <option value="tr">🇹🇷 Türkçe</option>
-          <option value="ja">🇯🇵 日本語</option>
-          <option value="es">🇪🇸 Español</option>
-          <option value="de">🇩🇪 Deutsch</option>
-          <option value="it">🇮🇹 Italiano</option>
-          <option value="ru">🇷🇺 Русский</option>
-          <option value="zh">🇨🇳 中文</option>
-        </select></li>
-      </ul>
-    </nav>
   </header>
 
-  <!-- 검색 -->
-  <section id="search">
-    <h2 data-lang="search_title">Find your perfect stay</h2>
-    <input type="text" placeholder="Search by location..." />
-    <button data-lang="search_btn">Search</button>
-  </section>
-
-  <!-- 숙소 필터 -->
-  <section id="filter">
-    <h2 data-lang="filter_title">Filter Options</h2>
-    <div class="filter-options">
-      <label><input type="checkbox" /> Hotel</label>
-      <label><input type="checkbox" /> Motel</label>
-      <label><input type="checkbox" /> Hostel</label>
-      <label><input type="checkbox" /> Apartment</label>
-      <label><input type="checkbox" /> Pension</label>
-      <label><input type="checkbox" /> Camping</label>
-      <label><input type="checkbox" /> Private House</label>
-      <label><input type="checkbox" /> Guesthouse</label>
-      <label><input type="checkbox" /> Shared Room</label>
+  <!-- 메인 배너 -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 data-lang="hero_title">Find Your Perfect Stay Anywhere in the World</h1>
+      <p data-lang="hero_sub">Verified homes, instant booking, and global rewards.</p>
+      <a href="#search" class="btn-primary" data-lang="hero_cta">Start Searching</a>
     </div>
   </section>
 
-  <!-- 멤버십 -->
-  <section id="membership">
-    <h2 data-lang="membership_title">Membership Levels</h2>
-    <ul class="levels">
-      <li>🥉 Bronze - Basic access</li>
-      <li>🥈 Silver - 3% Points on First Booking</li>
-      <li>🥇 Gold - 5% Points + Priority Support</li>
-      <li>💎 Platinum - 7% Points + Seasonal Discounts</li>
-      <li>👑 Diamond - 10% Points + VIP Coupons</li>
-      <li>🏆 Elite - 15% Points + Emergency Priority</li>
-    </ul>
+  <!-- 검색 섹션 -->
+  <section id="search" class="section">
+    <div class="container">
+      <h2 data-lang="search_title">Search Stays</h2>
+      <input type="text" placeholder="City, Region..." />
+      <button class="btn-secondary" data-lang="search_button">Search</button>
+    </div>
+  </section>
+
+  <!-- 필터 섹션 -->
+  <section id="filter" class="section">
+    <div class="container">
+      <h2 data-lang="filter_title">Filter Options</h2>
+      <div class="filters">
+        <label><input type="checkbox" /> Hotel</label>
+        <label><input type="checkbox" /> Motel</label>
+        <label><input type="checkbox" /> Hostel</label>
+        <label><input type="checkbox" /> Apartment</label>
+        <label><input type="checkbox" /> Pension</label>
+        <label><input type="checkbox" /> Camping</label>
+        <label><input type="checkbox" /> Shared Room</label>
+        <label><input type="checkbox" /> Guesthouse</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 멤버십 섹션 -->
+  <section id="membership" class="section dark">
+    <div class="container">
+      <h2 data-lang="membership_title">Membership Levels</h2>
+      <div class="membership-levels">
+        <div class="level">🥉 Bronze</div>
+        <div class="level">🥈 Silver - 3% Points</div>
+        <div class="level">🥇 Gold - 5% + Support</div>
+        <div class="level">💎 Platinum - 7% + Discounts</div>
+        <div class="level">👑 Diamond - 10% + VIP</div>
+        <div class="level">🏆 Elite - 15% + Private Deals</div>
+      </div>
+    </div>
   </section>
 
   <!-- 리뷰 -->
-  <section id="reviews">
-    <h2 data-lang="reviews_title">Guest Reviews</h2>
-    <p>★★★★★ 4.9/5 Avg Rating</p>
-    <div class="review-card">
-      <p>"Wonderful stay, great host!"</p>
-      <span>🌟🌟🌟🌟🌟</span>
+  <section id="reviews" class="section">
+    <div class="container">
+      <h2 data-lang="reviews_title">Reviews</h2>
+      <div class="review-card">
+        <p>"Amazing view and host! Will book again."</p>
+        <span>⭐⭐⭐⭐⭐</span>
+      </div>
     </div>
   </section>
 
-  <!-- AI 챗봇 -->
-  <section id="chatbot">
-    <h2 data-lang="chat_title">Ask Our AI Assistant</h2>
-    <button data-lang="chat_btn">Start Chat</button>
+  <!-- 챗봇 -->
+  <section id="chat" class="section">
+    <div class="container">
+      <h2 data-lang="chat_title">Chat With Us</h2>
+      <button class="btn-secondary" data-lang="chat_button">Open Chat</button>
+    </div>
   </section>
 
-  <!-- 로그인/회원가입 -->
-  <section id="login">
-    <h2 data-lang="login_title">Login / Sign Up</h2>
-    <button data-lang="login_btn">Login</button>
-    <button data-lang="signup_btn">Sign Up</button>
+  <!-- 로그인 -->
+  <section id="login" class="section dark">
+    <div class="container">
+      <h2 data-lang="login_title">Login / Sign Up</h2>
+      <button class="btn-primary">Login</button>
+      <button class="btn-secondary">Sign Up</button>
+    </div>
   </section>
 
   <!-- 예약 -->
-  <section id="reserve">
-    <h2 data-lang="reserve_title">Make a Reservation</h2>
-    <button data-lang="reserve_btn">Book Now</button>
+  <section id="reserve" class="section">
+    <div class="container">
+      <h2 data-lang="reserve_title">Make a Reservation</h2>
+      <button class="btn-primary" data-lang="reserve_button">Reserve Now</button>
+    </div>
   </section>
 
   <!-- 푸터 -->
-  <footer>
-    <p>&copy; 2025 StayWorld. All rights reserved.</p>
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 StayWorld. All rights reserved.</p>
+    </div>
   </footer>
 </body>
 </html>
