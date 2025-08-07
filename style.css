@@ -211,3 +211,15 @@ footer {
 .form-box button {
   margin-top: 20px;
 }
+header {
+  background-color: #111;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .logo {
+  height: 50px;
+}
