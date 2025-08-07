@@ -1,152 +1,43 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StayWorld - 회원가입</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0f0f0f;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .signup-box {
-      background-color: #1a1a1a;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-    }
-    .signup-box h1 {
-      font-family: 'Playfair Display', serif;
-      color: #d4af37;
-      margin-bottom: 30px;
-      font-size: 2rem;
-    }
-    .signup-box input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
-      border: none;
-      border-radius: 8px;
-      background-color: #2a2a2a;
-      color: #fff;
-    }
-    .signup-box button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background-color: #d4af37;
-      color: #000;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .signup-box button:hover {
-      background-color: #e0c45c;
-    }
-    #lang-switcher {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #1a1a1a;
-      color: #fff;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 5px 10px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up - StayWorld</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="lang.js"></script>
 </head>
 <body>
-  <select id="lang-switcher">
-    <option value="ko">🇰🇷 한국어</option>
-    <option value="en">🇬🇧 English</option>
-    <option value="fr">🇫🇷 Français</option>
-    <option value="tr">🇹🇷 Türkçe</option>
-    <option value="ja">🇯🇵 日本語</option>
-  </select>
+  <header>
+    <img src="images/logo.jpg" alt="StayWorld Logo" class="logo" />
+    <h2 data-i18n="signup_title">Create Your Account</h2>
+  </header>
 
-  <div class="signup-box">
-    <h1 data-i18n="title">회원가입</h1>
-    <input type="text" placeholder="이름" data-i18n-placeholder="name" />
-    <input type="email" placeholder="이메일" data-i18n-placeholder="email" />
-    <input type="password" placeholder="비밀번호" data-i18n-placeholder="password" />
-    <input type="password" placeholder="비밀번호 확인" data-i18n-placeholder="confirm" />
-    <button data-i18n="signup">회원가입</button>
-  </div>
+  <section class="form-section">
+    <form class="form-box">
+      <label for="name" data-i18n="label_name">Full Name</label>
+      <input type="text" id="name" required />
 
-  <script>
-    const translations = {
-      en: {
-        title: "Sign Up",
-        name: "Name",
-        email: "Email",
-        password: "Password",
-        confirm: "Confirm Password",
-        signup: "Sign Up"
-      },
-      fr: {
-        title: "S'inscrire",
-        name: "Nom",
-        email: "E-mail",
-        password: "Mot de passe",
-        confirm: "Confirmer le mot de passe",
-        signup: "S'inscrire"
-      },
-      tr: {
-        title: "Kayıt Ol",
-        name: "İsim",
-        email: "E-posta",
-        password: "Şifre",
-        confirm: "Şifreyi Onayla",
-        signup: "Kayıt Ol"
-      },
-      ja: {
-        title: "サインアップ",
-        name: "名前",
-        email: "メールアドレス",
-        password: "パスワード",
-        confirm: "パスワード確認",
-        signup: "登録する"
-      },
-      ko: {
-        title: "회원가입",
-        name: "이름",
-        email: "이메일",
-        password: "비밀번호",
-        confirm: "비밀번호 확인",
-        signup: "회원가입"
-      }
-    };
+      <label for="email" data-i18n="label_email">Email</label>
+      <input type="email" id="email" required />
 
-    function applyTranslations(lang) {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.textContent = translations[lang][key];
-      });
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        el.setAttribute('placeholder', translations[lang][key]);
-      });
-    }
+      <label for="password" data-i18n="label_password">Password</label>
+      <input type="password" id="password" required />
 
-    const langSwitcher = document.getElementById('lang-switcher');
-    langSwitcher.addEventListener('change', (e) => {
-      const lang = e.target.value;
-      if (translations[lang]) {
-        applyTranslations(lang);
-      }
-    });
-  </script>
+      <label for="confirm" data-i18n="label_confirm">Confirm Password</label>
+      <input type="password" id="confirm" required />
+
+      <button type="submit" data-i18n="btn_signup">Sign Up</button>
+
+      <p>
+        <span data-i18n="have_account">Already have an account?</span>
+        <a href="login.html" data-i18n="login_link">Login</a>
+      </p>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 StayWorld</p>
+  </footer>
 </body>
 </html>
