@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up - StayWorld</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="lang.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -14,9 +13,6 @@
     <nav>
       <ul>
         <li><a href="index.html#search">Search</a></li>
-        <li><a href="index.html#map">Map</a></li>
-        <li><a href="index.html#recommendations">Recommended</a></li>
-        <li><a href="index.html#membership">Membership</a></li>
         <li><a href="host-register.html">Host Register</a></li>
         <li><a href="login.html">Login</a></li>
         <li><a href="signup.html">Sign Up</a></li>
@@ -25,49 +21,28 @@
   </header>
 
   <section class="form-section">
-    <form class="form-box">
-      <h2 data-i18n="signup_title">Create Your Account</h2>
-
-      <label for="name" data-i18n="label_name">Full Name</label>
-      <input type="text" id="name" required />
-
-      <label for="email" data-i18n="label_email">Email</label>
-      <input type="email" id="email" required />
-
-      <label for="password" data-i18n="label_password">Password</label>
-      <input type="password" id="password" required />
-
-      <label for="confirm" data-i18n="label_confirm">Confirm Password</label>
-      <input type="password" id="confirm" required />
-
-      <button type="submit" data-i18n="btn_signup">Sign Up</button>
-
-      <p><span data-i18n="have_account">Already have an account?</span> <a href="login.html">Login</a></p>
-
-      <!-- Google Signup -->
-      <div class="google-login">
-        <p data-i18n="or_signup_with">or sign up with:</p>
-        <div id="g_id_onload"
-             data-client_id="YOUR_GOOGLE_CLIENT_ID"
-             data-context="signup"
-             data-ux_mode="popup"
-             data-callback="handleCredentialResponse">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
+    <div class="form-box">
+      <h2>Sign Up with Google</h2>
+      <div id="g_id_onload"
+          data-client_id="635837328384-o4m1pvqf8od97kud4ep3j9ra6usno3re.apps.googleusercontent.com"
+          data-context="signup"
+          data-ux_mode="popup"
+          data-callback="handleSignup"
+          data-auto_prompt="false">
       </div>
-    </form>
+      <div class="g_id_signin" data-type="standard" data-shape="rectangular"></div>
+    </div>
   </section>
 
-  <footer>
-    <p>&copy; 2025 StayWorld</p>
-  </footer>
+  <footer><p>&copy; 2025 StayWorld</p></footer>
 
   <script>
-    function handleCredentialResponse(response) {
-      console.log("Google ID Token:", response.credential);
-      alert("Google sign-up successful!");
-      // 여기에 백엔드와 통신 로직 추가 가능
+    function handleSignup(response) {
+      console.log("User signed up with token:", response.credential);
+      alert("✅ Signup successful with Google!");
+      window.location.href = "index.html";
     }
   </script>
 </body>
 </html>
+
