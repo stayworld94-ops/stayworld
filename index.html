@@ -1,173 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="lang.js"></script>
-  <script defer src="app.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayWorld</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="lang.js" defer></script>
+    <script src="app.js" defer></script>
 </head>
 <body>
-  <header>
-    <img src="images/logo.jpg" alt="StayWorld Logo" class="logo" />
-    <nav>
-      <ul>
-        <li><a href="#search" data-i18n="menu_search">Search</a></li>
-        <li><a href="#map" data-i18n="menu_map">Map</a></li>
-        <li><a href="#recommendations" data-i18n="menu_recommend">Recommended</a></li>
-        <li><a href="#membership" data-i18n="menu_membership">Membership</a></li>
-        <li><a href="login.html" data-i18n="menu_login">Login</a></li>
-        <li><a href="signup.html" data-i18n="menu_signup">Sign Up</a></li>
-        <li><a href="host-register.html" data-i18n="menu_host">Host Register</a></li>
-      </ul>
-    </nav>
-    <select id="languageSwitcher">
-      <option value="en">English</option>
-      <option value="ko">한국어</option>
-      <option value="fr">Français</option>
-      <option value="tr">Türkçe</option>
-      <option value="ja">日本語</option>
-      <option value="es">Español</option>
-      <option value="de">Deutsch</option>
-      <option value="ru">Русский</option>
-      <option value="it">Italiano</option>
-      <option value="zh">中文</option>
-    </select>
-  </header>
+    <header>
+        <img src="stayworld-logo.jpg" alt="StayWorld Logo" class="logo" />
+        <nav>
+            <ul>
+                <li><a href="#search">Search</a></li>
+                <li><a href="#map">Map</a></li>
+                <li><a href="#recommendations">Recommended</a></li>
+                <li><a href="membership.html">Membership</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="signup.html">Sign Up</a></li>
+                <li><a href="host-register.html">Host Register</a></li>
+            </ul>
+            <select id="language-selector">
+                <option value="en">English</option>
+                <option value="ko">한국어</option>
+                <option value="fr">Français</option>
+                <option value="tr">Türkçe</option>
+                <option value="ja">日本語</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="ru">Русский</option>
+                <option value="it">Italiano</option>
+                <option value="zh">中文</option>
+            </select>
+        </nav>
+    </header>
+    <main>
+        <section id="search">
+            <h2 data-translate="search-title">Where do you want to go?</h2>
+            <input type="text" id="searchInput" placeholder="Search..." />
+            <button onclick="search()" data-translate="search-button">Search</button>
+        </section>
 
-  <section id="search">
-    <h1 data-i18n="search_title">Where do you want to go?</h1>
-    <input type="text" id="searchInput" placeholder="Search cities or hotels..." />
-    <div id="autocomplete"></div>
-    <button id="searchBtn" data-i18n="btn_search">Search</button>
-  </section>
+        <section id="map">
+            <h2 data-translate="map-title">Map</h2>
+            <div id="map-container">Map Loading...</div>
+        </section>
 
-  <section id="map">
-    <h2 data-i18n="map_title">Accommodation Map</h2>
-    <div id="map" style="height: 400px;"></div>
-  </section>
-
-  <section id="recommendations">
-    <h2 data-i18n="recommended_title">Recommended Places</h2>
-    <div class="card-grid">
-      <div class="card" data-lat="35.6895" data-lng="139.6917">
-        <img src="images/hotel1.jpg" />
-        <h3>Hilton Tokyo</h3>
-        <p>💰 $150</p>
-        <p>⭐ 4.8</p>
-        <span class="verified">✔️ Verified</span>
-        <button data-i18n="btn_reserve">Reserve</button>
-      </div>
-      <div class="card" data-lat="41.0082" data-lng="28.9784">
-        <img src="images/hotel2.jpg" />
-        <h3>Istanbul Deluxe</h3>
-        <p>💰 $90</p>
-        <p>⭐ 4.5</p>
-        <span class="verified">✔️ Verified</span>
-        <button data-i18n="btn_reserve">Reserve</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="membership">
-    <h2 data-i18n="membership_title">Membership Levels</h2>
-    <div class="levels">
-      <div class="level bronze">🥉 Bronze - 0%</div>
-      <div class="level silver">🥈 Silver - 3%</div>
-      <div class="level gold">🥇 Gold - 5%</div>
-      <div class="level platinum">🏆 Platinum - 7%</div>
-      <div class="level diamond">💎 Diamond - 10%</div>
-      <div class="level elite">👑 Elite - 15%</div>
-    </div>
-  </section>
-
-  <section id="contact">
-    <h2 data-i18n="contact_title">Contact Us</h2>
-    <p>Email: support@stayworldbooking.com</p>
-    <button id="startChat" data-i18n="btn_chat">Talk to AI Assistant</button>
-  </section>
-
-  <footer>
-    <p>&copy; 2025 StayWorld. All rights reserved.</p>
-  </footer>
-
-  <!-- 검색 자동완성 -->
-  <script>
-    const suggestions = ['Istanbul', 'Tokyo', 'Paris', 'New York', 'London'];
-    const searchInput = document.getElementById('searchInput');
-    const autocomplete = document.getElementById('autocomplete');
-    document.getElementById('searchBtn').onclick = () => {
-      alert("Search feature coming soon!");
-    };
-    searchInput.addEventListener('input', () => {
-      const val = searchInput.value.toLowerCase();
-      autocomplete.innerHTML = '';
-      if (val.length > 1) {
-        suggestions.filter(s => s.toLowerCase().includes(val)).forEach(s => {
-          const div = document.createElement('div');
-          div.textContent = s;
-          div.onclick = () => {
-            searchInput.value = s;
-            autocomplete.innerHTML = '';
-          };
-          autocomplete.appendChild(div);
-        });
-      }
-    });
-  </script>
-
-  <!-- 지도 -->
-  <script>
-    function initMap() {
-      const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 2,
-        center: { lat: 20.0, lng: 0.0 },
-      });
-
-      document.querySelectorAll(".card").forEach(card => {
-        const lat = parseFloat(card.dataset.lat);
-        const lng = parseFloat(card.dataset.lng);
-        const name = card.querySelector("h3").textContent;
-
-        new google.maps.Marker({
-          position: { lat, lng },
-          map,
-          title: name,
-        });
-      });
-    }
-  </script>
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbD-TEST-KEY-WILL-BE-LIMITED&callback=initMap">
-  </script>
+        <section id="recommendations">
+            <h2 data-translate="recommendations-title">Recommended Places</h2>
+            <div class="recommendation">
+                <img src="https://via.placeholder.com/100" />
+                <h3>Hilton Tokyo</h3>
+                <p>💰 $150</p>
+                <p>⭐ 4.8</p>
+                <button class="verified">✔ Verified</button>
+                <button class="reserve">Reserve</button>
+            </div>
+            <div class="recommendation">
+                <img src="https://via.placeholder.com/100" />
+                <h3>Istanbul Deluxe</h3>
+                <p>💰 $90</p>
+                <p>⭐ 4.5</p>
+                <button class="verified">✔ Verified</button>
+                <button class="reserve">Reserve</button>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
-<header>
-  <img src="images/logo.jpg" alt="StayWorld Logo" class="logo" />
-  <nav>
-    <ul>
-      <li><a href="index.html#search">Search</a></li>
-      <li><a href="index.html#map">Map</a></li>
-      <li><a href="index.html#recommendations">Recommended</a></li>
-      <li><a href="index.html#membership">Membership</a></li>
-      <li><a href="host-register.html" data-i18n="menu_host">Host Register</a></li>
-      <li><a href="login.html" data-i18n="menu_login">Login</a></li>
-      <li><a href="signup.html" data-i18n="menu_signup">Sign Up</a></li>
-    </ul>
-  </nav>
-  <select id="languageSwitcher">
-    <option value="en">English</option>
-    <option value="ko">한국어</option>
-    <option value="fr">Français</option>
-    <option value="tr">Türkçe</option>
-    <option value="ja">日本語</option>
-    <option value="es">Español</option>
-    <option value="de">Deutsch</option>
-    <option value="ru">Русский</option>
-    <option value="it">Italiano</option>
-    <option value="zh">中文</option>
-  </select>
-</header>
-<body>
-  

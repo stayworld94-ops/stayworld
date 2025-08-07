@@ -1,34 +1,64 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const langBtns = document.querySelectorAll(".lang-btn");
-  langBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const lang = btn.dataset.lang;
-      document.querySelectorAll("[data-lang-text]").forEach(el => {
-        el.innerText = translations[lang][el.dataset.langText] || el.innerText;
-      });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const langMap = {
+    "search-title": {
+      en: "Where do you want to go?",
+      ko: "어디로 떠나시겠어요?",
+      fr: "Où voulez-vous aller ?",
+      tr: "Nereye gitmek istersiniz?",
+      ja: "どこに行きたいですか？",
+      es: "¿A dónde quieres ir?",
+      de: "Wohin möchten Sie gehen?",
+      ru: "Куда вы хотите поехать?",
+      it: "Dove vuoi andare?",
+      zh: "你想去哪里？"
+    },
+    "search-button": {
+      en: "Search",
+      ko: "검색",
+      fr: "Chercher",
+      tr: "Ara",
+      ja: "検索",
+      es: "Buscar",
+      de: "Suchen",
+      ru: "Поиск",
+      it: "Cerca",
+      zh: "搜索"
+    },
+    "map-title": {
+      en: "Map",
+      ko: "지도",
+      fr: "Carte",
+      tr: "Harita",
+      ja: "地図",
+      es: "Mapa",
+      de: "Karte",
+      ru: "Карта",
+      it: "Mappa",
+      zh: "地图"
+    },
+    "recommendations-title": {
+      en: "Recommended Places",
+      ko: "추천 장소",
+      fr: "Lieux recommandés",
+      tr: "Önerilen Yerler",
+      ja: "おすすめの場所",
+      es: "Lugares recomendados",
+      de: "Empfohlene Orte",
+      ru: "Рекомендуемые места",
+      it: "Luoghi consigliati",
+      zh: "推荐地点"
+    }
+  };
+
+  const selector = document.getElementById("language-selector");
+  selector.addEventListener("change", (e) => {
+    const lang = e.target.value;
+    document.querySelectorAll("[data-translate]").forEach((el) => {
+      const key = el.getAttribute("data-translate");
+      if (langMap[key] && langMap[key][lang]) {
+        el.textContent = langMap[key][lang];
+      }
     });
   });
 });
-
-const translations = {
-  ko: {
-    welcome: "StayWorld에 오신 것을 환영합니다!",
-    desc: "전 세계 숙소 예약과 프리미엄 혜택을 누리세요."
-  },
-  en: {
-    welcome: "Welcome to StayWorld!",
-    desc: "Book global stays and enjoy premium benefits."
-  },
-  fr: {
-    welcome: "Bienvenue chez StayWorld!",
-    desc: "Réservez dans le monde entier et profitez des avantages premium."
-  },
-  ja: {
-    welcome: "StayWorldへようこそ！",
-    desc: "世界中の宿泊施設を予約し、特典を楽しもう。"
-  },
-  tr: {
-    welcome: "StayWorld'e Hoşgeldiniz!",
-    desc: "Dünyanın her yerinde konaklayın, ayrıcalıkların tadını çıkarın."
-  }
-};
