@@ -91,3 +91,39 @@
   </script>
 </body>
 </html>
+<!-- Google 로그인 SDK 포함 -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+  // 로그인 유저 확인
+  function handleCredentialResponse(response) {
+    console.log("Google login token:", response.credential);
+    document.body.dataset.loggedin = "true";
+  }
+
+  window.onload = function() {
+    const loginContainer = document.createElement("div");
+    loginContainer.innerHTML = `
+      <div id="g_id_onload"
+        data-client_id="YOUR_GOOGLE_CLIENT_ID"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false"
+        data-ux_mode="popup"
+        data-context="signin">
+      </div>
+      <div class="g_id_signin" data-type="standard"></div>
+    `;
+
+    document.body.prepend(loginContainer);
+  };
+
+  document.getElementById("hostForm").addEventListener("submit", function(e) {
+    if (document.body.dataset.loggedin !== "true") {
+      e.preventDefault();
+      alert("🚫 Please log in with Google before submitting your listing.");
+      return;
+    }
+
+    // ... 등록 처리
+  });
+</script>
