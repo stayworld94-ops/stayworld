@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register Your Property - StayWorld</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="lang.js"></script>
+</head>
+<body>
+  <header>
+    <img src="images/logo.jpg" alt="StayWorld Logo" class="logo" />
+    <nav>
+      <ul>
+        <li><a href="index.html#search">Search</a></li>
+        <li><a href="index.html#map">Map</a></li>
+        <li><a href="index.html#recommendations">Recommended</a></li>
+        <li><a href="index.html#membership">Membership</a></li>
+        <li><a href="host-register.html">Host Register</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="form-section">
+    <form class="form-box" id="hostForm">
+      <h2 data-i18n="host_title">Register Your Property</h2>
+
+      <label for="propertyName" data-i18n="label_property_name">Property Name</label>
+      <input type="text" id="propertyName" required />
+
+      <label for="type" data-i18n="label_type">Property Type</label>
+      <select id="type">
+        <option>Hotel</option>
+        <option>Apartment</option>
+        <option>Hostel</option>
+        <option>Pension</option>
+        <option>Guesthouse</option>
+        <option>Camping</option>
+        <option>Other</option>
+      </select>
+
+      <label for="description" data-i18n="label_description">Description</label>
+      <textarea id="description" rows="4" required></textarea>
+
+      <label for="price" data-i18n="label_price">Price per night (USD)</label>
+      <input type="number" id="price" required />
+
+      <label for="address" data-i18n="label_address">Full Address</label>
+      <input type="text" id="address" required />
+
+      <label for="latitude" data-i18n="label_lat">Latitude</label>
+      <input type="text" id="latitude" />
+
+      <label for="longitude" data-i18n="label_lng">Longitude</label>
+      <input type="text" id="longitude" />
+
+      <label for="image" data-i18n="label_image">Upload Image</label>
+      <input type="file" id="image" accept="image/*" />
+
+      <button type="submit" data-i18n="btn_register_property">Submit Property</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 StayWorld</p>
+  </footer>
+
+  <script>
+    document.getElementById("hostForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      alert("📬 Property submitted! (Backend integration pending)");
+    });
+  </script>
+</body>
+</html>
