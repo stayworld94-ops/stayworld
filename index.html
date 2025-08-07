@@ -4,114 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StayWorld - 글로벌 숙소 예약 플랫폼</title>
+  <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/a2e0a1c6aa.js" crossorigin="anonymous"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0f0f0f;
-      color: #fff;
-    }
-    header {
-      background-color: #000;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #333;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    .logo {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #d4af37;
-      font-family: 'Playfair Display', serif;
-    }
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 20px;
-      margin: 0;
-      padding: 0;
-    }
-    nav ul li a {
-      text-decoration: none;
-      color: #ccc;
-      font-weight: 500;
-      transition: 0.3s;
-    }
-    nav ul li a:hover {
-      color: #d4af37;
-    }
-    #lang-switcher {
-      background-color: #1a1a1a;
-      color: #fff;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 5px 10px;
-      margin-left: 20px;
-      font-size: 0.9rem;
-    }
-    main.welcome {
-      max-width: 1000px;
-      margin: 120px auto 60px;
-      padding: 30px;
-      text-align: center;
-      background-color: #1a1a1a;
-      border-radius: 20px;
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-    }
-    main.welcome h1 {
-      font-size: 2.8rem;
-      color: #d4af37;
-      font-family: 'Playfair Display', serif;
-      margin-bottom: 20px;
-    }
-    main.welcome p {
-      font-size: 1.1rem;
-      color: #ccc;
-      margin: 10px 0;
-    }
-    main.welcome ul {
-      list-style: none;
-      padding: 0;
-      margin: 30px 0;
-    }
-    main.welcome ul li {
-      margin: 15px 0;
-      font-size: 1rem;
-      background-color: #2a2a2a;
-      padding: 14px;
-      border-radius: 12px;
-      color: #eee;
-      box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.1);
-    }
-    footer {
-      text-align: center;
-      padding: 30px;
-      background-color: #000;
-      border-top: 1px solid #333;
-      color: #777;
-      font-size: 0.9rem;
-    }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: 'Inter', sans-serif; background-color: #0f0f0f; color: #fff; }
+    header { background-color: #000; padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; border-bottom: 1px solid #333; }
+    .logo img { height: 40px; }
+    nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; }
+    nav ul li a { color: #ccc; text-decoration: none; font-weight: 500; transition: 0.3s; }
+    nav ul li a:hover { color: #d4af37; }
+    #lang-switcher { background-color: #1a1a1a; color: #fff; border: 1px solid #444; border-radius: 5px; padding: 4px 8px; margin-left: 20px; }
+    .section { padding: 80px 20px; max-width: 1200px; margin: auto; }
+    .section h2 { color: #d4af37; font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 20px; }
+    .card { background-color: #1a1a1a; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(212,175,55,0.2); margin-bottom: 20px; }
+    .rating { color: gold; }
+    .verified { color: deepskyblue; font-weight: bold; margin-left: 8px; }
+    .chatbot-button { position: fixed; bottom: 20px; right: 20px; background-color: #d4af37; border: none; padding: 12px 16px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
   </style>
 </head>
-
 <body>
   <header>
-    <div class="logo">🌍 StayWorld</div>
+    <div class="logo">
+      <img src="stayworld-logo.jpg" alt="StayWorld Logo">
+    </div>
     <nav>
       <ul>
-        <li><a href="#" data-i18n="home">홈</a></li>
-        <li><a href="#" data-i18n="login">로그인</a></li>
-        <li><a href="#" data-i18n="signup">회원가입</a></li>
-        <li><a href="#" data-i18n="reservation">숙소 예약</a></li>
-        <li><a href="#" data-i18n="subscribe">StayWorld+ 구독</a></li>
-        <li><a href="#" data-i18n="membership">멤버십</a></li>
-        <li><a href="#" data-i18n="support">고객센터</a></li>
-        <li><a href="#" data-i18n="dashboard">관리자 패널</a></li>
+        <li><a href="#home" data-i18n="menu_home">홈</a></li>
+        <li><a href="#membership" data-i18n="menu_membership">멤버십</a></li>
+        <li><a href="#promotions" data-i18n="menu_promotions">프로모션</a></li>
+        <li><a href="#filter" data-i18n="menu_filter">숙소검색</a></li>
+        <li><a href="#recommend" data-i18n="menu_recommend">추천</a></li>
+        <li><a href="#weather" data-i18n="menu_weather">날씨</a></li>
+        <li><a href="#login" data-i18n="menu_login">로그인</a></li>
       </ul>
     </nav>
     <select id="lang-switcher">
@@ -123,63 +49,95 @@
     </select>
   </header>
 
-  <main class="welcome">
-    <h1 data-i18n="welcome">StayWorld에 오신 것을 환영합니다</h1>
-    <p data-i18n="desc">글로벌 여행자를 위한 올인원 예약 플랫폼 StayWorld입니다.</p>
-    <ul>
-      <li data-i18n="f1">💬 AI 자동 번역 & 실시간 고객센터</li>
-      <li data-i18n="f2">🏅 브론즈~엘리트까지 레벨 업 시스템 + 자동 강등 조건 (60일 비활성 시)</li>
-      <li data-i18n="f3">🎫 티켓형 리워드 시스템 (할인/무료숙박/시크릿딜 등)</li>
-      <li data-i18n="f4">📍 지도 기반 숙소 검색 + 실시간 가용성 API</li>
-      <li data-i18n="f5">🧠 AI 기반 개인 맞춤 숙소 추천 + 이메일 발송</li>
-      <li data-i18n="f6">🧾 자동 영수증 발행 + 실시간 예약/후기 알림</li>
-      <li data-i18n="f7">💳 Stripe 결제 연동 + 환불 시 수수료 제외 안내</li>
-      <li data-i18n="f8">🌐 다국어 UI 지원 (영/일/불/터/독 등)</li>
-      <li data-i18n="f9">🔒 2단계 로그인 + 자동 로그인 설정</li>
-      <li data-i18n="f10">💎 StayWorld+ 유료 구독 전용 혜택 (긴급지원, 프라이빗딜 등)</li>
-      <li data-i18n="f11">🏢 기업/출장 전용 예약 시스템 (B2B)</li>
-      <li data-i18n="f12">👨‍💼 호스트 수익 예측, 일정 관리, 인터뷰 시스템</li>
-      <li data-i18n="f13">📱 앱 푸시 알림, 날씨/플래너/비교 기능 포함</li>
-      <li data-i18n="f14">🧾 관리자 승인 기반 후기 시스템 + 리뷰 검증</li>
-    </ul>
-    <p data-i18n="try">상단 메뉴를 통해 StayWorld의 모든 기능을 경험해보세요.</p>
-  </main>
+  <section id="home" class="section">
+    <h2 data-i18n="welcome_title">StayWorld에 오신 것을 환영합니다</h2>
+    <p data-i18n="welcome_desc">전 세계 숙소 예약, AI 추천, 레벨 보상, 인증된 숙소, 다국어 고객센터 등 완전한 여행 경험을 제공합니다.</p>
+  </section>
 
-  <footer>
-    <p>© 2025 StayWorld. All rights reserved. | contact@stayworldbooking.com</p>
-  </footer>
+  <section id="membership" class="section">
+    <h2 data-i18n="membership_title">레벨 및 멤버십 제도</h2>
+    <div class="card">브론즈, 실버, 골드, 플래티넘, 다이아몬드, 엘리트까지<br>포인트 적립, 쿠폰 제공, 우선 지원, 프라이빗 혜택까지 포함됩니다.</div>
+  </section>
+
+  <section id="promotions" class="section">
+    <h2 data-i18n="promo_title">시즌 프로모션</h2>
+    <div class="card">🔥 여름 특가! 전 세계 인기 숙소 최대 30% 할인!</div>
+  </section>
+
+  <section id="filter" class="section">
+    <h2 data-i18n="filter_title">숙소 검색 및 필터</h2>
+    <div class="card">
+      <input type="text" placeholder="도시나 지역을 입력하세요" style="width: 100%; padding: 10px; border-radius: 8px;">
+      <button style="margin-top: 10px; padding: 10px 20px;">검색</button>
+      <p style="margin-top: 10px; color: #999;">※ 필터 항목: 가격, 유형, 후기, 체크인, 편의시설, 인증 숙소, 반려동물 등 20개 이상 제공</p>
+    </div>
+  </section>
+
+  <section id="recommend" class="section">
+    <h2 data-i18n="recommend_title">추천 숙소 & 여행지</h2>
+    <div class="card">
+      <strong>파리 🗼</strong> - AI 추천 숙소 4.8점 | <span class="verified">✔️ 인증</span> <span class="rating">⭐⭐⭐⭐☆</span><br>
+      <strong>이스탄불 🕌</strong> - 사용자 추천 숙소 4.5점 | <span class="rating">⭐⭐⭐⭐☆</span><br>
+      <strong>도쿄 🗼</strong> - 트렌딩 숙소 4.9점 | <span class="verified">✔️ 인증</span> <span class="rating">⭐⭐⭐⭐⭐</span>
+    </div>
+  </section>
+
+  <section id="weather" class="section">
+    <h2 data-i18n="weather_title">현재 위치 날씨</h2>
+    <div class="card" id="weather-box">날씨 정보를 불러오는 중...</div>
+  </section>
+
+  <section id="login" class="section">
+    <h2 data-i18n="login_title">로그인 / 회원가입</h2>
+    <div class="card">
+      <button>이메일 로그인</button>
+      <button style="background-color: white; color: black; margin-top: 10px;"><i class="fab fa-google"></i> Google 계정으로 로그인</button>
+    </div>
+  </section>
+
+  <button class="chatbot-button" title="도움말 / Help">💬</button>
 
   <script>
     const translations = {
       en: {
-        home: "Home",
-        login: "Login",
-        signup: "Sign Up",
-        reservation: "Book Stay",
-        subscribe: "Subscribe to StayWorld+",
-        membership: "Membership",
-        support: "Support",
-        dashboard: "Admin Panel",
-        welcome: "Welcome to StayWorld",
-        desc: "Your all-in-one global booking platform.",
-        try: "Explore all StayWorld features from the top menu.",
-        f1: "💬 AI Auto Translation & Live Chat Support",
-        f2: "🏅 Bronze to Elite Level System + Auto Downgrade after 60 Days",
-        f3: "🎫 Ticket-based Rewards: Discounts, Free Stays, Secret Deals",
-        f4: "📍 Map-based Search + Real-time Availability API",
-        f5: "🧠 AI Personalized Stay Recommendations + Email Delivery",
-        f6: "🧾 Auto Receipts + Real-time Booking/Review Alerts",
-        f7: "💳 Stripe Payment + Fee Info on Refund",
-        f8: "🌐 Multilingual UI Support (EN/JP/FR/TR/DE)",
-        f9: "🔒 2FA Login + Auto Login Setup",
-        f10: "💎 Exclusive StayWorld+ Deals (Emergency Help, Private Offers)",
-        f11: "🏢 Business Travel Booking (B2B)",
-        f12: "👨‍💼 Host Revenue Forecast, Calendar & Interview",
-        f13: "📱 App Push Alerts, Weather, Planner, Comparison Tools",
-        f14: "🧾 Admin-Approved Reviews + Validation System"
+        menu_home: "Home", menu_membership: "Membership", menu_promotions: "Promotions", menu_filter: "Search", menu_recommend: "Recommend", menu_weather: "Weather", menu_login: "Login",
+        welcome_title: "Welcome to StayWorld", welcome_desc: "Book global stays, earn rewards, get AI suggestions, verified properties and more.",
+        membership_title: "Membership & Level System",
+        promo_title: "Seasonal Promotions",
+        filter_title: "Search & Filter Properties",
+        recommend_title: "Recommended Stays & Destinations",
+        weather_title: "Current Weather",
+        login_title: "Login / Sign Up"
       },
-      ko: {
-        // 한국어는 이미 본문에 반영되어 있어 그대로 유지됩니다.
+      fr: {
+        menu_home: "Accueil", menu_membership: "Adhésion", menu_promotions: "Promotions", menu_filter: "Recherche", menu_recommend: "Recommandé", menu_weather: "Météo", menu_login: "Connexion",
+        welcome_title: "Bienvenue chez StayWorld", welcome_desc: "Réservez des séjours, gagnez des récompenses, suggestions IA, logements vérifiés, etc.",
+        membership_title: "Système d'adhésion et de niveau",
+        promo_title: "Promotions saisonnières",
+        filter_title: "Recherche et filtres",
+        recommend_title: "Séjours et destinations recommandés",
+        weather_title: "Météo actuelle",
+        login_title: "Connexion / Inscription"
+      },
+      tr: {
+        menu_home: "Ana Sayfa", menu_membership: "Üyelik", menu_promotions: "Kampanyalar", menu_filter: "Filtrele", menu_recommend: "Önerilen", menu_weather: "Hava", menu_login: "Giriş",
+        welcome_title: "StayWorld'a Hoş Geldiniz", welcome_desc: "Dünya çapında rezervasyon yapın, ödül kazanın, doğrulanmış konaklama önerileri alın.",
+        membership_title: "Üyelik ve Seviye Sistemi",
+        promo_title: "Sezonluk Promosyonlar",
+        filter_title: "Konaklama Arama ve Filtreleme",
+        recommend_title: "Önerilen Konaklamalar ve Rotalar",
+        weather_title: "Şu Anki Hava Durumu",
+        login_title: "Giriş / Kayıt"
+      },
+      ja: {
+        menu_home: "ホーム", menu_membership: "メンバー", menu_promotions: "プロモ", menu_filter: "検索", menu_recommend: "おすすめ", menu_weather: "天気", menu_login: "ログイン",
+        welcome_title: "StayWorldへようこそ", welcome_desc: "宿泊予約、報酬、AIおすすめ、認証宿泊、マルチ言語対応センターなど。",
+        membership_title: "メンバーシップ・レベル制度",
+        promo_title: "季節限定プロモーション",
+        filter_title: "宿泊検索とフィルター",
+        recommend_title: "おすすめ宿・旅行先",
+        weather_title: "現在の天気",
+        login_title: "ログイン / 新規登録"
       }
     };
 
@@ -193,6 +151,14 @@
         }
       });
     });
+
+    // 날씨 API 연동 예시 (OpenWeatherMap 필요)
+    async function loadWeather() {
+      const res = await fetch(`https://wttr.in/?format=3`);
+      const text = await res.text();
+      document.getElementById('weather-box').textContent = text;
+    }
+    loadWeather();
   </script>
 </body>
 </html>
