@@ -6,6 +6,7 @@
   <title>Register a Property - StayWorld</title>
   <link rel="stylesheet" href="style.css" />
   <script defer src="lang.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <header>
@@ -21,8 +22,10 @@
   </header>
 
   <section class="form-section">
+    <div id="google-login-container" style="margin-bottom: 20px;"></div>
+
     <form class="form-box" id="hostForm">
-      <h2>Submit Your Property (Host ID Required)</h2>
+      <h2>Submit Your Property (Login & ID Required)</h2>
 
       <label>Property Title</label>
       <input type="text" id="title" required />
@@ -64,12 +67,38 @@
   <footer><p>&copy; 2025 StayWorld</p></footer>
 
   <script>
-    document.getElementById("hostForm").addEventListener("submit", function(e) {
+    let isLoggedIn = false;
+
+    function handleCredentialResponse(response) {
+      console.log("Google login token:", response.credential);
+      isLoggedIn = true;
+      document.getElementById("google-login-container").style.display = "none";
+    }
+
+    window.onload = function () {
+      const loginBox = document.createElement("div");
+      loginBox.innerHTML = `
+        <div id="g_id_onload"
+          data-client_id="635837328384-o4m1pvqf8od97kud4ep3j9ra6usno3re.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" data-type="standard"></div>
+      `;
+      document.getElementById("google-login-container").appendChild(loginBox);
+    };
+
+    document.getElementById("hostForm").addEventListener("submit", function (e) {
       e.preventDefault();
+
+      if (!isLoggedIn) {
+        alert("🚫 You must log in with Google before submitting your listing.");
+        return;
+      }
 
       const idFile = document.getElementById("idUpload").files[0];
       if (!idFile) {
-        alert("❗ You must upload a valid ID (passport or national ID) to continue.");
+        alert("❗ You must upload a valid ID to continue.");
         return;
       }
 
@@ -85,45 +114,9 @@
         idFile: idFile.name
       };
 
-      console.log("🏠 Submitting property:", property);
-      alert("✅ Property submitted with ID. Welcome, verified host!");
+      console.log("🏠 Property submitted:", property);
+      alert("✅ Property submitted successfully!");
     });
   </script>
 </body>
 </html>
-<!-- Google 로그인 SDK 포함 -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<script>
-  // 로그인 유저 확인
-  function handleCredentialResponse(response) {
-    console.log("Google login token:", response.credential);
-    document.body.dataset.loggedin = "true";
-  }
-
-  window.onload = function() {
-    const loginContainer = document.createElement("div");
-    loginContainer.innerHTML = `
-      <div id="g_id_onload"
-        data-client_id="YOUR_GOOGLE_CLIENT_ID"
-        data-callback="handleCredentialResponse"
-        data-auto_prompt="false"
-        data-ux_mode="popup"
-        data-context="signin">
-      </div>
-      <div class="g_id_signin" data-type="standard"></div>
-    `;
-
-    document.body.prepend(loginContainer);
-  };
-
-  document.getElementById("hostForm").addEventListener("submit", function(e) {
-    if (document.body.dataset.loggedin !== "true") {
-      e.preventDefault();
-      alert("🚫 Please log in with Google before submitting your listing.");
-      return;
-    }
-
-    // ... 등록 처리
-  });
-</script>
