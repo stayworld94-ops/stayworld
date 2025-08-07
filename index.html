@@ -6,6 +6,49 @@
   <title>StayWorld | Global Stays</title>
   <link rel="stylesheet" href="style.css" />
   <script src="lang.js" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const langSelect = document.getElementById("languageSelect");
+      const elements = document.querySelectorAll("[data-lang]");
+
+      function applyTranslations(lang) {
+        const translations = window.translations || {};
+        const selected = translations[lang];
+        if (!selected) return;
+        elements.forEach(el => {
+          const key = el.getAttribute("data-lang");
+          if (selected[key]) el.textContent = selected[key];
+        });
+      }
+
+      langSelect?.addEventListener("change", () => {
+        applyTranslations(langSelect.value);
+      });
+
+      applyTranslations(langSelect?.value || "en");
+
+      // 버튼 클릭 동작 연결
+      document.querySelector('[data-lang="search_button"]')?.addEventListener("click", () => {
+        alert("🔍 검색이 실행됩니다 (예시)");
+      });
+
+      document.querySelector('[data-lang="chat_button"]')?.addEventListener("click", () => {
+        alert("💬 AI 챗봇이 곧 연결됩니다 (예시)");
+      });
+
+      document.querySelector('#login .btn-primary')?.addEventListener("click", () => {
+        alert("🔐 로그인 페이지로 이동합니다 (예시)");
+      });
+
+      document.querySelector('#login .btn-secondary')?.addEventListener("click", () => {
+        alert("📝 회원가입 페이지로 이동합니다 (예시)");
+      });
+
+      document.querySelector('[data-lang="reserve_button"]')?.addEventListener("click", () => {
+        alert("📅 예약이 시작됩니다 (예시)");
+      });
+    });
+  </script>
 </head>
 <body>
   <!-- 헤더 및 로고 -->
@@ -128,11 +171,6 @@
   <footer class="footer">
     <div class="container">
       <p>&copy; 2025 StayWorld. All rights reserved.</p>
-    </div>
-  </footer>
-</body>
-</html>
-
     </div>
   </footer>
 </body>
