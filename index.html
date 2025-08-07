@@ -1,146 +1,111 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="page_title">StayWorld - 글로벌 숙소 예약 플랫폼</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a2e0a1c6aa.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StayWorld</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="lang.js" defer></script>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="stayworld-logo.jpg" alt="StayWorld Logo">
+  <!-- 로고 + 네비게이션 -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="images/stayworld-logo.jpg" alt="StayWorld Logo" class="logo" />
     </div>
-    <nav>
+    <nav class="navbar">
       <ul>
-        <li><a href="#home" data-i18n="menu_home">홈</a></li>
-        <li><a href="#membership" data-i18n="menu_membership">멤버십</a></li>
-        <li><a href="#promotions" data-i18n="menu_promotions">프로모션</a></li>
-        <li><a href="#filter" data-i18n="menu_filter">숙소검색</a></li>
-        <li><a href="#recommend" data-i18n="menu_recommend">추천</a></li>
-        <li><a href="#weather" data-i18n="menu_weather">날씨</a></li>
-        <li><a href="#login" data-i18n="menu_login">로그인</a></li>
+        <li><a href="#search">🔍 Search</a></li>
+        <li><a href="#filter">🎯 Filter</a></li>
+        <li><a href="#membership">🌟 Membership</a></li>
+        <li><a href="#reviews">⭐ Reviews</a></li>
+        <li><a href="#chatbot">🤖 Chat</a></li>
+        <li><a href="#login">👤 Login</a></li>
+        <li><a href="#reserve">📅 Reserve</a></li>
+        <li><select id="languageSelect">
+          <option value="en">🌎 English</option>
+          <option value="ko">🇰🇷 한국어</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="tr">🇹🇷 Türkçe</option>
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="it">🇮🇹 Italiano</option>
+          <option value="ru">🇷🇺 Русский</option>
+          <option value="zh">🇨🇳 中文</option>
+        </select></li>
       </ul>
     </nav>
-    <select id="lang-switcher">
-      <option value="ko">🇰🇷 한국어</option>
-      <option value="en">🇬🇧 English</option>
-      <option value="fr">🇫🇷 Français</option>
-      <option value="tr">🇹🇷 Türkçe</option>
-      <option value="ja">🇯🇵 日本語</option>
-      <option value="es">🇪🇸 Español</option>
-      <option value="de">🇩🇪 Deutsch</option>
-      <option value="it">🇮🇹 Italiano</option>
-      <option value="ru">🇷🇺 Русский</option>
-      <option value="zh">🇨🇳 中文</option>
-    </select>
   </header>
 
-  <main>
-    <section id="home" class="section">
-      <h2 data-i18n="welcome_title">StayWorld에 오신 것을 환영합니다</h2>
-      <p data-i18n="welcome_desc">전 세계 숙소 예약, AI 추천, 레벨 보상, 인증된 숙소, 다국어 고객센터 등 완전한 여행 경험을 제공합니다.</p>
-    </section>
+  <!-- 검색 -->
+  <section id="search">
+    <h2 data-lang="search_title">Find your perfect stay</h2>
+    <input type="text" placeholder="Search by location..." />
+    <button data-lang="search_btn">Search</button>
+  </section>
 
-    <section id="filter" class="section">
-      <h2 data-i18n="section_filter">상세 숙소 검색</h2>
-      <button data-i18n="button_search">숙소 검색</button>
-      <ul id="filter-options">
-        <li>가격 범위</li>
-        <li>숙소 유형 (호텔, 모텔, 호스텔, 아파트, 펜션, 게스트하우스, 리조트, 방갈로, 캠핑장, 전통가옥)</li>
-        <li>편의시설 (와이파이, 주차, 수영장, 체육관)</li>
-        <li>예약 유형 (즉시 예약/승인 예약)</li>
-        <li>체크인 옵션</li>
-        <li>리뷰 평점</li>
-        <li>숙소 인증 여부</li>
-        <li>침대 수 / 욕실 수</li>
-        <li>반려동물 가능</li>
-        <li>흡연 가능 여부</li>
-        <li>엘리베이터</li>
-        <li>장애인 접근성</li>
-        <li>조식 포함 여부</li>
-        <li>키친 여부</li>
-        <li>에어컨</li>
-        <li>세탁기/건조기</li>
-        <li>지역 (도심, 교외, 해변 등)</li>
-        <li>호스트 평점</li>
-        <li>체험형 숙소</li>
-        <li>장기 숙박 할인</li>
-      </ul>
-    </section>
+  <!-- 숙소 필터 -->
+  <section id="filter">
+    <h2 data-lang="filter_title">Filter Options</h2>
+    <div class="filter-options">
+      <label><input type="checkbox" /> Hotel</label>
+      <label><input type="checkbox" /> Motel</label>
+      <label><input type="checkbox" /> Hostel</label>
+      <label><input type="checkbox" /> Apartment</label>
+      <label><input type="checkbox" /> Pension</label>
+      <label><input type="checkbox" /> Camping</label>
+      <label><input type="checkbox" /> Private House</label>
+      <label><input type="checkbox" /> Guesthouse</label>
+      <label><input type="checkbox" /> Shared Room</label>
+    </div>
+  </section>
 
-    <section id="recommend" class="section">
-      <h2 data-i18n="section_recommend">AI 기반 추천 숙소</h2>
-      <p>AI가 선별한 인기 숙소를 만나보세요.</p>
-    </section>
+  <!-- 멤버십 -->
+  <section id="membership">
+    <h2 data-lang="membership_title">Membership Levels</h2>
+    <ul class="levels">
+      <li>🥉 Bronze - Basic access</li>
+      <li>🥈 Silver - 3% Points on First Booking</li>
+      <li>🥇 Gold - 5% Points + Priority Support</li>
+      <li>💎 Platinum - 7% Points + Seasonal Discounts</li>
+      <li>👑 Diamond - 10% Points + VIP Coupons</li>
+      <li>🏆 Elite - 15% Points + Emergency Priority</li>
+    </ul>
+  </section>
 
-    <section id="weather" class="section">
-      <h2 data-i18n="section_weather">지역 날씨</h2>
-      <div id="weather-widget">날씨 위젯 표시 예정</div>
-    </section>
+  <!-- 리뷰 -->
+  <section id="reviews">
+    <h2 data-lang="reviews_title">Guest Reviews</h2>
+    <p>★★★★★ 4.9/5 Avg Rating</p>
+    <div class="review-card">
+      <p>"Wonderful stay, great host!"</p>
+      <span>🌟🌟🌟🌟🌟</span>
+    </div>
+  </section>
 
-    <section id="membership" class="section">
-      <h2 data-i18n="section_membership">StayWorld 멤버십</h2>
-      <p>브론즈부터 엘리트까지의 레벨에 따른 다양한 혜택 제공</p>
-    </section>
+  <!-- AI 챗봇 -->
+  <section id="chatbot">
+    <h2 data-lang="chat_title">Ask Our AI Assistant</h2>
+    <button data-lang="chat_btn">Start Chat</button>
+  </section>
 
-    <section id="promotions" class="section">
-      <h2 data-i18n="section_promotions">프로모션</h2>
-      <p>시즌 한정 할인 및 긴급 특가 혜택</p>
-    </section>
+  <!-- 로그인/회원가입 -->
+  <section id="login">
+    <h2 data-lang="login_title">Login / Sign Up</h2>
+    <button data-lang="login_btn">Login</button>
+    <button data-lang="signup_btn">Sign Up</button>
+  </section>
 
-    <section id="login" class="section">
-      <h2 data-i18n="section_login">로그인 또는 회원가입</h2>
-      <a href="login.html" class="btn">로그인</a>
-      <a href="signup.html" class="btn">회원가입</a>
-    </section>
-  </main>
+  <!-- 예약 -->
+  <section id="reserve">
+    <h2 data-lang="reserve_title">Make a Reservation</h2>
+    <button data-lang="reserve_btn">Book Now</button>
+  </section>
 
+  <!-- 푸터 -->
   <footer>
-    <p>© 2025 StayWorld. All rights reserved.</p>
+    <p>&copy; 2025 StayWorld. All rights reserved.</p>
   </footer>
-
-  <script>
-    const translations = {
-      en: {
-        page_title: "StayWorld - Global Booking Platform",
-        menu_home: "Home", menu_membership: "Membership", menu_promotions: "Promotions", menu_filter: "Search", menu_recommend: "Recommend", menu_weather: "Weather", menu_login: "Login",
-        welcome_title: "Welcome to StayWorld",
-        welcome_desc: "Book global stays, earn rewards, get AI suggestions, verified properties and multilingual support.",
-        section_filter: "Detailed Search Filters",
-        section_recommend: "AI Recommended Stays",
-        section_weather: "Weather by Region",
-        section_membership: "StayWorld Membership",
-        section_promotions: "Promotions",
-        section_login: "Login or Sign Up",
-        button_search: "Search Now"
-      }
-    };
-
-    function applyTranslations(lang) {
-      const dictionary = translations[lang];
-      if (!dictionary) return;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dictionary[key]) el.textContent = dictionary[key];
-      });
-      document.documentElement.lang = lang;
-    }
-
-    const langSwitcher = document.getElementById('lang-switcher');
-    langSwitcher.addEventListener('change', e => {
-      const selectedLang = e.target.value;
-      localStorage.setItem('lang', selectedLang);
-      applyTranslations(selectedLang);
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedLang = localStorage.getItem('lang') || 'ko';
-      applyTranslations(savedLang);
-      langSwitcher.value = savedLang;
-    });
-  </script>
 </body>
 </html>
