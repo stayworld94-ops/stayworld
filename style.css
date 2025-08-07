@@ -1,112 +1,161 @@
+/* 기본 전체 스타일 */
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #f4f4f4;
   margin: 0;
   padding: 0;
+  background-color: #f7f9fc;
   color: #333;
 }
 
+h3 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+strong {
+  font-weight: 600;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* 검색창 스타일 */
 #search {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 25px 10px;
   gap: 10px;
   background: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #ddd;
 }
 
 #search input {
   padding: 10px;
-  width: 250px;
   font-size: 16px;
+  width: 260px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 #search button {
-  padding: 10px 15px;
-  font-size: 16px;
   background-color: #ffcc00;
-  color: black;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  padding: 10px 18px;
+  font-size: 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
 #search button:hover {
   background-color: #ffaa00;
 }
 
-#recommended-destinations, #recommended-hotels {
+/* 추천 도시 */
+#recommended-destinations {
+  padding: 20px;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 20px;
   justify-content: center;
 }
 
 .recommend-city {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 30px;
   padding: 10px 20px;
-  border: 1px solid #999;
-  border-radius: 20px;
-  background-color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
 }
 
 .recommend-city:hover {
-  background-color: #eaeaea;
+  background-color: #f0f0f0;
+}
+
+/* 추천 숙소 */
+#recommended-hotels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 20px;
+  justify-content: center;
 }
 
 .recommend-hotel {
-  background-color: white;
-  border: 1px solid #ccc;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  min-width: 220px;
-}
-
-#googleMap {
-  margin-top: 20px;
-  border-radius: 8px;
-}
-
-#weather {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-  margin-top: 20px;
-}
-
-#level-status {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   padding: 20px;
+  min-width: 220px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  font-size: 16px;
+}
+
+/* 지도 */
+#googleMap {
+  margin: 20px auto;
+  max-width: 90%;
+  height: 300px;
+  border-radius: 10px;
+}
+
+/* 날씨 */
+#weather {
+  text-align: center;
+  font-size: 20px;
+  padding: 20px;
+}
+
+/* 레벨 시스템 */
+#level-status {
   background-color: #fff;
-  border-top: 1px solid #ddd;
+  margin: 30px auto;
+  padding: 20px;
+  max-width: 90%;
+  border-top: 1px solid #eee;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-radius: 10px;
 }
 
-#level-alert ul {
-  list-style: none;
-  padding: 0;
-}
-
-#level-alert ul li {
+#level-status div {
   margin-bottom: 10px;
 }
 
+/* 레벨 알림 박스 */
+#level-alert {
+  max-width: 90%;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#level-alert ul {
+  padding-left: 20px;
+}
+
+#level-alert li {
+  margin-bottom: 10px;
+  line-height: 1.5em;
+}
+
 #level-alert button {
-  padding: 10px 15px;
-  font-size: 15px;
-  background: #222;
-  color: #fff;
+  margin-top: 15px;
+  padding: 10px 16px;
+  background-color: #000;
+  color: white;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
 }
 
 #level-alert button:hover {
-  background: #444;
+  background-color: #333;
 }
