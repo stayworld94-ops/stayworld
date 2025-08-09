@@ -339,10 +339,134 @@
     const YEAR_EL = document.getElementById('year'); YEAR_EL.textContent = new Date().getFullYear();
 
     // Languages
-    const LANGS = { en:{promo_text:"Earn up to 15% back with StayWorld+ Elite. Summer Flash Deals live now.",promo_cta:"See membership",nav_explore:"Explore",nav_deals:"Deals",nav_membership:"Membership",nav_host:"Become a host",nav_support:"Support",nav_login:"Log in",nav_signup:"Sign up",hero_verified:"Verified Stays",label_where:"Where",label_checkin:"Check‑in",label_checkout:"Check‑out",label_guests:"Guests",btn_filters:"Filters (20+)",btn_map:"Map view",btn_weather:"Weather",btn_search:"Search",reward_tier:"Your tier",reward_progress:"₩1,250,000 until Diamond. No stay for 60 days → auto downgrade 1 level.",btn_upgrade:"Manage Membership",downgrade_rule:"If no booking ≥60 days, you’ll be downgraded by 1 level. We’ll notify you in advance.",sec_explore:"Explore popular places",deal_title:"Flash Deals: up to 40% off",deal_desc:"Limited-time offers on verified and high-rated stays.",deal_cta:"Grab deals",host_title:"Become a verified host",notif_title:"Smart notifications",notif_desc:"AI suggestions, destination picks, and level updates, with perfect multilingual delivery.",sup_title:"24/7 Multilingual Support",sup_desc:"AI concierge + human agents. Secure, instant, and truly global.",sup_chat:"Open AI chat",sup_help:"Help center"},
-      ko:{promo_text:"StayWorld+ 엘리트 최대 15% 적립. 여름 한정 특가 진행중.",promo_cta:"멤버십 보기",nav_explore:"탐색",nav_deals:"특가",nav_membership:"멤버십",nav_host:"호스트 되기",nav_support:"고객센터",nav_login:"로그인",nav_signup:"회원가입",hero_verified:"인증 숙소",label_where:"어디로",label_checkin:"체크인",label_checkout:"체크아웃",label_guests:"인원",btn_filters:"필터 (20+)",btn_map:"지도 보기",btn_weather:"날씨",btn_search:"검색",reward_tier:"내 등급",reward_progress:"다이아몬드까지 ₩1,250,000. 60일 예약 없으면 자동 1단계 강등.",btn_upgrade:"멤버십 관리",downgrade_rule:"60일 이상 예약이 없으면 1단계 강등됩니다. 미리 알림을 보내드려요.",sec_explore:"인기 지역 탐색",deal_title:"번개 특가: 최대 40% 할인",deal_desc:"인증·고평점 숙소 한정 기간 할인.",deal_cta:"특가 받기",host_title:"인증 호스트 되기",notif_title:"스마트 알림",notif_desc:"AI 추천·여행지 제안·레벨 알림을 완벽한 다국어로.",sup_title:"24시간 다국어 지원",sup_desc:"AI 컨시어지 + 사람 상담원. 안전하고 즉시, 전 세계.",sup_chat:"AI 채팅 열기",sup_help:"도움말"}
+    const LANGS = {
+      en:{
+        promo_text:"Earn up to 15% back with StayWorld+ Elite. Summer Flash Deals live now.",promo_cta:"See membership",
+        nav_explore:"Explore",nav_deals:"Deals",nav_membership:"Membership",nav_host:"Become a host",nav_support:"Support",nav_login:"Log in",nav_signup:"Sign up",
+        hero_verified:"Verified Stays",label_where:"Where",label_checkin:"Check‑in",label_checkout:"Check‑out",label_guests:"Guests",
+        btn_filters:"Filters (20+)",btn_map:"Map view",btn_weather:"Weather",btn_search:"Search",
+        reward_tier:"Your tier",reward_progress:"₩1,250,000 until Diamond. No stay for 60 days → auto downgrade 1 level.",btn_upgrade:"Manage Membership",downgrade_rule:"If no booking ≥60 days, you’ll be downgraded by 1 level. We’ll notify you in advance.",
+        sec_explore:"Explore popular places",deal_title:"Flash Deals: up to 40% off",deal_desc:"Limited-time offers on verified and high-rated stays.",deal_cta:"Grab deals",
+        host_title:"Become a verified host",notif_title:"Smart notifications",notif_desc:"AI suggestions, destination picks, and level updates, with perfect multilingual delivery.",
+        sup_title:"24/7 Multilingual Support",sup_desc:"AI concierge + human agents. Secure, instant, and truly global.",sup_chat:"Open AI chat",sup_help:"Help center"
+      },
+      ko:{
+        promo_text:"StayWorld+ 엘리트 최대 15% 적립. 여름 한정 특가 진행중.",promo_cta:"멤버십 보기",
+        nav_explore:"탐색",nav_deals:"특가",nav_membership:"멤버십",nav_host:"호스트 되기",nav_support:"고객센터",nav_login:"로그인",nav_signup:"회원가입",
+        hero_verified:"인증 숙소",label_where:"어디로",label_checkin:"체크인",label_checkout:"체크아웃",label_guests:"인원",
+        btn_filters:"필터 (20+)",btn_map:"지도 보기",btn_weather:"날씨",btn_search:"검색",
+        reward_tier:"내 등급",reward_progress:"다이아몬드까지 ₩1,250,000. 60일 예약 없으면 자동 1단계 강등.",btn_upgrade:"멤버십 관리",downgrade_rule:"60일 이상 예약이 없으면 1단계 강등됩니다. 미리 알림을 보내드려요.",
+        sec_explore:"인기 지역 탐색",deal_title:"번개 특가: 최대 40% 할인",deal_desc:"인증·고평점 숙소 한정 기간 할인.",deal_cta:"특가 받기",
+        host_title:"인증 호스트 되기",notif_title:"스마트 알림",notif_desc:"AI 추천·여행지 제안·레벨 알림을 완벽한 다국어로.",
+        sup_title:"24시간 다국어 지원",sup_desc:"AI 컨시어지 + 사람 상담원. 안전하고 즉시, 전 세계.",sup_chat:"AI 채팅 열기",sup_help:"도움말"
+      },
+      es:{
+        promo_text:"Hasta un 15% de vuelta con StayWorld+ Elite. Ofertas relámpago activas.",promo_cta:"Ver membresía",
+        nav_explore:"Explorar",nav_deals:"Ofertas",nav_membership:"Membresía",nav_host:"Hazte anfitrión",nav_support:"Soporte",nav_login:"Iniciar sesión",nav_signup:"Registrarse",
+        hero_verified:"Alojamientos verificados",label_where:"Destino",label_checkin:"Entrada",label_checkout:"Salida",label_guests:"Huéspedes",
+        btn_filters:"Filtros (20+)",btn_map:"Mapa",btn_weather:"Clima",btn_search:"Buscar",
+        reward_tier:"Tu nivel",reward_progress:"₩1.250.000 para Diamante. 60 días sin reserva → baja automática de 1 nivel.",btn_upgrade:"Gestionar membresía",downgrade_rule:"Si no reservas en ≥60 días, bajarás 1 nivel. Avisaremos con antelación.",
+        sec_explore:"Explora lugares populares",deal_title:"Ofertas flash: hasta −40%",deal_desc:"Promos por tiempo limitado en alojamientos verificados y con alta puntuación.",deal_cta:"Aprovechar",
+        host_title:"Conviértete en anfitrión verificado",notif_title:"Notificaciones inteligentes",notif_desc:"Sugerencias de IA, destinos y avisos de nivel en tu idioma.",
+        sup_title:"Soporte 24/7 multilingüe",sup_desc:"IA + agentes humanos. Seguro, instantáneo y global.",sup_chat:"Abrir chat IA",sup_help:"Centro de ayuda"
+      },
+      it:{
+        promo_text:"Fino al 15% di ritorno con StayWorld+ Elite. Offerte lampo attive.",promo_cta:"Vedi membership",
+        nav_explore:"Esplora",nav_deals:"Offerte",nav_membership:"Membership",nav_host:"Diventa host",nav_support:"Supporto",nav_login:"Accedi",nav_signup:"Registrati",
+        hero_verified:"Soggiorni verificati",label_where:"Dove",label_checkin:"Check‑in",label_checkout:"Check‑out",label_guests:"Ospiti",
+        btn_filters:"Filtri (20+)",btn_map:"Mappa",btn_weather:"Meteo",btn_search:"Cerca",
+        reward_tier:"Il tuo livello",reward_progress:"₩1.250.000 fino a Diamond. 60 giorni senza prenotare → declassamento 1 livello.",btn_upgrade:"Gestisci membership",downgrade_rule:"Se non prenoti per ≥60 giorni, verrai declassato di 1 livello. Avviseremo in anticipo.",
+        sec_explore:"Esplora le mete più popolari",deal_title:"Offerte lampo: fino a −40%",deal_desc:"Promozioni a tempo su soggiorni verificati e ben recensiti.",deal_cta:"Scopri le offerte",
+        host_title:"Diventa host verificato",notif_title:"Notifiche intelligenti",notif_desc:"Suggerimenti IA, destinazioni e aggiornamenti livello nella tua lingua.",
+        sup_title:"Supporto multilingue 24/7",sup_desc:"IA + agenti umani. Sicuro, istantaneo e globale.",sup_chat:"Apri chat IA",sup_help:"Centro assistenza"
+      },
+      tr:{
+        promo_text:"StayWorld+ Elite ile %15’e kadar geri kazanın. Yıldırım fırsatlar başladı.",promo_cta:"Üyeliği gör",
+        nav_explore:"Keşfet",nav_deals:"Fırsatlar",nav_membership:"Üyelik",nav_host:"Ev sahibi ol",nav_support:"Destek",nav_login:"Giriş yap",nav_signup:"Kayıt ol",
+        hero_verified:"Doğrulanmış konaklamalar",label_where:"Nereye",label_checkin:"Giriş",label_checkout:"Çıkış",label_guests:"Misafir",
+        btn_filters:"Filtreler (20+)",btn_map:"Harita",btn_weather:"Hava",btn_search:"Ara",
+        reward_tier:"Seviyen",reward_progress:"Elmasa ₩1.250.000 kaldı. 60 gün rezervasyon yoksa → otomatik 1 seviye düşer.",btn_upgrade:"Üyeliği yönet",downgrade_rule:"≥60 gün rezervasyon olmazsa 1 seviye düşürülür. Önceden haber verilir.",
+        sec_explore:"Popüler yerleri keşfet",deal_title:"Flaş fırsatlar: %40’a kadar",deal_desc:"Doğrulanmış ve yüksek puanlı konaklamalarda sınırlı süreli indirimler.",deal_cta:"Fırsatı yakala",
+        host_title:"Doğrulanmış ev sahibi ol",notif_title:"Akıllı bildirimler",notif_desc:"Yapay zekâ önerileri, destinasyonlar ve seviye uyarıları – ana dilinde.",
+        sup_title:"7/24 Çok dilli destek",sup_desc:"Yapay zekâ + insan temsilci. Güvenli, anında ve küresel.",sup_chat:"Yapay zekâ sohbeti",sup_help:"Yardım merkezi"
+      },
+      fr:{
+        promo_text:"Jusqu’à 15 % de remise avec StayWorld+ Elite. Ventes flash en cours.",promo_cta:"Voir l’abonnement",
+        nav_explore:"Explorer",nav_deals:"Offres",nav_membership:"Abonnement",nav_host:"Devenir hôte",nav_support:"Assistance",nav_login:"Connexion",nav_signup:"S’inscrire",
+        hero_verified:"Hébergements vérifiés",label_where:"Où",label_checkin:"Arrivée",label_checkout:"Départ",label_guests:"Voyageurs",
+        btn_filters:"Filtres (20+)",btn_map:"Carte",btn_weather:"Météo",btn_search:"Rechercher",
+        reward_tier:"Votre niveau",reward_progress:"₩1 250 000 avant Diamant. 60 jours sans séjour → rétrogradation d’un niveau.",btn_upgrade:"Gérer l’abonnement",downgrade_rule:"Sans réservation ≥60 jours, rétrogradation d’un niveau. Nous vous préviendrons.",
+        sec_explore:"Explorer les lieux populaires",deal_title:"Ventes flash : jusqu’à −40 %",deal_desc:"Offres limitées sur des séjours vérifiés et bien notés.",deal_cta:"Profiter",
+        host_title:"Devenez hôte vérifié",notif_title:"Notifications intelligentes",notif_desc:"Suggestions IA, destinations et niveaux dans votre langue.",
+        sup_title:"Assistance multilingue 24/7",sup_desc:"IA + agents humains. Sécurisé, instantané et mondial.",sup_chat:"Ouvrir le chat IA",sup_help:"Centre d’aide"
+      },
+      ja:{
+        promo_text:"StayWorld+ Elite で最大15%還元。サマーフラッシュセール開催中。",promo_cta:"メンバーシップを見る",
+        nav_explore:"探す",nav_deals:"セール",nav_membership:"メンバー",nav_host:"ホストになる",nav_support:"サポート",nav_login:"ログイン",nav_signup:"登録",
+        hero_verified:"認証宿泊先",label_where:"場所",label_checkin:"チェックイン",label_checkout:"チェックアウト",label_guests:"人数",
+        btn_filters:"絞り込み (20+)",btn_map:"地図",btn_weather:"天気",btn_search:"検索",
+        reward_tier:"あなたのランク",reward_progress:"ダイヤモンドまで₩1,250,000。60日予約なし→自動で1ランク降格。",btn_upgrade:"メンバー管理",downgrade_rule:"60日以上予約がない場合、1ランク降格します。事前に通知します。",
+        sec_explore:"人気エリアを探す",deal_title:"フラッシュセール：最大40%OFF",deal_desc:"認証済み・高評価の宿に期間限定の割引。",deal_cta:"今すぐチェック",
+        host_title:"認証ホストになる",notif_title:"スマート通知",notif_desc:"AI提案・行き先提案・ランク通知を多言語で。",
+        sup_title:"24時間多言語サポート",sup_desc:"AIコンシェルジュ＋人の担当。安全・即時・グローバル。",sup_chat:"AIチャットを開く",sup_help:"ヘルプセンター"
+      },
+      de:{
+        promo_text:"Bis zu 15 % zurück mit StayWorld+ Elite. Blitzangebote jetzt.",promo_cta:"Mitgliedschaft ansehen",
+        nav_explore:"Entdecken",nav_deals:"Angebote",nav_membership:"Mitgliedschaft",nav_host:"Gastgeber werden",nav_support:"Support",nav_login:"Anmelden",nav_signup:"Registrieren",
+        hero_verified:"Verifizierte Unterkünfte",label_where:"Wohin",label_checkin:"Check‑in",label_checkout:"Check‑out",label_guests:"Gäste",
+        btn_filters:"Filter (20+)",btn_map:"Karte",btn_weather:"Wetter",btn_search:"Suchen",
+        reward_tier:"Dein Level",reward_progress:"Bis Diamant: ₩1.250.000. 60 Tage ohne Buchung → automatischer Levelabstieg.",btn_upgrade:"Mitgliedschaft verwalten",downgrade_rule:"Ohne Buchung ≥60 Tage: Abstieg um 1 Level. Wir informieren vorher.",
+        sec_explore:"Beliebte Orte entdecken",deal_title:"Blitzangebote: bis −40%",deal_desc:"Zeitlich begrenzte Deals für verifizierte, top‑bewertete Unterkünfte.",deal_cta:"Angebote ansehen",
+        host_title:"Verifizierter Gastgeber werden",notif_title:"Intelligente Benachrichtigungen",notif_desc:"KI‑Vorschläge, Reiseziele und Level‑Updates in deiner Sprache.",
+        sup_title:"Mehrsprachiger 24/7‑Support",sup_desc:"KI‑Concierge + menschliche Agents. Sicher, sofort, global.",sup_chat:"KI‑Chat öffnen",sup_help:"Hilfezentrum"
+      },
+      ru:{
+        promo_text:"До 15% баллами с StayWorld+ Elite. Молниеносные акции уже идут.",promo_cta:"Тарифы",
+        nav_explore:"Исследовать",nav_deals:"Скидки",nav_membership:"Подписка",nav_host:"Стать хозяином",nav_support:"Поддержка",nav_login:"Войти",nav_signup:"Регистрация",
+        hero_verified:"Проверенные объекты",label_where:"Куда",label_checkin:"Заезд",label_checkout:"Выезд",label_guests:"Гости",
+        btn_filters:"Фильтры (20+)",btn_map:"Карта",btn_weather:"Погода",btn_search:"Поиск",
+        reward_tier:"Ваш уровень",reward_progress:"До уровня Diamond осталось ₩1 250 000. 60 дней без брони → автопонижение на 1 уровень.",btn_upgrade:"Управлять подпиской",downgrade_rule:"Если нет брони ≥60 дней, понижение на 1 уровень. Предупредим заранее.",
+        sec_explore:"Популярные направления",deal_title:"Молниеносные скидки до −40%",deal_desc:"Ограниченные предложения на проверенные и высоко оценённые объекты.",deal_cta:"Забрать скидку",
+        host_title:"Станьте проверенным хозяином",notif_title:"Умные уведомления",notif_desc:"Рекомендации ИИ, направления и уровни – на вашем языке.",
+        sup_title:"Круглосуточная многоязычная поддержка",sup_desc:"ИИ‑консьерж + операторы. Безопасно, мгновенно, по всему миру.",sup_chat:"Открыть чат ИИ",sup_help:"Справочный центр"
+      },
+      zh:{
+        promo_text:"StayWorld+ Elite 返利最高 15%。夏季限时优惠进行中。",promo_cta:"查看会员",
+        nav_explore:"探索",nav_deals:"优惠",nav_membership:"会员",nav_host:"成为房东",nav_support:"支持",nav_login:"登录",nav_signup:"注册",
+        hero_verified:"已认证房源",label_where:"目的地",label_checkin:"入住",label_checkout:"退房",label_guests:"入住人数",
+        btn_filters:"筛选 (20+)",btn_map:"地图",btn_weather:"天气",btn_search:"搜索",
+        reward_tier:"您的等级",reward_progress:"距钻石还差 ₩1,250,000。60 天未预订 → 自动降级 1 级。",btn_upgrade:"管理会员",downgrade_rule:"≥60 天未预订将降级 1 级。我们会提前通知。",
+        sec_explore:"探索热门目的地",deal_title:"限时闪促：最高 −40%",deal_desc:"认证高分房源限时优惠。",deal_cta:"立即抢购",
+        host_title:"成为认证房东",notif_title:"智能通知",notif_desc:"AI 推荐、目的地与等级提醒，覆盖多语言。",
+        sup_title:"24/7 多语言支持",sup_desc:"AI 礼宾 + 人工客服。安全、即时、全球化。",sup_chat:"打开 AI 聊天",sup_help:"帮助中心"
+      }
     };
-    function setLang(code){ const dict = LANGS[code]||LANGS.en; document.querySelectorAll('[data-i18n]').forEach(el=>{ const key = el.getAttribute('data-i18n'); if(dict[key]) el.textContent = dict[key]; }); localStorage.setItem('sw_lang', code); document.getElementById('searchInput').placeholder = (code==='ko')? '파리, 도쿄, 이스탄불...' : 'Paris, Tokyo, Istanbul...'; }
+    function setLang(code){
+      const lang = LANGS[code] ? code : 'en';
+      const dict = LANGS[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el=>{
+        const key = el.getAttribute('data-i18n');
+        if(dict[key]) el.textContent = dict[key];
+      });
+      const placeholders = {
+        en:'Paris, Tokyo, Istanbul...',
+        ko:'파리, 도쿄, 서울...',
+        es:'París, Tokio, Estambul...',
+        it:'Parigi, Tokyo, Istanbul...',
+        tr:'Paris, Tokyo, İstanbul...',
+        fr:'Paris, Tokyo, Istanbul...',
+        ja:'パリ、東京、イスタンブール…',
+        de:'Paris, Tokio, Istanbul…',
+        ru:'Париж, Токио, Стамбул…',
+        zh:'巴黎、东京、伊斯坦布尔…'
+      };
+      const inp = document.getElementById('searchInput');
+      if(inp) inp.placeholder = placeholders[lang] || placeholders.en;
+      localStorage.setItem('sw_lang', lang);
+      document.documentElement.setAttribute('lang', lang);
+      const select = document.getElementById('langSelect');
+      if(select) select.value = lang;
+    }); localStorage.setItem('sw_lang', code); document.getElementById('searchInput').placeholder = (code==='ko')? '파리, 도쿄, 이스탄불...' : 'Paris, Tokyo, Istanbul...'; }
     (function(){ const saved = localStorage.getItem('sw_lang')||'en'; document.getElementById('langSelect').value = saved; setLang(saved); })();
 
     // Suggestions & city mapping
@@ -430,13 +554,7 @@
     function goNext(){ const list=getCurrentList(); const pages=Math.ceil(list.length/PAGE_SIZE); if(PAGE<pages){ PAGE++; renderCards(); scrollToExplore(); } }
     function scrollToExplore(){ document.getElementById('explore').scrollIntoView({behavior:'smooth', block:'start'}); }
     function applyQuickFilter(tag){ CURRENT_LIST = (tag==='verified')? 'verified' : tag; renderCards(true); }
-    function applyQuickFilter(tag){ const filtered = DEMO_LIST.filter(i=> i.tag===tag || (tag==='verified'&&i.verified)); const grid = document.getElementById('cardGrid'); grid.innerHTML=''; filtered.slice(0,12).forEach((item)=>{ const el=document.createElement('article'); el.className='card ring overflow-hidden'; el.innerHTML = `
-        <div class="h-44 bg-cover bg-center" style="background-image:url('https://picsum.photos/seed/${item.id+100}/800/600')"></div>
-        <div class="p-4">
-          <div class="flex items-center justify-between"><h3 class="font-bold">${item.title}</h3>${item.verified?'<span class="badge verified">Verified</span>':''}</div>
-          <div class="text-white/70 text-sm">${item.city} • ${item.type}</div>
-          <div class="flex items-center justify-between mt-2"><div class="rating text-sm">${ratingStars(item.rating)} <span class="text-white/70">${item.rating.toFixed(2)}</span></div><div class="font-bold">$${item.price}<span class="text-white/60 text-xs">/night</span></div></div>
-        </div>`; grid.appendChild(el); }); if(map && !window.ENV?.DEMO_MODE) plotListings(filtered); }
+    
 
     // Listing modal & drawer
     const $ = sel=>document.querySelector(sel);
