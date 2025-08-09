@@ -1,15 +1,12 @@
-# Create an upgraded, extended StayWorld index.html that works without API keys (shows a real map via OpenStreetMap iframe in DEMO_MODE)
-# and switches to Google Maps when keys are added. Includes extra sections (Collections, Trust/FAQ, Newsletter, Cookie banner),
-# plus richer modals for listing details and a booking drawer. 
-content = r"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>STAYWORLD – Book Stays, Live Better</title>
-  <meta name="description" content="StayWorld – global stays with pro-level filters, AI concierge, rewards & verified hosts. Luxury black-gold brand design." />
+  <meta name="description" content="StayWorld – global stays with pro‑level filters, AI concierge, rewards & verified hosts. Luxury black‑gold brand design." />
   <meta property="og:title" content="STAYWORLD – Book Stays, Live Better"/>
-  <meta property="og:description" content="Global stays with pro-level filters, AI concierge, rewards & verified hosts."/>
+  <meta property="og:description" content="Global stays with pro‑level filters, AI concierge, rewards & verified hosts."/>
   <meta property="og:type" content="website"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"TravelAgency","name":"STAYWORLD","url":"https://stayworldbooking.com","description":"Global booking platform with verified hosts and rewards","areaServed":"Worldwide"}</script>
@@ -31,9 +28,9 @@ content = r"""<!DOCTYPE html>
   </script>
   <style>
     :root{--bg:#0b0b0e;--card:#121218;--muted:#8b8fa3;--gold:#d4af37;--gold2:#f2d16b;--ring:rgba(212,175,55,.45)}
-    html,body{height:100%;}
-    body{background:var(--bg);color:#fff;font-family:Inter, Noto Sans, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;}
-    .glass{backdrop-filter: blur(10px);background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));}
+    html,body{height:100%}
+    body{background:var(--bg);color:#fff;font-family:Inter, Noto Sans, system-ui, -apple-system, Segoe UI, Roboto, sans-serif}
+    .glass{backdrop-filter: blur(10px);background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02))}
     .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:18px}
     .ring{box-shadow:0 0 0 1px var(--ring), 0 10px 30px rgba(0,0,0,.45)}
     .btn{border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:.7rem 1rem;transition:.2s ease all}
@@ -49,22 +46,18 @@ content = r"""<!DOCTYPE html>
     html{scroll-behavior:smooth;scroll-padding-top:80px}
     section{scroll-margin-top:90px}
     select#langSelect, select#langSelect option{background:#0f0f15;color:#fff}
-    /* Chatbot */
     #chat-launch{position:fixed;right:20px;bottom:20px;z-index:50}
     #chat-panel{position:fixed;right:20px;bottom:90px;width:380px;max-height:70vh;display:none;z-index:60}
-    /* Map height */
     #map{height:380px;border-radius:18px;border:1px solid rgba(255,255,255,.08);overflow:hidden}
-    /* Autocomplete dropdown */
     #suggestions{position:absolute;z-index:20;left:0;right:0;top:100%;background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:12px;display:none}
     #suggestions button{width:100%;text-align:left;padding:.7rem 1rem}
-    /* Drawer */
     #drawer{position:fixed;right:0;top:0;bottom:0;width:420px;transform:translateX(100%);transition:.25s ease transform;z-index:70}
     #drawer.show{transform:translateX(0)}
     .skeleton{background:linear-gradient(90deg,#1b1b22 25%,#20202a 37%,#1b1b22 63%);background-size:400% 100%;animation:shimmer 1.2s infinite}
     @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
   </style>
   <script>
-    // ENV: real keys later; DEMO_MODE shows real map via OSM iframe & demo auth
+    // Keys: keep DEMO_MODE true for demo (no keys needed). Toggle to false & add keys for production.
     window.ENV = { GMAPS_KEY:'', OWM_KEY:'', FB_API_KEY:'', FB_AUTH_DOMAIN:'', FB_PROJECT_ID:'', FB_APP_ID:'', FB_MEASUREMENT_ID:'', DEMO_MODE:true };
   </script>
 </head>
@@ -72,20 +65,14 @@ content = r"""<!DOCTYPE html>
   <div class="w-full glass text-sm text-white/80">
     <div class="max-w-7xl mx-auto px-5 py-2 flex items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <!-- Inline globe logo -->
-        <svg class="w-5 h-5" viewBox="0 0 24 24" aria-label="StayWorld" xmlns="http://www.w3.org/2000/svg">
-          <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#F2D16B"/><stop offset="1" stop-color="#D4AF37"/></linearGradient></defs>
-          <circle cx="12" cy="12" r="10" fill="url(#g)"/><path d="M2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20" stroke="#1a1a1f" stroke-width="1" fill="none"/>
-        </svg>
+        <svg class="w-5 h-5" viewBox="0 0 24 24" aria-label="StayWorld" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#F2D16B"/><stop offset="1" stop-color="#D4AF37"/></linearGradient></defs><circle cx="12" cy="12" r="10" fill="url(#g)"/><path d="M2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20" stroke="#1a1a1f" stroke-width="1" fill="none"/></svg>
         <span data-i18n="promo_text">Earn up to 15% back with StayWorld+ Elite. Summer Flash Deals live now.</span>
       </div>
       <div class="flex items-center gap-3">
         <button class="badge elite" onclick="openMembership()" data-i18n="promo_cta">See membership</button>
-        <div class="flex items-center gap-1">
-          <select id="langSelect" class="bg-transparent border border-white/15 rounded-md px-2 py-1 text-sm" onchange="setLang(this.value)">
-            <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option><option value="de">DE</option><option value="es">ES</option><option value="ru">RU</option><option value="it">IT</option><option value="zh">ZH</option>
-          </select>
-        </div>
+        <select id="langSelect" class="bg-transparent border border-white/15 rounded-md px-2 py-1 text-sm" onchange="setLang(this.value)">
+          <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option><option value="de">DE</option><option value="es">ES</option><option value="ru">RU</option><option value="it">IT</option><option value="zh">ZH</option>
+        </select>
       </div>
     </div>
   </div>
@@ -93,11 +80,7 @@ content = r"""<!DOCTYPE html>
   <header class="w-full border-b border-white/10 sticky top-0 z-40 bg-[#0b0b0ee6] backdrop-blur">
     <div class="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <!-- Inline wordmark -->
-        <svg class="h-8" viewBox="0 0 320 40" xmlns="http://www.w3.org/2000/svg" aria-label="STAYWORLD">
-          <defs><linearGradient id="wg" x1="0" x2="1"><stop offset="0" stop-color="#F2D16B"/><stop offset="1" stop-color="#D4AF37"/></linearGradient></defs>
-          <text x="0" y="28" font-family="Inter, sans-serif" font-weight="800" font-size="28" fill="url(#wg)">STAYWORLD</text>
-        </svg>
+        <svg class="h-8" viewBox="0 0 320 40" xmlns="http://www.w3.org/2000/svg" aria-label="STAYWORLD"><defs><linearGradient id="wg" x1="0" x2="1"><stop offset="0" stop-color="#F2D16B"/><stop offset="1" stop-color="#D4AF37"/></linearGradient></defs><text x="0" y="28" font-family="Inter, sans-serif" font-weight="800" font-size="28" fill="url(#wg)">STAYWORLD</text></svg>
         <span class="text-sm text-white/60 hidden sm:block">Global stays. Verified hosts. Premium design.</span>
       </div>
       <nav class="hidden md:flex items-center gap-6 text-sm">
@@ -108,22 +91,15 @@ content = r"""<!DOCTYPE html>
         <a href="#trust" class="hover:text-brand.gold">Trust</a>
         <a href="#support" class="hover:text-brand.gold" data-i18n="nav_support">Support</a>
       </nav>
-      <div class="flex items-center gap-2">
-        <button class="btn" onclick="openLogin()" data-i18n="nav_login">Log in</button>
-        <button class="btn btn-gold" onclick="openSignup()" data-i18n="nav_signup">Sign up</button>
-      </div>
+      <div class="flex items-center gap-2"><button class="btn" onclick="openLogin()" data-i18n="nav_login">Log in</button><button class="btn btn-gold" onclick="openSignup()" data-i18n="nav_signup">Sign up</button></div>
     </div>
   </header>
 
-  <!-- Hero Search -->
   <section class="relative">
     <div class="max-w-7xl mx-auto px-5 py-10 md:py-14">
       <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-start">
         <div class="card ring p-6 md:p-8">
-          <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight"><span class="text-brand.gold">STAY</span>WORLD</h1>
-            <span class="badge verified" data-i18n="hero_verified">Verified Stays</span>
-          </div>
+          <div class="flex items-center justify-between mb-4"><h1 class="text-2xl md:text-3xl font-extrabold tracking-tight"><span class="text-brand.gold">STAY</span>WORLD</h1><span class="badge verified" data-i18n="hero_verified">Verified Stays</span></div>
           <div class="relative">
             <div class="grid md:grid-cols-5 gap-3">
               <div class="md:col-span-2">
@@ -133,18 +109,9 @@ content = r"""<!DOCTYPE html>
                   <div id="suggestions"></div>
                 </div>
               </div>
-              <div>
-                <label class="text-xs text-white/60" data-i18n="label_checkin">Check-in</label>
-                <input type="date" id="checkin" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" />
-              </div>
-              <div>
-                <label class="text-xs text-white/60" data-i18n="label_checkout">Check-out</label>
-                <input type="date" id="checkout" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" />
-              </div>
-              <div>
-                <label class="text-xs text-white/60" data-i18n="label_guests">Guests</label>
-                <input type="number" id="guests" min="1" value="2" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" />
-              </div>
+              <div><label class="text-xs text-white/60" data-i18n="label_checkin">Check-in</label><input type="date" id="checkin" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" /></div>
+              <div><label class="text-xs text-white/60" data-i18n="label_checkout">Check-out</label><input type="date" id="checkout" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" /></div>
+              <div><label class="text-xs text-white/60" data-i18n="label_guests">Guests</label><input type="number" id="guests" min="1" value="2" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" /></div>
             </div>
             <div class="mt-4 flex flex-wrap gap-2">
               <button class="chip" onclick="openFilters()" data-i18n="btn_filters">Filters (20+)</button>
@@ -164,15 +131,8 @@ content = r"""<!DOCTYPE html>
             </div>
             <span class="badge elite">STAYWORLD+</span>
           </div>
-          <div class="mt-4">
-            <div class="w-full bg-white/10 rounded-full h-2"><div class="bg-[var(--gold)] h-2 rounded-full" style="width: 45%"></div></div>
-            <div class="text-right text-xs text-white/60 mt-1">45%</div>
-          </div>
-          <ul class="text-sm text-white/80 mt-4 space-y-2">
-            <li>• 15% points back + Private Deals</li>
-            <li>• Priority support & emergency assist</li>
-            <li>• Includes all lower-tier benefits</li>
-          </ul>
+          <div class="mt-4"><div class="w-full bg-white/10 rounded-full h-2"><div class="bg-[var(--gold)] h-2 rounded-full" style="width: 45%"></div></div><div class="text-right text-xs text-white/60 mt-1">45%</div></div>
+          <ul class="text-sm text-white/80 mt-4 space-y-2"><li>• 15% points back + Private Deals</li><li>• Priority support & emergency assist</li><li>• Includes all lower-tier benefits</li></ul>
           <button class="btn btn-gold mt-5 w-full" onclick="openMembership()" data-i18n="btn_upgrade">Manage Membership</button>
           <div class="text-xs text-white/60 mt-3" data-i18n="downgrade_rule">If no booking ≥60 days, you’ll be downgraded by 1 level. We’ll notify you in advance.</div>
         </div>
@@ -180,40 +140,22 @@ content = r"""<!DOCTYPE html>
     </div>
   </section>
 
-  <!-- Explore / Cards -->
   <section id="explore" class="py-6">
     <div class="max-w-7xl mx-auto px-5">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-xl font-bold" data-i18n="sec_explore">Explore popular places</h2>
-        <div class="flex gap-2 overflow-x-auto scrollbar">
-          <button class="badge" onclick="applyQuickFilter('beach')">🏖 Beach</button>
-          <button class="badge" onclick="applyQuickFilter('city')">🌇 City</button>
-          <button class="badge" onclick="applyQuickFilter('camp')">🏕 Nature</button>
-          <button class="badge" onclick="applyQuickFilter('lux')">✨ Luxury</button>
-          <button class="badge" onclick="applyQuickFilter('verified')">✔ Verified</button>
-        </div>
-      </div>
+      <div class="flex items-center justify-between mb-3"><h2 class="text-xl font-bold" data-i18n="sec_explore">Explore popular places</h2><div class="flex gap-2 overflow-x-auto scrollbar"><button class="badge" onclick="applyQuickFilter('beach')">🏖 Beach</button><button class="badge" onclick="applyQuickFilter('city')">🌇 City</button><button class="badge" onclick="applyQuickFilter('camp')">🏕 Nature</button><button class="badge" onclick="applyQuickFilter('lux')">✨ Luxury</button><button class="badge" onclick="applyQuickFilter('verified')">✔ Verified</button></div></div>
       <div id="cardGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
-      <div class="mt-6 flex items-center justify-center"><button class="btn" onclick="loadMore()" data-i18n="btn_loadmore">Load more</button></div>
-    </div>
-  </section>
-
-  <!-- Deals -->
-  <section id="deals" class="py-10">
-    <div class="max-w-7xl mx-auto px-5">
-      <div class="card p-6 ring">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h3 class="text-lg font-bold" data-i18n="deal_title">Flash Deals: up to 40% off</h3>
-            <p class="text-white/70" data-i18n="deal_desc">Limited-time offers on verified and high-rated stays.</p>
-          </div>
-          <button class="btn btn-gold" onclick="openDeals()" data-i18n="deal_cta">Grab deals</button>
-        </div>
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <button id="pagerPrev" class="btn" onclick="goPrev()">Prev</button>
+        <span id="pagerInfo" class="text-white/70 text-sm">1 / 1</span>
+        <button id="pagerNext" class="btn" onclick="goNext()">Next</button>
       </div>
     </div>
   </section>
 
-  <!-- Collections / Themes -->
+  <section id="deals" class="py-10">
+    <div class="max-w-7xl mx-auto px-5"><div class="card p-6 ring"><div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"><div><h3 class="text-lg font-bold" data-i18n="deal_title">Flash Deals: up to 40% off</h3><p class="text-white/70" data-i18n="deal_desc">Limited-time offers on verified and high-rated stays.</p></div><button class="btn btn-gold" onclick="openDeals()" data-i18n="deal_cta">Grab deals</button></div></div></div>
+  </section>
+
   <section id="collections" class="py-10">
     <div class="max-w-7xl mx-auto px-5">
       <h3 class="text-2xl font-extrabold mb-4">Collections</h3>
@@ -226,168 +168,169 @@ content = r"""<!DOCTYPE html>
     </div>
   </section>
 
-  <!-- Host CTA -->
   <section id="host" class="py-10">
     <div class="max-w-7xl mx-auto px-5">
       <div class="grid md:grid-cols-2 gap-6 items-center">
-        <div class="card p-8 ring">
-          <h3 class="text-2xl font-extrabold" data-i18n="host_title">Become a verified host</h3>
-          <ul class="mt-3 space-y-2 text-white/80 text-sm">
-            <li>✔ ID verification & badge</li>
-            <li>✔ Real-time calendar sync API</li>
-            <li>✔ Revenue dashboard and payouts</li>
-          </ul>
-          <button class="btn btn-gold mt-5" onclick="openHost()" data-i18n="host_cta">Start hosting</button>
-        </div>
-        <div class="card p-8 ring">
-          <h4 class="text-xl font-bold mb-2" data-i18n="notif_title">Smart notifications</h4>
-          <p class="text-white/70 text-sm" data-i18n="notif_desc">AI suggestions, destination picks, and level updates, with perfect multilingual delivery.</p>
-          <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div class="glass p-4 rounded-xl">AI Picks → Tokyo • Elite Only</div>
-            <div class="glass p-4 rounded-xl">Level warning → 12 days left</div>
-            <div class="glass p-4 rounded-xl">Deal near you → 25% off</div>
-            <div class="glass p-4 rounded-xl">Weather alert → Warm & clear</div>
-          </div>
-        </div>
+        <div class="card p-8 ring"><h3 class="text-2xl font-extrabold" data-i18n="host_title">Become a verified host</h3><ul class="mt-3 space-y-2 text-white/80 text-sm"><li>✔ ID verification & badge</li><li>✔ Real-time calendar sync API</li><li>✔ Revenue dashboard and payouts</li></ul><button class="btn btn-gold mt-5" onclick="openHost()" data-i18n="host_cta">Start hosting</button></div>
+        <div class="card p-8 ring"><h4 class="text-xl font-bold mb-2" data-i18n="notif_title">Smart notifications</h4><p class="text-white/70 text-sm" data-i18n="notif_desc">AI suggestions, destination picks, and level updates, with perfect multilingual delivery.</p><div class="mt-4 grid grid-cols-2 gap-3 text-sm"><div class="glass p-4 rounded-xl">AI Picks → Tokyo • Elite Only</div><div class="glass p-4 rounded-xl">Level warning → 12 days left</div><div class="glass p-4 rounded-xl">Deal near you → 25% off</div><div class="glass p-4 rounded-xl">Weather alert → Warm & clear</div></div></div>
       </div>
     </div>
   </section>
 
-  <!-- Membership -->
   <section id="membership" class="py-10">
-    <div class="max-w-7xl mx-auto px-5">
-      <h3 class="text-2xl font-extrabold mb-4" data-i18n="mem_title">StayWorld+ Rewards</h3>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="card p-6 ring"><h4 class="font-bold">Gold</h4><p class="text-sm text-white/70">5% back • Priority queue</p></div>
-        <div class="card p-6 ring"><h4 class="font-bold">Diamond</h4><p class="text-sm text-white/70">10% back • VIP coupons</p></div>
-        <div class="card p-6 ring"><h4 class="font-bold">Elite</h4><p class="text-sm text-white/70">15% back • Private deals • Emergency first</p></div>
-      </div>
-    </div>
+    <div class="max-w-7xl mx-auto px-5"><h3 class="text-2xl font-extrabold mb-4" data-i18n="mem_title">StayWorld+ Rewards</h3><div class="grid md:grid-cols-3 gap-6"><div class="card p-6 ring"><h4 class="font-bold">Gold</h4><p class="text-sm text-white/70">5% back • Priority queue</p></div><div class="card p-6 ring"><h4 class="font-bold">Diamond</h4><p class="text-sm text-white/70">10% back • VIP coupons</p></div><div class="card p-6 ring"><h4 class="font-bold">Elite</h4><p class="text-sm text-white/70">15% back • Private deals • Emergency first</p></div></div></div>
   </section>
 
-  <!-- Trust & Safety / FAQ -->
   <section id="trust" class="py-10">
     <div class="max-w-7xl mx-auto px-5 grid md:grid-cols-2 gap-6">
-      <div class="card ring p-6">
-        <h3 class="text-xl font-bold mb-2">Trust & Safety</h3>
-        <ul class="text-sm text-white/80 space-y-2">
-          <li>✔ Verified hosts & ID checks</li>
-          <li>✔ Fraud detection & review moderation</li>
-          <li>✔ 24/7 emergency support worldwide</li>
-          <li>✔ Secure payments & refunds</li>
-        </ul>
-      </div>
-      <div class="card ring p-6">
-        <h3 class="text-xl font-bold mb-2">FAQ</h3>
-        <details class="mb-2"><summary class="cursor-pointer font-semibold">How do points work?</summary><p class="text-sm text-white/70 mt-2">Book stays to earn up to 15% back. Points can be used as coupons on checkout.</p></details>
-        <details class="mb-2"><summary class="cursor-pointer font-semibold">What is verified?</summary><p class="text-sm text-white/70 mt-2">Host identity and property details are checked to receive the verified badge.</p></details>
-        <details><summary class="cursor-pointer font-semibold">How to cancel?</summary><p class="text-sm text-white/70 mt-2">See your booking page for policy; many listings support flexible cancellation.</p></details>
-      </div>
+      <div class="card ring p-6"><h3 class="text-xl font-bold mb-2">Trust & Safety</h3><ul class="text-sm text-white/80 space-y-2"><li>✔ Verified hosts & ID checks</li><li>✔ Fraud detection & review moderation</li><li>✔ 24/7 emergency support worldwide</li><li>✔ Secure payments & refunds</li></ul></div>
+      <div class="card ring p-6"><h3 class="text-xl font-bold mb-2">FAQ</h3><details class="mb-2"><summary class="cursor-pointer font-semibold">How do points work?</summary><p class="text-sm text-white/70 mt-2">Book stays to earn up to 15% back. Points can be used as coupons on checkout.</p></details><details class="mb-2"><summary class="cursor-pointer font-semibold">What is verified?</summary><p class="text-sm text-white/70 mt-2">Host identity and property details are checked to receive the verified badge.</p></details><details><summary class="cursor-pointer font-semibold">How to cancel?</summary><p class="text-sm text-white/70 mt-2">See your booking page for policy; many listings support flexible cancellation.</p></details></div>
     </div>
   </section>
 
-  <!-- Support -->
   <section id="support" class="py-12">
-    <div class="max-w-7xl mx-auto px-5">
-      <div class="card p-8 ring grid md:grid-cols-2 gap-6">
-        <div>
-          <h3 class="text-xl font-bold" data-i18n="sup_title">24/7 Multilingual Support</h3>
-          <p class="text-white/70 text-sm" data-i18n="sup_desc">AI concierge + human agents. Secure, instant, and truly global.</p>
-          <div class="mt-4 flex gap-2">
-            <button class="btn" onclick="openChat()" data-i18n="sup_chat">Open AI chat</button>
-            <button class="btn" onclick="openHelp()" data-i18n="sup_help">Help center</button>
-          </div>
-        </div>
-        <div>
-          <div class="grid grid-cols-2 gap-3 text-sm">
-            <div class="glass p-4 rounded-xl">Crypto payments supported</div>
-            <div class="glass p-4 rounded-xl">2FA login</div>
-            <div class="glass p-4 rounded-xl">Receipt automation</div>
-            <div class="glass p-4 rounded-xl">Fraud & review verification</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="max-w-7xl mx-auto px-5"><div class="card p-8 ring grid md:grid-cols-2 gap-6"><div><h3 class="text-xl font-bold" data-i18n="sup_title">24/7 Multilingual Support</h3><p class="text-white/70 text-sm" data-i18n="sup_desc">AI concierge + human agents. Secure, instant, and truly global.</p><div class="mt-4 flex gap-2"><button class="btn" onclick="openChat()" data-i18n="sup_chat">Open AI chat</button><button class="btn" onclick="openHelp()" data-i18n="sup_help">Help center</button></div></div><div><div class="grid grid-cols-2 gap-3 text-sm"><div class="glass p-4 rounded-xl">Crypto payments supported</div><div class="glass p-4 rounded-xl">2FA login</div><div class="glass p-4 rounded-xl">Receipt automation</div><div class="glass p-4 rounded-xl">Fraud & review verification</div></div></div></div></div>
   </section>
 
-  <!-- Newsletter & Cookie -->
-  <section id="newsletter" class="py-6">
-    <div class="max-w-3xl mx-auto px-5 card ring p-6">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div><h4 class="font-bold">Stay in the loop</h4><p class="text-sm text-white/70">Deals, new cities, and private offers.</p></div>
-        <div class="flex gap-2 w-full md:w-auto"><input id="nl" class="flex-1 px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="your@email.com"/><button class="btn btn-gold" onclick="alert('Subscribed!')">Subscribe</button></div>
-      </div>
-    </div>
-  </section>
-  <div id="cookie" class="fixed bottom-4 left-4 right-4 md:left-6 md:right-auto md:max-w-xl card ring p-4 hidden">
-    <div class="flex items-center justify-between gap-3">
-      <div class="text-sm text-white/80">We use cookies to improve your experience. Read our policy.</div>
-      <div class="flex gap-2"><button class="btn" onclick="document.getElementById('cookie').classList.add('hidden')">Decline</button><button class="btn btn-gold" onclick="document.getElementById('cookie').classList.add('hidden')">Accept</button></div>
-    </div>
-  </div>
+  <section id="newsletter" class="py-6"><div class="max-w-3xl mx-auto px-5 card ring p-6"><div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3"><div><h4 class="font-bold">Stay in the loop</h4><p class="text-sm text-white/70">Deals, new cities, and private offers.</p></div><div class="flex gap-2 w-full md:w-auto"><input id="nl" class="flex-1 px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="you@email.com"/><button class="btn btn-gold" onclick="alert('Subscribed!')">Subscribe</button></div></div></div></section>
+  <div id="cookie" class="fixed bottom-4 left-4 right-4 md:left-6 md:right-auto md:max-w-xl card ring p-4 hidden"><div class="flex items-center justify-between gap-3"><div class="text-sm text-white/80">We use cookies to improve your experience. Read our policy.</div><div class="flex gap-2"><button class="btn" onclick="document.getElementById('cookie').classList.add('hidden')">Decline</button><button class="btn btn-gold" onclick="document.getElementById('cookie').classList.add('hidden')">Accept</button></div></div></div>
 
-  <!-- Footer -->
   <footer class="border-t border-white/10 py-10 mt-auto">
     <div class="max-w-7xl mx-auto px-5 grid md:grid-cols-4 gap-6 text-sm">
       <div>
-        <svg class="h-7 mb-3" viewBox="0 0 320 40" xmlns="http://www.w3.org/2000/svg" aria-label="STAYWORLD">
-          <defs><linearGradient id="wgg" x1="0" x2="1"><stop offset="0" stop-color="#F2D16B"/><stop offset="1" stop-color="#D4AF37"/></linearGradient></defs>
-          <text x="0" y="28" font-family="Inter, sans-serif" font-weight="800" font-size="28" fill="url(#wgg)">STAYWORLD</text>
-        </svg>
+        <svg class="h-7 mb-3" viewBox="0 0 320 40" xmlns="http://www.w3.org/2000/svg" aria-label="STAYWORLD"><defs><linearGradient id="wgg" x1="0" x2="1"><stop offset="0" stop-color="#F2D16B"/><stop offset="1" stop-color="#D4AF37"/></linearGradient></defs><text x="0" y="28" font-family="Inter, sans-serif" font-weight="800" font-size="28" fill="url(#wgg)">STAYWORLD</text></svg>
         <p class="text-white/60">Global booking platform built for trust & rewards.</p>
       </div>
-      <div>
-        <h5 class="font-bold mb-2">Company</h5>
-        <ul class="space-y-1 text-white/70"><li><a href="#" class="hover:text-brand.gold">About</a></li><li><a href="#" class="hover:text-brand.gold">Careers</a></li><li><a href="#" class="hover:text-brand.gold">Press</a></li></ul>
-      </div>
-      <div>
-        <h5 class="font-bold mb-2">Support</h5>
-        <ul class="space-y-1 text-white/70"><li><a href="#support" class="hover:text-brand.gold">Help Center</a></li><li><a href="#" class="hover:text-brand.gold">Safety</a></li><li><a href="#" class="hover:text-brand.gold">Terms</a></li></ul>
-      </div>
-      <div>
-        <h5 class="font-bold mb-2">Contact</h5>
-        <ul class="space-y-1 text-white/70"><li>Email: stayworld94@gmail.com</li><li>Domain: stayworldbooking.com</li></ul>
-      </div>
+      <div><h5 class="font-bold mb-2">Company</h5><ul class="space-y-1 text-white/70"><li><a href="#" class="hover:text-brand.gold">About</a></li><li><a href="#" class="hover:text-brand.gold">Careers</a></li><li><a href="#" class="hover:text-brand.gold">Press</a></li></ul></div>
+      <div><h5 class="font-bold mb-2">Support</h5><ul class="space-y-1 text-white/70"><li><a href="#support" class="hover:text-brand.gold">Help Center</a></li><li><a href="#" class="hover:text-brand.gold">Safety</a></li><li><a href="#" class="hover:text-brand.gold">Terms</a></li></ul></div>
+      <div><h5 class="font-bold mb-2">Contact</h5><ul class="space-y-1 text-white/70"><li>Email: stayworld94@gmail.com</li><li>Domain: stayworldbooking.com</li></ul></div>
     </div>
     <div class="max-w-7xl mx-auto px-5 mt-6 text-xs text-white/50">© <span id="year"></span> STAYWORLD. All rights reserved.</div>
   </footer>
 
-  <!-- Chatbot Floating Button & Panel -->
   <button id="chat-launch" class="btn btn-gold shadow-xl" onclick="toggleChat()">AI Chat</button>
-  <div id="chat-panel" class="card ring overflow-hidden" style="display:none;">
-    <div class="p-3 border-b border-white/10 flex items-center justify-between"><div class="font-bold">StayWorld Assistant</div><button class="badge" onclick="toggleChat()">✕</button></div>
-    <div id="chatLog" class="p-3 space-y-2 overflow-y-auto" style="max-height:50vh"><div class="text-white/70 text-sm">Hello! Ask me anything in your language.</div></div>
-    <div class="p-3 border-t border-white/10 flex gap-2"><input id="chatInput" class="flex-1 px-3 py-2 rounded-lg bg-[#0f0f15] border border-white/10" placeholder="Type your message..."/><button class="btn btn-gold" onclick="sendChat()">Send</button></div>
-  </div>
+  <div id="chat-panel" class="card ring overflow-hidden" style="display:none;"><div class="p-3 border-b border-white/10 flex items-center justify-between"><div class="font-bold">StayWorld Assistant</div><button class="badge" onclick="toggleChat()">✕</button></div><div id="chatLog" class="p-3 space-y-2 overflow-y-auto" style="max-height:50vh"><div class="text-white/70 text-sm">Hello! Ask me anything in your language.</div></div><div class="p-3 border-t border-white/10 flex gap-2"><input id="chatInput" class="flex-1 px-3 py-2 rounded-lg bg-[#0f0f15] border border-white/10" placeholder="Type your message..."/><button class="btn btn-gold" onclick="sendChat()">Send</button></div></div>
 
-  <!-- Modals / Drawer -->
   <dialog id="loginModal" class="card ring w-[95%] max-w-md p-6"></dialog>
   <dialog id="signupModal" class="card ring w-[95%] max-w-md p-6"></dialog>
   <dialog id="filtersModal" class="card ring w-[95%] max-w-4xl p-0 overflow-hidden"></dialog>
   <dialog id="hostModal" class="card ring w-[95%] max-w-2xl p-0 overflow-hidden"></dialog>
   <dialog id="dealsModal" class="card ring w-[95%] max-w-2xl p-0 overflow-hidden"></dialog>
   <dialog id="listingModal" class="card ring w-[95%] max-w-3xl p-0 overflow-hidden"></dialog>
-  <div id="drawer" class="card ring bg-[#0f0f15] p-0">
-    <div class="p-4 border-b border-white/10 flex items-center justify-between"><b>Booking</b><button class="badge" onclick="closeDrawer()">✕</button></div>
-    <div class="p-4 space-y-3">
-      <div class="skeleton h-40 rounded-xl"></div>
-      <div class="grid grid-cols-2 gap-2 text-sm">
-        <label class="block">Check-in<input type="date" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label>
-        <label class="block">Check-out<input type="date" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label>
-      </div>
-      <label class="block text-sm">Guests<input type="number" min="1" value="2" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label>
-      <div class="flex items-center justify-between text-sm"><span>Subtotal</span><b id="subtot">$220</b></div>
-      <div class="flex items-center justify-between text-sm"><span>Taxes & fees</span><b id="fees">$35</b></div>
-      <div class="flex items-center justify-between text-sm"><span>StayWorld+ discount</span><b class="text-brand.gold">−$20</b></div>
-      <div class="flex items-center justify-between text-base border-t border-white/10 pt-2"><span>Total</span><b id="total">$235</b></div>
-      <button class="btn btn-gold w-full" onclick="alert('Proceed to payment (wire your gateway)')">Continue to pay</button>
-    </div>
-  </div>
+  <div id="drawer" class="card ring bg-[#0f0f15] p-0"><div class="p-4 border-b border-white/10 flex items-center justify-between"><b>Booking</b><button class="badge" onclick="closeDrawer()">✕</button></div><div class="p-4 space-y-3"><div class="skeleton h-40 rounded-xl"></div><div class="grid grid-cols-2 gap-2 text-sm"><label class="block">Check-in<input type="date" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label><label class="block">Check-out<input type="date" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label></div><label class="block text-sm">Guests<input type="number" min="1" value="2" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label><div class="flex items-center justify-between text-sm"><span>Subtotal</span><b id="subtot">$220</b></div><div class="flex items-center justify-between text-sm"><span>Taxes & fees</span><b id="fees">$35</b></div><div class="flex items-center justify-between text-sm"><span>StayWorld+ discount</span><b class="text-brand.gold">−$20</b></div><div class="flex items-center justify-between text-base border-t border-white/10 pt-2"><span>Total</span><b id="total">$235</b></div><button class="btn btn-gold w-full" onclick="alert('Proceed to payment (wire your gateway)')">Continue to pay</button></div></div>
 
-  <!-- Templates -->
   <template id="loginTpl"><h3 class="text-xl font-bold mb-2">Log in</h3><p class="text-white/70 text-sm mb-3">Welcome back!</p><div class="space-y-3"><input id="loginEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/><input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/><button class="btn btn-gold w-full" onclick="doLogin()">Log in</button><button class="btn w-full" onclick="googleLogin()">Continue with Google</button></div></template>
   <template id="signupTpl"><h3 class="text-xl font-bold mb-2">Create account</h3><p class="text-white/70 text-sm mb-3">Join StayWorld</p><div class="space-y-3"><input id="suName" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Full name"/><input id="suEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/><input id="suPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/><button class="btn btn-gold w-full" onclick="doSignup()">Sign up</button><button class="btn w-full" onclick="googleLogin()">Sign up with Google</button></div></template>
-  <template id="filtersTpl"><div class="p-5 border-b border-white/10 flex items-center justify-between"><h3 class="text-lg font-bold">Filters</h3><button class="badge" onclick="closeFilters()">✕</button></div><div class="p-5 grid md:grid-cols-3 gap-6 text-sm"><div><h4 class="font-bold mb-2">Price & Type</h4><div class="space-y-2"><div class="flex items-center gap-2"><input type="range" min="10" max="1000" value="200" class="w-full" oninput="priceOut.textContent='$'+this.value"/><span id="priceOut" class="badge">$200</span></div><div class="grid grid-cols-2 gap-2"><label class="chip"><input type="checkbox" class="mr-2">Hotel</label><label class="chip"><input type="checkbox" class="mr-2">Motel</label><label class="chip"><input type="checkbox" class="mr-2">Hostel</label><label class="chip"><input type="checkbox" class="mr-2">Apartment</label></div></div></div><div><h4 class="font-bold mb-2">Amenities</h4><div class="grid grid-cols-2 gap-2"><label class="chip"><input type="checkbox" class="mr-2">Kitchen</label><label class="chip"><input type="checkbox" class="mr-2">Washer</label><label class="chip"><input type="checkbox" class="mr-2">AC</label><label class="chip"><input type="checkbox" class="mr-2">Parking</label><label class="chip"><input type="checkbox" class="mr-2">Pool</label><label class="chip"><input type="checkbox" class="mr-2">Gym</label><label class="chip"><input type="checkbox" class="mr-2">Workspace</label><label class="chip"><input type="checkbox" class="mr-2">Breakfast</label></div></div><div><h4 class="font-bold mb-2">Rules & Options</h4><div class="grid grid-cols-2 gap-2"><label class="chip"><input type="checkbox" class="mr-2">Instant book</label><label class="chip"><input type="checkbox" class="mr-2">Self check-in</label><label class="chip"><input type="checkbox" class="mr-2">Pet friendly</label><label class="chip"><input type="checkbox" class="mr-2">Family rooms</label><label class="chip"><input type="checkbox" class="mr-2">EV charger</label><label class="chip"><input type="checkbox" class="mr-2">Accessibility</label><label class="chip"><input type="checkbox" class="mr-2">Verified only</label><label class="chip"><input type="checkbox" class="mr-2">5★ 4★+</label></div></div><div class="md:col-span-3"><h4 class="font-bold mb-2">Beds / Baths / Score</h4><div class="grid grid-cols-3 gap-2"><input type="number" min="0" class="chip" placeholder="Beds ≥ 1"/><input type="number" min="0" class="chip" placeholder="Baths ≥ 1"/><input type="number" min="0" max="5" step="0.1" class="chip" placeholder="Rating ≥ 4.5"/></div></div></div><div class="p-5 border-t border-white/10 flex items-center justify-end gap-2"><button class="btn" onclick="closeFilters()">Cancel</button><button class="btn btn-gold" onclick="applyFilters()">Apply</button></div></template>
+  <template id="filtersTpl">
+      <div class="p-5 border-b border-white/10 flex items-center justify-between">
+        <h3 class="text-lg font-bold">Filters</h3>
+        <button class="badge" onclick="closeFilters()">✕</button>
+      </div>
+      <div class="p-5 grid md:grid-cols-3 gap-6 text-sm">
+        <div>
+          <h4 class="font-bold mb-2">Price & Type</h4>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2"><input type="range" min="10" max="2500" value="220" class="w-full" oninput="priceOut.textContent='$'+this.value"/><span id="priceOut" class="badge">$220</span></div>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="chip"><input type="checkbox" class="mr-2">Hotel</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Apartment</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Villa</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Resort</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Ryokan</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Guesthouse</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Capsule</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Hostel</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Boutique</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Riad</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Chalet</label>
+              <label class="chip"><input type="checkbox" class="mr-2">Cave house</label>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold mb-2">Amenities</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="chip"><input type="checkbox" class="mr-2">Pool</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Hot tub</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Sauna</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Spa</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Ocean view</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Mountain view</label>
+            <label class="chip"><input type="checkbox" class="mr-2">City view</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Rooftop</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Balcony</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Terrace</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Garden</label>
+            <label class="chip"><input type="checkbox" class="mr-2">BBQ</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Fireplace</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Workspace</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Fast Wi‑Fi</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Breakfast</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Washer</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Dryer</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Dishwasher</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Air purifier</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Blackout curtains</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Bathtub</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Bidet</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Bathtub – spa</label>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold mb-2">Policies</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="chip"><input type="checkbox" class="mr-2">Free cancellation</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Non‑refundable</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Instant book</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Self check‑in</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Pet friendly</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Family rooms</label>
+            <label class="chip"><input type="checkbox" class="mr-2">No smoking</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Parties allowed</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Long‑term stays</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Luggage dropoff</label>
+          </div>
+        </div>
+        <div class="md:col-span-3">
+          <h4 class="font-bold mb-2">Accessibility & Parking</h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <label class="chip"><input type="checkbox" class="mr-2">Step‑free access</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Wide doors</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Accessible bathroom</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Elevator</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Free parking</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Valet parking</label>
+            <label class="chip"><input type="checkbox" class="mr-2">EV charger</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Shuttle</label>
+          </div>
+        </div>
+        <div class="md:col-span-3">
+          <h4 class="font-bold mb-2">Beds / Baths / Rating</h4>
+          <div class="grid grid-cols-3 gap-2">
+            <input type="number" min="0" class="chip" placeholder="Beds ≥ 1"/>
+            <input type="number" min="0" class="chip" placeholder="Baths ≥ 1"/>
+            <input type="number" min="0" max="5" step="0.1" class="chip" placeholder="Rating ≥ 4.5"/>
+          </div>
+        </div>
+        <div class="md:col-span-3">
+          <h4 class="font-bold mb-2">Safety</h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <label class="chip"><input type="checkbox" class="mr-2">CCTV</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Fire extinguisher</label>
+            <label class="chip"><input type="checkbox" class="mr-2">First aid kit</label>
+            <label class="chip"><input type="checkbox" class="mr-2">CO detector</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Smoke detector</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Safe box</label>
+            <label class="chip"><input type="checkbox" class="mr-2">24/7 security</label>
+            <label class="chip"><input type="checkbox" class="mr-2">Emergency exit map</label>
+          </div>
+        </div>
+      </div>
+      <div class="p-5 border-t border-white/10 flex items-center justify-end gap-2">
+        <button class="btn" onclick="closeFilters()">Cancel</button>
+        <button class="btn btn-gold" onclick="applyFilters()">Apply</button>
+      </div>
+    </template>
   <template id="hostTpl"><div class="p-5 border-b border-white/10 flex items-center justify-between"><h3 class="text-lg font-bold">Host verification</h3><button class="badge" onclick="closeHost()">✕</button></div><div class="p-5 space-y-3 text-sm"><input class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Full name"/><input class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/><input class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Phone"/><label class="block">Upload ID (passport / ID card)<input type="file" class="mt-1"/></label><button class="btn btn-gold w-full">Submit for verification</button><div class="text-white/60">Only verified hosts can publish listings. Instant activation after approval.</div></div></template>
   <template id="dealsTpl"><div class="p-5 border-b border-white/10 flex items-center justify-between"><h3 class="text-lg font-bold">Deals</h3><button class="badge" onclick="closeDeals()">✕</button></div><div class="p-5 space-y-3 text-sm" id="dealsList"></div></template>
   <template id="listingTpl"><div class="grid md:grid-cols-2"><div class="p-0"><img id="lstImg" class="w-full h-full object-cover" alt="listing"/></div><div class="p-6"><div class="flex items-center justify-between"><h3 id="lstTitle" class="text-xl font-bold">Title</h3><span id="lstBadges" class="badge verified hidden">Verified</span></div><div id="lstCity" class="text-white/70 text-sm mt-1">City • Type</div><div class="mt-3 text-sm">Beautiful view, modern design, and near everything.</div><div class="mt-4 flex items-center justify-between"><div class="rating text-sm" id="lstRating">★★★★★ 4.9</div><div class="font-bold" id="lstPrice">$199<span class="text-white/60 text-xs">/night</span></div></div><div class="mt-5 grid grid-cols-2 gap-2 text-sm"><div class="glass p-3 rounded-lg">Free Wi-Fi</div><div class="glass p-3 rounded-lg">Kitchen</div><div class="glass p-3 rounded-lg">Washer</div><div class="glass p-3 rounded-lg">Self check-in</div></div><button class="btn btn-gold w-full mt-5" onclick="openDrawer()">Book this stay</button></div></div></template>
@@ -395,137 +338,140 @@ content = r"""<!DOCTYPE html>
   <script>
     const YEAR_EL = document.getElementById('year'); YEAR_EL.textContent = new Date().getFullYear();
 
-    // Language
-    const LANGS = {
-      en:{promo_text:"Earn up to 15% back with StayWorld+ Elite. Summer Flash Deals live now.",promo_cta:"See membership",nav_explore:"Explore",nav_deals:"Deals",nav_membership:"Membership",nav_host:"Become a host",nav_support:"Support",nav_login:"Log in",nav_signup:"Sign up",hero_verified:"Verified Stays",label_where:"Where",label_checkin:"Check-in",label_checkout:"Check-out",label_guests:"Guests",btn_filters:"Filters (20+)",btn_map:"Map view",btn_weather:"Weather",btn_search:"Search",reward_tier:"Your tier",reward_progress:"₩1,250,000 until Diamond. No stay for 60 days → auto downgrade 1 level.",btn_upgrade:"Manage Membership",downgrade_rule:"If no booking ≥60 days, you’ll be downgraded by 1 level. We’ll notify you in advance.",sec_explore:"Explore popular places",deal_title:"Flash Deals: up to 40% off",deal_desc:"Limited-time offers on verified and high-rated stays.",deal_cta:"Grab deals",host_title:"Become a verified host",notif_title:"Smart notifications",notif_desc:"AI suggestions, destination picks, and level updates, with perfect multilingual delivery.",sup_title:"24/7 Multilingual Support",sup_desc:"AI concierge + human agents. Secure, instant, and truly global.",sup_chat:"Open AI chat",sup_help:"Help center"},
+    // Languages
+    const LANGS = { en:{promo_text:"Earn up to 15% back with StayWorld+ Elite. Summer Flash Deals live now.",promo_cta:"See membership",nav_explore:"Explore",nav_deals:"Deals",nav_membership:"Membership",nav_host:"Become a host",nav_support:"Support",nav_login:"Log in",nav_signup:"Sign up",hero_verified:"Verified Stays",label_where:"Where",label_checkin:"Check‑in",label_checkout:"Check‑out",label_guests:"Guests",btn_filters:"Filters (20+)",btn_map:"Map view",btn_weather:"Weather",btn_search:"Search",reward_tier:"Your tier",reward_progress:"₩1,250,000 until Diamond. No stay for 60 days → auto downgrade 1 level.",btn_upgrade:"Manage Membership",downgrade_rule:"If no booking ≥60 days, you’ll be downgraded by 1 level. We’ll notify you in advance.",sec_explore:"Explore popular places",deal_title:"Flash Deals: up to 40% off",deal_desc:"Limited-time offers on verified and high-rated stays.",deal_cta:"Grab deals",host_title:"Become a verified host",notif_title:"Smart notifications",notif_desc:"AI suggestions, destination picks, and level updates, with perfect multilingual delivery.",sup_title:"24/7 Multilingual Support",sup_desc:"AI concierge + human agents. Secure, instant, and truly global.",sup_chat:"Open AI chat",sup_help:"Help center"},
       ko:{promo_text:"StayWorld+ 엘리트 최대 15% 적립. 여름 한정 특가 진행중.",promo_cta:"멤버십 보기",nav_explore:"탐색",nav_deals:"특가",nav_membership:"멤버십",nav_host:"호스트 되기",nav_support:"고객센터",nav_login:"로그인",nav_signup:"회원가입",hero_verified:"인증 숙소",label_where:"어디로",label_checkin:"체크인",label_checkout:"체크아웃",label_guests:"인원",btn_filters:"필터 (20+)",btn_map:"지도 보기",btn_weather:"날씨",btn_search:"검색",reward_tier:"내 등급",reward_progress:"다이아몬드까지 ₩1,250,000. 60일 예약 없으면 자동 1단계 강등.",btn_upgrade:"멤버십 관리",downgrade_rule:"60일 이상 예약이 없으면 1단계 강등됩니다. 미리 알림을 보내드려요.",sec_explore:"인기 지역 탐색",deal_title:"번개 특가: 최대 40% 할인",deal_desc:"인증·고평점 숙소 한정 기간 할인.",deal_cta:"특가 받기",host_title:"인증 호스트 되기",notif_title:"스마트 알림",notif_desc:"AI 추천·여행지 제안·레벨 알림을 완벽한 다국어로.",sup_title:"24시간 다국어 지원",sup_desc:"AI 컨시어지 + 사람 상담원. 안전하고 즉시, 전 세계.",sup_chat:"AI 채팅 열기",sup_help:"도움말"}
     };
-    function setLang(code){
-      const dict = LANGS[code]||LANGS.en;
-      document.querySelectorAll('[data-i18n]').forEach(el=>{
-        const key = el.getAttribute('data-i18n');
-        if(dict[key]) el.textContent = dict[key];
-      });
-      localStorage.setItem('sw_lang', code);
-      document.getElementById('searchInput').placeholder = (code==='ko')? '파리, 도쿄, 이스탄불...' : 'Paris, Tokyo, Istanbul...';
-    }
+    function setLang(code){ const dict = LANGS[code]||LANGS.en; document.querySelectorAll('[data-i18n]').forEach(el=>{ const key = el.getAttribute('data-i18n'); if(dict[key]) el.textContent = dict[key]; }); localStorage.setItem('sw_lang', code); document.getElementById('searchInput').placeholder = (code==='ko')? '파리, 도쿄, 이스탄불...' : 'Paris, Tokyo, Istanbul...'; }
     (function(){ const saved = localStorage.getItem('sw_lang')||'en'; document.getElementById('langSelect').value = saved; setLang(saved); })();
 
-    // Suggestions
-    const SUGGESTIONS = ['Istanbul','이스탄불','Paris','파리','Tokyo','도쿄','Seoul','서울','Berlin','베를린','Barcelona','바르셀로나','New York','뉴욕','Dubai','두바이','Antalya','안탈리아','Rome','로마','Osaka','오사카','Cappadocia','카파도키아'];
+    // Suggestions & city mapping
+    const SUGGESTIONS = [
+      'Istanbul','이스탄불','Seoul','서울','Tokyo','도쿄','Paris','파리','Osaka','오사카','Kyoto','교토','Sapporo','삿포로','Fukuoka','후쿠오카','Nagoya','나고야','Okinawa','오키나와',
+      'Beijing','베이징','Shanghai','상하이','Shenzhen','선전','Guangzhou','광저우','Chengdu','청두','Chongqing','충칭','Hangzhou','항저우','Xian','시안','Wuhan','우한','Nanjing','난징',
+      'Hong Kong','홍콩','Macau','마카오','Taipei','타이베이','Kaohsiung','가오슝',
+      'Bangkok','방콕','Chiang Mai','치앙마이','Phuket','푸켓','Krabi','끄라비','Kuala Lumpur','쿠알라룸푸르','Penang','페낭','Singapore','싱가포르','Jakarta','자카르타','Bali','발리','Yogyakarta','욕야카르타',
+      'Hanoi','하노이','Ho Chi Minh City','호치민','Da Nang','다낭','Nha Trang','나트랑',
+      'Delhi','델리','Mumbai','뭄바이','Goa','고아','Jaipur','자이푸르','Bengaluru','벵갈루루',
+      'Dubai','두바이','Abu Dhabi','아부다비','Doha','도하','Riyadh','리야드','Jeddah','제다','Kuwait City','쿠웨이트',
+      'Cairo','카이로','Marrakesh','마라케시','Casablanca','카사블랑카','Nairobi','나이로비','Cape Town','케이프타운','Johannesburg','요하네스버그',
+      'London','런던','Manchester','맨체스터','Edinburgh','에든버러','Dublin','더블린','Glasgow','글래스고',
+      'Paris','파리','Lyon','리옹','Nice','니스','Marseille','마르세유','Bordeaux','보르도',
+      'Barcelona','바르셀로나','Madrid','마드리드','Seville','세비야','Valencia','발렌시아','Lisbon','리스본','Porto','포르투',
+      'Berlin','베를린','Munich','뮌헨','Frankfurt','프랑크푸르트','Hamburg','함부르크','Cologne','쾰른','Zurich','취리히','Geneva','제네바','Vienna','빈','Prague','프라하','Budapest','부다페스트','Warsaw','바르샤바','Krakow','크라쿠프',
+      'Rome','로마','Milan','밀라노','Florence','피렌체','Venice','베네치아','Naples','나폴리','Turin','토리노',
+      'Athens','아테네','Santorini','산토리니','Mykonos','미코노스','Istanbul','이스탄불','Antalya','안탈리아','Cappadocia','카파도키아','Bodrum','보드룸','Izmir','이즈미르',
+      'New York','뉴욕','Los Angeles','로스앤젤레스','San Francisco','샌프란시스코','Seattle','시애틀','Chicago','시카고','Miami','마이애미','Orlando','올랜도','Boston','보스턴','Las Vegas','라스베이거스','Washington DC','워싱턴',
+      'Toronto','토론토','Vancouver','밴쿠버','Montreal','몬트리올','Quebec City','퀘벡',
+      'Mexico City','멕시코시티','Cancun','칸쿤','Tulum','툴룸','Havana','아바나',
+      'Rio de Janeiro','리우데자네이루','Sao Paulo','상파울루','Buenos Aires','부에노스아이레스','Lima','리마','Cusco','쿠스코'
+    ];
+    const CITY_VIEW = { istanbul:{center:[41.0082,28.9784], bbox:'28.80%2C40.90%2C29.20%2C41.10'}, seoul:{center:[37.5665,126.9780], bbox:'126.80%2C37.45%2C127.10%2C37.65'}, tokyo:{center:[35.6762,139.6503], bbox:'139.55%2C35.60%2C139.80%2C35.75'}, paris:{center:[48.8566,2.3522], bbox:'2.20%2C48.80%2C2.45%2C48.90'}, barcelona:{center:[41.3874,2.1686], bbox:'2.10%2C41.33%2C2.25%2C41.42'}, berlin:{center:[52.5200,13.4050], bbox:'13.30%2C52.47%2C13.55%2C52.55'}, dubai:{center:[25.2048,55.2708], bbox:'55.15%2C25.15%2C55.40%2C25.30'}, newyork:{center:[40.7128,-74.0060], bbox:'-74.10%2C40.65%2C-73.90%2C40.78'} };
+    function normalizeCity(name){ if(!name) return 'istanbul'; const k=name.toString().trim().toLowerCase(); if(['seoul','서울'].includes(k)) return 'seoul'; if(['tokyo','도쿄','東京'].includes(k)) return 'tokyo'; if(['paris','파리'].includes(k)) return 'paris'; if(['istanbul','이스탄불'].includes(k)) return 'istanbul'; if(['barcelona','바르셀로나'].includes(k)) return 'barcelona'; if(['berlin','베를린'].includes(k)) return 'berlin'; if(['dubai','두바이'].includes(k)) return 'dubai'; if(['new york','뉴욕','newyork'].includes(k)) return 'newyork'; return 'istanbul'; }
+
     const input = document.getElementById('searchInput'); const sug = document.getElementById('suggestions');
     input.addEventListener('input',()=>{ const q=input.value.trim().toLowerCase(); const list = !q? SUGGESTIONS.slice(0,6) : SUGGESTIONS.filter(v=>v.toLowerCase().includes(q)).slice(0,6); sug.innerHTML = list.map(v=>`<button class="hover:bg-white/5" onclick="pickSuggestion('${v}')">${v}</button>`).join(''); sug.style.display = list.length?'block':'none'; });
     input.addEventListener('focus',()=>{ if(!input.value.trim()){ const list=SUGGESTIONS.slice(0,6); sug.innerHTML=list.map(v=>`<button class='hover:bg-white/5' onclick="pickSuggestion('${v}')">${v}</button>`).join(''); sug.style.display='block'; } });
     document.addEventListener('click',(e)=>{ if(!e.target.closest('#suggestions') && e.target!==input){sug.style.display='none'} });
     function pickSuggestion(v){ input.value=v; sug.style.display='none'; }
-    function searchNow(){ renderCards(true); if(document.getElementById('map').classList.contains('hidden')) toggleMap(); }
+    function searchNow(){ const val = document.getElementById('searchInput').value; window._currentCity = normalizeCity(val); renderCards(true); const mapEl=document.getElementById('map'); if(mapEl.classList.contains('hidden')){ toggleMap(); } else if(window.ENV?.DEMO_MODE){ updateOsmMap(); } }
 
-    // Map: OSM iframe in DEMO_MODE; Google Maps when keys exist
-    let map, markers=[];
-    function toggleMap(){
-      const m = document.getElementById('map'); m.classList.toggle('hidden'); if(m.classList.contains('hidden')) return;
-      if(window.ENV?.DEMO_MODE){ m.innerHTML = '<iframe title="map" width="100%" height="380" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=28.80%2C40.90%2C29.20%2C41.10&layer=mapnik&marker=41.0082%2C28.9784"></iframe>'; return; }
-      if(!map){
-        if(!document.getElementById('gmap-js')){ const key=window.ENV.GMAPS_KEY||''; const s=document.createElement('script'); s.id='gmap-js'; s.async=true; s.src=`https://maps.googleapis.com/maps/api/js?key=${key}&callback=initMap`; document.body.appendChild(s); }
-        else{ initMap(); }
-      }
-    }
+    // Map
+    let map, markers=[]; window._currentCity='istanbul';
+    function toggleMap(){ const m=document.getElementById('map'); m.classList.toggle('hidden'); if(m.classList.contains('hidden')) return; if(window.ENV?.DEMO_MODE){ updateOsmMap(); return; } if(!map){ if(!document.getElementById('gmap-js')){ const key=window.ENV.GMAPS_KEY||''; const s=document.createElement('script'); s.id='gmap-js'; s.async=true; s.src=`https://maps.googleapis.com/maps/api/js?key=${key}&callback=initMap`; document.body.appendChild(s); } else { initMap(); } } }
+    function updateOsmMap(){ const city = CITY_VIEW[window._currentCity] || CITY_VIEW.istanbul; const [lat,lng]=city.center; const src=`https://www.openstreetmap.org/export/embed.html?bbox=${city.bbox}&layer=mapnik&marker=${lat}%2C${lng}`; document.getElementById('map').innerHTML = `<iframe title="map" width="100%" height="380" frameborder="0" scrolling="no" src="${src}"></iframe>`; }
     function initMap(){ map = new google.maps.Map(document.getElementById('map'),{center:{lat:41.0082,lng:28.9784},zoom:11,styles:[{elementType:'geometry',stylers:[{color:'#0f0f15'}]},{elementType:'labels.text.fill',stylers:[{color:'#eaeaea'}]},{featureType:'poi',stylers:[{visibility:'off'}]}]}); plotListings(DEMO_LIST); }
     function plotListings(list){ if(!window.google||!google.maps){return} markers?.forEach(m=>m.setMap(null)); markers=[]; list.slice(0,20).forEach(item=>{ const mk = new google.maps.Marker({position:item.coords,map,title:item.title}); markers.push(mk); }) }
 
     // Weather
-    async function getWeather(){
-      const city = (input.value||'Istanbul'); const apiKey = window.ENV.OWM_KEY;
-      if(window.ENV?.DEMO_MODE || !apiKey){ const demoTemps = { Istanbul: 29, Paris: 24, Tokyo: 31, Seoul: 30, Berlin: 22, Barcelona: 28 }; const t = demoTemps[city] ?? 27; alert(`${city}: ${t}°C, Clear (demo)`); return; }
-      try{
-        const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
-        const d = await r.json(); if(d && d.weather){ alert(`${city}: ${Math.round(d.main.temp)}°C, ${d.weather[0].main}`); } else { alert('Weather unavailable (check API key).') }
-      }catch(e){ alert('Weather error: '+e.message) }
-    }
+    async function getWeather(){ const city = (input.value||'Istanbul'); const apiKey = window.ENV.OWM_KEY; if(window.ENV?.DEMO_MODE || !apiKey){ const demoTemps = { Istanbul: 29, Paris: 24, Tokyo: 31, Seoul: 30, Berlin: 22, Barcelona: 28 }; const t = demoTemps[city] ?? 27; alert(`${city}: ${t}°C, Clear (demo)`); return; } try{ const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`); const d = await r.json(); if(d && d.weather){ alert(`${city}: ${Math.round(d.main.temp)}°C, ${d.weather[0].main}`); } else { alert('Weather unavailable (check API key).') } }catch(e){ alert('Weather error: '+e.message) } }
 
     // Demo data & cards
-    const DEMO_LIST = Array.from({length:24}).map((_,i)=>({
-      id:i+1, title:['Elite Bosphorus View','Shibuya Sky Loft','Montmartre Classic','Gaudí Design Flat','Cappadocia Cave Suite','Dubai Marina Luxe'][i%6],
-      city:['Istanbul','Tokyo','Paris','Barcelona','Nevşehir','Dubai'][i%6],
-      price: 80+ (i%6)*40, rating: [4.7,4.9,4.5,4.8,4.6,4.95][i%6], verified: i%2===0, type: ['apartment','hotel','hostel','apartment','boutique','aparthotel'][i%6],
-      tag: ['lux','city','beach','camp','verified','lux'][i%6],
-      coords: [{lat:41.039, lng:29.004},{lat:35.659, lng:139.700},{lat:48.886, lng:2.343},{lat:41.394, lng:2.166},{lat:38.642, lng:34.828},{lat:25.080, lng:55.140}][i%6]
-    }));
-    function ratingStars(r){ const full=Math.floor(r); const half=(r-full)>=0.5; return '★★★★★'.split('').map((s,idx)=>{ if(idx<full) return '<i>★</i>'; if(idx===full && half) return '<i>★</i>'; return '<i class=\"text-white/25\">★</i>'}).join(''); }
-    function renderCards(reset=false){
-      const grid = document.getElementById('cardGrid'); if(reset) grid.innerHTML=''; const current = grid.children.length; const chunk = DEMO_LIST.slice(current, current+8);
-      chunk.forEach(item=>{ const el=document.createElement('article'); el.className='card ring overflow-hidden'; el.innerHTML = `
-        <div class="h-44 bg-cover bg-center" style="background-image:url('https://picsum.photos/seed/${item.id}/800/600')"></div>
-        <div class="p-4">
-          <div class="flex items-center justify-between"><h3 class="font-bold">${item.title}</h3>${item.verified?'<span class="badge verified">Verified</span>':''}</div>
-          <div class="text-white/70 text-sm">${item.city} • ${item.type}</div>
-          <div class="flex items-center justify-between mt-2"><div class="rating text-sm">${ratingStars(item.rating)} <span class="text-white/70">${item.rating.toFixed(2)}</span></div><div class="font-bold">$${item.price}<span class="text-white/60 text-xs">/night</span></div></div>
-          <div class="mt-3 flex gap-2">
-            <button class="btn" onclick="viewListing(${item.id})">View</button>
-            <button class="btn btn-gold" onclick="bookNow(${item.id})">Book</button>
-          </div>
-        </div>`; grid.appendChild(el); });
-      if(map && !window.ENV?.DEMO_MODE) plotListings(Array.from(grid.children).map((_,idx)=>DEMO_LIST[idx]));
+    const DEMO_LIST = Array.from({length:96}).map((_,i)=>({ id:i+1, title:['Elite Bosphorus View','Shibuya Sky Loft','Montmartre Classic','Gaudí Design Flat','Cappadocia Cave Suite','Dubai Marina Luxe'][i%6], city:['Istanbul','Tokyo','Paris','Barcelona','Nevşehir','Dubai'][i%6], price: 80+ (i%6)*40, rating: [4.7,4.9,4.5,4.8,4.6,4.95][i%6], verified: i%2===0, type: ['apartment','hotel','hostel','apartment','boutique','aparthotel'][i%6], tag: ['lux','city','beach','camp','verified','lux'][i%6], coords: [{lat:41.039, lng:29.004},{lat:35.659, lng:139.700},{lat:48.886, lng:2.343},{lat:41.394, lng:2.166},{lat:38.642, lng:34.828},{lat:25.080, lng:55.140}][i%6] }));
+    function ratingStars(r){ const full=Math.floor(r); const half=(r-full)>=0.5; return '★★★★★'.split('').map((s,idx)=>{ if(idx<full) return '<i>★</i>'; if(idx===full && half) return '<i>★</i>'; return '<i class="text-white/25">★</i>'}).join(''); }
+    let PAGE=1, PAGE_SIZE=12, CURRENT_LIST='all';
+    function getCurrentList(){
+      if(CURRENT_LIST==='all') return DEMO_LIST;
+      if(CURRENT_LIST==='verified') return DEMO_LIST.filter(i=>i.verified);
+      return DEMO_LIST.filter(i=> i.tag===CURRENT_LIST);
     }
-    function loadMore(){renderCards(false)}
-    function applyQuickFilter(tag){
-      const filtered = DEMO_LIST.filter(i=> i.tag===tag || (tag==='verified'&&i.verified));
-      const grid = document.getElementById('cardGrid'); grid.innerHTML='';
-      filtered.slice(0,12).forEach((item,ix)=>{ const el=document.createElement('article'); el.className='card ring overflow-hidden'; el.innerHTML = `
+    function renderCards(reset=false){
+      const grid = document.getElementById('cardGrid');
+      if(reset){ PAGE=1; grid.innerHTML=''; }
+      const list = getCurrentList();
+      const start = (PAGE-1)*PAGE_SIZE;
+      const slice = list.slice(start, start+PAGE_SIZE);
+      grid.innerHTML = '';
+      slice.forEach(item=>{
+        const el=document.createElement('article');
+        el.className='card ring overflow-hidden';
+        el.innerHTML = `
+          <div class="h-44 bg-cover bg-center" style="background-image:url('https://picsum.photos/seed/${item.id}/800/600')"></div>
+          <div class="p-4">
+            <div class="flex items-center justify-between"><h3 class="font-bold">${item.title}</h3>${item.verified?'<span class="badge verified">Verified</span>':''}</div>
+            <div class="text-white/70 text-sm">${item.city} • ${item.type}</div>
+            <div class="flex items-center justify-between mt-2"><div class="rating text-sm">${ratingStars(item.rating)} <span class="text-white/70">${item.rating.toFixed(2)}</span></div><div class="font-bold">$${item.price}<span class="text-white/60 text-xs">/night</span></div></div>
+            <div class="mt-3 flex gap-2"><button class="btn" onclick="viewListing(${item.id})">View</button><button class="btn btn-gold" onclick="bookNow(${item.id})">Book</button></div>
+          </div>`;
+        grid.appendChild(el);
+      });
+      updatePager(list.length);
+      if(map && !window.ENV?.DEMO_MODE) plotListings(slice);
+    }
+    function updatePager(total){
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      const prev = document.getElementById('pagerPrev');
+      const next = document.getElementById('pagerNext');
+      const info = document.getElementById('pagerInfo');
+      prev.disabled = PAGE<=1; next.disabled = PAGE>=pages;
+      info.textContent = `${PAGE} / ${pages}`;
+    }
+    function goPrev(){ if(PAGE>1){ PAGE--; renderCards(); scrollToExplore(); } }
+    function goNext(){ const list=getCurrentList(); const pages=Math.ceil(list.length/PAGE_SIZE); if(PAGE<pages){ PAGE++; renderCards(); scrollToExplore(); } }
+    function scrollToExplore(){ document.getElementById('explore').scrollIntoView({behavior:'smooth', block:'start'}); }
+    function applyQuickFilter(tag){ CURRENT_LIST = (tag==='verified')? 'verified' : tag; renderCards(true); }
+    function applyQuickFilter(tag){ const filtered = DEMO_LIST.filter(i=> i.tag===tag || (tag==='verified'&&i.verified)); const grid = document.getElementById('cardGrid'); grid.innerHTML=''; filtered.slice(0,12).forEach((item)=>{ const el=document.createElement('article'); el.className='card ring overflow-hidden'; el.innerHTML = `
         <div class="h-44 bg-cover bg-center" style="background-image:url('https://picsum.photos/seed/${item.id+100}/800/600')"></div>
         <div class="p-4">
           <div class="flex items-center justify-between"><h3 class="font-bold">${item.title}</h3>${item.verified?'<span class="badge verified">Verified</span>':''}</div>
           <div class="text-white/70 text-sm">${item.city} • ${item.type}</div>
           <div class="flex items-center justify-between mt-2"><div class="rating text-sm">${ratingStars(item.rating)} <span class="text-white/70">${item.rating.toFixed(2)}</span></div><div class="font-bold">$${item.price}<span class="text-white/60 text-xs">/night</span></div></div>
-        </div>`; grid.appendChild(el); });
-      if(map && !window.ENV?.DEMO_MODE) plotListings(filtered);
-    }
+        </div>`; grid.appendChild(el); }); if(map && !window.ENV?.DEMO_MODE) plotListings(filtered); }
 
-    // Listing modal + drawer
+    // Listing modal & drawer
     const $ = sel=>document.querySelector(sel);
-    function viewListing(id){
-      const d=$('#listingModal'); d.innerHTML=$('#listingTpl').innerHTML; const it=DEMO_LIST.find(x=>x.id===id);
-      d.querySelector('#lstTitle').textContent=it.title; d.querySelector('#lstCity').textContent=`${it.city} • ${it.type}`;
-      d.querySelector('#lstRating').innerHTML = ratingStars(it.rating)+` <span class="text-white/70">${it.rating.toFixed(2)}</span>`;
-      d.querySelector('#lstPrice').innerHTML = `$${it.price}<span class="text-white/60 text-xs">/night</span>`;
-      if(it.verified){ d.querySelector('#lstBadges').classList.remove('hidden'); }
-      d.querySelector('#lstImg').src = `https://picsum.photos/seed/${it.id+200}/1200/900`;
-      d.showModal();
-    }
+    function viewListing(id){ const d=$('#listingModal'); d.innerHTML=$('#listingTpl').innerHTML; const it=DEMO_LIST.find(x=>x.id===id); d.querySelector('#lstTitle').textContent=it.title; d.querySelector('#lstCity').textContent=`${it.city} • ${it.type}`; d.querySelector('#lstRating').innerHTML = ratingStars(it.rating)+` <span class="text-white/70">${it.rating.toFixed(2)}</span>`; d.querySelector('#lstPrice').innerHTML = `$${it.price}<span class="text-white/60 text-xs">/night</span>`; if(it.verified){ d.querySelector('#lstBadges').classList.remove('hidden'); } d.querySelector('#lstImg').src = `https://picsum.photos/seed/${it.id+200}/1200/900`; d.showModal(); }
     function openDrawer(){ $('#listingModal').close(); $('#drawer').classList.add('show'); }
     function closeDrawer(){ $('#drawer').classList.remove('show'); }
     function bookNow(id){ openDrawer(); }
 
-    // Modals simple
-    function openLogin(){const dlg=$('#loginModal');dlg.innerHTML=$('#loginTpl').innerHTML;dlg.showModal()}
-    function openSignup(){const dlg=$('#signupModal');dlg.innerHTML=$('#signupTpl').innerHTML;dlg.showModal()}
-    function openFilters(){const d=$('#filtersModal');d.innerHTML=$('#filtersTpl').innerHTML;d.showModal()}
+    // Simple modals
+    function openLogin(){const dlg=$('#loginModal'); dlg.innerHTML=$('#loginTpl').innerHTML; dlg.showModal()}
+    function openSignup(){const dlg=$('#signupModal'); dlg.innerHTML=$('#signupTpl').innerHTML; dlg.showModal()}
+    function openFilters(){const d=$('#filtersModal'); d.innerHTML=$('#filtersTpl').innerHTML; d.showModal()}
     function closeFilters(){$('#filtersModal').close()}
-    function applyFilters(){closeFilters();renderCards(true)}
-    function openHost(){const d=$('#hostModal');d.innerHTML=$('#hostTpl').innerHTML;d.showModal()}
+    function applyFilters(){closeFilters(); renderCards(true)}
+    function openHost(){const d=$('#hostModal'); d.innerHTML=$('#hostTpl').innerHTML; d.showModal()}
     function closeHost(){$('#hostModal').close()}
-    function openDeals(){const d=$('#dealsModal');d.innerHTML=$('#dealsTpl').innerHTML;const list=$('#dealsList');list.innerHTML = DEMO_LIST.slice(0,6).map(i=>`<div class='card p-4 ring flex items-center justify-between'><div><div class='font-bold'>${i.title}</div><div class='text-white/70 text-sm'>${i.city}</div></div><button class='btn btn-gold' onclick='bookNow(${i.id})'>Book −${10+(i.id%3)*10}%</button></div>`).join('');d.showModal()}
+    function openDeals(){const d=$('#dealsModal'); d.innerHTML=$('#dealsTpl').innerHTML; const list=document.getElementById('dealsList'); list.innerHTML = DEMO_LIST.slice(0,6).map(i=>`<div class='card p-4 ring flex items-center justify-between'><div><div class='font-bold'>${i.title}</div><div class='text-white/70 text-sm'>${i.city}</div></div><button class='btn btn-gold' onclick='bookNow(${i.id})'>Book −${10+(i.id%3)*10}%</button></div>`).join(''); d.showModal()}
     function closeDeals(){$('#dealsModal').close()}
     function openMembership(){document.getElementById('membership').scrollIntoView({behavior:'smooth', block:'start'})}
     function openHelp(){alert('Open Help Center (link your route)')}
 
-    // Auth
+    // Auth (only when DEMO_MODE=false)
     (function(){ if(window.ENV?.DEMO_MODE) return; const s1=document.createElement('script'); s1.src='https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js'; const s2=document.createElement('script'); s2.src='https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js'; s2.onload=()=>{ const cfg={ apiKey:window.ENV.FB_API_KEY, authDomain:window.ENV.FB_AUTH_DOMAIN, projectId:window.ENV.FB_PROJECT_ID, appId:window.ENV.FB_APP_ID, measurementId:window.ENV.FB_MEASUREMENT_ID }; try{ firebase.initializeApp(cfg);}catch(e){} window._fbReady=true; }; document.body.appendChild(s1); document.body.appendChild(s2); })();
     function doLogin(){ if(window.ENV?.DEMO_MODE){ alert('Logged in (demo mode).'); return; } if(!window._fbReady){alert('Firebase not initialized. Add keys in window.ENV.');return} const email=document.getElementById('loginEmail').value; const pwd=document.getElementById('loginPwd').value; firebase.auth().signInWithEmailAndPassword(email,pwd).then(()=>alert('Logged in!')).catch(e=>alert(e.message)); }
     function doSignup(){ if(window.ENV?.DEMO_MODE){ alert('Signed up (demo mode).'); return; } if(!window._fbReady){alert('Firebase not initialized. Add keys in window.ENV.');return} const email=document.getElementById('suEmail').value; const pwd=document.getElementById('suPwd').value; firebase.auth().createUserWithEmailAndPassword(email,pwd).then(()=>alert('Signed up!')).catch(e=>alert(e.message)); }
     function googleLogin(){ if(window.ENV?.DEMO_MODE){ alert('Google login (demo mode).'); return; } if(!window._fbReady){alert('Firebase not initialized. Add keys in window.ENV.');return} const provider=new firebase.auth.GoogleAuthProvider(); firebase.auth().signInWithPopup(provider).then(()=>alert('Google login OK')).catch(e=>alert(e.message)); }
 
-    // Chatbot
-    function toggleChat(){const p=$('#chat-panel');p.style.display=p.style.display==='none'||!p.style.display?'block':'none'}
-    function openChat(){const p=$('#chat-panel');p.style.display='block'}
-    function sendChat(){const i=$('#chatInput');const log=$('#chatLog');if(!i.value.trim())return;const you=document.createElement('div');you.className='text-sm';you.innerHTML='<b>You:</b> '+i.value;log.appendChild(you);const bot=document.createElement('div');bot.className='text-sm text-white/80';bot.innerHTML='<b>AI:</b> Thanks! (Connect to your AI backend for real answers.)';log.appendChild(bot);log.scrollTop=log.scrollHeight;i.value=''}
+    // Chat
+    function toggleChat(){const p=document.querySelector('#chat-panel'); p.style.display=p.style.display==='none'||!p.style.display?'block':'none'}
+    function openChat(){document.querySelector('#chat-panel').style.display='block'}
+    function sendChat(){const i=document.querySelector('#chatInput');const log=document.querySelector('#chatLog');if(!i.value.trim())return;const you=document.createElement('div');you.className='text-sm';you.innerHTML='<b>You:</b> '+i.value;log.appendChild(you);const bot=document.createElement('div');bot.className='text-sm text-white/80';bot.innerHTML='<b>AI:</b> Thanks! (Connect to your AI backend for real answers.)';log.appendChild(bot);log.scrollTop=log.scrollHeight;i.value=''}
 
     // Init
     renderCards(true);
-    setTimeout(()=>{ document.getElementById('cookie').classList.remove('hidden'); }, 1200);
+    setTimeout(()=>{ const c=document.getElementById('cookie'); if(c) c.classList?.remove('hidden'); }, 1200);
   </script>
 </body>
 </html>
-"""
-open('/mnt/data/index_stayworld_pro.html','w',encoding='utf-8').write(content)
-print("Saved to /mnt/data/index_stayworld_pro.html")
