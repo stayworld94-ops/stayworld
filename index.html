@@ -61,7 +61,19 @@
     #suggestions{position:absolute;z-index:20;left:0;right:0;top:100%;background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:12px;display:none}
     #suggestions button{width:100%;text-align:left;padding:.7rem 1rem}
   </style>
-  <script>window.ENV = { GMAPS_KEY: 'YOUR_GOOGLE_MAPS_API_KEY', OWM_KEY: 'YOUR_OPENWEATHER_API_KEY', FB_API_KEY: 'YOUR_FIREBASE_API_KEY', FB_AUTH_DOMAIN: 'YOUR_FIREBASE_AUTH_DOMAIN', FB_PROJECT_ID: 'YOUR_FIREBASE_PROJECT_ID', FB_APP_ID: 'YOUR_FIREBASE_APP_ID', FB_MEASUREMENT_ID: 'YOUR_GA_MEASUREMENT_ID' };</script>
+  <!-- ENV: put your real keys and set DEMO_MODE to false for production -->
+  <script>
+    window.ENV = {
+      GMAPS_KEY: '',
+      OWM_KEY: '',
+      FB_API_KEY: '',
+      FB_AUTH_DOMAIN: '',
+      FB_PROJECT_ID: '',
+      FB_APP_ID: '',
+      FB_MEASUREMENT_ID: '',
+      DEMO_MODE: true
+    };
+  </script>
 </head>
 <body class="min-h-screen flex flex-col">
   <!-- Top Announcement / Promo -->
@@ -324,7 +336,7 @@
 
   <!-- Chatbot Floating Button & Panel -->
   <button id="chat-launch" class="btn btn-gold shadow-xl" onclick="toggleChat()">AI Chat</button>
-  <div id="chat-panel" class="card ring overflow-hidden">
+  <div id="chat-panel" class="card ring overflow-hidden" style="display:none;">
     <div class="p-3 border-b border-white/10 flex items-center justify-between">
       <div class="font-bold">StayWorld Assistant</div>
       <button class="badge" onclick="toggleChat()">✕</button>
@@ -505,12 +517,18 @@
       if(document.getElementById('map').classList.contains('hidden')) toggleMap();
     }
 
-    // --- Map --- (Google Maps – loads dynamically with ENV key)
+    // --- Map --- (Google Maps – loads dynamically with ENV key) ---
     let map, markers=[];
     function toggleMap(){
       const m = document.getElementById('map');
       m.classList.toggle('hidden');
-      if(!m.classList.contains('hidden') && !map){
+      if(m.classList.contains('hidden')) return;
+      if(window.ENV?.DEMO_MODE){
+        // Demo: render a simple placeholder without Google Maps
+        m.innerHTML = '<div class="w-full h-full flex items-center justify-center text-white/70">Map demo: Istanbul center (no API key needed)</div>';
+        return;
+      }
+      if(!map){
         // inject maps script once
         if(!document.getElementById('gmap-js')){
           const key = (window.ENV && window.ENV.GMAPS_KEY) || 'YOUR_GOOGLE_MAPS_API_KEY';
@@ -538,10 +556,17 @@
       })
     }
 
-    // --- Weather (OpenWeather – uses window.ENV.OWM_KEY) ---
+    // --- Weather (OpenWeather – uses window.ENV.OWM_KEY). Falls back to DEMO_MODE ---
     async function getWeather(){
       const city = (input.value||'Istanbul');
-      const apiKey = (window.ENV && window.ENV.OWM_KEY) || 'YOUR_OPENWEATHER_API_KEY';
+      const apiKey = (window.ENV && window.ENV.OWM_KEY);
+      if(window.ENV?.DEMO_MODE || !apiKey){
+        // Demo fallback
+        const demoTemps = { Istanbul: 29, Paris: 24, Tokyo: 31, Seoul: 30, Berlin: 22, Barcelona: 28 };
+        const t = demoTemps[city] ?? 27;
+        alert(`${city}: ${t}°C, Clear (demo)`);
+        return;
+      }
       try{
         const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
         const d = await r.json();
@@ -585,4 +610,124 @@
       const current = grid.children.length;
       const chunk = DEMO_LIST.slice(current, current+8);
       chunk.forEach(item=>{
-        const el = document.c
+        const el = document.createElement('article');
+        el.className='card ring overflow-hidden';
+        el.innerHTML = `
+          <div class="h-44 bg-cover bg-center" style="background-image:url('https://picsum.photos/seed/${item.id}/800/600')"></div>
+          <div class="p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold">${item.title}</h3>
+              ${item.verified?'<span class="badge verified">Verified</span>':''}
+            </div>
+            <div class="text-white/70 text-sm">${item.city} • ${item.type}</div>
+            <div class="flex items-center justify-between mt-2">
+              <div class="rating text-sm">${ratingStars(item.rating)} <span class="text-white/70">${item.rating.toFixed(2)}</span></div>
+              <div class="font-bold">$${item.price}<span class="text-white/60 text-xs">/night</span></div>
+            </div>
+            <div class="mt-3 flex gap-2">
+              <button class="btn" onclick="viewListing(${item.id})">View</button>
+              <button class="btn btn-gold" onclick="bookNow(${item.id})">Book</button>
+            </div>
+          </div>`;
+        grid.appendChild(el);
+      });
+      if(map && !window.ENV?.DEMO_MODE) plotListings(Array.from(grid.children).map((_,idx)=>DEMO_LIST[idx]));
+    }
+
+    function loadMore(){renderCards(false)}
+    function applyQuickFilter(tag){
+      const filtered = DEMO_LIST.filter(i=> i.tag===tag || (tag==='verified'&&i.verified));
+      const grid = document.getElementById('cardGrid');
+      grid.innerHTML='';
+      filtered.slice(0,12).forEach((item,ix)=>{
+        const el = document.createElement('article');
+        el.className='card ring overflow-hidden';
+        el.innerHTML = `
+          <div class="h-44 bg-cover bg-center" style="background-image:url('https://picsum.photos/seed/${item.id+100}/800/600')"></div>
+          <div class="p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold">${item.title}</h3>
+              ${item.verified?'<span class="badge verified">Verified</span>':''}
+            </div>
+            <div class="text-white/70 text-sm">${item.city} • ${item.type}</div>
+            <div class="flex items-center justify-between mt-2">
+              <div class="rating text-sm">${ratingStars(item.rating)} <span class="text-white/70">${item.rating.toFixed(2)}</span></div>
+              <div class="font-bold">$${item.price}<span class="text-white/60 text-xs">/night</span></div>
+            </div>
+          </div>`;
+        grid.appendChild(el);
+      });
+      if(map && !window.ENV?.DEMO_MODE) plotListings(filtered);
+    }
+
+    function viewListing(id){alert('Open listing detail: '+id)}
+    function bookNow(id){alert('Proceed to booking for listing #'+id)}
+
+    // --- Modals wiring ---
+    const $ = sel=>document.querySelector(sel);
+    function openLogin(){const dlg=$('#loginModal');dlg.innerHTML=$('#loginTpl').innerHTML;dlg.showModal()}
+    function openSignup(){const dlg=$('#signupModal');dlg.innerHTML=$('#signupTpl').innerHTML;dlg.showModal()}
+    function openFilters(){const d=$('#filtersModal');d.innerHTML=$('#filtersTpl').innerHTML;d.showModal()}
+    function closeFilters(){$('#filtersModal').close()}
+    function applyFilters(){closeFilters();renderCards(true)}
+    function openHost(){const d=$('#hostModal');d.innerHTML=$('#hostTpl').innerHTML;d.showModal()}
+    function closeHost(){$('#hostModal').close()}
+    function openDeals(){const d=$('#dealsModal');d.innerHTML=$('#dealsTpl').innerHTML;const list=$('#dealsList');list.innerHTML = DEMO_LIST.slice(0,6).map(i=>`<div class='card p-4 ring flex items-center justify-between'><div><div class='font-bold'>${i.title}</div><div class='text-white/70 text-sm'>${i.city}</div></div><button class='btn btn-gold' onclick='bookNow(${i.id})'>Book −${10+(i.id%3)*10}%</button></div>`).join('');d.showModal()}
+    function closeDeals(){$('#dealsModal').close()}
+    function openMembership(){location.hash='#membership'}
+    function openHelp(){alert('Open Help Center (link your route)')}
+
+    // --- Auth (placeholder + Firebase compat when keys exist) ---
+    (function(){
+      // load firebase only if not in demo or keys provided
+      if(window.ENV?.DEMO_MODE) return;
+      const s1 = document.createElement('script');
+      s1.src = 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js';
+      const s2 = document.createElement('script');
+      s2.src = 'https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js';
+      s2.onload = () => {
+        const cfg = {
+          apiKey: window.ENV.FB_API_KEY,
+          authDomain: window.ENV.FB_AUTH_DOMAIN,
+          projectId: window.ENV.FB_PROJECT_ID,
+          appId: window.ENV.FB_APP_ID,
+          measurementId: window.ENV.FB_MEASUREMENT_ID
+        };
+        try{ firebase.initializeApp(cfg); }catch(e){}
+        window._fbReady = true;
+      };
+      document.body.appendChild(s1);
+      document.body.appendChild(s2);
+    })();
+
+    function doLogin(){
+      if(window.ENV?.DEMO_MODE){ alert('Logged in (demo mode).'); return; }
+      if(!window._fbReady){alert('Firebase not initialized. Add keys in window.ENV.');return}
+      const email = document.getElementById('loginEmail').value;
+      const pwd = document.getElementById('loginPwd').value;
+      firebase.auth().signInWithEmailAndPassword(email,pwd).then(()=>alert('Logged in!')).catch(e=>alert(e.message));
+    }
+    function doSignup(){
+      if(window.ENV?.DEMO_MODE){ alert('Signed up (demo mode).'); return; }
+      if(!window._fbReady){alert('Firebase not initialized. Add keys in window.ENV.');return}
+      const email = document.getElementById('suEmail').value;
+      const pwd = document.getElementById('suPwd').value;
+      firebase.auth().createUserWithEmailAndPassword(email,pwd).then(()=>alert('Signed up!')).catch(e=>alert(e.message));
+    }
+    function googleLogin(){
+      if(window.ENV?.DEMO_MODE){ alert('Google login (demo mode).'); return; }
+      if(!window._fbReady){alert('Firebase not initialized. Add keys in window.ENV.');return}
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider).then(()=>alert('Google login OK')).catch(e=>alert(e.message));
+    }
+
+    // --- Chatbot ---
+    function toggleChat(){const p=$('#chat-panel');p.style.display=p.style.display==='none'||!p.style.display?'block':'none'}
+    function openChat(){const p=$('#chat-panel');p.style.display='block'}
+    function sendChat(){const i=$('#chatInput');const log=$('#chatLog');if(!i.value.trim())return;const you=document.createElement('div');you.className='text-sm';you.innerHTML='<b>You:</b> '+i.value;log.appendChild(you);const bot=document.createElement('div');bot.className='text-sm text-white/80';bot.innerHTML='<b>AI:</b> Thanks! (Connect to your AI backend for real answers.)';log.appendChild(bot);log.scrollTop=log.scrollHeight;i.value=''}
+
+    // --- Initialize grid ---
+    renderCards(true);
+  </script>
+</body>
+</html>
