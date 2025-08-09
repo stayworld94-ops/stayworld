@@ -77,7 +77,7 @@
       </div>
       <div class="flex items-center gap-3">
         <button class="badge elite" onclick="openMembership()" data-i18n="promo_cta">See membership</button>
-        <select id="langSelect" class="bg-transparent border border-white/15 rounded-md px-2 py-1 text-sm" onchange="setLang(this.value)">
+        <select id="langSelect" class="bg-transparent border border-white/15 rounded-md px-2 py-1 text-sm" onchange="setLang(this.value);">
           <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option><option value="de">DE</option><option value="es">ES</option><option value="ru">RU</option><option value="it">IT</option><option value="zh">ZH</option>
         </select>
       </div>
@@ -607,8 +607,16 @@
         ]
       });
       plotListings(DEMO_LIST);
-    },zoom:11,styles:[{elementType:'geometry',stylers:[{color:'#0f0f15'}]},{elementType:'labels.text.fill',stylers:[{color:'#eaeaea'}]},{featureType:'poi',stylers:[{visibility:'off'}]}]}); plotListings(DEMO_LIST); }
-    function plotListings(list){ if(!window.google||!google.maps){return} markers?.forEach(m=>m.setMap(null)); markers=[]; list.slice(0,20).forEach(item=>{ const mk = new google.maps.Marker({position:item.coords,map,title:item.title}); markers.push(mk); }) }
+    }
+    function plotListings(list){
+      if(!window.google||!google.maps){return}
+      markers?.forEach(m=>m.setMap(null));
+      markers=[];
+      list.slice(0,20).forEach(item=>{
+        const mk = new google.maps.Marker({position:item.coords,map,title:item.title});
+        markers.push(mk);
+      });
+    }
 
     // Weather
     async function getWeather(){ const city = (input.value||'Istanbul'); const apiKey = window.ENV.OWM_KEY; if(window.ENV?.DEMO_MODE || !apiKey){ const demoTemps = { Istanbul: 29, Paris: 24, Tokyo: 31, Seoul: 30, Berlin: 22, Barcelona: 28 }; const t = demoTemps[city] ?? 27; alert(`${city}: ${t}°C, Clear (demo)`); return; } try{ const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`); const d = await r.json(); if(d && d.weather){ alert(`${city}: ${Math.round(d.main.temp)}°C, ${d.weather[0].main}`); } else { alert('Weather unavailable (check API key).') } }catch(e){ alert('Weather error: '+e.message) } }
