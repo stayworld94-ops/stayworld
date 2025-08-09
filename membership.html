@@ -1,166 +1,74 @@
+<section id="membership" class="py-10">
+  <div class="max-w-7xl mx-auto px-5">
+    <h3 class="text-2xl font-extrabold mb-4" data-i18n="mem_title">StayWorld+ Rewards</h3>
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StayWorld - 멤버십</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0f0f0f;
-      color: #fff;
-    }
-    header {
-      text-align: center;
-      padding: 40px 20px 20px;
-    }
-    header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.5rem;
-      color: #d4af37;
-    }
-    #lang-switcher {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #1a1a1a;
-      color: #fff;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 5px 10px;
-    }
-    .membership-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      padding: 40px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .card {
-      background-color: #1a1a1a;
-      border: 2px solid #333;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
-    }
-    .card h2 {
-      color: #d4af37;
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 12px;
-    }
-    .card ul {
-      list-style: none;
-      padding: 0;
-    }
-    .card ul li {
-      margin: 10px 0;
-      color: #ccc;
-    }
-  </style>
-</head>
-<body>
-  <select id="lang-switcher">
-    <option value="ko">🇰🇷 한국어</option>
-    <option value="en">🇬🇧 English</option>
-    <option value="fr">🇫🇷 Français</option>
-    <option value="tr">🇹🇷 Türkçe</option>
-    <option value="ja">🇯🇵 日本語</option>
-  </select>
+    <div id="tiersGrid" class="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+      <!-- Bronze -->
+      <div class="card p-6 ring" data-tier="Bronze">
+        <h4 class="font-bold">Bronze</h4>
+        <p class="text-sm text-white/70">기본 등급 (가입 시 자동 부여)</p>
+        <ul class="text-xs text-white/80 mt-3 space-y-1">
+          <li>• StayWorld 서비스 기본 이용 가능</li>
+        </ul>
+        <p class="text-xs text-white/50 mt-2">₩0 ~</p>
+      </div>
+      <!-- Silver -->
+      <div class="card p-6 ring" data-tier="Silver">
+        <h4 class="font-bold">Silver</h4>
+        <p class="text-sm text-white/70">3% 적립</p>
+        <ul class="text-xs text-white/80 mt-3 space-y-1">
+          <li>• 브론즈 혜택 포함</li>
+          <li>• 첫 예약 시 3% 포인트 적립</li>
+        </ul>
+        <p class="text-xs text-white/50 mt-2">₩500,000 ~</p>
+      </div>
+      <!-- Gold -->
+      <div class="card p-6 ring" data-tier="Gold">
+        <h4 class="font-bold">Gold</h4>
+        <p class="text-sm text-white/70">5% 적립 + 우선 고객 응대</p>
+        <ul class="text-xs text-white/80 mt-3 space-y-1">
+          <li>• 실버 혜택 포함</li>
+          <li>• 매 예약 시 5% 포인트 적립</li>
+          <li>• 고객센터 우선 응대</li>
+        </ul>
+        <p class="text-xs text-white/50 mt-2">₩2,000,000 ~</p>
+      </div>
+      <!-- Platinum -->
+      <div class="card p-6 ring" data-tier="Platinum">
+        <h4 class="font-bold">Platinum</h4>
+        <p class="text-sm text-white/70">7% 적립 + 시즌 할인</p>
+        <ul class="text-xs text-white/80 mt-3 space-y-1">
+          <li>• 골드 혜택 포함</li>
+          <li>• 시즌 할인 자동 적용</li>
+        </ul>
+        <p class="text-xs text-white/50 mt-2">₩4,000,000 ~</p>
+      </div>
+      <!-- Diamond -->
+      <div class="card p-6 ring" data-tier="Diamond">
+        <h4 class="font-bold">Diamond</h4>
+        <p class="text-sm text-white/70">10% 적립 + 전용 쿠폰</p>
+        <ul class="text-xs text-white/80 mt-3 space-y-1">
+          <li>• 플래티넘 혜택 포함</li>
+          <li>• 전용 VIP 쿠폰 제공</li>
+          <li>• 고객센터 최우선권</li>
+        </ul>
+        <p class="text-xs text-white/50 mt-2">₩7,500,000 ~</p>
+      </div>
+      <!-- Elite -->
+      <div class="card p-6 ring" data-tier="Elite">
+        <h4 class="font-bold text-brand.gold">Elite</h4>
+        <p class="text-sm text-white/70">15% 적립 + 프라이빗 딜</p>
+        <ul class="text-xs text-white/80 mt-3 space-y-1">
+          <li>• 다이아몬드 혜택 포함</li>
+          <li>• 프라이빗 딜 접근권</li>
+          <li>• 긴급 지원 최우선 처리</li>
+        </ul>
+        <p class="text-xs text-white/50 mt-2">₩15,000,000 + 수동 승격</p>
+      </div>
+    </div>
 
-  <header>
-    <h1 data-i18n="title">StayWorld 멤버십 혜택</h1>
-  </header>
-
-  <section class="membership-container">
-    <div class="card">
-      <h2 data-i18n="bronze">브론즈</h2>
-      <ul>
-        <li data-i18n="b1">기본 이용 가능</li>
-        <li data-i18n="b2">가입 시 자동 부여</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2 data-i18n="silver">실버</h2>
-      <ul>
-        <li data-i18n="s1">첫 예약 시 3% 포인트 적립</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2 data-i18n="gold">골드</h2>
-      <ul>
-        <li data-i18n="g1">매 예약 시 5% 포인트 적립</li>
-        <li data-i18n="g2">우선 고객 응대</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2 data-i18n="platinum">플래티넘</h2>
-      <ul>
-        <li data-i18n="p1">7% 포인트 적립</li>
-        <li data-i18n="p2">시즌 할인 자동 적용</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2 data-i18n="diamond">다이아몬드</h2>
-      <ul>
-        <li data-i18n="d1">10% 포인트 적립</li>
-        <li data-i18n="d2">전용 쿠폰 제공</li>
-        <li data-i18n="d3">고객센터 우선권</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h2 data-i18n="elite">엘리트</h2>
-      <ul>
-        <li data-i18n="e1">15% 포인트 적립</li>
-        <li data-i18n="e2">프라이빗 딜 접근 가능</li>
-        <li data-i18n="e3">긴급 지원 우선 처리</li>
-        <li data-i18n="e4">모든 하위 등급 혜택 포함</li>
-      </ul>
-    </div>
-  </section>
-
-  <script>
-    const translations = {
-      en: {
-        title: "StayWorld Membership Benefits",
-        bronze: "Bronze",
-        b1: "Basic access",
-        b2: "Granted upon registration",
-        silver: "Silver",
-        s1: "3% point bonus on first booking",
-        gold: "Gold",
-        g1: "5% point bonus on every booking",
-        g2: "Priority customer support",
-        platinum: "Platinum",
-        p1: "7% point bonus",
-        p2: "Seasonal discounts auto-applied",
-        diamond: "Diamond",
-        d1: "10% point bonus",
-        d2: "Exclusive coupons",
-        d3: "Priority support",
-        elite: "Elite",
-        e1: "15% point bonus",
-        e2: "Private deal access",
-        e3: "Emergency help priority",
-        e4: "All lower tier benefits included"
-      },
-      ko: {}
-    };
-
-    document.getElementById('lang-switcher').addEventListener('change', (e) => {
-      const lang = e.target.value;
-      if (!translations[lang]) return;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) {
-          el.textContent = translations[lang][key];
-        }
-      });
-    });
-  </script>
-</body>
-</html>
+    <p class="text-xs text-white/60 mt-4">
+      ※ 모든 등급은 60일 이상 예약이 없으면 자동으로 1단계 강등됩니다. (사전 알림 발송)
+    </p>
+  </div>
+</section>
