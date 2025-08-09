@@ -3,45 +3,79 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - StayWorld</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <title>StayWorld - Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold: #FFD700;
+    }
+    body { background-color: #0f0f15; color: white; font-family: 'Inter', sans-serif; }
+    .btn-gold { background-color: var(--gold); color: black; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
+    .btn-gold:hover { background-color: #e6c200; }
+    .btn-ghost-gold { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+    .btn-ghost-gold:hover { background: rgba(212,175,55,0.12); }
+    .btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; }
+    dialog::backdrop { background: rgba(0,0,0,0.65); backdrop-filter: blur(2px); }
+  </style>
 </head>
-<body>
-  <header>
-    <img src="images/logo.jpg" alt="StayWorld Logo" class="logo" />
-    <nav>
-      <ul>
-        <li><a href="index.html#search">Search</a></li>
-        <li><a href="host-register.html">Host Register</a></li>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="signup.html">Sign Up</a></li>
-      </ul>
-    </nav>
-  </header>
+<body class="flex flex-col items-center justify-center min-h-screen">
 
-  <section class="form-section">
-    <div class="form-box">
-      <h2>Login with Google</h2>
-      <div id="g_id_onload"
-          data-client_id="635837328384-o4m1pvqf8od97kud4ep3j9ra6usno3re.apps.googleusercontent.com"
-          data-context="signin"
-          data-ux_mode="popup"
-          data-callback="handleLogin"
-          data-auto_prompt="false">
-      </div>
-      <div class="g_id_signin" data-type="standard" data-shape="rectangular"></div>
+  <!-- Log in Button -->
+  <button class="btn-gold" onclick="openLogin()">Log in</button>
+
+  <!-- Login Modal -->
+  <dialog id="loginModal" class="rounded-xl shadow-lg w-[95%] max-w-md p-0 bg-[#1b1b25] text-white">
+    <div class="p-4 border-b border-white/10 flex items-center justify-between">
+      <h3 class="text-lg font-bold">Log in</h3>
+      <button class="btn-icon btn-ghost-gold" onclick="closeLogin()" aria-label="Close">✕</button>
     </div>
-  </section>
-
-  <footer><p>&copy; 2025 StayWorld</p></footer>
+    <div class="p-5 space-y-3">
+      <p class="text-white/70 text-sm">Welcome back!</p>
+      <input id="loginEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email" />
+      <input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password" />
+      <button class="btn-gold w-full" onclick="doLogin()">Log in</button>
+      <button class="w-full bg-white text-black flex items-center justify-center gap-2 py-3 rounded-xl" onclick="googleLogin()">
+        <span class="text-lg">G</span><span>Continue with Google</span>
+      </button>
+    </div>
+  </dialog>
 
   <script>
-    function handleLogin(response) {
-      console.log("User logged in with token:", response.credential);
-      alert("✅ Login successful!");
-      window.location.href = "index.html";
+    function openLogin(){
+      const dlg = document.getElementById('loginModal');
+      if (!dlg) return;
+      dlg.showModal();
+    }
+    function closeLogin(){
+      const dlg = document.getElementById('loginModal');
+      if (!dlg) return;
+      dlg.close();
+    }
+    // 밖 클릭 닫기
+    (function(){
+      const dlg = document.getElementById('loginModal');
+      if (!dlg) return;
+      dlg.addEventListener('click', (e) => {
+        const rect = dlg.getBoundingClientRect();
+        const inDialog = (
+          e.clientX >= rect.left && e.clientX <= rect.right &&
+          e.clientY >= rect.top && e.clientY <= rect.bottom
+        );
+        if (!inDialog) closeLogin();
+      });
+      // ESC 닫기
+      dlg.addEventListener('cancel', (e)=>{ e.preventDefault(); closeLogin(); });
+    })();
+    function doLogin(){
+      alert('Login logic goes here.');
+      closeLogin();
+    }
+    function googleLogin(){
+      alert('Google OAuth logic goes here.');
+      closeLogin();
     }
   </script>
+
 </body>
 </html>
