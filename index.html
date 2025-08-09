@@ -26,6 +26,9 @@
       }
     }
   </script>
+  <!-- Leaflet (OSM, no key needed) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <style>
     :root{--bg:#0b0b0e;--card:#121218;--muted:#8b8fa3;--gold:#d4af37;--gold2:#f2d16b;--ring:rgba(212,175,55,.45)}
     html,body{height:100%}
@@ -48,7 +51,11 @@
     select#langSelect, select#langSelect option{background:#0f0f15;color:#fff}
     #chat-launch{position:fixed;right:20px;bottom:20px;z-index:50}
     #chat-panel{position:fixed;right:20px;bottom:90px;width:380px;max-height:70vh;display:none;z-index:60}
-    #map{height:380px;border-radius:18px;border:1px solid rgba(255,255,255,.08);overflow:hidden}
+    #map{height:380px;border-radius:18px;border:1px solid rgba(255,255,255,.08);overflow:hidden;position:relative}
+    .leaflet-container{background:#0f0f15}
+    .map-ctrl{position:absolute;right:10px;top:10px;z-index:5000}
+    .map-ctrl .btn{background:rgba(0,0,0,.55);border-color:rgba(255,255,255,.2)}
+    .map-ctrl .btn:hover{background:rgba(0,0,0,.75)}
     #suggestions{position:absolute;z-index:20;left:0;right:0;top:100%;background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:12px;display:none}
     #suggestions button{width:100%;text-align:left;padding:.7rem 1rem}
     #drawer{position:fixed;right:0;top:0;bottom:0;width:420px;transform:translateX(100%);transition:.25s ease transform;z-index:70}
@@ -84,6 +91,7 @@
         <span class="text-sm text-white/60 hidden sm:block">Global stays. Verified hosts. Premium design.</span>
       </div>
       <nav class="hidden md:flex items-center gap-6 text-sm">
+        <img src="assets/stayworld-logo.jpg" alt="STAYWORLD logo" class="h-7 w-auto hidden" onerror="this.style.display='none'">
         <a href="#explore" class="hover:text-brand.gold" data-i18n="nav_explore">Explore</a>
         <a href="#deals" class="hover:text-brand.gold" data-i18n="nav_deals">Deals</a>
         <a href="#membership" class="hover:text-brand.gold" data-i18n="nav_membership">Membership</a>
@@ -119,7 +127,9 @@
               <button class="chip" onclick="getWeather()" data-i18n="btn_weather">Weather</button>
               <button class="chip" onclick="searchNow()" data-i18n="btn_search">Search</button>
             </div>
-            <div id="map" class="mt-4 hidden"></div>
+            <div id="map" class="mt-4 hidden">
+              <div class="map-ctrl"><button class="btn text-sm" onclick="fullMap()">Full screen</button></div>
+            </div>
           </div>
         </div>
         <div class="card ring p-6 md:p-8">
@@ -219,12 +229,12 @@
   <dialog id="listingModal" class="card ring w-[95%] max-w-3xl p-0 overflow-hidden"></dialog>
   <div id="drawer" class="card ring bg-[#0f0f15] p-0"><div class="p-4 border-b border-white/10 flex items-center justify-between"><b>Booking</b><button class="badge" onclick="closeDrawer()">✕</button></div><div class="p-4 space-y-3"><div class="skeleton h-40 rounded-xl"></div><div class="grid grid-cols-2 gap-2 text-sm"><label class="block">Check-in<input type="date" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label><label class="block">Check-out<input type="date" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label></div><label class="block text-sm">Guests<input type="number" min="1" value="2" class="w-full mt-1 px-3 py-2 rounded-lg bg-[#15151d] border border-white/10"/></label><div class="flex items-center justify-between text-sm"><span>Subtotal</span><b id="subtot">$220</b></div><div class="flex items-center justify-between text-sm"><span>Taxes & fees</span><b id="fees">$35</b></div><div class="flex items-center justify-between text-sm"><span>StayWorld+ discount</span><b class="text-brand.gold">−$20</b></div><div class="flex items-center justify-between text-base border-t border-white/10 pt-2"><span>Total</span><b id="total">$235</b></div><button class="btn btn-gold w-full" onclick="alert('Proceed to payment (wire your gateway)')">Continue to pay</button></div></div>
 
-  <template id="loginTpl"><h3 class="text-xl font-bold mb-2">Log in</h3><p class="text-white/70 text-sm mb-3">Welcome back!</p><div class="space-y-3"><input id="loginEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/><input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/><button class="btn btn-gold w-full" onclick="doLogin()">Log in</button><button class="btn w-full" onclick="googleLogin()">Continue with Google</button></div></template>
-  <template id="signupTpl"><h3 class="text-xl font-bold mb-2">Create account</h3><p class="text-white/70 text-sm mb-3">Join StayWorld</p><div class="space-y-3"><input id="suName" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Full name"/><input id="suEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/><input id="suPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/><button class="btn btn-gold w-full" onclick="doSignup()">Sign up</button><button class="btn w-full" onclick="googleLogin()">Sign up with Google</button></div></template>
+  <template id="loginTpl"><h3 class="text-xl font-bold mb-2">Log in</h3><p class="text-white/70 text-sm mb-3">Welcome back!</p><div class="space-y-3"><input id="loginEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/><input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/><button class="btn btn-gold w-full" onclick="doLogin()">Log in</button><button class="btn w-full bg-white text-black flex items-center justify-center gap-2" onclick="googleLogin()"><span class="text-lg">G</span><span>Continue with Google</span></button></div></template>
+  <template id="signupTpl"><h3 class="text-xl font-bold mb-2">Create account</h3><p class="text-white/70 text-sm mb-3">Join StayWorld</p><div class="space-y-3"><input id="suName" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Full name"/><input id="suEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/><input id="suPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/><button class="btn btn-gold w-full" onclick="doSignup()">Sign up</button><button class="btn w-full bg-white text-black flex items-center justify-center gap-2" onclick="googleLogin()"><span class="text-lg">G</span><span>Sign up with Google</span></button></div></template>
   <template id="filtersTpl">
       <div class="p-5 border-b border-white/10 flex items-center justify-between">
         <h3 class="text-lg font-bold">Filters</h3>
-        <button class="badge" onclick="closeFilters()">✕</button>
+        <button class="btn" style="border-color:var(--gold);color:var(--gold)" onclick="closeFilters()">✕</button>
       </div>
       <div class="p-5 grid md:grid-cols-3 gap-6 text-sm">
         <div>
@@ -326,7 +336,7 @@
           </div>
         </div>
       </div>
-      <div class="p-5 border-t border-white/10 flex items-center justify-end gap-2">
+      <div class="p-5 border-t border-white/10 flex items-center justify-end gap-2 sticky bottom-0 bg-[#0f0f15]/95 backdrop-blur">
         <button class="btn" onclick="closeFilters()">Cancel</button>
         <button class="btn btn-gold" onclick="applyFilters()">Apply</button>
       </div>
@@ -444,9 +454,9 @@
     function setLang(code){
       const lang = LANGS[code] ? code : 'en';
       const dict = LANGS[lang];
-      document.querySelectorAll('[data-i18n]').forEach(el=>{
+      document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if(dict[key]) el.textContent = dict[key];
+        if (dict[key]) el.textContent = dict[key];
       });
       const placeholders = {
         en:'Paris, Tokyo, Istanbul...',
@@ -461,17 +471,24 @@
         zh:'巴黎、东京、伊斯坦布尔…'
       };
       const inp = document.getElementById('searchInput');
-      if(inp) inp.placeholder = placeholders[lang] || placeholders.en;
+      if (inp) inp.placeholder = placeholders[lang] || placeholders.en;
       localStorage.setItem('sw_lang', lang);
       document.documentElement.setAttribute('lang', lang);
       const select = document.getElementById('langSelect');
-      if(select) select.value = lang;
-    }); localStorage.setItem('sw_lang', code); document.getElementById('searchInput').placeholder = (code==='ko')? '파리, 도쿄, 이스탄불...' : 'Paris, Tokyo, Istanbul...'; }
-    (function(){ const saved = localStorage.getItem('sw_lang')||'en'; document.getElementById('langSelect').value = saved; setLang(saved); })();
+      if (select) select.value = lang;
+    }
+    (function(){
+      const saved = localStorage.getItem('sw_lang') || 'en';
+      const select = document.getElementById('langSelect');
+      if (select) select.value = saved;
+      setLang(saved);
+    })()
+    
 
     // Suggestions & city mapping
     const SUGGESTIONS = [
       'Istanbul','이스탄불','Seoul','서울','Tokyo','도쿄','Paris','파리','Osaka','오사카','Kyoto','교토','Sapporo','삿포로','Fukuoka','후쿠오카','Nagoya','나고야','Okinawa','오키나와',
+      'Nerima','練馬','Meguro','目黒','Shinjuku','新宿','Shibuya','渋谷','Chiyoda','千代田',
       'Beijing','베이징','Shanghai','상하이','Shenzhen','선전','Guangzhou','광저우','Chengdu','청두','Chongqing','충칭','Hangzhou','항저우','Xian','시안','Wuhan','우한','Nanjing','난징',
       'Hong Kong','홍콩','Macau','마카오','Taipei','타이베이','Kaohsiung','가오슝',
       'Bangkok','방콕','Chiang Mai','치앙마이','Phuket','푸켓','Krabi','끄라비','Kuala Lumpur','쿠알라룸푸르','Penang','페낭','Singapore','싱가포르','Jakarta','자카르타','Bali','발리','Yogyakarta','욕야카르타',
@@ -484,27 +501,113 @@
       'Barcelona','바르셀로나','Madrid','마드리드','Seville','세비야','Valencia','발렌시아','Lisbon','리스본','Porto','포르투',
       'Berlin','베를린','Munich','뮌헨','Frankfurt','프랑크푸르트','Hamburg','함부르크','Cologne','쾰른','Zurich','취리히','Geneva','제네바','Vienna','빈','Prague','프라하','Budapest','부다페스트','Warsaw','바르샤바','Krakow','크라쿠프',
       'Rome','로마','Milan','밀라노','Florence','피렌체','Venice','베네치아','Naples','나폴리','Turin','토리노',
-      'Athens','아테네','Santorini','산토리니','Mykonos','미코노스','Istanbul','이스탄불','Antalya','안탈리아','Cappadocia','카파도키아','Bodrum','보드룸','Izmir','이즈미르',
+      'Athens','아테네','Santorini','산토리니','Mykonos','미코노스','Antalya','안탈리아','Cappadocia','카파도키아','Bodrum','보드룸','Izmir','이즈미르',
       'New York','뉴욕','Los Angeles','로스앤젤레스','San Francisco','샌프란시스코','Seattle','시애틀','Chicago','시카고','Miami','마이애미','Orlando','올랜도','Boston','보스턴','Las Vegas','라스베이거스','Washington DC','워싱턴',
       'Toronto','토론토','Vancouver','밴쿠버','Montreal','몬트리올','Quebec City','퀘벡',
       'Mexico City','멕시코시티','Cancun','칸쿤','Tulum','툴룸','Havana','아바나',
       'Rio de Janeiro','리우데자네이루','Sao Paulo','상파울루','Buenos Aires','부에노스아이레스','Lima','리마','Cusco','쿠스코'
     ];
-    const CITY_VIEW = { istanbul:{center:[41.0082,28.9784], bbox:'28.80%2C40.90%2C29.20%2C41.10'}, seoul:{center:[37.5665,126.9780], bbox:'126.80%2C37.45%2C127.10%2C37.65'}, tokyo:{center:[35.6762,139.6503], bbox:'139.55%2C35.60%2C139.80%2C35.75'}, paris:{center:[48.8566,2.3522], bbox:'2.20%2C48.80%2C2.45%2C48.90'}, barcelona:{center:[41.3874,2.1686], bbox:'2.10%2C41.33%2C2.25%2C41.42'}, berlin:{center:[52.5200,13.4050], bbox:'13.30%2C52.47%2C13.55%2C52.55'}, dubai:{center:[25.2048,55.2708], bbox:'55.15%2C25.15%2C55.40%2C25.30'}, newyork:{center:[40.7128,-74.0060], bbox:'-74.10%2C40.65%2C-73.90%2C40.78'} };
-    function normalizeCity(name){ if(!name) return 'istanbul'; const k=name.toString().trim().toLowerCase(); if(['seoul','서울'].includes(k)) return 'seoul'; if(['tokyo','도쿄','東京'].includes(k)) return 'tokyo'; if(['paris','파리'].includes(k)) return 'paris'; if(['istanbul','이스탄불'].includes(k)) return 'istanbul'; if(['barcelona','바르셀로나'].includes(k)) return 'barcelona'; if(['berlin','베를린'].includes(k)) return 'berlin'; if(['dubai','두바이'].includes(k)) return 'dubai'; if(['new york','뉴욕','newyork'].includes(k)) return 'newyork'; return 'istanbul'; }
+    const CITY_VIEW = {
+      istanbul:{center:[41.0082,28.9784], bbox:'28.80%2C40.90%2C29.20%2C41.10'},
+      seoul:{center:[37.5665,126.9780], bbox:'126.80%2C37.45%2C127.10%2C37.65'},
+      tokyo:{center:[35.6762,139.6503], bbox:'139.55%2C35.60%2C139.80%2C35.75'},
+      nerima:{center:[35.7356,139.6517], bbox:'139.58%2C35.70%2C139.72%2C35.77'},
+      meguro:{center:[35.6417,139.6982], bbox:'139.66%2C35.61%2C139.73%2C35.67'},
+      shibuya:{center:[35.6618,139.7041], bbox:'139.68%2C35.64%2C139.73%2C35.69'},
+      shinjuku:{center:[35.6938,139.7034], bbox:'139.68%2C35.68%2C139.73%2C35.71'},
+      chiyoda:{center:[35.6930,139.7530], bbox:'139.74%2C35.68%2C139.77%2C35.71'},
+      paris:{center:[48.8566,2.3522], bbox:'2.20%2C48.80%2C2.45%2C48.90'},
+      barcelona:{center:[41.3874,2.1686], bbox:'2.10%2C41.33%2C2.25%2C41.42'},
+      berlin:{center:[52.5200,13.4050], bbox:'13.30%2C52.47%2C13.55%2C52.55'},
+      dubai:{center:[25.2048,55.2708], bbox:'55.15%2C25.15%2C55.40%2C25.30'},
+      newyork:{center:[40.7128,-74.0060], bbox:'-74.10%2C40.65%2C-73.90%2C40.78'}
+    };
+    function normalizeCity(name){
+      if(!name) return 'istanbul';
+      const k = name.toString().trim().toLowerCase();
+      if(k.includes('nerima') || k.includes('練馬')) return 'nerima';
+      if(k.includes('meguro') || k.includes('目黒')) return 'meguro';
+      if(k.includes('shibuya') || k.includes('渋谷')) return 'shibuya';
+      if(k.includes('shinjuku') || k.includes('新宿')) return 'shinjuku';
+      if(k.includes('chiyoda') || k.includes('千代田')) return 'chiyoda';
+      if(['seoul','서울'].includes(k)) return 'seoul';
+      if(['tokyo','도쿄','東京'].includes(k) || k.endsWith(' tokyo')) return 'tokyo';
+      if(['paris','파리'].includes(k)) return 'paris';
+      if(['istanbul','이스탄불'].includes(k)) return 'istanbul';
+      if(['barcelona','바르셀로나'].includes(k)) return 'barcelona';
+      if(['berlin','베를린'].includes(k)) return 'berlin';
+      if(['dubai','두바이'].includes(k)) return 'dubai';
+      if(['new york','뉴욕','newyork'].includes(k)) return 'newyork';
+      return 'istanbul';
+    }
 
     const input = document.getElementById('searchInput'); const sug = document.getElementById('suggestions');
     input.addEventListener('input',()=>{ const q=input.value.trim().toLowerCase(); const list = !q? SUGGESTIONS.slice(0,6) : SUGGESTIONS.filter(v=>v.toLowerCase().includes(q)).slice(0,6); sug.innerHTML = list.map(v=>`<button class="hover:bg-white/5" onclick="pickSuggestion('${v}')">${v}</button>`).join(''); sug.style.display = list.length?'block':'none'; });
     input.addEventListener('focus',()=>{ if(!input.value.trim()){ const list=SUGGESTIONS.slice(0,6); sug.innerHTML=list.map(v=>`<button class='hover:bg-white/5' onclick="pickSuggestion('${v}')">${v}</button>`).join(''); sug.style.display='block'; } });
     document.addEventListener('click',(e)=>{ if(!e.target.closest('#suggestions') && e.target!==input){sug.style.display='none'} });
+    input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); searchNow(); } });
     function pickSuggestion(v){ input.value=v; sug.style.display='none'; }
-    function searchNow(){ const val = document.getElementById('searchInput').value; window._currentCity = normalizeCity(val); renderCards(true); const mapEl=document.getElementById('map'); if(mapEl.classList.contains('hidden')){ toggleMap(); } else if(window.ENV?.DEMO_MODE){ updateOsmMap(); } }
+    async function searchNow(){
+      const val = document.getElementById('searchInput').value;
+      window._currentCity = normalizeCity(val);
+      renderCards(true);
+      const mapEl=document.getElementById('map');
+      if(mapEl.classList.contains('hidden')){ toggleMap(); }
+      if(window.ENV?.DEMO_MODE){
+        await geocodeAndCenter(val || window._currentCity);
+      } else {
+        // Prod (Google Maps): keep previous behavior
+        if(map) plotListings(getCurrentList().slice(0,20));
+      }
+    }
 
-    // Map
-    let map, markers=[]; window._currentCity='istanbul';
-    function toggleMap(){ const m=document.getElementById('map'); m.classList.toggle('hidden'); if(m.classList.contains('hidden')) return; if(window.ENV?.DEMO_MODE){ updateOsmMap(); return; } if(!map){ if(!document.getElementById('gmap-js')){ const key=window.ENV.GMAPS_KEY||''; const s=document.createElement('script'); s.id='gmap-js'; s.async=true; s.src=`https://maps.googleapis.com/maps/api/js?key=${key}&callback=initMap`; document.body.appendChild(s); } else { initMap(); } } }
-    function updateOsmMap(){ const city = CITY_VIEW[window._currentCity] || CITY_VIEW.istanbul; const [lat,lng]=city.center; const src=`https://www.openstreetmap.org/export/embed.html?bbox=${city.bbox}&layer=mapnik&marker=${lat}%2C${lng}`; document.getElementById('map').innerHTML = `<iframe title="map" width="100%" height="380" frameborder="0" scrolling="no" src="${src}"></iframe>`; }
-    function initMap(){ map = new google.maps.Map(document.getElementById('map'),{center:{lat:41.0082,lng:28.9784},zoom:11,styles:[{elementType:'geometry',stylers:[{color:'#0f0f15'}]},{elementType:'labels.text.fill',stylers:[{color:'#eaeaea'}]},{featureType:'poi',stylers:[{visibility:'off'}]}]}); plotListings(DEMO_LIST); }
+
+    // Map (Leaflet for DEMO_MODE, Google Maps for production)
+    let map, markers=[], lmap, lmarkers;
+    window._currentCity='istanbul';
+    function toggleMap(){
+      const m=document.getElementById('map');
+      m.classList.toggle('hidden');
+      if(m.classList.contains('hidden')) return;
+      if(window.ENV?.DEMO_MODE){ ensureLeafletMap(); return; }
+      if(!map){ if(!document.getElementById('gmap-js')){ const key=window.ENV.GMAPS_KEY||''; const s=document.createElement('script'); s.id='gmap-js'; s.async=true; s.src=`https://maps.googleapis.com/maps/api/js?key=${key}&callback=initMap`; document.body.appendChild(s); } else { initMap(); } }
+    }
+    function ensureLeafletMap(){
+      if(lmap){ setTimeout(()=>lmap.invalidateSize(), 50); return; }
+      lmap = L.map('map',{zoomControl:true});
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(lmap);
+      lmap.setView([41.0082,28.9784], 12);
+      lmarkers = L.layerGroup().addTo(lmap);
+      plotLeafletListings(getCurrentList().slice(0,100));
+    }
+    function plotLeafletListings(list){ if(!lmap) return; lmarkers.clearLayers(); list.forEach(it=>{ L.marker([it.coords.lat,it.coords.lng]).addTo(lmarkers).bindPopup(`<b>${it.title}</b><br/>${it.city} • $${it.price}/night`); }); }
+    async function geocodeAndCenter(q){
+      try{
+        // If the city is known, center directly for speed
+        const preset = CITY_VIEW[normalizeCity(q)] || null;
+        if(!lmap) ensureLeafletMap();
+        if(preset){ lmap.setView(preset.center, 13); plotLeafletListings(getCurrentList().slice(0,100)); return; }
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`;
+        const r = await fetch(url, {headers:{'Accept':'application/json'}});
+        const d = await r.json();
+        if(d && d[0]){ lmap.setView([+d[0].lat, +d[0].lon], 14); plotLeafletListings(getCurrentList().slice(0,100)); }
+      }catch(e){ console.warn('Geocode error', e); }
+    }
+    function fullMap(){ const el=document.getElementById('map'); if(el.requestFullscreen){ el.requestFullscreen(); setTimeout(()=>{ lmap?.invalidateSize(); }, 300); } }
+    
+    // Google Maps (production)
+    function initMap(){
+      map = new google.maps.Map(document.getElementById('map'),{
+        center:{lat:41.0082,lng:28.9784},
+        zoom:11,
+        styles:[
+          {elementType:'geometry',stylers:[{color:'#0f0f15'}]},
+          {elementType:'labels.text.fill',stylers:[{color:'#eaeaea'}]},
+          {featureType:'poi',stylers:[{visibility:'off'}]}
+        ]
+      });
+      plotListings(DEMO_LIST);
+    },zoom:11,styles:[{elementType:'geometry',stylers:[{color:'#0f0f15'}]},{elementType:'labels.text.fill',stylers:[{color:'#eaeaea'}]},{featureType:'poi',stylers:[{visibility:'off'}]}]}); plotListings(DEMO_LIST); }
     function plotListings(list){ if(!window.google||!google.maps){return} markers?.forEach(m=>m.setMap(null)); markers=[]; list.slice(0,20).forEach(item=>{ const mk = new google.maps.Marker({position:item.coords,map,title:item.title}); markers.push(mk); }) }
 
     // Weather
@@ -540,7 +643,7 @@
         grid.appendChild(el);
       });
       updatePager(list.length);
-      if(map && !window.ENV?.DEMO_MODE) plotListings(slice);
+      if((map && !window.ENV?.DEMO_MODE) || (lmap && window.ENV?.DEMO_MODE)) { if(window.ENV?.DEMO_MODE) plotLeafletListings(slice); else plotListings(slice); }
     }
     function updatePager(total){
       const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
