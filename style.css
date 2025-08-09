@@ -509,3 +509,10 @@ hr { border: 0; height: 1px; background: var(--border); }
    Footer CTA
 ===================== */
 .footer-cta { background: linear-gradient(180deg, rgba(216,163,22,.10), transparent); border:1px solid var(--border); border-radius: var(--radius-xl); padding: var(--sp-6); box-shadow: var(--shadow-1); }
+/* === Tier highlight === */
+.tier-active{
+  outline: 2px solid var(--gold);
+  box-shadow: 0 0 0 1px rgba(212,175,55,.35), 0 18px 48px rgba(0,0,0,.6);
+  transform: translateY(-2px);
+}
+.tier-muted{ opacity: .6; }
