@@ -516,3 +516,7 @@ hr { border: 0; height: 1px; background: var(--border); }
   transform: translateY(-2px);
 }
 .tier-muted{ opacity: .6; }
+.btn-ghost-gold{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+.btn-ghost-gold:hover{background:rgba(212,175,55,.12)}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px}
+dialog::backdrop{background:rgba(0,0,0,.65);backdrop-filter:blur(2px)}
