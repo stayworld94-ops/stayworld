@@ -1,93 +1,67 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StayWorld 로그인</title>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>STAYWORLD — Log in</title>
 <link rel="stylesheet" href="style.css">
-</head>
-<body>
+</head><body class="sw-auth-body">
 
-<!-- 로그인 버튼 -->
-<button onclick="openLogin()" class="btn btn-gold">로그인</button>
-
-<!-- 로그인 모달 -->
-<dialog id="loginModal" class="rounded-xl p-0 w-full max-w-md bg-[#0f0f15] text-white shadow-lg"></dialog>
-
-<!-- 로그인 템플릿 -->
-<template id="loginTpl">
-  <div class="p-5 space-y-3">
-    <h3 class="text-lg font-bold mb-2">로그인</h3>
-    <input id="loginEmail" type="email" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="이메일">
-    <input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="비밀번호">
-    <button data-login-submit class="btn btn-gold w-full">이메일로 로그인</button>
-    <button id="googleLoginBtn" class="btn w-full bg-white text-black flex items-center justify-center gap-2">
-      <span class="text-lg">G</span> Google로 계속하기
-    </button>
+<header class="sw-header">
+  <div class="sw-container sw-header-inner">
+    <a class="sw-brand" href="index.html">
+      <img src="assets/logo-gold.png" alt="STAYWORLD" class="sw-logo-img">
+      <div class="sw-title">STAYWORLD</div>
+    </a>
+    <nav class="sw-nav">
+      <a href="index.html#home">Home</a><a href="index.html#deals">Deals</a>
+      <a href="index.html#membership">Membership</a><a href="index.html#host">Host</a><a href="index.html#support">Support</a>
+    </nav>
   </div>
-</template>
+</header>
 
-<!-- Firebase SDK -->
+<main class="sw-auth-main">
+  <form class="sw-auth-card" id="loginForm" onsubmit="return false;">
+    <h2>Log in</h2>
+
+    <label>Email</label>
+    <input id="li_email" type="email" class="sw-input" placeholder="you@example.com">
+
+    <label>Password</label>
+    <input id="li_pass" type="password" class="sw-input" placeholder="Your password">
+
+    <button id="btn_email_login" class="sw-btn gold" style="width:100%;margin-top:14px">Log in</button>
+
+    <div class="sw-or"><span>or</span></div>
+
+    <button id="btn_google_login" type="button" class="sw-btn sw-btn-google" style="width:100%">
+      <!-- same Google SVG -->
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.8 32.4 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c10 0 19-7.3 19-20 0-1.2-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.4 15.3 18.8 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.6 8.4 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.6-5.3l-6.3-5.3C29.2 35.6 26.8 36 24 36c-5.4 0-9.9-3.6-11.3-8.5l-6.6 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.3 3.8-5.1 6.5-9.3 6.5-5.4 0-9.9-3.6-11.3-8.5l-6.6 5.1C9.5 39.6 16.2 44 24 44c10 0 19-7.3 19-20 0-1.2-.1-2.3-.4-3.5z"/></svg>
+      <span style="margin-left:8px">Continue with Google</span>
+    </button>
+
+    <p class="sw-auth-sub">No account? <a class="sw-link" href="signup.html">Sign up</a></p>
+  </form>
+</main>
+
+<script src="firebase-config.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
-
-<!-- StayWorld Firebase 설정 -->
 <script>
-window.firebaseConfig = {
-  apiKey: "AIzaSyD7EXAMPLE-API-KEY",
-  authDomain: "stayworldglobal.firebaseapp.com",
-  projectId: "stayworldglobal",
-  storageBucket: "stayworldglobal.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef123456"
-};
-firebase.initializeApp(window.firebaseConfig);
-window._fbReady = true;
+  firebase.initializeApp(window.firebaseConfig);
+  const auth = firebase.auth();
+
+  document.getElementById('btn_email_login').addEventListener('click', async ()=>{
+    try{
+      const { user } = await auth.signInWithEmailAndPassword(li_email.value.trim(), li_pass.value);
+      alert('Welcome back, ' + (user.displayName || user.email));
+      location.href = 'index.html';
+    }catch(e){ alert(e.message); }
+  });
+
+  document.getElementById('btn_google_login').addEventListener('click', async ()=>{
+    try{
+      const provider = new firebase.auth.GoogleAuthProvider();
+      await auth.signInWithPopup(provider);
+      location.href = 'index.html';
+    }catch(e){ alert(e.message); }
+  });
 </script>
-
-<!-- 로그인 로직 -->
-<script>
-(function(){
-  const $ = (sel, scope)=> (scope||document).querySelector(sel);
-
-  function openLogin(){
-    const dlg = $('#loginModal');
-    const tpl = $('#loginTpl');
-    if (dlg && tpl){
-      dlg.innerHTML = tpl.innerHTML;
-      dlg.showModal();
-      hydrateActions(dlg);
-    }
-  }
-
-  function closeLogin(){
-    const dlg = $('#loginModal');
-    if (dlg && dlg.open) dlg.close();
-  }
-
-  function hydrateActions(container){
-    container.querySelector('[data-login-submit]')?.addEventListener('click', doLogin);
-    container.querySelector('#googleLoginBtn')?.addEventListener('click', googleLogin);
-  }
-
-  function doLogin(){
-    const email = $('#loginEmail')?.value;
-    const pwd = $('#loginPwd')?.value;
-    firebase.auth().signInWithEmailAndPassword(email, pwd)
-      .then(user=>{ alert(`로그인 성공: ${user.user.email}`); closeLogin(); })
-      .catch(e=> alert(e.message));
-  }
-
-  function googleLogin(){
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-      .then(result=>{ alert(`환영합니다, ${result.user.displayName}`); closeLogin(); })
-      .catch(e=> alert(e.message));
-  }
-
-  window.openLogin = openLogin;
-})();
-</script>
-
-</body>
-</html>
+</body></html>
