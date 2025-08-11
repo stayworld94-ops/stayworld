@@ -1,104 +1,86 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld Membership</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --gold: #FFD700;
-    }
-    .tier-active { border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(255,215,0,0.5); }
-    .tier-muted { opacity: 0.4; }
-  </style>
+  <title>STAYWORLD — Membership</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10">
-
-  <h1 class="text-3xl font-bold mb-8">StayWorld Membership</h1>
-
-  <!-- 상단 프로그레스 카드 -->
-  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-3xl mb-10 shadow-lg">
-    <h2 class="text-2xl font-bold mb-4">회원 등급 진행 상황</h2>
-    <div class="flex justify-between mb-2">
-      <span id="currentLevel" class="font-semibold">현재 등급</span>
-      <span class="text-sm text-gray-400" id="levelProgressText"></span>
+<body>
+  <header>
+    <div class="container h-inner">
+      <div class="logo">
+        <img src="logo.png" alt="StayWorld Logo" style="height:40px;">
+      </div>
+      <nav>
+        <a id="t_nav_home" href="index.html#home">Home</a>
+        <a id="t_nav_deals" href="index.html#deals">Deals</a>
+        <a id="t_nav_membership" href="membership.html">Membership</a>
+        <a id="t_nav_host" href="host-register.html">Host</a>
+        <a id="t_nav_support" href="support.html">Support</a>
+      </nav>
+      <div>
+        <select id="langSelect">
+          <option value="en">EN</option>
+          <option value="ko">KO</option>
+          <option value="fr">FR</option>
+          <option value="tr">TR</option>
+          <option value="ja">JA</option>
+          <option value="de">DE</option>
+          <option value="es">ES</option>
+          <option value="it">IT</option>
+          <option value="zh">ZH</option>
+          <option value="ru">RU</option>
+        </select>
+      </div>
     </div>
-    <div class="w-full bg-white/10 rounded-full h-2">
-      <div class="bg-[var(--gold)] h-2 rounded-full transition-all duration-500"></div>
-    </div>
-    <div class="text-right text-xs text-white/60 mt-1">0%</div>
-  </div>
+  </header>
 
-  <!-- 멤버십 등급 카드 -->
-  <div id="tiersGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
-    <!-- Bronze -->
-    <div data-tier="Bronze" class="bg-gray-800 p-6 rounded-xl shadow-lg">
-      <h3 class="text-xl font-bold mb-2">Bronze</h3>
-      <p>기본 이용 가능 (회원가입 시 자동 부여)</p>
+  <section class="hero">
+    <div class="container">
+      <h1 id="t_membership_title">StayWorld+ Rewards</h1>
+      <p class="sub" id="t_membership_sub">Higher levels include all benefits of lower levels.</p>
     </div>
+  </section>
 
-    <!-- Silver -->
-    <div data-tier="Silver" class="bg-gray-800 p-6 rounded-xl shadow-lg">
-      <h3 class="text-xl font-bold mb-2">Silver</h3>
-      <p>첫 예약 시 3% 포인트 적립</p>
-    </div>
-
-    <!-- Gold -->
-    <div data-tier="Gold" class="bg-gray-800 p-6 rounded-xl shadow-lg">
-      <h3 class="text-xl font-bold mb-2">Gold</h3>
-      <p>매 예약 시 5% 적립 + 우선 고객 응대</p>
-    </div>
-
-    <!-- Platinum -->
-    <div data-tier="Platinum" class="bg-gray-800 p-6 rounded-xl shadow-lg">
-      <h3 class="text-xl font-bold mb-2">Platinum</h3>
-      <p>7% 적립 + 시즌 할인 자동 적용</p>
-    </div>
-
-    <!-- Diamond -->
-    <div data-tier="Diamond" class="bg-gray-800 p-6 rounded-xl shadow-lg">
-      <h3 class="text-xl font-bold mb-2">Diamond</h3>
-      <p>10% 적립 + 전용 쿠폰 + 고객센터 우선권</p>
+  <section class="container">
+    <div class="membership-level">
+      <h2 id="t_level_bronze">Bronze</h2>
+      <p id="t_bronze_desc">Basic access granted upon signup.</p>
     </div>
 
-    <!-- Elite -->
-    <div data-tier="Elite" class="bg-gray-800 p-6 rounded-xl shadow-lg">
-      <h3 class="text-xl font-bold mb-2">Elite</h3>
-      <p>15% 적립 + 프라이빗 딜 + 긴급 지원 우선 처리</p>
+    <div class="membership-level">
+      <h2 id="t_level_silver">Silver</h2>
+      <p id="t_silver_desc">3% points on first booking.</p>
     </div>
-  </div>
 
-  <!-- JS 로직 연결 -->
-  <script src="membership.js"></script>
-  <script>
-    // 예시 데이터 (실제 서비스에서는 로그인 후 서버 데이터로 변경)
-    setUserContext({
-      totalSpentKRW: 3250000, // 누적 결제 금액
-      lastBookingISO: new Date(Date.now() - 20 * 86400000).toISOString() // 마지막 예약 20일 전
-    });
-  </script>
+    <div class="membership-level">
+      <h2 id="t_level_gold">Gold</h2>
+      <p id="t_gold_desc">5% points on every booking + priority support.</p>
+    </div>
+
+    <div class="membership-level">
+      <h2 id="t_level_platinum">Platinum</h2>
+      <p id="t_platinum_desc">7% points + seasonal discounts.</p>
+    </div>
+
+    <div class="membership-level">
+      <h2 id="t_level_diamond">Diamond</h2>
+      <p id="t_diamond_desc">10% points + exclusive coupons + VIP support.</p>
+    </div>
+
+    <div class="membership-level">
+      <h2 id="t_level_elite">Elite</h2>
+      <p id="t_elite_desc">15% points + private deals + urgent priority service.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 StayWorld</p>
+    </div>
+  </footer>
+
+  <script src="lang.js"></script>
 </body>
 </html>
-<!-- 네비 텍스트에 id 추가 -->
-<a id="t_nav_home" href="index.html#home">Home</a>
-<a id="t_nav_deals" href="index.html#deals">Deals</a>
-<a id="t_nav_membership" href="membership.html">Membership</a>
-<a id="t_nav_host" href="host-register.html">Host</a>
-<a id="t_nav_support" href="support.html">Support</a>
-
-<!-- 본문 문구에도 id -->
-<h1 id="t_membership_title">StayWorld+ Rewards</h1>
-<p id="t_membership_sub">Higher levels include all benefits of lower levels.</p>
-
-<!-- 맨 아래 스크립트 순서: 페이지 스크립트 후에 lang.js -->
-<script src="membership.js"></script>
-<script src="lang.js"></script>
-<script>
-  // 저장된 언어로 즉시 적용 (index와 동일 로직 사용)
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const saved = localStorage.getItem('sw_lang') || 'en';
-    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
-  });
-</script>
-
