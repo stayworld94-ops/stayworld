@@ -76,3 +76,36 @@
   });
 </script>
 </body></html>
+<!-- 1) 공용 config -->
+<script type="module" src="firebase-config.js"></script>
+
+<!-- 2) 회원가입 핸들러 -->
+<script type="module">
+  const {
+    auth, GoogleAuthProvider, signInWithPopup,
+    createUserWithEmailAndPassword, updateProfile
+  } = window._swAuth;
+
+  // 이메일 회원가입
+  document.getElementById('btn_email_signup')?.addEventListener('click', async ()=>{
+    const name  = document.getElementById('su_name').value.trim();
+    const email = document.getElementById('su_email').value.trim();
+    const pass  = document.getElementById('su_pass').value;
+    if(!email || !pass){ alert('Please enter email & password.'); return; }
+    try{
+      const { user } = await createUserWithEmailAndPassword(auth, email, pass);
+      if(name) await updateProfile(user, { displayName: name });
+      alert('Welcome to StayWorld!');
+      location.href = 'index.html';
+    }catch(err){ alert(err.message); }
+  });
+
+  // 구글 회원가입(로그인 겸용)
+  document.getElementById('btn_google_signup')?.addEventListener('click', async ()=>{
+    try{
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      location.href = 'index.html';
+    }catch(err){ alert(err.message); }
+  });
+</script>
