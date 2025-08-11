@@ -1,122 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register a Property - StayWorld</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="lang.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <title>STAYWORLD — Host Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0a0c;--panel:#0f0f16;--muted:#a1a7b3;--text:#f1f3f7;--gold:#d4b166;--gold-2:#f0d58d}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui;color:var(--text);background:var(--bg)}
+    .container{max-width:1000px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;z-index:10;background:rgba(10,10,12,.7);backdrop-filter:blur(10px);border-bottom:1px solid #1a1a22}
+    .h-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+    nav a{margin:0 10px;color:#a1a7b3;text-decoration:none;font-weight:600}
+    nav a:hover{color:#fff}
+    select{background:#0d0d14;border:1px solid #262631;color:#fff;border-radius:10px;padding:8px 10px}
+    .hero{padding:48px 0;border-bottom:1px solid #1a1a22;background:radial-gradient(700px 400px at 80% -10%, rgba(212,177,102,.08), transparent 60%)}
+    .hero h1{font-size:40px;margin:0 0 8px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+    .card{background:linear-gradient(180deg,#13131c,#0d0d14);border:1px solid #242430;border-radius:16px;padding:18px}
+    .btn{margin-top:12px;background:linear-gradient(180deg,var(--gold-2),var(--gold));border:0;color:#111;font-weight:800;border-radius:12px;padding:12px 14px;cursor:pointer}
+    label{display:block;margin:10px 0 6px;font-weight:600}
+    input,select.form{width:100%;padding:12px;border-radius:10px;border:1px solid #262631;background:#0d0d14;color:#fff}
+    footer{border-top:1px solid #1a1a22;padding:18px 0;margin-top:24px;color:#a1a7b3}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-  <header>
-    <img src="images/logo.jpg" alt="StayWorld Logo" class="logo" />
+<header>
+  <div class="container h-inner">
+    <strong>STAYWORLD</strong>
     <nav>
-      <ul>
-        <li><a href="index.html#search">Search</a></li>
-        <li><a href="host-register.html">Host Register</a></li>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="signup.html">Sign Up</a></li>
-      </ul>
+      <a id="t_nav_home" href="index.html#home">Home</a>
+      <a id="t_nav_deals" href="index.html#deals">Deals</a>
+      <a id="t_nav_membership" href="membership.html">Membership</a>
+      <a id="t_nav_host" href="host-register.html">Host</a>
+      <a id="t_nav_support" href="support.html">Support</a>
     </nav>
-  </header>
+    <select id="langSelect">
+      <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option>
+      <option value="de">DE</option><option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
+    </select>
+  </div>
+</header>
 
-  <section class="form-section">
-    <div id="google-login-container" style="margin-bottom: 20px;"></div>
+<section class="hero">
+  <div class="container">
+    <h1 id="t_host_title">Host with confidence</h1>
+    <p class="muted" id="t_host_sub">ID verification required. Listings go live automatically.</p>
+  </div>
+</section>
 
-    <form class="form-box" id="hostForm">
-      <h2>Submit Your Property (Login & ID Required)</h2>
+<div class="container">
+  <div class="grid">
+    <div class="card">
+      <h3 id="t_host_benefits_title">Benefits</h3>
+      <ul style="margin:0 0 8px 18px;line-height:1.6">
+        <li id="t_host_benefit1">Instant listing activation</li>
+        <li id="t_host_benefit2">Secure payments</li>
+        <li id="t_host_benefit3">AI-powered pricing tips</li>
+        <li id="t_host_benefit4">24/7 host support</li>
+      </ul>
+      <button class="btn" id="t_host_verify_btn">Start verification</button>
+    </div>
 
-      <label>Property Title</label>
-      <input type="text" id="title" required />
+    <div class="card">
+      <h3 id="t_host_register_title">Register property</h3>
+      <label for="i_host_title" id="t_host_label_title">Property title</label>
+      <input id="i_host_title" type="text" placeholder="e.g. Bosporus Elite Suite"/>
 
-      <label>Type</label>
-      <select id="type" required>
-        <option>Apartment</option>
-        <option>House</option>
-        <option>Hotel</option>
-        <option>Villa</option>
-        <option>Guesthouse</option>
+      <label for="i_host_city" id="t_host_label_city">City</label>
+      <input id="i_host_city" type="text" placeholder="Istanbul"/>
+
+      <label for="i_host_type" id="t_host_label_type">Type</label>
+      <select id="i_host_type" class="form">
+        <option value="apartment">Apartment</option>
+        <option value="hotel">Hotel</option>
+        <option value="villa">Villa</option>
+        <option value="hostel">Hostel</option>
       </select>
 
-      <label>Description</label>
-      <textarea id="description" rows="4" required></textarea>
+      <button class="btn" id="t_host_register_btn">Submit registration</button>
+    </div>
+  </div>
+</div>
 
-      <label>Nightly Price (USD)</label>
-      <input type="number" id="price" required />
+<footer>
+  <div class="container">© 2025 StayWorld</div>
+</footer>
 
-      <label>Address</label>
-      <input type="text" id="address" required />
-
-      <label>Latitude</label>
-      <input type="text" id="latitude" placeholder="Optional" />
-
-      <label>Longitude</label>
-      <input type="text" id="longitude" placeholder="Optional" />
-
-      <label>Upload Property Image</label>
-      <input type="file" id="image" accept="image/*" required />
-
-      <label>Upload Government ID (Passport or National ID)</label>
-      <input type="file" id="idUpload" accept=".jpg,.jpeg,.png,.pdf" required />
-
-      <button type="submit">Submit Listing</button>
-    </form>
-  </section>
-
-  <footer><p>&copy; 2025 StayWorld</p></footer>
-
-  <script>
-    let isLoggedIn = false;
-
-    function handleCredentialResponse(response) {
-      console.log("Google login token:", response.credential);
-      isLoggedIn = true;
-      document.getElementById("google-login-container").style.display = "none";
-    }
-
-    window.onload = function () {
-      const loginBox = document.createElement("div");
-      loginBox.innerHTML = `
-        <div id="g_id_onload"
-          data-client_id="635837328384-o4m1pvqf8od97kud4ep3j9ra6usno3re.apps.googleusercontent.com"
-          data-callback="handleCredentialResponse"
-          data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
-      `;
-      document.getElementById("google-login-container").appendChild(loginBox);
-    };
-
-    document.getElementById("hostForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      if (!isLoggedIn) {
-        alert("🚫 You must log in with Google before submitting your listing.");
-        return;
-      }
-
-      const idFile = document.getElementById("idUpload").files[0];
-      if (!idFile) {
-        alert("❗ You must upload a valid ID to continue.");
-        return;
-      }
-
-      const property = {
-        title: document.getElementById("title").value,
-        type: document.getElementById("type").value,
-        description: document.getElementById("description").value,
-        price: document.getElementById("price").value,
-        address: document.getElementById("address").value,
-        lat: document.getElementById("latitude").value,
-        lng: document.getElementById("longitude").value,
-        image: document.getElementById("image").files[0]?.name,
-        idFile: idFile.name
-      };
-
-      console.log("🏠 Property submitted:", property);
-      alert("✅ Property submitted successfully!");
-    });
-  </script>
+<script src="lang.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const saved = localStorage.getItem('sw_lang') || 'en';
+    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
+  });
+</script>
 </body>
 </html>
+
+
