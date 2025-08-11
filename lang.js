@@ -220,3 +220,339 @@
 
       host_title:"安心してホスティング", host_sub:"本人確認が必要。掲載は自動で公開。",
       host_benefits_title:"特典",
+      host_benefit1:"即時掲載",
+      host_benefit2:"安全な決済",
+      host_benefit3:"AI料金アドバイス",
+      host_benefit4:"24時間365日サポート",
+      host_verify_btn:"認証を開始",
+      host_register_title:"物件登録",
+      host_label_title:"物件名",
+      host_label_city:"都市",
+      host_label_type:"タイプ",
+      host_register_btn:"登録を送信"
+    },
+    de:{
+      nav:{home:"Start",deals:"Angebote",membership:"Mitgliedschaft",host:"Gastgeber",support:"Support"},
+      kicker:"Weltweite Aufenthalte • Verifizierte Gastgeber • Premium-Design",
+      h1:"Luxuriöse Aufenthalte.<br><span class='gold'>Weltweite Reichweite.</span>",
+      pay:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
+      filters:"Filter", search:"Suchen", popular:"Beliebt:", level:"Level", plus:"StayWorld+ aktiv",
+      deals_title:"Verifizierte Unterkünfte für dich",
+      level_hint:"Punkte sammeln. 60+ Tage inaktiv ➝ Auto-Downgrade (−1).",
+      placeholder:"Paris, Tokio, Istanbul…",
+      auth:{login:"Anmelden",signup:"Registrieren"},
+
+      membership_title:"StayWorld+ Prämien",
+      membership_sub:"Höhere Stufen enthalten alle Vorteile der niedrigeren.",
+      level_bronze:"Bronze", bronze_desc:"Grundzugang bei Registrierung.",
+      level_silver:"Silber", silver_desc:"3 % Punkte bei der ersten Buchung.",
+      level_gold:"Gold", gold_desc:"5 % Punkte pro Buchung + priorisierter Support.",
+      level_platinum:"Platin", platinum_desc:"7 % Punkte + saisonale Rabatte.",
+      level_diamond:"Diamant", diamond_desc:"10 % Punkte + exklusive Coupons + VIP-Support.",
+      level_elite:"Elite", elite_desc:"15 % Punkte + private Angebote + dringender Premium-Service.",
+
+      login_title:"Bei StayWorld anmelden", login_sub:"Willkommen zurück – auf Buchungen, Punkte & Vorteile zugreifen.",
+      login_email_label:"E-Mail", login_email_ph:"du@beispiel.de",
+      login_password_label:"Passwort", login_password_ph:"Passwort eingeben",
+      login_remember:"Angemeldet bleiben", login_forgot:"Passwort vergessen?", login_btn:"Anmelden",
+      login_to_signup:"Noch kein Konto? Registrieren",
+
+      signup_title:"Konto erstellen", signup_sub:"Sammle ab dem ersten Tag Punkte.",
+      signup_name_label:"Vollständiger Name", signup_name_ph:"Dein Name",
+      signup_email_label:"E-Mail", signup_email_ph:"du@beispiel.de",
+      signup_password_label:"Passwort", signup_password_ph:"Mindestens 8 Zeichen",
+      signup_btn:"Registrieren", signup_to_login:"Schon ein Konto? Anmelden",
+
+      host_title:"Mit Vertrauen hosten", host_sub:"ID-Verifizierung erforderlich. Listings gehen automatisch live.",
+      host_benefits_title:"Vorteile",
+      host_benefit1:"Sofortige Aktivierung",
+      host_benefit2:"Sichere Zahlungen",
+      host_benefit3:"KI-gestützte Preis-Tipps",
+      host_benefit4:"24/7-Host-Support",
+      host_verify_btn:"Verifizierung starten",
+      host_register_title:"Unterkunft registrieren",
+      host_label_title:"Titel der Unterkunft",
+      host_label_city:"Stadt",
+      host_label_type:"Typ",
+      host_register_btn:"Registrierung senden"
+    },
+    es:{
+      nav:{home:"Inicio",deals:"Ofertas",membership:"Membresía",host:"Anfitrión",support:"Soporte"},
+      kicker:"Estancias globales • Anfitriones verificados • Diseño premium",
+      h1:"Estancias de lujo.<br><span class='gold'>Alcance global.</span>",
+      pay:"Tarjetas, transferencia y cripto (BTC · ETH · USDT).",
+      filters:"Filtros", search:"Buscar", popular:"Popular:", level:"Nivel", plus:"StayWorld+ activo",
+      deals_title:"Estancias verificadas para ti",
+      level_hint:"Gana puntos. 60+ días inactivo ➝ degradación automática (−1).",
+      placeholder:"París, Tokio, Estambul…",
+      auth:{login:"Entrar",signup:"Registrarse"},
+
+      membership_title:"Recompensas StayWorld+",
+      membership_sub:"Los niveles superiores incluyen todos los beneficios de los inferiores.",
+      level_bronze:"Bronce", bronze_desc:"Acceso básico al registrarte.",
+      level_silver:"Plata", silver_desc:"3% de puntos en la primera reserva.",
+      level_gold:"Oro", gold_desc:"5% de puntos por reserva + soporte prioritario.",
+      level_platinum:"Platino", platinum_desc:"7% de puntos + descuentos de temporada.",
+      level_diamond:"Diamante", diamond_desc:"10% de puntos + cupones exclusivos + soporte VIP.",
+      level_elite:"Élite", elite_desc:"15% de puntos + ofertas privadas + servicio urgente prioritario.",
+
+      login_title:"Inicia sesión en StayWorld", login_sub:"Bienvenido de nuevo: accede a reservas, puntos y beneficios.",
+      login_email_label:"Correo", login_email_ph:"tú@ejemplo.com",
+      login_password_label:"Contraseña", login_password_ph:"Escribe tu contraseña",
+      login_remember:"Recordarme", login_forgot:"¿Olvidaste la contraseña?", login_btn:"Entrar",
+      login_to_signup:"¿Sin cuenta? Regístrate",
+
+      signup_title:"Crea tu cuenta", signup_sub:"Gana puntos desde el primer día.",
+      signup_name_label:"Nombre completo", signup_name_ph:"Tu nombre",
+      signup_email_label:"Correo", signup_email_ph:"tú@ejemplo.com",
+      signup_password_label:"Contraseña", signup_password_ph:"Mínimo 8 caracteres",
+      signup_btn:"Registrarse", signup_to_login:"¿Ya tienes cuenta? Inicia sesión",
+
+      host_title:"Anfitriona con confianza", host_sub:"Se requiere verificación de identidad. Publicación automática.",
+      host_benefits_title:"Beneficios",
+      host_benefit1:"Activación instantánea",
+      host_benefit2:"Pagos seguros",
+      host_benefit3:"Consejos de precios con IA",
+      host_benefit4:"Soporte 24/7",
+      host_verify_btn:"Iniciar verificación",
+      host_register_title:"Registrar propiedad",
+      host_label_title:"Título de la propiedad",
+      host_label_city:"Ciudad",
+      host_label_type:"Tipo",
+      host_register_btn:"Enviar registro"
+    },
+    it:{
+      nav:{home:"Home",deals:"Offerte",membership:"Abbonamento",host:"Host",support:"Supporto"},
+      kicker:"Soggiorni globali • Host verificati • Design premium",
+      h1:"Soggiorni di lusso.<br><span class='gold'>Portata globale.</span>",
+      pay:"Carte, bonifico e crypto (BTC · ETH · USDT).",
+      filters:"Filtri", search:"Cerca", popular:"Popolari:", level:"Livello", plus:"StayWorld+ attivo",
+      deals_title:"Soggiorni verificati per te",
+      level_hint:"Guadagna punti. 60+ giorni inattivo ➝ retrocessione automatica (−1).",
+      placeholder:"Parigi, Tokyo, Istanbul…",
+      auth:{login:"Accedi",signup:"Registrati"},
+
+      membership_title:"Premi StayWorld+",
+      membership_sub:"I livelli superiori includono tutti i vantaggi di quelli inferiori.",
+      level_bronze:"Bronzo", bronze_desc:"Accesso di base alla registrazione.",
+      level_silver:"Argento", silver_desc:"3% punti alla prima prenotazione.",
+      level_gold:"Oro", gold_desc:"5% punti a prenotazione + supporto prioritario.",
+      level_platinum:"Platino", platinum_desc:"7% punti + sconti stagionali.",
+      level_diamond:"Diamante", diamond_desc:"10% punti + coupon esclusivi + supporto VIP.",
+      level_elite:"Elite", elite_desc:"15% punti + offerte private + servizio urgente prioritario.",
+
+      login_title:"Accedi a StayWorld", login_sub:"Bentornato. Accedi a prenotazioni, punti e vantaggi.",
+      login_email_label:"Email", login_email_ph:"tu@esempio.com",
+      login_password_label:"Password", login_password_ph:"Inserisci la password",
+      login_remember:"Ricordami", login_forgot:"Password dimenticata?", login_btn:"Accedi",
+      login_to_signup:"Non hai un account? Registrati",
+
+      signup_title:"Crea il tuo account", signup_sub:"Guadagna punti dal primo giorno.",
+      signup_name_label:"Nome e cognome", signup_name_ph:"Il tuo nome",
+      signup_email_label:"Email", signup_email_ph:"tu@esempio.com",
+      signup_password_label:"Password", signup_password_ph:"Minimo 8 caratteri",
+      signup_btn:"Registrati", signup_to_login:"Hai già un account? Accedi",
+
+      host_title:"Ospita in tutta sicurezza", host_sub:"Verifica ID richiesta. Pubblicazione automatica.",
+      host_benefits_title:"Vantaggi",
+      host_benefit1:"Attivazione immediata",
+      host_benefit2:"Pagamenti sicuri",
+      host_benefit3:"Suggerimenti di prezzo IA",
+      host_benefit4:"Supporto 24/7",
+      host_verify_btn:"Avvia verifica",
+      host_register_title:"Registra proprietà",
+      host_label_title:"Titolo proprietà",
+      host_label_city:"Città",
+      host_label_type:"Tipo",
+      host_register_btn:"Invia registrazione"
+    },
+    zh:{
+      nav:{home:"首页",deals:"优惠",membership:"会员",host:"房东",support:"支持"},
+      kicker:"全球住宿 • 认证房东 • 高端设计",
+      h1:"奢华住宿。<br><span class='gold'>全球触达。</span>",
+      pay:"支持银行卡、转账与加密货币 (BTC · ETH · USDT)。",
+      filters:"筛选", search:"搜索", popular:"热门：", level:"等级", plus:"StayWorld+ 已启用",
+      deals_title:"为你精选的认证住宿",
+      level_hint:"赚取积分。60+ 天不活跃 ➝ 自动降级（−1）。",
+      placeholder:"巴黎、东京、伊斯坦布尔…",
+      auth:{login:"登录",signup:"注册"},
+
+      membership_title:"StayWorld+ 奖励",
+      membership_sub:"更高级别包含低级别的所有福利。",
+      level_bronze:"青铜", bronze_desc:"注册后获得基本访问。",
+      level_silver:"白银", silver_desc:"首次预订 3% 积分。",
+      level_gold:"黄金", gold_desc:"每次预订 5% 积分 + 优先支持。",
+      level_platinum:"白金", platinum_desc:"7% 积分 + 季节性折扣。",
+      level_diamond:"钻石", diamond_desc:"10% 积分 + 独家优惠券 + VIP 支持。",
+      level_elite:"精英", elite_desc:"15% 积分 + 私享优惠 + 紧急优先服务。",
+
+      login_title:"登录 StayWorld", login_sub:"欢迎回来。访问预订、积分与权益。",
+      login_email_label:"邮箱", login_email_ph:"you@example.com",
+      login_password_label:"密码", login_password_ph:"请输入密码",
+      login_remember:"记住我", login_forgot:"忘记密码？", login_btn:"登录",
+      login_to_signup:"没有账号？立即注册",
+
+      signup_title:"创建账户", signup_sub:"从第一天开始赚取积分。",
+      signup_name_label:"姓名", signup_name_ph:"你的名字",
+      signup_email_label:"邮箱", signup_email_ph:"you@example.com",
+      signup_password_label:"密码", signup_password_ph:"至少 8 个字符",
+      signup_btn:"注册", signup_to_login:"已有账号？去登录",
+
+      host_title:"放心成为房东", host_sub:"需要身份验证。房源自动上线。",
+      host_benefits_title:"优势",
+      host_benefit1:"即时上线",
+      host_benefit2:"安全支付",
+      host_benefit3:"AI 定价建议",
+      host_benefit4:"7×24 小时支持",
+      host_verify_btn:"开始验证",
+      host_register_title:"注册房源",
+      host_label_title:"房源标题",
+      host_label_city:"城市",
+      host_label_type:"类型",
+      host_register_btn:"提交注册"
+    },
+    ru:{
+      nav:{home:"Главная",deals:"Акции",membership:"Членство",host:"Хост",support:"Поддержка"},
+      kicker:"Мировые размещения • Проверенные хосты • Премиум-дизайн",
+      h1:"Роскошное проживание.<br><span class='gold'>Глобальный охват.</span>",
+      pay:"Карты, банковский перевод и крипто (BTC · ETH · USDT).",
+      filters:"Фильтры", search:"Поиск", popular:"Популярное:", level:"Уровень", plus:"StayWorld+ активен",
+      deals_title:"Проверенные предложения для вас",
+      level_hint:"Копите баллы. 60+ дней неактивности ➝ понижение (−1).",
+      placeholder:"Париж, Токио, Стамбул…",
+      auth:{login:"Войти",signup:"Регистрация"},
+
+      membership_title:"Награды StayWorld+",
+      membership_sub:"Высшие уровни включают все преимущества нижних.",
+      level_bronze:"Бронза", bronze_desc:"Базовый доступ при регистрации.",
+      level_silver:"Серебро", silver_desc:"3% баллов при первом бронировании.",
+      level_gold:"Золото", gold_desc:"5% баллов за каждое бронирование + приоритетная поддержка.",
+      level_platinum:"Платина", platinum_desc:"7% баллов + сезонные скидки.",
+      level_diamond:"Бриллиант", diamond_desc:"10% баллов + эксклюзивные купоны + VIP поддержка.",
+      level_elite:"Элита", elite_desc:"15% баллов + приватные предложения + срочный приоритетный сервис.",
+
+      login_title:"Вход в StayWorld", login_sub:"С возвращением. Доступ к бронированиям, баллам и привилегиям.",
+      login_email_label:"Email", login_email_ph:"you@example.com",
+      login_password_label:"Пароль", login_password_ph:"Введите пароль",
+      login_remember:"Запомнить меня", login_forgot:"Забыли пароль?", login_btn:"Войти",
+      login_to_signup:"Нет аккаунта? Зарегистрируйтесь",
+
+      signup_title:"Создать аккаунт", signup_sub:"Получайте баллы с первого дня.",
+      signup_name_label:"Полное имя", signup_name_ph:"Ваше имя",
+      signup_email_label:"Email", signup_email_ph:"you@example.com",
+      signup_password_label:"Пароль", signup_password_ph:"Минимум 8 символов",
+      signup_btn:"Зарегистрироваться", signup_to_login:"Уже есть аккаунт? Войдите",
+
+      host_title:"Хостинг с уверенностью", host_sub:"Требуется проверка личности. Объявления публикуются автоматически.",
+      host_benefits_title:"Преимущества",
+      host_benefit1:"Мгновенная публикация",
+      host_benefit2:"Безопасные платежи",
+      host_benefit3:"Рекомендации цен на базе ИИ",
+      host_benefit4:"Круглосуточная поддержка",
+      host_verify_btn:"Начать проверку",
+      host_register_title:"Зарегистрировать объект",
+      host_label_title:"Название объекта",
+      host_label_city:"Город",
+      host_label_type:"Тип",
+      host_register_btn:"Отправить регистрацию"
+    }
+  };
+
+  // --- Apply language to elements ---
+  function setHTML(id, html){ const el=document.getElementById(id); if(el) el.innerHTML = html; }
+  function setText(id, txt){ const el=document.getElementById(id); if(el) el.textContent = txt; }
+  function setPH(id, ph){ const el=document.getElementById(id); if(el && 'placeholder' in el) el.placeholder = ph; }
+
+  function applyLang(code){
+    const t = LANGS[code] || LANGS.en;
+
+    // INDEX / NAV
+    setHTML("t_kicker", t.kicker);
+    setHTML("t_h1", t.h1);
+    setHTML("t_pay", t.pay);
+    setText("t_filters", t.filters);
+    setText("t_search", t.search);
+    setText("t_popular", t.popular);
+    setText("t_level", t.level);
+    setText("t_plus", t.plus);
+    setText("t_deals_title", t.deals_title);
+    setText("t_level_hint", t.level_hint);
+    const si = document.getElementById("searchInput"); if (si) si.placeholder = t.placeholder;
+
+    // NAV + auth (for pages that have them)
+    setText("t_nav_home", t.nav?.home);
+    setText("t_nav_deals", t.nav?.deals);
+    setText("t_nav_membership", t.nav?.membership);
+    setText("t_nav_host", t.nav?.host);
+    setText("t_nav_support", t.nav?.support);
+    setText("loginBtn", t.auth?.login);
+    setText("signupBtn", t.auth?.signup);
+
+    // MEMBERSHIP
+    setText("t_membership_title", t.membership_title);
+    setText("t_membership_sub", t.membership_sub);
+    setText("t_level_bronze", t.level_bronze);
+    setText("t_bronze_desc", t.bronze_desc);
+    setText("t_level_silver", t.level_silver);
+    setText("t_silver_desc", t.silver_desc);
+    setText("t_level_gold", t.level_gold);
+    setText("t_gold_desc", t.gold_desc);
+    setText("t_level_platinum", t.level_platinum);
+    setText("t_platinum_desc", t.platinum_desc);
+    setText("t_level_diamond", t.level_diamond);
+    setText("t_diamond_desc", t.diamond_desc);
+    setText("t_level_elite", t.level_elite);
+    setText("t_elite_desc", t.elite_desc);
+
+    // LOGIN
+    setText("t_login_title", t.login_title);
+    setText("t_login_sub", t.login_sub);
+    setText("t_login_email_label", t.login_email_label);
+    setPH("i_login_email", t.login_email_ph);
+    setText("t_login_password_label", t.login_password_label);
+    setPH("i_login_password", t.login_password_ph);
+    setText("t_login_remember", t.login_remember);
+    setText("t_login_forgot", t.login_forgot);
+    setText("t_login_btn", t.login_btn);
+    setText("t_login_to_signup", t.login_to_signup);
+
+    // SIGNUP
+    setText("t_signup_title", t.signup_title);
+    setText("t_signup_sub", t.signup_sub);
+    setText("t_signup_name_label", t.signup_name_label);
+    setPH("i_signup_name", t.signup_name_ph);
+    setText("t_signup_email_label", t.signup_email_label);
+    setPH("i_signup_email", t.signup_email_ph);
+    setText("t_signup_password_label", t.signup_password_label);
+    setPH("i_signup_password", t.signup_password_ph);
+    setText("t_signup_btn", t.signup_btn);
+    setText("t_signup_to_login", t.signup_to_login);
+
+    // HOST REGISTER
+    setText("t_host_title", t.host_title);
+    setText("t_host_sub", t.host_sub);
+    setText("t_host_benefits_title", t.host_benefits_title);
+    setText("t_host_benefit1", t.host_benefit1);
+    setText("t_host_benefit2", t.host_benefit2);
+    setText("t_host_benefit3", t.host_benefit3);
+    setText("t_host_benefit4", t.host_benefit4);
+    setText("t_host_verify_btn", t.host_verify_btn);
+    setText("t_host_register_title", t.host_register_title);
+    setText("t_host_label_title", t.host_label_title);
+    setText("t_host_label_city", t.host_label_city);
+    setText("t_host_label_type", t.host_label_type);
+    setText("t_host_register_btn", t.host_register_btn);
+  }
+
+  // Init & persist
+  function initI18n(){
+    const sel = document.getElementById("langSelect");
+    const saved = localStorage.getItem("sw_lang") || (navigator.language||"en").slice(0,2).toLowerCase();
+    const final = LANGS[saved] ? saved : "en";
+    if (sel){ sel.value = final; sel.addEventListener("change", e=>{ const v=e.target.value; localStorage.setItem("sw_lang", v); applyLang(v); }); }
+    applyLang(final);
+  }
+
+  window.StayWorldI18n = { applyLang };
+  document.addEventListener("DOMContentLoaded", initI18n);
+})();
