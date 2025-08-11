@@ -1,81 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld - Login</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
+  <title>STAYWORLD — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --gold: #FFD700;
-    }
-    body { background-color: #0f0f15; color: white; font-family: 'Inter', sans-serif; }
-    .btn-gold { background-color: var(--gold); color: black; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
-    .btn-gold:hover { background-color: #e6c200; }
-    .btn-ghost-gold { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
-    .btn-ghost-gold:hover { background: rgba(212,175,55,0.12); }
-    .btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; }
-    dialog::backdrop { background: rgba(0,0,0,0.65); backdrop-filter: blur(2px); }
+    :root{--bg:#0a0a0c;--panel:#0f0f16;--muted:#a1a7b3;--text:#f1f3f7;--gold:#d4b166;--gold-2:#f0d58d}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui;color:var(--text);background:var(--bg)}
+    .container{max-width:960px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;z-index:10;background:rgba(10,10,12,.7);backdrop-filter:blur(10px);border-bottom:1px solid #1a1a22}
+    .h-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+    nav a{margin:0 10px;color:#a1a7b3;text-decoration:none;font-weight:600}
+    nav a:hover{color:#fff}
+    select{background:#0d0d14;border:1px solid #262631;color:#fff;border-radius:10px;padding:8px 10px}
+    .hero{padding:48px 0;border-bottom:1px solid #1a1a22;background:radial-gradient(700px 400px at 80% -10%, rgba(212,177,102,.08), transparent 60%)}
+    .hero h1{font-size:40px;margin:0 0 8px}
+    .muted{color:var(--muted)}
+    .panel{max-width:520px;margin:24px auto;background:linear-gradient(180deg,#13131c,#0d0d14);border:1px solid #242430;border-radius:16px;padding:18px}
+    label{display:block;margin:10px 0 6px;font-weight:600}
+    input[type=email],input[type=password]{width:100%;padding:12px;border-radius:10px;border:1px solid #262631;background:#0d0d14;color:#fff}
+    .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+    .btn{width:100%;margin-top:14px;background:linear-gradient(180deg,var(--gold-2),var(--gold));border:0;color:#111;font-weight:800;border-radius:12px;padding:12px 14px;cursor:pointer}
+    footer{border-top:1px solid #1a1a22;padding:18px 0;margin-top:32px;color:#a1a7b3}
   </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen">
+<body>
+<header>
+  <div class="container h-inner">
+    <strong>STAYWORLD</strong>
+    <nav>
+      <a id="t_nav_home" href="index.html#home">Home</a>
+      <a id="t_nav_deals" href="index.html#deals">Deals</a>
+      <a id="t_nav_membership" href="membership.html">Membership</a>
+      <a id="t_nav_host" href="host-register.html">Host</a>
+      <a id="t_nav_support" href="support.html">Support</a>
+    </nav>
+    <select id="langSelect">
+      <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option>
+      <option value="de">DE</option><option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
+    </select>
+  </div>
+</header>
 
-  <!-- Log in Button -->
-  <button class="btn-gold" onclick="openLogin()">Log in</button>
+<section class="hero">
+  <div class="container">
+    <h1 id="t_login_title">Log in to StayWorld</h1>
+    <p class="muted" id="t_login_sub">Welcome back. Access your bookings, points and perks.</p>
+  </div>
+</section>
 
-  <!-- Login Modal -->
-  <dialog id="loginModal" class="rounded-xl shadow-lg w-[95%] max-w-md p-0 bg-[#1b1b25] text-white">
-    <div class="p-4 border-b border-white/10 flex items-center justify-between">
-      <h3 class="text-lg font-bold">Log in</h3>
-      <button class="btn-icon btn-ghost-gold" onclick="closeLogin()" aria-label="Close">✕</button>
+<div class="container">
+  <div class="panel">
+    <label for="i_login_email" id="t_login_email_label">Email</label>
+    <input id="i_login_email" type="email" placeholder="you@example.com"/>
+
+    <label for="i_login_password" id="t_login_password_label">Password</label>
+    <input id="i_login_password" type="password" placeholder="Enter your password"/>
+
+    <div class="row">
+      <label style="display:flex;gap:8px;align-items:center">
+        <input id="i_login_remember" type="checkbox"/>
+        <span id="t_login_remember">Remember me</span>
+      </label>
+      <a href="reset.html" class="muted" id="t_login_forgot">Forgot password?</a>
     </div>
-    <div class="p-5 space-y-3">
-      <p class="text-white/70 text-sm">Welcome back!</p>
-      <input id="loginEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email" />
-      <input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password" />
-      <button class="btn-gold w-full" onclick="doLogin()">Log in</button>
-      <button class="w-full bg-white text-black flex items-center justify-center gap-2 py-3 rounded-xl" onclick="googleLogin()">
-        <span class="text-lg">G</span><span>Continue with Google</span>
-      </button>
-    </div>
-  </dialog>
 
-  <script>
-    function openLogin(){
-      const dlg = document.getElementById('loginModal');
-      if (!dlg) return;
-      dlg.showModal();
-    }
-    function closeLogin(){
-      const dlg = document.getElementById('loginModal');
-      if (!dlg) return;
-      dlg.close();
-    }
-    // 밖 클릭 닫기
-    (function(){
-      const dlg = document.getElementById('loginModal');
-      if (!dlg) return;
-      dlg.addEventListener('click', (e) => {
-        const rect = dlg.getBoundingClientRect();
-        const inDialog = (
-          e.clientX >= rect.left && e.clientX <= rect.right &&
-          e.clientY >= rect.top && e.clientY <= rect.bottom
-        );
-        if (!inDialog) closeLogin();
-      });
-      // ESC 닫기
-      dlg.addEventListener('cancel', (e)=>{ e.preventDefault(); closeLogin(); });
-    })();
-    function doLogin(){
-      alert('Login logic goes here.');
-      closeLogin();
-    }
-    function googleLogin(){
-      alert('Google OAuth logic goes here.');
-      closeLogin();
-    }
-  </script>
+    <button class="btn" id="t_login_btn">Log in</button>
+    <p class="muted" style="text-align:center;margin-top:12px" id="t_login_to_signup">No account? Sign up</p>
+  </div>
+</div>
 
+<footer>
+  <div class="container">© 2025 StayWorld</div>
+</footer>
+
+<script src="lang.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const saved = localStorage.getItem('sw_lang') || 'en';
+    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
+  });
+</script>
 </body>
 </html>
