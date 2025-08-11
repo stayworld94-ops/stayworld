@@ -25,6 +25,9 @@
     input[type=email],input[type=password]{width:100%;padding:12px;border-radius:10px;border:1px solid #262631;background:#0d0d14;color:#fff}
     .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
     .btn{width:100%;margin-top:14px;background:linear-gradient(180deg,var(--gold-2),var(--gold));border:0;color:#111;font-weight:800;border-radius:12px;padding:12px 14px;cursor:pointer}
+    .btn-icon{border:1px solid #2a2a34;border-radius:10px;padding:8px 12px}
+    .btn-ghost-gold{background:#151520;color:#f1f3f7;border:1px solid rgba(212,177,102,.35)}
+    dialog::backdrop{background:rgba(0,0,0,.5)}
     footer{border-top:1px solid #1a1a22;padding:18px 0;margin-top:32px;color:#a1a7b3}
   </style>
 </head>
@@ -69,21 +72,30 @@
       <a href="reset.html" class="muted" id="t_login_forgot">Forgot password?</a>
     </div>
 
+    <!-- 일반 로그인 -->
     <button class="btn" id="t_login_btn">Log in</button>
+    <!-- 모달로 로그인 열기 버튼 (원하면 숨겨도 됨) -->
+    <button class="btn-ghost-gold" style="width:100%;margin-top:10px" onclick="openLogin()">Open login modal</button>
+
+    <!-- Google 로그인(직접 버튼) -->
+    <button class="btn" id="googleLoginBtn" style="margin-top:10px">
+      <span id="t_login_google_btn">Continue with Google</span>
+    </button>
+
     <p class="muted" style="text-align:center;margin-top:12px" id="t_login_to_signup">No account? Sign up</p>
   </div>
 </div>
 
-<footer>
-  <div class="container">© 2025 StayWorld</div>
-</footer>
+<!-- ========= [여기부터가 'footer 바로 위' 섹션입니다] ========= -->
 
-<script src="lang.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const saved = localStorage.getItem('sw_lang') || 'en';
-    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
-  });
-</script>
-</body>
-</html>
+<!-- 1) 로그인 모달 템플릿 -->
+<template id="loginTpl">
+  <div class="rounded-2xl overflow-hidden bg-[#0f0f16] border border-white/10" style="min-width:340px;max-width:420px">
+    <div class="p-4 border-b border-white/10 flex items-center justify-between">
+      <h3 class="text-lg font-bold">Log in</h3>
+      <button type="button" data-login-close class="btn-icon btn-ghost-gold" aria-label="Close">✕</button>
+    </div>
+    <div class="p-5 space-y-3">
+      <input id="loginEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/>
+      <input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/>
+      <button data-login-s
