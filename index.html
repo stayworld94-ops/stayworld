@@ -2,18 +2,134 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STAYWORLD — Global Booking Platform</title>
-  <meta name="description" content="StayWorld: Luxury global stays with crypto & traditional payments, 10-language UI, AI concierge, maps, filters, and rewards."/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STAYWORLD — Luxury Global Stays (All-in-One)</title>
+  <meta name="description" content="StayWorld: Luxury global stays with verified hosts, elite rewards, and crypto payments."/>
+
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=20250810">
-  <!-- Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.454.0/font/lucide.css">
-  <!-- Leaflet for Maps -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Leaflet (Map) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
+
+  <style>
+    :root{--bg:#0a0a0c;--panel:#0f0f16;--card:#13131c;--muted:#a1a7b3;--text:#f1f3f7;--gold:#d4b166;--gold-2:#f0d58d;--ok:#22c55e}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);
+      background:
+        radial-gradient(1200px 900px at 80% -20%, rgba(212,177,102,.10), transparent 60%),
+        radial-gradient(900px 600px at -10% 120%, rgba(212,177,102,.07), transparent 50%),
+        var(--bg);
+    }
+    .sw-container{max-width:1200px;margin:0 auto;padding:0 16px}
+
+    /* Header */
+    .sw-header{position:sticky;top:0;z-index:50;background:rgba(10,10,12,.7);backdrop-filter:blur(10px);border-bottom:1px solid #1a1a22}
+    .sw-header-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
+    .sw-brand{display:flex;align-items:center;gap:12px}
+    .sw-logo{width:38px;height:38px;border-radius:50%;background:
+      radial-gradient(60% 60% at 40% 40%, var(--gold-2), var(--gold)),
+      radial-gradient(30% 30% at 70% 70%, #6b4c1e, transparent);
+      box-shadow:0 0 0 2px rgba(212,177,102,.28), 0 8px 26px rgba(0,0,0,.5)}
+    .sw-title{font-weight:900;letter-spacing:.08em}
+    .sw-nav{display:flex;gap:18px}
+    .sw-nav a{color:var(--muted);text-decoration:none;font-weight:600}
+    .sw-nav a:hover{color:var(--text)}
+    .sw-actions{display:flex;align-items:center;gap:12px}
+    .sw-actions select{background:#0d0d14;border:1px solid #262631;color:var(--text);padding:8px 10px;border-radius:10px}
+    .sw-btn{border:1px solid #2c2c36;background:#151520;color:var(--text);padding:10px 14px;border-radius:14px;cursor:pointer;transition:.2s}
+    .sw-btn:hover{transform:translateY(-1px)}
+    .sw-btn.solid{background:linear-gradient(180deg,#20202a,#14141d)}
+    .sw-btn.gold{background:linear-gradient(180deg,var(--gold-2),var(--gold));border-color:transparent;color:#111;font-weight:800}
+
+    /* Hero */
+    .sw-hero{position:relative;padding:72px 0 28px;border-bottom:1px solid #1a1a22;overflow:hidden}
+    .sw-glow{position:absolute;inset:-20% -10% auto -10%;height:420px;background:radial-gradient(60% 60% at 20% 20%, rgba(240,213,141,.12), transparent 60%);pointer-events:none}
+    .sw-hero-inner{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}
+    .sw-kicker{color:var(--muted);font-weight:600;letter-spacing:.04em;margin-bottom:8px}
+    .sw-hero-text h1{font-size:56px;line-height:1.02;margin:0 0 10px}
+    .gold{color:var(--gold-2)}
+    .sw-hero-sub{color:var(--muted);margin:0 0 18px}
+
+    .sw-searchbar{display:flex;gap:10px;align-items:center;background:#0e0e15;padding:10px;border:1px solid #262631;border-radius:16px;box-shadow:inset 0 0 0 1px rgba(212,177,102,.12)}
+    .sw-input-wrap{position:relative;display:flex;align-items:center;gap:8px;flex:1;background:#0b0b12;border:1px solid #262631;border-radius:12px;padding:8px 10px}
+    .sw-input-wrap input{flex:1;background:transparent;border:0;outline:none;color:var(--text)}
+    .sw-autocomplete{position:absolute;left:0;right:0;top:100%;margin-top:8px;background:#0b0b12;border:1px solid #262631;border-radius:12px;overflow:hidden;display:none}
+    .sw-autocomplete div{padding:10px 12px;cursor:pointer;border-bottom:1px solid #1a1a22}
+    .sw-autocomplete div:hover{background:#14141c}
+
+    .sw-quick{margin-top:14px;color:var(--muted)}
+    .sw-quick-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .sw-quick-tags .sw-badge{cursor:pointer}
+
+    .sw-map{height:300px;border-radius:16px;border:1px solid #262631;overflow:hidden}
+    .sw-status-row{display:flex;gap:8px;margin-top:10px}
+
+    /* Sections & cards */
+    .sw-section{padding:44px 0}
+    .sw-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .sw-level-hint{color:var(--muted)}
+    .sw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .sw-card{background:linear-gradient(180deg,#13131c,#0d0d14);border:1px solid #242430;border-radius:20px;padding:14px;transition:.2s}
+    .sw-card:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
+    .sw-card .sw-thumb{height:160px;border-radius:14px;background:#0b0b10;border:1px solid #1a1a22;margin-bottom:12px;display:flex;align-items:center;justify-content:center}
+    .sw-card .sw-title{font-weight:800;margin-bottom:4px}
+    .sw-muted{color:var(--muted)}
+    .sw-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#14141c;border:1px solid #2a2a34;font-size:12px}
+    .sw-stars{display:flex;align-items:center;gap:2px}
+    .sw-verify{border-color:rgba(34,197,94,.4);color:var(--ok)}
+
+    /* Membership */
+    .sw-membership{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+    .sw-membership-card{background:linear-gradient(180deg,#14141b,#0d0d13);border:1px solid #23232b;border-radius:20px;padding:18px}
+    .sw-tickets{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .sw-ticket{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#111;border-radius:12px;padding:8px 12px;font-weight:800;border:1px solid rgba(0,0,0,.25)}
+    .sw-cta{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#181820,#0d0d13);border:1px solid #23232b;border-radius:18px;padding:14px}
+
+    /* Support */
+    .sw-btn-row{display:flex;gap:8px}
+    .sw-support-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+    /* Footer */
+    .sw-footer{border-top:1px solid #1a1a22;padding:20px 0}
+    .sw-footer-inner{display:flex;align-items:center;justify-content:space-between}
+
+    /* Drawer */
+    .sw-drawer{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end}
+    .sw-drawer[aria-hidden="false"]{display:flex}
+    .sw-drawer-inner{background:#0f0f16;border-top-left-radius:16px;border-top-right-radius:16px;border:1px solid #23232b;max-height:85vh;overflow:auto;width:100%}
+    .sw-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #1b1b20}
+    .sw-filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:14px}
+    .sw-drawer-foot{display:flex;justify-content:space-between;padding:12px 14px;border-top:1px solid #1b1b20}
+
+    /* Bot */
+    .sw-bot{position:fixed;right:16px;bottom:86px;width:360px;border:1px solid #23232b;border-radius:18px;background:#101018;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .sw-bot-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1b1b20}
+    .sw-bot-body{padding:12px;max-height:260px;overflow:auto}
+    .sw-bot-msg{background:#171723;border:1px solid #23232b;border-radius:16px;padding:10px 12px;margin:8px 0}
+    .sw-bot-msg.sys{opacity:.85}
+    .sw-bot-foot{display:flex;gap:8px;padding:10px;border-top:1px solid #1b1b20}
+    .sw-bot-foot input{flex:1;background:#0f0f16;border:1px solid #23232b;border-radius:10px;color:var(--text);padding:10px}
+
+    /* Floating chat button */
+    .sw-chat-fab{position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:999px;border:1px solid rgba(212,177,102,.45);
+      background:radial-gradient(70% 70% at 30% 30%, var(--gold-2), var(--gold));
+      color:#111;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.45);transition:.2s}
+    .sw-chat-fab:hover{transform:translateY(-2px);box-shadow:0 16px 50px rgba(0,0,0,.55)}
+
+    @media (max-width:980px){
+      .sw-hero-inner{grid-template-columns:1fr}
+      .sw-membership{grid-template-columns:1fr}
+      .sw-grid{grid-template-columns:1fr 1fr}
+      .sw-support-grid{grid-template-columns:1fr}
+      .sw-filter-grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
 <body>
   <header class="sw-header">
@@ -23,71 +139,48 @@
         <div class="sw-title">STAYWORLD</div>
       </div>
       <nav class="sw-nav">
-        <a href="#home" data-i18n="nav_home"></a>
-        <a href="#search" data-i18n="nav_search"></a>
-        <a href="#deals" data-i18n="nav_deals"></a>
-        <a href="#membership" data-i18n="nav_membership"></a>
-        <a href="#host" data-i18n="nav_host"></a>
-        <a href="#support" data-i18n="nav_support"></a>
+        <a href="#home">Home</a><a href="#deals">Deals</a><a href="#membership">Membership</a><a href="#host">Host</a><a href="#support">Support</a>
       </nav>
       <div class="sw-actions">
-        <div class="sw-lang">
-          <select id="langSelect" aria-label="Language">
-            <option value="en">EN</option>
-            <option value="ko">KO</option>
-            <option value="fr">FR</option>
-            <option value="tr">TR</option>
-            <option value="ja">JA</option>
-            <option value="de">DE</option>
-            <option value="es">ES</option>
-            <option value="ru">RU</option>
-            <option value="it">IT</option>
-            <option value="zh">ZH</option>
-          </select>
-        </div>
-        <button class="sw-btn ghost" id="loginBtn" data-i18n="login"></button>
-        <button class="sw-btn solid" id="signupBtn" data-i18n="signup"></button>
+        <select id="langSelect"><option>EN</option><option>KO</option></select>
+        <button class="sw-btn ghost" id="loginBtn">Log in</button>
+        <button class="sw-btn gold" id="signupBtn">Sign up</button>
       </div>
     </div>
   </header>
 
   <main id="home">
     <section class="sw-hero">
+      <div class="sw-glow"></div>
       <div class="sw-container sw-hero-inner">
         <div class="sw-hero-text">
-          <h1 data-i18n="hero_title"></h1>
-          <p class="sw-hero-sub" data-i18n="hero_sub"></p>
-          <div class="sw-payment-row">
-            <span class="sw-chip" data-i18n="payment_all"></span>
-            <span class="sw-divider">•</span>
-            <span class="sw-chip" data-i18n="payment_crypto"></span>
-          </div>
+          <div class="sw-kicker">Global stays • Verified hosts • Premium design</div>
+          <h1>Luxury stays.<br><span class="gold">Global reach.</span></h1>
+          <p class="sw-hero-sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+
           <div class="sw-searchbar" id="search">
             <div class="sw-input-wrap">
               <i class="lucide lucide-search"></i>
-              <input id="searchInput" placeholder="Search cities, stays…" autocomplete="off"/>
+              <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off"/>
               <div id="autocomplete" class="sw-autocomplete"></div>
             </div>
             <input type="date" id="dateFrom"/>
             <input type="date" id="dateTo"/>
-            <button class="sw-btn solid" id="filterOpen"><i class="lucide lucide-sliders-horizontal"></i><span data-i18n="filters"></span></button>
-            <button class="sw-btn gold" id="searchBtn" data-i18n="search_btn"></button>
+            <button class="sw-btn ghost" id="filterOpen"><i class="lucide lucide-sliders-horizontal"></i> Filters</button>
+            <button class="sw-btn gold" id="searchBtn">Search</button>
           </div>
+
           <div class="sw-quick">
-            <span data-i18n="quick_title"></span>
+            <span>Popular:</span>
             <div class="sw-quick-tags" id="quickTags"></div>
           </div>
         </div>
+
         <div class="sw-hero-visual">
           <div id="map" class="sw-map"></div>
-          <div class="sw-weather">
-            <div class="sw-weather-row">
-              <span class="sw-badge" data-i18n="weather_title"></span>
-              <input id="weatherCity" placeholder="Istanbul"/>
-              <input id="weatherKey" placeholder="OpenWeather API Key"/>
-              <button class="sw-btn ghost" id="weatherBtn" data-i18n="weather_check"></button>
-            </div>
-            <div id="weatherOut" class="sw-weather-out"></div>
+          <div class="sw-status-row">
+            <span class="sw-badge">Level: <b id="userLevel">BRONZE</b></span>
+            <span class="sw-badge">StayWorld+ active</span>
           </div>
         </div>
       </div>
@@ -96,46 +189,37 @@
     <section id="deals" class="sw-section">
       <div class="sw-container">
         <div class="sw-section-head">
-          <h2 data-i18n="featured"></h2>
-          <div class="sw-level">
-            <span class="sw-level-badge" id="userLevel">BRONZE</span>
-            <span id="levelHint" data-i18n="level_hint"></span>
-          </div>
+          <h2>Verified stays for you</h2>
+          <div class="sw-level-hint">Earn points. 60+ days inactive ➝ auto downgrade (−1 level).</div>
         </div>
-        <div class="sw-grid" id="cardGrid">
-          <!-- Cards injected by JS -->
-        </div>
+        <div class="sw-grid" id="cardGrid"></div>
       </div>
     </section>
 
     <section id="membership" class="sw-section">
       <div class="sw-container sw-membership">
         <div class="sw-membership-card">
-          <h3 data-i18n="membership_title"></h3>
-          <p data-i18n="membership_sub"></p>
+          <h3>StayWorld+ Rewards</h3>
+          <p>Higher levels include all benefits of lower levels.</p>
           <ul class="sw-list" id="benefitList"></ul>
           <div class="sw-tickets">
-            <span class="sw-ticket" data-i18n="ticket_free"></span>
-            <span class="sw-ticket" data-i18n="ticket_discount"></span>
-            <span class="sw-ticket" data-i18n="ticket_early"></span>
-            <span class="sw-ticket" data-i18n="ticket_secret"></span>
+            <span class="sw-ticket">Free night</span>
+            <span class="sw-ticket">Discount</span>
+            <span class="sw-ticket">Early check-in</span>
+            <span class="sw-ticket">Secret deal</span>
           </div>
         </div>
         <div class="sw-membership-cta">
-          <div class="sw-cta-row">
-            <div class="sw-cta-text">
-              <h4 data-i18n="cta_title"></h4>
-              <p data-i18n="cta_sub"></p>
+          <div class="sw-cta">
+            <div>
+              <h4>Up to <span class="gold">15% back</span></h4>
+              <p>Elite perks, priority support, seasonal promos.</p>
             </div>
-            <button class="sw-btn gold" data-i18n="cta_join"></button>
+            <button class="sw-btn gold">Join StayWorld+</button>
           </div>
           <div class="sw-crypto">
-            <span class="sw-badge">Visa</span>
-            <span class="sw-badge">Mastercard</span>
-            <span class="sw-badge">Amex</span>
-            <span class="sw-badge">BTC</span>
-            <span class="sw-badge">ETH</span>
-            <span class="sw-badge">USDT</span>
+            <span class="sw-badge">Visa</span><span class="sw-badge">Mastercard</span><span class="sw-badge">Amex</span>
+            <span class="sw-badge">BTC</span><span class="sw-badge">ETH</span><span class="sw-badge">USDT</span>
           </div>
         </div>
       </div>
@@ -143,36 +227,36 @@
 
     <section id="host" class="sw-section">
       <div class="sw-container">
-        <h2 data-i18n="host_title"></h2>
-        <p data-i18n="host_sub"></p>
+        <h2>Host with confidence</h2>
+        <p>ID verification required. Listings go live automatically.</p>
         <div class="sw-btn-row">
-          <button class="sw-btn ghost" data-i18n="host_register"></button>
-          <button class="sw-btn solid" data-i18n="host_verify"></button>
+          <button class="sw-btn ghost">Register property</button>
+          <button class="sw-btn solid">Start verification</button>
         </div>
       </div>
     </section>
 
     <section id="support" class="sw-section">
       <div class="sw-container">
-        <h2 data-i18n="support_title"></h2>
+        <h2>Support</h2>
         <div class="sw-support-grid">
           <div class="sw-card">
-            <h4 data-i18n="ai_chat"></h4>
-            <p data-i18n="ai_chat_sub"></p>
-            <button class="sw-btn ghost" id="openBot" data-i18n="open_bot"></button>
+            <h4>AI Concierge</h4>
+            <p>Chat in your language — 24/7.</p>
+            <button class="sw-btn ghost" id="openBot">Open bot</button>
           </div>
           <div class="sw-card">
-            <h4 data-i18n="faq"></h4>
-            <p data-i18n="faq_sub"></p>
-            <button class="sw-btn ghost" data-i18n="view_faq"></button>
+            <h4>FAQ</h4>
+            <p>Common questions & answers.</p>
+            <button class="sw-btn ghost">View FAQs</button>
           </div>
           <div class="sw-card">
-            <h4 data-i18n="alerts"></h4>
-            <p data-i18n="alerts_sub"></p>
+            <h4>Smart alerts</h4>
+            <p>AI picks, destination tips & level updates.</p>
             <div class="sw-badge-row">
-              <span class="sw-badge" data-i18n="alert_ai"></span>
-              <span class="sw-badge" data-i18n="alert_dest"></span>
-              <span class="sw-badge" data-i18n="alert_level"></span>
+              <span class="sw-badge">AI picks</span>
+              <span class="sw-badge">Top destinations</span>
+              <span class="sw-badge">Level-up</span>
             </div>
           </div>
         </div>
@@ -184,126 +268,217 @@
     <div class="sw-container sw-footer-inner">
       <div>
         <div class="sw-title">STAYWORLD</div>
-        <div class="sw-muted">© 2025 StayWorldGlobal — stayworldbooking.com</div>
+        <div class="sw-muted">© StayWorldGlobal — stayworldbooking.com</div>
       </div>
-      <div class="sw-muted">v20250810</div>
+      <div class="sw-muted">All-in-One</div>
     </div>
   </footer>
 
   <!-- Filters Drawer -->
-  <div class="sw-drawer" id="filterDrawer" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="sw-drawer" id="filterDrawer" aria-hidden="true">
     <div class="sw-drawer-inner">
       <div class="sw-drawer-head">
-        <h3 data-i18n="filters_title"></h3>
-        <button id="filterClose" class="sw-icon-btn" aria-label="Close"><i class="lucide lucide-x"></i></button>
+        <h3>Filters</h3>
+        <button id="filterClose" class="sw-btn" aria-label="Close">×</button>
       </div>
       <div class="sw-drawer-body">
         <div class="sw-filter-grid">
-          <!-- 20+ filter groups -->
           <div class="sw-filter-group">
-            <h4 data-i18n="f_price"></h4>
+            <h4>Price per night</h4>
             <input type="range" id="priceMin" min="0" max="1000" step="10">
             <input type="range" id="priceMax" min="0" max="5000" step="50">
           </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_type"></h4>
-            <label><input type="checkbox" value="hotel"> <span data-i18n="type_hotel"></span></label>
-            <label><input type="checkbox" value="motel"> <span data-i18n="type_motel"></span></label>
-            <label><input type="checkbox" value="hostel"> <span data-i18n="type_hostel"></span></label>
-            <label><input type="checkbox" value="apartment"> <span data-i18n="type_apartment"></span></label>
-            <label><input type="checkbox" value="villa"> <span data-i18n="type_villa"></span></label>
+          <div class="sw-filter-group"><h4>Stay type</h4>
+            <label><input type="checkbox" value="hotel"> Hotel</label>
+            <label><input type="checkbox" value="motel"> Motel</label>
+            <label><input type="checkbox" value="hostel"> Hostel</label>
+            <label><input type="checkbox" value="apartment"> Apartment</label>
+            <label><input type="checkbox" value="villa"> Villa</label>
           </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_rating"></h4>
+          <div class="sw-filter-group"><h4>Review score</h4>
             <label><input type="radio" name="rating" value="4.5+"> 4.5+</label>
             <label><input type="radio" name="rating" value="4.0+"> 4.0+</label>
             <label><input type="radio" name="rating" value="any" checked> Any</label>
           </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_beds"></h4><input type="number" min="1" id="beds" value="1"></div>
-          <div class="sw-filter-group"><h4 data-i18n="f_baths"></h4><input type="number" min="1" id="baths" value="1"></div>
-          <div class="sw-filter-group"><h4 data-i18n="f_pets"></h4>
-            <label><input type="checkbox" id="pets"> <span data-i18n="opt_allowed"></span></label>
+          <div class="sw-filter-group"><h4>Beds</h4><input type="number" min="1" id="beds" value="1"></div>
+          <div class="sw-filter-group"><h4>Baths</h4><input type="number" min="1" id="baths" value="1"></div>
+          <div class="sw-filter-group"><h4>Pets</h4><label><input type="checkbox" id="pets"> Allowed</label></div>
+          <div class="sw-filter-group"><h4>Check-in</h4><label><input type="checkbox" id="selfCheckin"> Self check-in</label></div>
+          <div class="sw-filter-group"><h4>Amenities</h4>
+            <label><input type="checkbox" value="wifi"> Wi-Fi</label>
+            <label><input type="checkbox" value="kitchen"> Kitchen</label>
+            <label><input type="checkbox" value="parking"> Parking</label>
+            <label><input type="checkbox" value="pool"> Pool</label>
+            <label><input type="checkbox" value="ac"> Air conditioning</label>
+            <label><input type="checkbox" value="gym"> Gym</label>
+            <label><input type="checkbox" value="workspace"> Workspace</label>
+            <label><input type="checkbox" value="washer"> Washer</label>
+            <label><input type="checkbox" value="dryer"> Dryer</label>
           </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_checkin"></h4>
-            <label><input type="checkbox" id="selfCheckin"> <span data-i18n="opt_self"></span></label>
+          <div class="sw-filter-group"><h4>Booking</h4>
+            <label><input type="checkbox" value="instant"> Instant book</label>
+            <label><input type="checkbox" value="request"> Request to book</label>
           </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_amen"></h4>
-            <label><input type="checkbox" value="wifi"> Wi‑Fi</label>
-            <label><input type="checkbox" value="kitchen" data-i18n="amen_kitchen"></label>
-            <label><input type="checkbox" value="parking" data-i18n="amen_parking"></label>
-            <label><input type="checkbox" value="pool" data-i18n="amen_pool"></label>
-            <label><input type="checkbox" value="ac" data-i18n="amen_ac"></label>
-            <label><input type="checkbox" value="gym" data-i18n="amen_gym"></label>
-            <label><input type="checkbox" value="workspace" data-i18n="amen_workspace"></label>
-            <label><input type="checkbox" value="washer" data-i18n="amen_washer"></label>
-            <label><input type="checkbox" value="dryer" data-i18n="amen_dryer"></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_booking"></h4>
-            <label><input type="checkbox" value="instant" data-i18n="book_instant"></label>
-            <label><input type="checkbox" value="request" data-i18n="book_request"></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_verified"></h4>
-            <label><input type="checkbox" id="verifiedOnly"> <span data-i18n="opt_verified"></span></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_longstay"></h4>
-            <label><input type="checkbox" id="longStay"> <span data-i18n="opt_longstay"></span></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_currency"></h4>
-            <select id="currencySelect">
-              <option>USD</option><option>EUR</option><option>TRY</option>
-              <option>JPY</option><option>GBP</option><option>KRW</option>
-            </select>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_location"></h4>
-            <input id="distance" type="range" min="1" max="50">
-            <label><input type="checkbox" value="near_airport"> <span data-i18n="near_airport"></span></label>
-            <label><input type="checkbox" value="near_station"> <span data-i18n="near_station"></span></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_accessibility"></h4>
-            <label><input type="checkbox" value="step_free" data-i18n="acc_stepfree"></label>
-            <label><input type="checkbox" value="elevator" data-i18n="acc_elevator"></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_business"></h4>
-            <label><input type="checkbox" value="b2b" data-i18n="b2b_ready"></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_experiences"></h4>
-            <label><input type="checkbox" value="nature" data-i18n="exp_nature"></label>
-            <label><input type="checkbox" value="camping" data-i18n="exp_camping"></label>
-            <label><input type="checkbox" value="traditional" data-i18n="exp_traditional"></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_security"></h4>
-            <label><input type="checkbox" value="badge" data-i18n="sec_verified"></label>
-            <label><input type="checkbox" value="reviews" data-i18n="sec_reviewed"></label>
-          </div>
-          <div class="sw-filter-group"><h4 data-i18n="f_more"></h4>
-            <label><input type="checkbox" value="breakfast" data-i18n="amen_breakfast"></label>
-            <label><input type="checkbox" value="spa" data-i18n="amen_spa"></label>
-            <label><input type="checkbox" value="beach" data-i18n="amen_beach"></label>
-            <label><input type="checkbox" value="ski" data-i18n="amen_ski"></label>
-          </div>
+          <div class="sw-filter-group"><h4>Verification</h4><label><input type="checkbox" id="verifiedOnly"> Verified listings only</label></div>
+          <div class="sw-filter-group"><h4>Long-stay</h4><label><input type="checkbox" id="longStay"> Show long-stay deals</label></div>
         </div>
         <div class="sw-drawer-foot">
-          <button class="sw-btn ghost" id="filterReset" data-i18n="reset"></button>
-          <button class="sw-btn gold" id="applyFilters" data-i18n="apply"></button>
+          <button class="sw-btn" id="filterReset">Reset</button>
+          <button class="sw-btn gold" id="applyFilters">Apply</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- AI Concierge -->
+  <button id="chatFab" class="sw-chat-fab" title="Chat with AI"><i class="lucide lucide-message-circle"></i></button>
   <div class="sw-bot" id="botPanel" hidden>
     <div class="sw-bot-head">
       <div class="sw-title">AI Concierge</div>
-      <button class="sw-icon-btn" id="botClose"><i class="lucide lucide-x"></i></button>
+      <button class="sw-btn" id="botClose">×</button>
     </div>
     <div class="sw-bot-body" id="botBody">
       <div class="sw-bot-msg sys">Hello! Ask me anything in your language.</div>
     </div>
     <div class="sw-bot-foot">
       <input id="botInput" placeholder="Type a message…"/>
-      <button class="sw-btn solid" id="botSend">Send</button>
+      <button class="sw-btn gold" id="botSend">Send</button>
     </div>
   </div>
 
-  <script src="./lang.js?v=20250810"></script>
-  <script src="./app.js?v=20250810"></script>
+  <script>
+  (function(){
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+
+    // Popular quick chips
+    const POPULAR = ["Istanbul","Paris","Tokyo","Seoul","New York","Rome","Antalya","Dubai"];
+    const quick = $("#quickTags");
+    POPULAR.forEach(city=>{
+      const b = document.createElement("span");
+      b.className="sw-badge"; b.textContent=city;
+      b.addEventListener("click", ()=>{ $("#searchInput").value = city; runSearch(); });
+      quick.appendChild(b);
+    });
+
+    // Autocomplete
+    const auto = $("#autocomplete");
+    $("#searchInput").addEventListener("input", e=>{
+      const v = e.target.value.toLowerCase();
+      if(!v){ auto.style.display="none"; return; }
+      const items = POPULAR.filter(c=>c.toLowerCase().includes(v));
+      auto.innerHTML = items.map(i=>'<div data-city="'+i+'">'+i+'</div>').join("");
+      auto.style.display = items.length ? "block" : "none";
+    });
+    auto.addEventListener("click", e=>{
+      const d = e.target.closest("div[data-city]"); if(!d) return;
+      $("#searchInput").value = d.dataset.city; auto.style.display="none"; runSearch();
+    });
+
+    // Map
+    const map = L.map('map').setView([41.015137, 28.979530], 3);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18, attribution:'&copy; OpenStreetMap'}).addTo(map);
+
+    // Demo stays
+    const STAYS = [
+      {id:1, city:"Istanbul", title:"Bosporus Elite Suite", price:220, rating:4.8, verified:true,  type:"apartment", coords:[41.0082, 28.9784]},
+      {id:2, city:"Paris",    title:"Louvre Gold Residence", price:310, rating:4.7, verified:true,  type:"hotel",     coords:[48.8606,  2.3376]},
+      {id:3, city:"Tokyo",    title:"Shibuya Luxe Tower",    price:180, rating:4.6, verified:false, type:"apartment", coords:[35.6595,139.7005]},
+      {id:4, city:"Seoul",    title:"Gangnam Prime Loft",    price:150, rating:4.5, verified:true,  type:"apartment", coords:[37.4979,127.0276]},
+      {id:5, city:"New York", title:"Central Park Signature",price:420, rating:4.9, verified:true,  type:"hotel",     coords:[40.7812,-73.9665]},
+      {id:6, city:"Rome",     title:"Colosseo Regal Flat",   price:200, rating:4.4, verified:false, type:"apartment", coords:[41.8902, 12.4922]}
+    ];
+    STAYS.forEach(s=>{ s.marker = L.marker(s.coords).addTo(map).bindPopup(s.title+' — '+s.city); });
+
+    // Cards
+    const grid = $("#cardGrid");
+    function stars(r){
+      const n = Math.round(r);
+      return '<div class="sw-stars">'+Array.from({length:5},(_,i)=>'<i class="lucide lucide-star'+(i<n?'':'-half')+'"></i>').join('')+'</div>';
+    }
+    function card(s){
+      return '<div class="sw-card">'
+        + '<div class="sw-thumb">IMG</div>'
+        + '<div class="sw-title">'+s.title+'</div>'
+        + '<div class="sw-muted">'+s.city+'</div>'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">'
+        +   '<div>' + stars(s.rating) + '</div>'
+        +   '<div class="sw-badge '+(s.verified?'sw-verify':'')+'">'+(s.verified?'Verified':'')+'</div>'
+        + '</div>'
+        + '<div style="margin-top:8px;font-weight:800">$'+s.price+'/night</div>'
+        + '</div>';
+    }
+    function render(list){ grid.innerHTML = list.map(card).join(''); }
+    render(STAYS);
+
+    // Filters
+    const drawer = $("#filterDrawer");
+    $("#filterOpen").addEventListener("click", ()=>drawer.setAttribute("aria-hidden","false"));
+    $("#filterClose").addEventListener("click", ()=>drawer.setAttribute("aria-hidden","true"));
+    $("#filterReset").addEventListener("click", ()=>{
+      $$("input[type=checkbox]").forEach(c=>c.checked=false);
+      const vo = $("#verifiedOnly"); if(vo) vo.checked=false;
+      render(STAYS);
+    });
+    $("#applyFilters").addEventListener("click", ()=>{
+      let result = [...STAYS];
+      const vo = $("#verifiedOnly");
+      if(vo && vo.checked) result = result.filter(s=>s.verified);
+      const rating = $$("input[name=rating]").find(r=>r.checked).value;
+      if(rating!=="any"){ const min=parseFloat(rating); result = result.filter(s=>s.rating>=min); }
+      const types = $$(".sw-filter-group input[type=checkbox][value]").filter(c=>c.checked).map(c=>c.value);
+      if(types.length) result = result.filter(s=>types.includes(s.type));
+      render(result); drawer.setAttribute("aria-hidden","true");
+    });
+
+    // Search
+    function runSearch(){
+      const q = $("#searchInput").value.trim().toLowerCase();
+      const filtered = STAYS.filter(s=>!q || s.city.toLowerCase().includes(q));
+      if(filtered[0]) map.setView(filtered[0].coords, 10);
+      render(filtered);
+    }
+    $("#searchBtn").addEventListener("click", runSearch);
+
+    // Level calc demo (with inheritance of benefits)
+    const LEVELS = [
+      {name:"BRONZE",   threshold:0,        benefits:["Basic access"]},
+      {name:"SILVER",   threshold:500000,   benefits:["3% points on first booking"]},
+      {name:"GOLD",     threshold:2000000,  benefits:["5% points","Priority support"]},
+      {name:"PLATINUM", threshold:4000000,  benefits:["7% points","Seasonal discounts"]},
+      {name:"DIAMOND",  threshold:7500000,  benefits:["10% points","Exclusive coupons","Priority CS"]},
+      {name:"ELITE",    threshold:15000000, benefits:["15% points","Private deals","Priority emergency"]}
+    ];
+    const spent = 2200000;
+    let level = LEVELS[0].name;
+    for(const l of LEVELS) if(spent>=l.threshold) level = l.name;
+    document.getElementById("userLevel").textContent = level;
+
+    const benefitList = document.getElementById("benefitList");
+    const lvIndex = LEVELS.findIndex(l=>l.name===level);
+    const aggregated = LEVELS.slice(0, lvIndex+1).flatMap(l=>l.benefits);
+    aggregated.forEach(b=>{ const li=document.createElement("li"); li.textContent = '• '+b; benefitList.appendChild(li); });
+
+    // AI Concierge (demo)
+    const openBot = document.getElementById("openBot");
+    const chatFab = document.getElementById("chatFab");
+    const botPanel = document.getElementById("botPanel");
+    const botClose = document.getElementById("botClose");
+    const botBody  = document.getElementById("botBody");
+    const botSend  = document.getElementById("botSend");
+    const botInput = document.getElementById("botInput");
+
+    function showBot(){ botPanel.hidden=false; botInput && botInput.focus(); }
+    openBot && openBot.addEventListener("click", showBot);
+    chatFab.addEventListener("click", showBot);
+    botClose.addEventListener("click", ()=> botPanel.hidden=true);
+    botSend.addEventListener("click", ()=>{
+      const v = botInput.value.trim(); if(!v) return;
+      const me = document.createElement("div"); me.className="sw-bot-msg"; me.textContent=v; botBody.appendChild(me);
+      const ai = document.createElement("div"); ai.className="sw-bot-msg"; ai.textContent="Thanks! (Demo)"; botBody.appendChild(ai);
+      botInput.value=""; botBody.scrollTop = botBody.scrollHeight;
+    });
+  })();
+  </script>
 </body>
 </html>
