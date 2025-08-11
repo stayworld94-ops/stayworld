@@ -642,3 +642,34 @@
     }
   });
 </script>
+<!-- 어디든 버튼만 추가 -->
+<button id="pay-crypto" style="padding:12px 18px;border-radius:10px;">
+  Pay with Crypto (Coinbase)
+</button>
+
+<script>
+  document.getElementById("pay-crypto").addEventListener("click", async () => {
+    // 실제론 장바구니/숙소가격 합계로 amountUSD 세팅
+    const reservationId = "R-" + Date.now();
+    const amountUSD = 299; // 예시
+    const customerEmail = "guest@example.com";
+
+    const r = await fetch("/api/crypto/create-charge", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ reservationId, amountUSD, customerEmail })
+    });
+
+    if (!r.ok) {
+      alert("결제 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    const { hostedUrl } = await r.json();
+    if (hostedUrl) {
+      window.location.href = hostedUrl; // Coinbase 호스팅 결제 페이지로 이동
+    } else {
+      alert("결제 링크 생성에 실패했습니다.");
+    }
+  });
+</script>
