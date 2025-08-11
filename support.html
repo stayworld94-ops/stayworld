@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STAYWORLD — Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0a0c;--panel:#0f0f16;--muted:#a1a7b3;--text:#f1f3f7;--gold:#d4b166;--gold-2:#f0d58d}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui;color:var(--text);background:
+      radial-gradient(900px 600px at 80% -10%, rgba(212,177,102,.08), transparent 60%), var(--bg)}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;z-index:10;background:rgba(10,10,12,.7);backdrop-filter:blur(10px);border-bottom:1px solid #1a1a22}
+    .h-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+    nav a{margin:0 10px;color:#a1a7b3;text-decoration:none;font-weight:600}
+    nav a:hover{color:#fff}
+    select{background:#0d0d14;border:1px solid #262631;color:#fff;border-radius:10px;padding:8px 10px}
+    .hero{padding:48px 0;border-bottom:1px solid #1a1a22}
+    .hero h1{font-size:40px;margin:0 0 8px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0}
+    .card{background:linear-gradient(180deg,#13131c,#0d0d14);border:1px solid #242430;border-radius:16px;padding:18px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .badge{display:inline-block;background:#14141c;border:1px solid #2a2a34;border-radius:999px;padding:6px 10px;font-size:12px}
+    .btn{background:#151520;border:1px solid #2a2a34;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
+    .btn.gold{background:linear-gradient(180deg,var(--gold-2),var(--gold));border:0;color:#111;font-weight:800}
+    footer{border-top:1px solid #1a1a22;padding:18px 0;margin-top:24px;color:#a1a7b3}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="container h-inner">
+    <strong>STAYWORLD</strong>
+    <nav>
+      <a id="t_nav_home" href="index.html#home">Home</a>
+      <a id="t_nav_deals" href="index.html#deals">Deals</a>
+      <a id="t_nav_membership" href="membership.html">Membership</a>
+      <a id="t_nav_host" href="host-register.html">Host</a>
+      <a id="t_nav_support" href="support.html">Support</a>
+    </nav>
+    <select id="langSelect">
+      <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option>
+      <option value="de">DE</option><option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
+    </select>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1 id="t_support_title">Support</h1>
+    <p class="muted" id="t_support_sub">We’re here 24/7. Choose the fastest way to get help.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="grid">
+    <!-- AI Concierge -->
+    <div class="card">
+      <h3 id="t_support_ai_title">AI Concierge</h3>
+      <p id="t_support_ai_desc">Chat in your language — instant answers and trip tips.</p>
+      <button class="btn gold" id="t_support_ai_btn">Open bot</button>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card">
+      <h3 id="t_support_faq_title">FAQ</h3>
+      <p id="t_support_faq_desc">Common questions about bookings, payments and accounts.</p>
+      <a class="btn" href="faq.html" id="t_support_faq_btn">View FAQs</a>
+    </div>
+
+    <!-- Smart alerts -->
+    <div class="card">
+      <h3 id="t_support_alerts_title">Smart alerts</h3>
+      <p id="t_support_alerts_desc">AI picks, destination tips & level updates.</p>
+      <div class="row">
+        <span class="badge" id="t_support_badge_ai">AI picks</span>
+        <span class="badge" id="t_support_badge_dest">Top destinations</span>
+        <span class="badge" id="t_support_badge_lvl">Level-up</span>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="card" style="grid-column:1/-1">
+      <h3 id="t_support_contact_title">Contact us</h3>
+      <p id="t_support_contact_desc">Email or messenger — average reply under 2 hours.</p>
+      <div class="row">
+        <a class="btn" href="mailto:support@stayworldbooking.com" id="t_support_email_btn">Email support</a>
+        <a class="btn" href="https://t.me/stayworldsupport" target="_blank" rel="noopener" id="t_support_messenger_btn">Open messenger</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">© 2025 StayWorld</div>
+</footer>
+
+<script src="lang.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const saved = localStorage.getItem('sw_lang') || 'en';
+    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
+  });
+</script>
+</body>
+</html>
