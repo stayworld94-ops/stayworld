@@ -80,3 +80,25 @@
   </script>
 </body>
 </html>
+<!-- 네비 텍스트에 id 추가 -->
+<a id="t_nav_home" href="index.html#home">Home</a>
+<a id="t_nav_deals" href="index.html#deals">Deals</a>
+<a id="t_nav_membership" href="membership.html">Membership</a>
+<a id="t_nav_host" href="host-register.html">Host</a>
+<a id="t_nav_support" href="support.html">Support</a>
+
+<!-- 본문 문구에도 id -->
+<h1 id="t_membership_title">StayWorld+ Rewards</h1>
+<p id="t_membership_sub">Higher levels include all benefits of lower levels.</p>
+
+<!-- 맨 아래 스크립트 순서: 페이지 스크립트 후에 lang.js -->
+<script src="membership.js"></script>
+<script src="lang.js"></script>
+<script>
+  // 저장된 언어로 즉시 적용 (index와 동일 로직 사용)
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const saved = localStorage.getItem('sw_lang') || 'en';
+    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
+  });
+</script>
+
