@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STAYWORLD — Reservations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0a0c;--panel:#0f0f16;--muted:#a1a7b3;--text:#f1f3f7;--gold:#d4b166;--gold-2:#f0d58d}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui;color:var(--text);background:
+      radial-gradient(900px 600px at 80% -10%, rgba(212,177,102,.08), transparent 60%), var(--bg)}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;z-index:10;background:rgba(10,10,12,.7);backdrop-filter:blur(10px);border-bottom:1px solid #1a1a22}
+    .h-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+    nav a{margin:0 10px;color:#a1a7b3;text-decoration:none;font-weight:600}
+    nav a:hover{color:#fff}
+    select{background:#0d0d14;border:1px solid #262631;color:#fff;border-radius:10px;padding:8px 10px}
+    .hero{padding:48px 0;border-bottom:1px solid #1a1a22}
+    .hero h1{font-size:40px;margin:0 0 8px}
+    .muted{color:var(--muted)}
+    .card{background:linear-gradient(180deg,#13131c,#0d0d14);border:1px solid #242430;border-radius:16px;padding:18px;margin:18px 0}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px;border-bottom:1px solid #242430;text-align:left}
+    th{color:#a1a7b3;font-weight:600}
+    .btn{background:#151520;border:1px solid #2a2a34;color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
+    .btn.gold{background:linear-gradient(180deg,var(--gold-2),var(--gold));border:0;color:#111;font-weight:800}
+    .row{display:flex;gap:8px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="container h-inner">
+    <strong>STAYWORLD</strong>
+    <nav>
+      <a id="t_nav_home" href="index.html#home">Home</a>
+      <a id="t_nav_deals" href="index.html#deals">Deals</a>
+      <a id="t_nav_membership" href="membership.html">Membership</a>
+      <a id="t_nav_host" href="host-register.html">Host</a>
+      <a id="t_nav_support" href="support.html">Support</a>
+    </nav>
+    <select id="langSelect">
+      <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option>
+      <option value="de">DE</option><option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
+    </select>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1 id="t_res_title">Reservations</h1>
+    <p class="muted" id="t_res_sub">View, modify or cancel your bookings.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th id="t_res_th_id">ID</th>
+          <th id="t_res_th_property">Property</th>
+          <th id="t_res_th_checkin">Check-in</th>
+          <th id="t_res_th_checkout">Check-out</th>
+          <th id="t_res_th_status">Status</th>
+          <th id="t_res_th_actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="resTable">
+        <!-- Demo rows -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  <div class="container">© 2025 StayWorld</div>
+</footer>
+
+<script src="lang.js"></script>
+<script>
+  const DEMO = [
+    {id:"#A1029", property:"Bosporus Elite Suite", checkin:"2025-09-12", checkout:"2025-09-15", status:"Confirmed"},
+    {id:"#A1034", property:"Louvre Gold Residence", checkin:"2025-10-01", checkout:"2025-10-05", status:"Pending"}
+  ];
+  function row(r){
+    return `<tr>
+      <td>${r.id}</td>
+      <td>${r.property}</td>
+      <td>${r.checkin}</td>
+      <td>${r.checkout}</td>
+      <td>${r.status}</td>
+      <td class="row">
+        <button class="btn gold" id="t_res_action_view">View</button>
+        <button class="btn" id="t_res_action_cancel">Cancel</button>
+      </td>
+    </tr>`;
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('resTable').innerHTML = DEMO.map(row).join('');
+    const saved = localStorage.getItem('sw_lang') || 'en';
+    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
+  });
+</script>
+</body>
+</html>
