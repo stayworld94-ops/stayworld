@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>STAYWORLD — Luxury Global Stays (All-in-One)</title>
   <meta name="description" content="StayWorld: Luxury global stays with verified hosts, elite rewards, and crypto payments."/>
@@ -14,122 +14,9 @@
 
   <!-- Leaflet (Map) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
 
-  <style>
-    :root{--bg:#0a0a0c;--panel:#0f0f16;--card:#13131c;--muted:#a1a7b3;--text:#f1f3f7;--gold:#d4b166;--gold-2:#f0d58d;--ok:#22c55e}
-    *{box-sizing:border-box} html,body{height:100%}
-    body{
-      margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);
-      background:
-        radial-gradient(1200px 900px at 80% -20%, rgba(212,177,102,.10), transparent 60%),
-        radial-gradient(900px 600px at -10% 120%, rgba(212,177,102,.07), transparent 50%),
-        var(--bg);
-    }
-    .sw-container{max-width:1200px;margin:0 auto;padding:0 16px}
-
-    /* Header */
-    .sw-header{position:sticky;top:0;z-index:50;background:rgba(10,10,12,.7);backdrop-filter:blur(10px);border-bottom:1px solid #1a1a22}
-    .sw-header-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
-    .sw-brand{display:flex;align-items:center;gap:12px}
-    .sw-logo{width:38px;height:38px;border-radius:50%;background:
-      radial-gradient(60% 60% at 40% 40%, var(--gold-2), var(--gold)),
-      radial-gradient(30% 30% at 70% 70%, #6b4c1e, transparent);
-      box-shadow:0 0 0 2px rgba(212,177,102,.28), 0 8px 26px rgba(0,0,0,.5)}
-    .sw-title{font-weight:900;letter-spacing:.08em}
-    .sw-nav{display:flex;gap:18px}
-    .sw-nav a{color:var(--muted);text-decoration:none;font-weight:600}
-    .sw-nav a:hover{color:var(--text)}
-    .sw-actions{display:flex;align-items:center;gap:12px}
-    .sw-actions select{background:#0d0d14;border:1px solid #262631;color:var(--text);padding:8px 10px;border-radius:10px}
-    .sw-btn{border:1px solid #2c2c36;background:#151520;color:var(--text);padding:10px 14px;border-radius:14px;cursor:pointer;transition:.2s}
-    .sw-btn:hover{transform:translateY(-1px)}
-    .sw-btn.solid{background:linear-gradient(180deg,#20202a,#14141d)}
-    .sw-btn.gold{background:linear-gradient(180deg,var(--gold-2),var(--gold));border-color:transparent;color:#111;font-weight:800}
-
-    /* Hero */
-    .sw-hero{position:relative;padding:72px 0 28px;border-bottom:1px solid #1a1a22;overflow:hidden}
-    .sw-glow{position:absolute;inset:-20% -10% auto -10%;height:420px;background:radial-gradient(60% 60% at 20% 20%, rgba(240,213,141,.12), transparent 60%);pointer-events:none}
-    .sw-hero-inner{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}
-    .sw-kicker{color:var(--muted);font-weight:600;letter-spacing:.04em;margin-bottom:8px}
-    .sw-hero-text h1{font-size:56px;line-height:1.02;margin:0 0 10px}
-    .gold{color:var(--gold-2)}
-    .sw-hero-sub{color:var(--muted);margin:0 0 18px}
-
-    .sw-searchbar{display:flex;gap:10px;align-items:center;background:#0e0e15;padding:10px;border:1px solid #262631;border-radius:16px;box-shadow:inset 0 0 0 1px rgba(212,177,102,.12)}
-    .sw-input-wrap{position:relative;display:flex;align-items:center;gap:8px;flex:1;background:#0b0b12;border:1px solid #262631;border-radius:12px;padding:8px 10px}
-    .sw-input-wrap input{flex:1;background:transparent;border:0;outline:none;color:var(--text)}
-    .sw-autocomplete{position:absolute;left:0;right:0;top:100%;margin-top:8px;background:#0b0b12;border:1px solid #262631;border-radius:12px;overflow:hidden;display:none}
-    .sw-autocomplete div{padding:10px 12px;cursor:pointer;border-bottom:1px solid #1a1a22}
-    .sw-autocomplete div:hover{background:#14141c}
-
-    .sw-quick{margin-top:14px;color:var(--muted)}
-    .sw-quick-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-    .sw-quick-tags .sw-badge{cursor:pointer}
-
-    .sw-map{height:300px;border-radius:16px;border:1px solid #262631;overflow:hidden}
-    .sw-status-row{display:flex;gap:8px;margin-top:10px}
-
-    /* Sections & cards */
-    .sw-section{padding:44px 0}
-    .sw-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .sw-level-hint{color:var(--muted)}
-    .sw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .sw-card{background:linear-gradient(180deg,#13131c,#0d0d14);border:1px solid #242430;border-radius:20px;padding:14px;transition:.2s}
-    .sw-card:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
-    .sw-card .sw-thumb{height:160px;border-radius:14px;background:#0b0b10;border:1px solid #1a1a22;margin-bottom:12px;display:flex;align-items:center;justify-content:center}
-    .sw-card .sw-title{font-weight:800;margin-bottom:4px}
-    .sw-muted{color:var(--muted)}
-    .sw-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#14141c;border:1px solid #2a2a34;font-size:12px}
-    .sw-stars{display:flex;align-items:center;gap:2px}
-    .sw-verify{border-color:rgba(34,197,94,.4);color:var(--ok)}
-
-    /* Membership */
-    .sw-membership{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
-    .sw-membership-card{background:linear-gradient(180deg,#14141b,#0d0d13);border:1px solid #23232b;border-radius:20px;padding:18px}
-    .sw-tickets{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .sw-ticket{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#111;border-radius:12px;padding:8px 12px;font-weight:800;border:1px solid rgba(0,0,0,.25)}
-    .sw-cta{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#181820,#0d0d13);border:1px solid #23232b;border-radius:18px;padding:14px}
-
-    /* Support */
-    .sw-btn-row{display:flex;gap:8px}
-    .sw-support-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-
-    /* Footer */
-    .sw-footer{border-top:1px solid #1a1a22;padding:20px 0}
-    .sw-footer-inner{display:flex;align-items:center;justify-content:space-between}
-
-    /* Drawer */
-    .sw-drawer{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end}
-    .sw-drawer[aria-hidden="false"]{display:flex}
-    .sw-drawer-inner{background:#0f0f16;border-top-left-radius:16px;border-top-right-radius:16px;border:1px solid #23232b;max-height:85vh;overflow:auto;width:100%}
-    .sw-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #1b1b20}
-    .sw-filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:14px}
-    .sw-drawer-foot{display:flex;justify-content:space-between;padding:12px 14px;border-top:1px solid #1b1b20}
-
-    /* Bot */
-    .sw-bot{position:fixed;right:16px;bottom:86px;width:360px;border:1px solid #23232b;border-radius:18px;background:#101018;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-    .sw-bot-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1b1b20}
-    .sw-bot-body{padding:12px;max-height:260px;overflow:auto}
-    .sw-bot-msg{background:#171723;border:1px solid #23232b;border-radius:16px;padding:10px 12px;margin:8px 0}
-    .sw-bot-msg.sys{opacity:.85}
-    .sw-bot-foot{display:flex;gap:8px;padding:10px;border-top:1px solid #1b1b20}
-    .sw-bot-foot input{flex:1;background:#0f0f16;border:1px solid #23232b;border-radius:10px;color:var(--text);padding:10px}
-
-    /* Floating chat button */
-    .sw-chat-fab{position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:999px;border:1px solid rgba(212,177,102,.45);
-      background:radial-gradient(70% 70% at 30% 30%, var(--gold-2),var(--gold));
-      color:#111;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.45);transition:.2s}
-    .sw-chat-fab:hover{transform:translateY(-2px);box-shadow:0 16px 50px rgba(0,0,0,.55)}
-
-    @media (max-width:980px){
-      .sw-hero-inner{grid-template-columns:1fr}
-      .sw-membership{grid-template-columns:1fr}
-      .sw-grid{grid-template-columns:1fr 1fr}
-      .sw-support-grid{grid-template-columns:1fr}
-      .sw-filter-grid{grid-template-columns:1fr}
-    }
-  </style>
+  <!-- App CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="sw-header">
@@ -146,18 +33,9 @@
         <a id="t_nav_support" href="#support">Support</a>
       </nav>
       <div class="sw-actions">
-        <!-- 언어 옵션 확대 -->
         <select id="langSelect">
-          <option value="en">EN</option>
-          <option value="ko">KO</option>
-          <option value="fr">FR</option>
-          <option value="tr">TR</option>
-          <option value="ja">JA</option>
-          <option value="de">DE</option>
-          <option value="es">ES</option>
-          <option value="it">IT</option>
-          <option value="zh">ZH</option>
-          <option value="ru">RU</option>
+          <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option>
+          <option value="de">DE</option><option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
         </select>
         <button class="sw-btn ghost" id="loginBtn">Log in</button>
         <button class="sw-btn gold" id="signupBtn">Sign up</button>
@@ -276,6 +154,11 @@
             </div>
           </div>
         </div>
+
+        <!-- Coinbase 결제 버튼 (한 개만 존재) -->
+        <div style="margin-top:16px">
+          <button id="pay-crypto" class="sw-btn gold">Pay with Crypto (Coinbase)</button>
+        </div>
       </div>
     </section>
   </main>
@@ -346,7 +229,26 @@
     </div>
   </div>
 
-  <!-- 본문 스크립트 -->
+  <!-- AI Concierge (floating) -->
+  <button id="chatFab" class="sw-chat-fab" title="Chat with AI"><i class="lucide lucide-message-circle"></i></button>
+  <div class="sw-bot" id="botPanel" hidden>
+    <div class="sw-bot-head">
+      <div class="sw-title">AI Concierge</div>
+      <button class="sw-btn" id="botClose">×</button>
+    </div>
+    <div class="sw-bot-body" id="botBody">
+      <div class="sw-bot-msg sys">Hello! Ask me anything in your language.</div>
+    </div>
+    <div class="sw-bot-foot">
+      <input id="botInput" placeholder="Type a message…"/>
+      <button class="sw-btn gold" id="botSend">Send</button>
+    </div>
+  </div>
+
+  <!-- JS: Vendor -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
+
+  <!-- JS: App -->
   <script>
   (function(){
     const $ = s => document.querySelector(s);
@@ -461,10 +363,68 @@
     const lvIndex = LEVELS.findIndex(l=>l.name===level);
     const aggregated = LEVELS.slice(0, lvIndex+1).flatMap(l=>l.benefits);
     aggregated.forEach(b=>{ const li=document.createElement("li"); li.textContent = '• '+b; benefitList.appendChild(li); });
+
+    // ===== Nav smooth scroll & links =====
+    // anchor로 이동하는 링크는 부드러운 스크롤
+    document.querySelectorAll('.sw-nav a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const id = a.getAttribute('href');
+        const target = document.querySelector(id);
+        if (target){
+          e.preventDefault();
+          target.scrollIntoView({ behavior:'smooth', block:'start' });
+        }
+      });
+    });
+    // 로그인/회원가입 페이지 이동
+    const go = (file)=> ()=>{ window.location.href = file; };
+    document.getElementById('loginBtn')?.addEventListener('click', go('login.html'));
+    document.getElementById('signupBtn')?.addEventListener('click', go('signup.html'));
+
+    // ===== AI Concierge =====
+    const openBot = document.getElementById("openBot");
+    const chatFab = document.getElementById("chatFab");
+    const botPanel = document.getElementById("botPanel");
+    const botClose = document.getElementById("botClose");
+    const botBody  = document.getElementById("botBody");
+    const botSend  = document.getElementById("botSend");
+    const botInput = document.getElementById("botInput");
+
+    function showBot(){ botPanel.hidden=false; botInput && botInput.focus(); }
+    openBot && openBot.addEventListener("click", showBot);
+    chatFab.addEventListener("click", showBot);
+    botClose.addEventListener("click", ()=> botPanel.hidden=true);
+    botSend.addEventListener("click", ()=>{
+      const v = botInput.value.trim(); if(!v) return;
+      const me = document.createElement("div"); me.className="sw-bot-msg"; me.textContent=v; botBody.appendChild(me);
+      // 데모 AI 응답
+      const ai = document.createElement("div"); ai.className="sw-bot-msg sys"; ai.textContent="(Demo) Got it! We’ll find you the best stays."; botBody.appendChild(ai);
+      botInput.value=""; botBody.scrollTop = botBody.scrollHeight;
+    });
+
+    // ===== Coinbase crypto payment =====
+    const cryptoBtn = document.getElementById('pay-crypto');
+    cryptoBtn?.addEventListener('click', async ()=>{
+      try{
+        const reservationId = 'R-' + Date.now();
+        const amountUSD = 299;
+        const customerEmail = 'guest@example.com';
+        const r = await fetch('/api/crypto/create-charge', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ reservationId, amountUSD, customerEmail })
+        });
+        if(!r.ok){ alert('결제 생성 실패. 잠시 후 다시 시도해주세요.'); return; }
+        const { hostedUrl } = await r.json();
+        if (hostedUrl){ window.location.href = hostedUrl; }
+        else { alert('결제 링크 생성에 실패했습니다.'); }
+      }catch(e){ console.error(e); alert('결제 처리 중 오류가 발생했습니다.'); }
+    });
+
   })();
   </script>
 
-  <!-- i18n 스크립트: 다국어 데이터 + 적용 -->
+  <!-- i18n -->
   <script>
   (function () {
     const LANGS = {
@@ -588,14 +548,13 @@
       const si = document.getElementById("searchInput");
       if (si) si.placeholder = t.placeholder;
 
-      const navMap = [["t_nav_home","home"],["t_nav_deals","deals"],["t_nav_membership","membership"],["t_nav_host","host"],["t_nav_support","support"]];
-      navMap.forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.textContent = t.nav[k]; });
+      [["t_nav_home","home"],["t_nav_deals","deals"],["t_nav_membership","membership"],["t_nav_host","host"],["t_nav_support","support"]]
+        .forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.textContent = t.nav[k]; });
 
       const lb = document.getElementById("loginBtn");  if (lb) lb.textContent  = t.auth.login;
       const sb = document.getElementById("signupBtn"); if (sb) sb.textContent = t.auth.signup;
     }
 
-    // init & persist
     const sel = document.getElementById("langSelect");
     const saved = localStorage.getItem("sw_lang") || "en";
     if (sel){ sel.value = saved; applyLang(saved);
@@ -604,72 +563,8 @@
         localStorage.setItem("sw_lang", v);
         applyLang(v);
       });
-    } else {
-      applyLang(saved);
-    }
+    } else { applyLang(saved); }
   })();
   </script>
 </body>
 </html>
-<!-- 어디든 버튼만 추가 -->
-<button id="pay-crypto" style="padding:12px 18px;border-radius:10px;">
-  Pay with Crypto (Coinbase)
-</button>
-
-<script>
-  document.getElementById("pay-crypto").addEventListener("click", async () => {
-    // 실제론 장바구니/숙소가격 합계로 amountUSD 세팅
-    const reservationId = "R-" + Date.now();
-    const amountUSD = 299; // 예시
-    const customerEmail = "guest@example.com";
-
-    const r = await fetch("/api/crypto/create-charge", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ reservationId, amountUSD, customerEmail })
-    });
-
-    if (!r.ok) {
-      alert("결제 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
-      return;
-    }
-
-    const { hostedUrl } = await r.json();
-    if (hostedUrl) {
-      window.location.href = hostedUrl; // Coinbase 호스팅 결제 페이지로 이동
-    } else {
-      alert("결제 링크 생성에 실패했습니다.");
-    }
-  });
-</script>
-<!-- 어디든 버튼만 추가 -->
-<button id="pay-crypto" style="padding:12px 18px;border-radius:10px;">
-  Pay with Crypto (Coinbase)
-</button>
-
-<script>
-  document.getElementById("pay-crypto").addEventListener("click", async () => {
-    // 실제론 장바구니/숙소가격 합계로 amountUSD 세팅
-    const reservationId = "R-" + Date.now();
-    const amountUSD = 299; // 예시
-    const customerEmail = "guest@example.com";
-
-    const r = await fetch("/api/crypto/create-charge", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ reservationId, amountUSD, customerEmail })
-    });
-
-    if (!r.ok) {
-      alert("결제 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
-      return;
-    }
-
-    const { hostedUrl } = await r.json();
-    if (hostedUrl) {
-      window.location.href = hostedUrl; // Coinbase 호스팅 결제 페이지로 이동
-    } else {
-      alert("결제 링크 생성에 실패했습니다.");
-    }
-  });
-</script>
