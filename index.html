@@ -1,201 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>STAYWORLD — Luxury Global Stays (Patched)</title>
-  <meta name="description" content="StayWorld: Luxury global stays with verified hosts, elite rewards, and crypto payments."/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin/>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>STAYWORLD</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="sw-header">
-    <div class="sw-container sw-header-inner">
-      <a class="sw-brand" href="index.html" aria-label="STAYWORLD Home">
-        <div class="sw-logo" aria-hidden="true"></div>
-        <img class="sw-logo-img" src="assets/stayworld-logo.jpg" alt="STAYWORLD" onerror="this.style.display='none'">
-        <div class="sw-title">STAYWORLD</div>
-      </a>
-      <nav class="sw-nav">
-        <a id="t_nav_home" href="#home">Home</a>
-        <a id="t_nav_deals" href="#deals">Deals</a>
-        <a id="t_nav_membership" href="#membership">Membership</a>
-        <a id="t_nav_host" href="#host">Host</a>
-        <a id="t_nav_support" href="#support">Support</a>
-      </nav>
-      <div class="sw-actions">
-        <select id="langSelect" aria-label="Language">
-          <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option>
-          <option value="tr">TR</option><option value="ja">JA</option><option value="de">DE</option>
-          <option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
-        </select>
-        <button class="sw-btn ghost" id="loginBtn">Log in</button>
-        <button class="sw-btn gold" id="signupBtn">Sign up</button>
-      </div>
-    </div>
-  </header>
-
-  <main id="home">
-    <section class="sw-hero">
-      <div class="sw-glow"></div>
-      <div class="sw-container sw-hero-inner">
-        <div class="sw-hero-text">
-          <div class="sw-kicker" id="t_kicker">Global stays • Verified hosts • Premium design</div>
-          <h1 id="t_h1">Luxury stays.<br><span class="gold">Global reach.</span></h1>
-          <p class="sw-hero-sub" id="t_pay">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
-
-          <div class="sw-searchbar" id="search">
-            <div class="sw-input-wrap">
-              <span class="lucide-search" aria-hidden="true">🔍</span>
-              <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off"/>
-              <div id="autocomplete" class="sw-autocomplete"></div>
-            </div>
-            <input type="date" id="dateFrom"/>
-            <input type="date" id="dateTo"/>
-            <button class="sw-btn ghost" id="filterOpen">Filters</button>
-            <button class="sw-btn gold" id="searchBtn">Search</button>
-          </div>
-
-          <div class="sw-quick">
-            <span id="t_popular">Popular:</span>
-            <div class="sw-quick-tags" id="quickTags"></div>
-          </div>
-        </div>
-
-        <div class="sw-hero-visual">
-          <div id="map" class="sw-map"></div>
-          <div class="sw-status-row">
-            <span class="sw-badge"><span id="t_level">Level</span>: <b id="userLevel">BRONZE</b></span>
-            <span class="sw-badge" id="t_plus">StayWorld+ active</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="deals" class="sw-section">
-      <div class="sw-container">
-        <div class="sw-section-head">
-          <h2 id="t_deals_title">Verified stays for you</h2>
-          <div class="sw-level-hint" id="t_level_hint">Earn points. 60+ days inactive ➝ auto downgrade (−1 level).</div>
-        </div>
-        <div class="sw-grid" id="cardGrid"></div>
-      </div>
-    </section>
-
-    <section id="membership" class="sw-section">
-      <div class="sw-container sw-membership">
-        <div class="sw-membership-card">
-          <h3>StayWorld+ Rewards</h3>
-          <p>Higher levels include all benefits of lower levels.</p>
-          <ul class="sw-list" id="benefitList"></ul>
-          <div class="sw-tickets">
-            <span class="sw-ticket">Free night</span>
-            <span class="sw-ticket">Discount</span>
-            <span class="sw-ticket">Early check-in</span>
-            <span class="sw-ticket">Secret deal</span>
-          </div>
-        </div>
-        <div class="sw-membership-cta">
-          <div class="sw-cta">
-            <div>
-              <h4>Up to <span class="gold">15% back</span></h4>
-              <p>Elite perks, priority support, seasonal promos.</p>
-            </div>
-            <button class="sw-btn gold">Join StayWorld+</button>
-          </div>
-          <div class="sw-crypto">
-            <span class="sw-badge">Visa</span><span class="sw-badge">Mastercard</span><span class="sw-badge">Amex</span>
-            <span class="sw-badge">BTC</span><span class="sw-badge">ETH</span><span class="sw-badge">USDT</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="host" class="sw-section">
-      <div class="sw-container">
-        <h2>Host with confidence</h2>
-        <p>ID verification required. Listings go live automatically.</p>
-        <div class="sw-btn-row">
-          <button class="sw-btn ghost" onclick="location.href='host-register.html'">Register property</button>
-          <button class="sw-btn solid">Start verification</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="support" class="sw-section">
-      <div class="sw-container">
-        <h2>Support</h2>
-        <div class="sw-support-grid">
-          <div class="sw-card">
-            <h4>AI Concierge</h4>
-            <p>Chat in your language — 24/7.</p>
-            <button class="sw-btn ghost" id="openBot" type="button">Open bot</button>
-          </div>
-          <div class="sw-card">
-            <h4>FAQ</h4>
-            <p>Common questions & answers.</p>
-            <button class="sw-btn ghost" type="button" onclick="location.href='support.html'">View FAQs</button>
-          </div>
-          <div class="sw-card">
-            <h4>Smart alerts</h4>
-            <p>AI picks, destination tips & level updates.</p>
-            <div class="sw-badge-row">
-              <span class="sw-badge">AI picks</span>
-              <span class="sw-badge">Top destinations</span>
-              <span class="sw-badge">Level-up</span>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:16px">
-          <button id="pay-crypto" class="sw-btn gold" type="button" onclick="location.href='pay.html'">Pay with Crypto</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="sw-footer">
-    <div class="sw-container sw-footer-inner">
-      <div>
-        <div class="sw-title">STAYWORLD</div>
-        <div class="sw-muted">© StayWorldGlobal — stayworldbooking.com</div>
-      </div>
-      <div class="sw-muted">All-in-One</div>
-    </div>
-  </footer>
-
-  <div class="sw-drawer" id="filterDrawer" aria-hidden="true">
-    <div class="sw-drawer-inner">
-      <div class="sw-drawer-head">
-        <h3>Filters</h3>
-        <button id="filterClose" class="sw-btn" aria-label="Close" type="button">×</button>
-      </div>
-      <div class="sw-drawer-foot">
-        <button class="sw-btn" id="filterReset" type="button">Reset</button>
-        <button class="sw-btn gold" id="applyFilters" type="button">Apply</button>
-      </div>
-    </div>
+<div class="sw-brand">
+  <img src="assets/logo-gold.png" alt="STAYWORLD" class="sw-logo-img" width="38" height="38">
+  <div class="sw-title">STAYWORLD</div>
+</div>
+<button id="chatFab" class="sw-chat-fab">💬</button>
+<div class="sw-bot" id="botPanel" hidden>
+  <div class="sw-bot-head">
+    <div class="sw-title">AI Concierge</div>
+    <button class="sw-btn" id="botClose">×</button>
   </div>
-
-  <button id="chatFab" class="sw-chat-fab" title="Chat with AI" type="button">💬</button>
-  <div class="sw-bot" id="botPanel" hidden>
-    <div class="sw-bot-head">
-      <div class="sw-title">AI Concierge</div>
-      <button class="sw-btn" id="botClose" type="button">×</button>
-    </div>
-    <div class="sw-bot-body" id="botBody">
-      <div class="sw-bot-msg sys">Hello! Ask me anything in your language.</div>
-    </div>
-    <div class="sw-bot-foot">
-      <input id="botInput" placeholder="Type a message…"/>
-      <button class="sw-btn gold" id="botSend" type="button">Send</button>
-    </div>
+  <div class="sw-bot-body" id="botBody">
+    <div class="sw-bot-msg sys">Hello! Ask me anything in your language.</div>
   </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
-  <script src="app.js"></script>
+  <div class="sw-bot-foot">
+    <input id="botInput" placeholder="Type a message…"/>
+    <button class="sw-btn gold" id="botSend">Send</button>
+  </div>
+</div>
+<script src="app.js?v=1"></script>
 </body>
 </html>
