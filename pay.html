@@ -1,47 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StayWorld Crypto Pay</title>
-<style>
-body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-input, button { padding: 10px; margin: 10px; font-size: 16px; }
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STAYWORLD — Pay with Crypto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>StayWorld USDT(TRC20) 결제</h1>
-<p>원하는 결제 금액을 입력하세요 (USD)</p>
-<input type="number" id="amount" placeholder="Amount in USD" min="1">
-<br>
-<button onclick="createInvoice()">💳 결제하기</button>
-<p id="status"></p>
+<header class="sw-header">
+  <div class="sw-container sw-header-inner">
+    <a class="sw-brand" href="index.html"><div class="sw-logo"></div><div class="sw-title">STAYWORLD</div></a>
+  </div>
+</header>
+
+<main class="sw-section">
+  <div class="sw-container" style="max-width:680px">
+    <div class="sw-card" style="border-radius:18px;padding:18px">
+      <h2 style="margin:0 0 12px">Create crypto invoice</h2>
+      <p class="sw-muted" style="margin:0 0 16px">USDT (TRC20). The network fee is paid by the customer.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label>Amount (USD)</label><input id="amount" class="sw-input-wrap" style="width:100%;padding:10px" value="299"></div>
+        <div><label>Order ID</label><input id="orderId" class="sw-input-wrap" style="width:100%;padding:10px" placeholder="R-12345"></div>
+      </div>
+      <button id="create" class="sw-btn gold" style="margin-top:14px">Create invoice</button>
+      <div id="out" class="sw-muted" style="margin-top:10px"></div>
+    </div>
+  </div>
+</main>
 
 <script>
-async function createInvoice() {
-    const amount = document.getElementById('amount').value;
-    if (!amount || amount <= 0) {
-        alert("금액을 입력하세요.");
-        return;
-    }
-    document.getElementById('status').innerText = "결제 링크 생성중...";
-    try {
-        const res = await fetch('/.netlify/functions/np-create-invoice', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ price_amount: amount })
-        });
-        const data = await res.json();
-        if (data.invoice_url) {
-            window.location.href = data.invoice_url;
-        } else {
-            document.getElementById('status').innerText = "결제 생성 실패";
-        }
-    } catch (err) {
-        console.error(err);
-        document.getElementById('status').innerText = "오류 발생";
-    }
-}
+document.getElementById('create').addEventListener('click', async ()=>{
+  const amount = parseFloat(document.getElementById('amount').value||'0');
+  const orderId = (document.getElementById('orderId').value||('R-'+Date.now())).toString();
+  const out = document.getElementById('out');
+  if (!amount || amount<=0){ out.textContent = 'Enter a valid amount.'; return; }
+  out.textContent = 'Creating invoice…';
+  try{
+    const r = await fetch('/.netlify/functions/np-create-invoice', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ amountUSD: amount, orderId })
+    });
+    const data = await r.json();
+    if(r.ok && data.invoice_url){ location.href = data.invoice_url; }
+    else { out.textContent = 'Failed: ' + JSON.stringify(data); }
+  }catch(e){ out.textContent = 'Error: ' + e.message; }
+});
 </script>
 </body>
 </html>

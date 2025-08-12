@@ -3,28 +3,22 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>STAYWORLD — Luxury Global Stays (All-in-One)</title>
+  <title>STAYWORLD — Luxury Global Stays (Patched)</title>
   <meta name="description" content="StayWorld: Luxury global stays with verified hosts, elite rewards, and crypto payments."/>
-
-  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.454.0/font/lucide.css">
-
-  <!-- Leaflet (Map) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin/>
-
-  <!-- App CSS -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="sw-header">
     <div class="sw-container sw-header-inner">
-      <div class="sw-brand">
-        <div class="sw-logo"></div>
+      <a class="sw-brand" href="index.html" aria-label="STAYWORLD Home">
+        <div class="sw-logo" aria-hidden="true"></div>
+        <img class="sw-logo-img" src="assets/stayworld-logo.jpg" alt="STAYWORLD" onerror="this.style.display='none'">
         <div class="sw-title">STAYWORLD</div>
-      </div>
+      </a>
       <nav class="sw-nav">
         <a id="t_nav_home" href="#home">Home</a>
         <a id="t_nav_deals" href="#deals">Deals</a>
@@ -33,9 +27,10 @@
         <a id="t_nav_support" href="#support">Support</a>
       </nav>
       <div class="sw-actions">
-        <select id="langSelect">
-          <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option><option value="tr">TR</option><option value="ja">JA</option>
-          <option value="de">DE</option><option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
+        <select id="langSelect" aria-label="Language">
+          <option value="en">EN</option><option value="ko">KO</option><option value="fr">FR</option>
+          <option value="tr">TR</option><option value="ja">JA</option><option value="de">DE</option>
+          <option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
         </select>
         <button class="sw-btn ghost" id="loginBtn">Log in</button>
         <button class="sw-btn gold" id="signupBtn">Sign up</button>
@@ -54,14 +49,14 @@
 
           <div class="sw-searchbar" id="search">
             <div class="sw-input-wrap">
-              <i class="lucide lucide-search"></i>
+              <span class="lucide-search" aria-hidden="true">🔍</span>
               <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off"/>
               <div id="autocomplete" class="sw-autocomplete"></div>
             </div>
             <input type="date" id="dateFrom"/>
             <input type="date" id="dateTo"/>
-            <button class="sw-btn ghost" id="filterOpen"><i class="lucide lucide-sliders-horizontal"></i> <span id="t_filters">Filters</span></button>
-            <button class="sw-btn gold" id="searchBtn"><span id="t_search">Search</span></button>
+            <button class="sw-btn ghost" id="filterOpen">Filters</button>
+            <button class="sw-btn gold" id="searchBtn">Search</button>
           </div>
 
           <div class="sw-quick">
@@ -124,7 +119,7 @@
         <h2>Host with confidence</h2>
         <p>ID verification required. Listings go live automatically.</p>
         <div class="sw-btn-row">
-          <button class="sw-btn ghost">Register property</button>
+          <button class="sw-btn ghost" onclick="location.href='host-register.html'">Register property</button>
           <button class="sw-btn solid">Start verification</button>
         </div>
       </div>
@@ -137,12 +132,12 @@
           <div class="sw-card">
             <h4>AI Concierge</h4>
             <p>Chat in your language — 24/7.</p>
-            <button class="sw-btn ghost" id="openBot">Open bot</button>
+            <button class="sw-btn ghost" id="openBot" type="button">Open bot</button>
           </div>
           <div class="sw-card">
             <h4>FAQ</h4>
             <p>Common questions & answers.</p>
-            <button class="sw-btn ghost">View FAQs</button>
+            <button class="sw-btn ghost" type="button" onclick="location.href='support.html'">View FAQs</button>
           </div>
           <div class="sw-card">
             <h4>Smart alerts</h4>
@@ -155,9 +150,8 @@
           </div>
         </div>
 
-        <!-- Coinbase 결제 버튼 (한 개만 존재) -->
         <div style="margin-top:16px">
-          <button id="pay-crypto" class="sw-btn gold">Pay with Crypto (Coinbase)</button>
+          <button id="pay-crypto" class="sw-btn gold" type="button" onclick="location.href='pay.html'">Pay with Crypto</button>
         </div>
       </div>
     </section>
@@ -173,398 +167,35 @@
     </div>
   </footer>
 
-  <!-- Filters Drawer -->
   <div class="sw-drawer" id="filterDrawer" aria-hidden="true">
     <div class="sw-drawer-inner">
       <div class="sw-drawer-head">
         <h3>Filters</h3>
-        <button id="filterClose" class="sw-btn" aria-label="Close">×</button>
+        <button id="filterClose" class="sw-btn" aria-label="Close" type="button">×</button>
       </div>
-      <div class="sw-drawer-body">
-        <div class="sw-filter-grid">
-          <div class="sw-filter-group">
-            <h4>Price per night</h4>
-            <input type="range" id="priceMin" min="0" max="1000" step="10">
-            <input type="range" id="priceMax" min="0" max="5000" step="50">
-          </div>
-          <div class="sw-filter-group"><h4>Stay type</h4>
-            <label><input type="checkbox" value="hotel"> Hotel</label>
-            <label><input type="checkbox" value="motel"> Motel</label>
-            <label><input type="checkbox" value="hostel"> Hostel</label>
-            <label><input type="checkbox" value="apartment"> Apartment</label>
-            <label><input type="checkbox" value="villa"> Villa</label>
-          </div>
-          <div class="sw-filter-group"><h4>Review score</h4>
-            <label><input type="radio" name="rating" value="4.5+"> 4.5+</label>
-            <label><input type="radio" name="rating" value="4.0+"> 4.0+</label>
-            <label><input type="radio" name="rating" value="any" checked> Any</label>
-          </div>
-          <div class="sw-filter-group"><h4>Beds</h4><input type="number" min="1" id="beds" value="1"></div>
-          <div class="sw-filter-group"><h4>Baths</h4><input type="number" min="1" id="baths" value="1"></div>
-          <div class="sw-filter-group"><h4>Pets</h4><label><input type="checkbox" id="pets"> Allowed</label></div>
-          <div class="sw-filter-group"><h4>Check-in</h4><label><input type="checkbox" id="selfCheckin"> Self check-in</label></div>
-          <div class="sw-filter-group"><h4>Amenities</h4>
-            <label><input type="checkbox" value="wifi"> Wi-Fi</label>
-            <label><input type="checkbox" value="kitchen"> Kitchen</label>
-            <label><input type="checkbox" value="parking"> Parking</label>
-            <label><input type="checkbox" value="pool"> Pool</label>
-            <label><input type="checkbox" value="ac"> Air conditioning</label>
-            <label><input type="checkbox" value="gym"> Gym</label>
-            <label><input type="checkbox" value="workspace"> Workspace</label>
-            <label><input type="checkbox" value="washer"> Washer</label>
-            <label><input type="checkbox" value="dryer"> Dryer</label>
-          </div>
-          <div class="sw-filter-group"><h4>Booking</h4>
-            <label><input type="checkbox" value="instant"> Instant book</label>
-            <label><input type="checkbox" value="request"> Request to book</label>
-          </div>
-          <div class="sw-filter-group"><h4>Verification</h4><label><input type="checkbox" id="verifiedOnly"> Verified listings only</label></div>
-          <div class="sw-filter-group"><h4>Long-stay</h4><label><input type="checkbox" id="longStay"> Show long-stay deals</label></div>
-        </div>
-        <div class="sw-drawer-foot">
-          <button class="sw-btn" id="filterReset">Reset</button>
-          <button class="sw-btn gold" id="applyFilters">Apply</button>
-        </div>
+      <div class="sw-drawer-foot">
+        <button class="sw-btn" id="filterReset" type="button">Reset</button>
+        <button class="sw-btn gold" id="applyFilters" type="button">Apply</button>
       </div>
     </div>
   </div>
 
-  <!-- AI Concierge (floating) -->
-  <button id="chatFab" class="sw-chat-fab" title="Chat with AI"><i class="lucide lucide-message-circle"></i></button>
+  <button id="chatFab" class="sw-chat-fab" title="Chat with AI" type="button">💬</button>
   <div class="sw-bot" id="botPanel" hidden>
     <div class="sw-bot-head">
       <div class="sw-title">AI Concierge</div>
-      <button class="sw-btn" id="botClose">×</button>
+      <button class="sw-btn" id="botClose" type="button">×</button>
     </div>
     <div class="sw-bot-body" id="botBody">
       <div class="sw-bot-msg sys">Hello! Ask me anything in your language.</div>
     </div>
     <div class="sw-bot-foot">
       <input id="botInput" placeholder="Type a message…"/>
-      <button class="sw-btn gold" id="botSend">Send</button>
+      <button class="sw-btn gold" id="botSend" type="button">Send</button>
     </div>
   </div>
 
-  <!-- JS: Vendor -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
-
-  <!-- JS: App -->
-  <script>
-  (function(){
-    const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
-
-    // Popular quick chips
-    const POPULAR = ["Istanbul","Paris","Tokyo","Seoul","New York","Rome","Antalya","Dubai"];
-    const quick = $("#quickTags");
-    if (quick) POPULAR.forEach(city=>{
-      const b = document.createElement("span");
-      b.className="sw-badge"; b.textContent=city;
-      b.addEventListener("click", ()=>{ $("#searchInput").value = city; runSearch(); });
-      quick.appendChild(b);
-    });
-
-    // Autocomplete
-    const auto = $("#autocomplete");
-    if (auto) {
-      $("#searchInput").addEventListener("input", e=>{
-        const v = e.target.value.toLowerCase();
-        if(!v){ auto.style.display="none"; return; }
-        const items = POPULAR.filter(c=>c.toLowerCase().includes(v));
-        auto.innerHTML = items.map(i=>'<div data-city="'+i+'">'+i+'</div>').join("");
-        auto.style.display = items.length ? "block" : "none";
-      });
-      auto.addEventListener("click", e=>{
-        const d = e.target.closest("div[data-city]"); if(!d) return;
-        $("#searchInput").value = d.dataset.city; auto.style.display="none"; runSearch();
-      });
-    }
-
-    // Map
-    const map = L.map('map').setView([41.015137, 28.979530], 3);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18, attribution:'&copy; OpenStreetMap'}).addTo(map);
-
-    // Demo stays
-    const STAYS = [
-      {id:1, city:"Istanbul", title:"Bosporus Elite Suite", price:220, rating:4.8, verified:true,  type:"apartment", coords:[41.0082, 28.9784]},
-      {id:2, city:"Paris",    title:"Louvre Gold Residence", price:310, rating:4.7, verified:true,  type:"hotel",     coords:[48.8606,  2.3376]},
-      {id:3, city:"Tokyo",    title:"Shibuya Luxe Tower",    price:180, rating:4.6, verified:false, type:"apartment", coords:[35.6595,139.7005]},
-      {id:4, city:"Seoul",    title:"Gangnam Prime Loft",    price:150, rating:4.5, verified:true,  type:"apartment", coords:[37.4979,127.0276]},
-      {id:5, city:"New York", title:"Central Park Signature",price:420, rating:4.9, verified:true,  type:"hotel",     coords:[40.7812,-73.9665]},
-      {id:6, city:"Rome",     title:"Colosseo Regal Flat",   price:200, rating:4.4, verified:false, type:"apartment", coords:[41.8902, 12.4922]}
-    ];
-    STAYS.forEach(s=>{ L.marker(s.coords).addTo(map).bindPopup(s.title+' — '+s.city); });
-
-    // Cards
-    const grid = $("#cardGrid");
-    function stars(r){
-      const n = Math.round(r);
-      return '<div class="sw-stars">'+Array.from({length:5},(_,i)=>'<i class="lucide lucide-star'+(i<n?'':'-half')+'"></i>').join('')+'</div>';
-    }
-    function card(s){
-      return '<div class="sw-card">'
-        + '<div class="sw-thumb">IMG</div>'
-        + '<div class="sw-title">'+s.title+'</div>'
-        + '<div class="sw-muted">'+s.city+'</div>'
-        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">'
-        +   '<div>' + stars(s.rating) + '</div>'
-        +   '<div class="sw-badge '+(s.verified?'sw-verify':'')+'">'+(s.verified?'Verified':'')+'</div>'
-        + '</div>'
-        + '<div style="margin-top:8px;font-weight:800">$'+s.price+'/night</div>'
-        + '</div>';
-    }
-    function render(list){ if(grid) grid.innerHTML = list.map(card).join(''); }
-    render(STAYS);
-
-    // Filters
-    const drawer = $("#filterDrawer");
-    $("#filterOpen").addEventListener("click", ()=>drawer.setAttribute("aria-hidden","false"));
-    $("#filterClose").addEventListener("click", ()=>drawer.setAttribute("aria-hidden","true"));
-    $("#filterReset").addEventListener("click", ()=>{
-      $$("input[type=checkbox]").forEach(c=>c.checked=false);
-      const vo = $("#verifiedOnly"); if(vo) vo.checked=false;
-      render(STAYS);
-    });
-    $("#applyFilters").addEventListener("click", ()=>{
-      let result = [...STAYS];
-      const vo = $("#verifiedOnly");
-      if(vo && vo.checked) result = result.filter(s=>s.verified);
-      const rating = $$("input[name=rating]").find(r=>r.checked).value;
-      if(rating!=="any"){ const min=parseFloat(rating); result = result.filter(s=>s.rating>=min); }
-      const types = $$(".sw-filter-group input[type=checkbox][value]").filter(c=>c.checked).map(c=>c.value);
-      if(types.length) result = result.filter(s=>types.includes(s.type));
-      render(result); drawer.setAttribute("aria-hidden","true");
-    });
-
-    // Search
-    function runSearch(){
-      const q = $("#searchInput").value.trim().toLowerCase();
-      const filtered = STAYS.filter(s=>!q || s.city.toLowerCase().includes(q));
-      if(filtered[0]) map.setView(filtered[0].coords, 10);
-      render(filtered);
-    }
-    $("#searchBtn").addEventListener("click", runSearch);
-
-    // Level calc demo
-    const LEVELS = [
-      {name:"BRONZE",   threshold:0,        benefits:["Basic access"]},
-      {name:"SILVER",   threshold:500000,   benefits:["3% points on first booking"]},
-      {name:"GOLD",     threshold:2000000,  benefits:["5% points","Priority support"]},
-      {name:"PLATINUM", threshold:4000000,  benefits:["7% points","Seasonal discounts"]},
-      {name:"DIAMOND",  threshold:7500000,  benefits:["10% points","Exclusive coupons","Priority CS"]},
-      {name:"ELITE",    threshold:15000000, benefits:["15% points","Private deals","Priority emergency"]}
-    ];
-    const spent = 2200000;
-    let level = LEVELS[0].name;
-    for(const l of LEVELS) if(spent>=l.threshold) level = l.name;
-    document.getElementById("userLevel").textContent = level;
-
-    const benefitList = document.getElementById("benefitList");
-    const lvIndex = LEVELS.findIndex(l=>l.name===level);
-    const aggregated = LEVELS.slice(0, lvIndex+1).flatMap(l=>l.benefits);
-    aggregated.forEach(b=>{ const li=document.createElement("li"); li.textContent = '• '+b; benefitList.appendChild(li); });
-
-    // ===== Nav smooth scroll & links =====
-    // anchor로 이동하는 링크는 부드러운 스크롤
-    document.querySelectorAll('.sw-nav a[href^="#"]').forEach(a=>{
-      a.addEventListener('click', e=>{
-        const id = a.getAttribute('href');
-        const target = document.querySelector(id);
-        if (target){
-          e.preventDefault();
-          target.scrollIntoView({ behavior:'smooth', block:'start' });
-        }
-      });
-    });
-    // 로그인/회원가입 페이지 이동
-    const go = (file)=> ()=>{ window.location.href = file; };
-    document.getElementById('loginBtn')?.addEventListener('click', go('login.html'));
-    document.getElementById('signupBtn')?.addEventListener('click', go('signup.html'));
-
-    // ===== AI Concierge =====
-    const openBot = document.getElementById("openBot");
-    const chatFab = document.getElementById("chatFab");
-    const botPanel = document.getElementById("botPanel");
-    const botClose = document.getElementById("botClose");
-    const botBody  = document.getElementById("botBody");
-    const botSend  = document.getElementById("botSend");
-    const botInput = document.getElementById("botInput");
-
-    function showBot(){ botPanel.hidden=false; botInput && botInput.focus(); }
-    openBot && openBot.addEventListener("click", showBot);
-    chatFab.addEventListener("click", showBot);
-    botClose.addEventListener("click", ()=> botPanel.hidden=true);
-    botSend.addEventListener("click", ()=>{
-      const v = botInput.value.trim(); if(!v) return;
-      const me = document.createElement("div"); me.className="sw-bot-msg"; me.textContent=v; botBody.appendChild(me);
-      // 데모 AI 응답
-      const ai = document.createElement("div"); ai.className="sw-bot-msg sys"; ai.textContent="(Demo) Got it! We’ll find you the best stays."; botBody.appendChild(ai);
-      botInput.value=""; botBody.scrollTop = botBody.scrollHeight;
-    });
-
-    // ===== Coinbase crypto payment =====
-    const cryptoBtn = document.getElementById('pay-crypto');
-    cryptoBtn?.addEventListener('click', async ()=>{
-      try{
-        const reservationId = 'R-' + Date.now();
-        const amountUSD = 299;
-        const customerEmail = 'guest@example.com';
-        const r = await fetch('/api/crypto/create-charge', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ reservationId, amountUSD, customerEmail })
-        });
-        if(!r.ok){ alert('결제 생성 실패. 잠시 후 다시 시도해주세요.'); return; }
-        const { hostedUrl } = await r.json();
-        if (hostedUrl){ window.location.href = hostedUrl; }
-        else { alert('결제 링크 생성에 실패했습니다.'); }
-      }catch(e){ console.error(e); alert('결제 처리 중 오류가 발생했습니다.'); }
-    });
-
-  })();
-  </script>
-
-  <!-- i18n -->
-  <script>
-  (function () {
-    const LANGS = {
-      en:{kicker:"Global stays • Verified hosts • Premium design",
-          h1:"Luxury stays.<br><span class='gold'>Global reach.</span>",
-          pay:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
-          filters:"Filters", search:"Search", popular:"Popular:",
-          level:"Level", plus:"StayWorld+ active",
-          nav:{home:"Home",deals:"Deals",membership:"Membership",host:"Host",support:"Support"},
-          auth:{login:"Log in",signup:"Sign up"},
-          deals_title:"Verified stays for you",
-          level_hint:"Earn points. 60+ days inactive ➝ auto downgrade (−1 level).",
-          placeholder:"Paris, Tokyo, Istanbul…"},
-      ko:{kicker:"글로벌 스테이 • 인증된 호스트 • 프리미엄 디자인",
-          h1:"럭셔리 스테이.<br><span class='gold'>글로벌 리치.</span>",
-          pay:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
-          filters:"필터", search:"검색", popular:"인기:",
-          level:"레벨", plus:"StayWorld+ 활성",
-          nav:{home:"Home",deals:"딜",membership:"멤버십",host:"호스트",support:"지원"},
-          auth:{login:"로그인",signup:"가입"},
-          deals_title:"추천 인증 숙소",
-          level_hint:"포인트 적립. 60일 이상 미접속 시 자동 강등(−1레벨).",
-          placeholder:"파리, 도쿄, 이스탄불…"},
-      fr:{kicker:"Séjours mondiaux • Hôtes vérifiés • Design premium",
-          h1:"Séjours de luxe.<br><span class='gold'>Portée mondiale.</span>",
-          pay:"Cartes, virement & crypto (BTC · ETH · USDT).",
-          filters:"Filtres", search:"Rechercher", popular:"Populaire :",
-          level:"Niveau", plus:"StayWorld+ actif",
-          nav:{home:"Accueil",deals:"Offres",membership:"Adhésion",host:"Hôte",support:"Assistance"},
-          auth:{login:"Connexion",signup:"S’inscrire"},
-          deals_title:"Séjours vérifiés pour vous",
-          level_hint:"Gagnez des points. Inactif 60+ jours ➝ rétrogradation (−1 niveau).",
-          placeholder:"Paris, Tokyo, Istanbul…"},
-      tr:{kicker:"Küresel konaklamalar • Doğrulanmış ev sahipleri • Premium tasarım",
-          h1:"Lüks konaklamalar.<br><span class='gold'>Küresel erişim.</span>",
-          pay:"Kart, havale & kripto (BTC · ETH · USDT).",
-          filters:"Filtreler", search:"Ara", popular:"Popüler:",
-          level:"Seviye", plus:"StayWorld+ aktif",
-          nav:{home:"Ana sayfa",deals:"Fırsatlar",membership:"Üyelik",host:"Ev Sahibi",support:"Destek"},
-          auth:{login:"Giriş",signup:"Kaydol"},
-          deals_title:"Sizin için doğrulanmış konaklamalar",
-          level_hint:"Puan kazanın. 60+ gün pasif ➝ otomatik düşürme (−1).",
-          placeholder:"Paris, Tokyo, İstanbul…"},
-      ja:{kicker:"世界の滞在先 • 認証ホスト • プレミアムデザイン",
-          h1:"ラグジュアリーな滞在。<br><span class='gold'>グローバルに。</span>",
-          pay:"カード・振込・暗号資産 (BTC · ETH · USDT)。",
-          filters:"フィルター", search:"検索", popular:"人気:",
-          level:"レベル", plus:"StayWorld+ 有効",
-          nav:{home:"ホーム",deals:"お得情報",membership:"メンバーシップ",host:"ホスト",support:"サポート"},
-          auth:{login:"ログイン",signup:"登録"},
-          deals_title:"あなたへの認証済みステイ",
-          level_hint:"ポイント獲得。60日以上の非アクティブで自動降格(−1)。",
-          placeholder:"パリ、東京、イスタンブール…"},
-      de:{kicker:"Weltweite Aufenthalte • Verifizierte Gastgeber • Premium-Design",
-          h1:"Luxuriöse Aufenthalte.<br><span class='gold'>Weltweite Reichweite.</span>",
-          pay:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
-          filters:"Filter", search:"Suchen", popular:"Beliebt:",
-          level:"Level", plus:"StayWorld+ aktiv",
-          nav:{home:"Start",deals:"Angebote",membership:"Mitgliedschaft",host:"Gastgeber",support:"Support"},
-          auth:{login:"Anmelden",signup:"Registrieren"},
-          deals_title:"Verifizierte Unterkünfte für dich",
-          level_hint:"Punkte sammeln. 60+ Tage inaktiv ➝ Auto-Downgrade (−1).",
-          placeholder:"Paris, Tokio, Istanbul…"},
-      es:{kicker:"Estancias globales • Anfitriones verificados • Diseño premium",
-          h1:"Estancias de lujo.<br><span class='gold'>Alcance global.</span>",
-          pay:"Tarjetas, transferencia y cripto (BTC · ETH · USDT).",
-          filters:"Filtros", search:"Buscar", popular:"Popular:",
-          level:"Nivel", plus:"StayWorld+ activo",
-          nav:{home:"Inicio",deals:"Ofertas",membership:"Membresía",host:"Anfitrión",support:"Soporte"},
-          auth:{login:"Entrar",signup:"Registrarse"},
-          deals_title:"Estancias verificadas para ti",
-          level_hint:"Gana puntos. 60+ días inactivo ➝ degradación automática (−1).",
-          placeholder:"París, Tokio, Estambul…"},
-      it:{kicker:"Soggiorni globali • Host verificati • Design premium",
-          h1:"Soggiorni di lusso.<br><span class='gold'>Portata globale.</span>",
-          pay:"Carte, bonifico e crypto (BTC · ETH · USDT).",
-          filters:"Filtri", search:"Cerca", popular:"Popolari:",
-          level:"Livello", plus:"StayWorld+ attivo",
-          nav:{home:"Home",deals:"Offerte",membership:"Abbonamento",host:"Host",support:"Supporto"},
-          auth:{login:"Accedi",signup:"Registrati"},
-          deals_title:"Soggiorni verificati per te",
-          level_hint:"Guadagna punti. 60+ giorni inattivo ➝ retrocessione automatica (−1).",
-          placeholder:"Parigi, Tokyo, Istanbul…"},
-      zh:{kicker:"全球住宿 • 认证房东 • 高端设计",
-          h1:"奢华住宿。<br><span class='gold'>全球触达。</span>",
-          pay:"支持银行卡、转账与加密货币 (BTC · ETH · USDT)。",
-          filters:"筛选", search:"搜索", popular:"热门：",
-          level:"等级", plus:"StayWorld+ 已启用",
-          nav:{home:"首页",deals:"优惠",membership:"会员",host:"房东",support:"支持"},
-          auth:{login:"登录",signup:"注册"},
-          deals_title:"为你精选的认证住宿",
-          level_hint:"赚取积分。60+ 天不活跃 ➝ 自动降级（−1）。",
-          placeholder:"巴黎、东京、伊斯坦布尔…"},
-      ru:{kicker:"Мировые размещения • Проверенные хосты • Премиум-дизайн",
-          h1:"Роскошное проживание.<br><span class='gold'>Глобальный охват.</span>",
-          pay:"Карты, банковский перевод и крипто (BTC · ETH · USDT).",
-          filters:"Фильтры", search:"Поиск", popular:"Популярное:",
-          level:"Уровень", plus:"StayWorld+ активен",
-          nav:{home:"Главная",deals:"Скидки",membership:"Подписка",host:"Хост",support:"Поддержка"},
-          auth:{login:"Войти",signup:"Регистрация"},
-          deals_title:"Проверенные предложения для вас",
-          level_hint:"Копите баллы. 60+ дней неактивности ➝ понижение (−1).",
-          placeholder:"Париж, Токио, Стамбул…"}
-    };
-
-    function applyLang(code){
-      const t = LANGS[code] || LANGS.en;
-      const set = (id, html)=>{ const el=document.getElementById(id); if(el) el.innerHTML = html; };
-
-      set("t_kicker", t.kicker);
-      set("t_h1",     t.h1);
-      set("t_pay",    t.pay);
-      set("t_filters",t.filters);
-      set("t_search", t.search);
-      set("t_popular",t.popular);
-      set("t_level",  t.level);
-      set("t_plus",   t.plus);
-      set("t_deals_title", t.deals_title);
-      set("t_level_hint",  t.level_hint);
-
-      const si = document.getElementById("searchInput");
-      if (si) si.placeholder = t.placeholder;
-
-      [["t_nav_home","home"],["t_nav_deals","deals"],["t_nav_membership","membership"],["t_nav_host","host"],["t_nav_support","support"]]
-        .forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.textContent = t.nav[k]; });
-
-      const lb = document.getElementById("loginBtn");  if (lb) lb.textContent  = t.auth.login;
-      const sb = document.getElementById("signupBtn"); if (sb) sb.textContent = t.auth.signup;
-    }
-
-    const sel = document.getElementById("langSelect");
-    const saved = localStorage.getItem("sw_lang") || "en";
-    if (sel){ sel.value = saved; applyLang(saved);
-      sel.addEventListener("change", e => {
-        const v = e.target.value;
-        localStorage.setItem("sw_lang", v);
-        applyLang(v);
-      });
-    } else { applyLang(saved); }
-  })();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
