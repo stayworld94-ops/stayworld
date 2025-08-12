@@ -1,29 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>STAYWORLD</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="sw-brand">
-  <img src="assets/logo-gold.png" alt="STAYWORLD" class="sw-logo-img" width="38" height="38">
-  <div class="sw-title">STAYWORLD</div>
-</div>
-<button id="chatFab" class="sw-chat-fab">💬</button>
-<div class="sw-bot" id="botPanel" hidden>
-  <div class="sw-bot-head">
-    <div class="sw-title">AI Concierge</div>
-    <button class="sw-btn" id="botClose">×</button>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAYWORLD — Luxury Global Stays</title>
+<link rel="stylesheet" href="/style.css"><link rel="icon" href="/stayworld-logo.png"><link rel="preconnect" href="https://unpkg.com">
+</head><body>
+<header><div class="container nav">
+  <div class="brand"><img src="/stayworld-logo.png" alt="STAYWORLD"><strong>STAYWORLD</strong></div>
+  <nav class="nav-links">
+    <a href="/index.html">Home</a><a href="/deals.html">Deals</a><a href="/membership.html">Membership</a><a href="/host-register.html">Host</a><a href="/support.html">Support</a>
+    <a class="btn" href="/login.html">Log in</a><a class="btn btn-gold" href="/signup.html">Sign up</a>
+  </nav>
+</div></header>
+
+<main class="container hero">
+  <h1>Luxury stays.<br><span style="color:var(--gold)">Global reach.</span></h1>
+  <p class="lead">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+  <div class="searchbar" style="margin-top:14px">
+    <input id="search" placeholder="Paris, Tokyo, Istanbul..." style="flex:1">
+    <input type="date"><input type="date">
+    <a class="btn">Filters</a><a class="btn btn-gold" href="/results.html">Search</a>
   </div>
-  <div class="sw-bot-body" id="botBody">
-    <div class="sw-bot-msg sys">Hello! Ask me anything in your language.</div>
+  <div id="map"></div>
+</main>
+
+<section class="container" style="padding:24px 0 10px">
+  <h2>Support</h2>
+  <div class="grid">
+    <div class="card"><h3>AI Concierge</h3><p>Chat in your language — 24/7.</p><button class="btn" id="open-ai">Open bot</button></div>
+    <div class="card"><h3>FAQ</h3><p>Common questions & answers.</p><a class="btn" href="/support.html">View FAQs</a></div>
+    <div class="card"><h3>Smart alerts</h3><p>AI picks, destination tips & level updates.</p><a class="btn" href="/subscribe.html">Subscribe</a></div>
   </div>
-  <div class="sw-bot-foot">
-    <input id="botInput" placeholder="Type a message…"/>
-    <button class="sw-btn gold" id="botSend">Send</button>
-  </div>
-</div>
-<script src="app.js?v=1"></script>
-</body>
-</html>
+</section>
+
+<footer class="container"><div>© STAYWORLD — stayworldbooking.com</div>
+<div style="margin-top:8px"><a href="/pay.html" class="btn btn-gold">Pay with Crypto (USDT)</a></div></footer>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>(function(){try{const m=L.map('map').setView([41.0082,28.9784],5);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(m);L.marker([41.0082,28.9784]).addTo(m).bindPopup('Istanbul');}catch(e){}})();</script>
+<script defer src="/assets/js/ai-concierge.js"></script>
+</body></html>
