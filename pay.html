@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayWorld Crypto Pay</title>
+<style>
+body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+input, button { padding: 10px; margin: 10px; font-size: 16px; }
+</style>
+</head>
+<body>
+<h1>StayWorld USDT(TRC20) 결제</h1>
+<p>원하는 결제 금액을 입력하세요 (USD)</p>
+<input type="number" id="amount" placeholder="Amount in USD" min="1">
+<br>
+<button onclick="createInvoice()">💳 결제하기</button>
+<p id="status"></p>
+
+<script>
+async function createInvoice() {
+    const amount = document.getElementById('amount').value;
+    if (!amount || amount <= 0) {
+        alert("금액을 입력하세요.");
+        return;
+    }
+    document.getElementById('status').innerText = "결제 링크 생성중...";
+    try {
+        const res = await fetch('/.netlify/functions/np-create-invoice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ price_amount: amount })
+        });
+        const data = await res.json();
+        if (data.invoice_url) {
+            window.location.href = data.invoice_url;
+        } else {
+            document.getElementById('status').innerText = "결제 생성 실패";
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById('status').innerText = "오류 발생";
+    }
+}
+</script>
+</body>
+</html>
