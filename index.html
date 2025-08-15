@@ -1,42 +1,45 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>STAYWORLD — Luxury Global Stays</title>
-<link rel="stylesheet" href="/style.css"><link rel="icon" href="/stayworld-logo.png"><link rel="preconnect" href="https://unpkg.com">
-</head><body>
-<header><div class="container nav">
-  <div class="brand"><img src="/stayworld-logo.png" alt="STAYWORLD"><strong>STAYWORLD</strong></div>
-  <nav class="nav-links">
-    <a href="/index.html">Home</a><a href="/deals.html">Deals</a><a href="/membership.html">Membership</a><a href="/host-register.html">Host</a><a href="/support.html">Support</a>
-    <a class="btn" href="/login.html">Log in</a><a class="btn btn-gold" href="/signup.html">Sign up</a>
-  </nav>
-</div></header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StayWorld - Global Booking</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="lang.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="stayworld-logo.png" alt="StayWorld Logo" />
+    </div>
+    <nav>
+      <a href="#" data-translate="home">Home</a>
+      <a href="membership.html" data-translate="membership">Membership</a>
+      <a href="login.html" data-translate="login">Login</a>
+      <a href="signup.html" data-translate="signup">Sign Up</a>
+    </nav>
+    <select id="languageSelector"></select>
+  </header>
 
-<main class="container hero">
-  <h1>Luxury stays.<br><span style="color:var(--gold)">Global reach.</span></h1>
-  <p class="lead">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
-  <div class="searchbar" style="margin-top:14px">
-    <input id="search" placeholder="Paris, Tokyo, Istanbul..." style="flex:1">
-    <input type="date"><input type="date">
-    <a class="btn">Filters</a><a class="btn btn-gold" href="/results.html">Search</a>
+  <section class="hero">
+    <h1 data-translate="welcome">Welcome to StayWorld</h1>
+    <p data-translate="tagline">
+      Book hotels, apartments, and more worldwide with crypto & cards.
+    </p>
+    <div class="search-bar">
+      <input type="text" data-placeholder="search_placeholder" placeholder="Search destinations..." />
+      <button data-translate="search_btn">Search</button>
+    </div>
+  </section>
+
+  <div id="chatbot">
+    <div id="chat-window">
+      <div id="chat-messages"></div>
+      <input id="chat-input" type="text" placeholder="Type a message..." />
+      <button id="send-btn">Send</button>
+    </div>
+    <button id="chat-toggle">💬</button>
   </div>
-  <div id="map"></div>
-</main>
-
-<section class="container" style="padding:24px 0 10px">
-  <h2>Support</h2>
-  <div class="grid">
-    <div class="card"><h3>AI Concierge</h3><p>Chat in your language — 24/7.</p><button class="btn" id="open-ai">Open bot</button></div>
-    <div class="card"><h3>FAQ</h3><p>Common questions & answers.</p><a class="btn" href="/support.html">View FAQs</a></div>
-    <div class="card"><h3>Smart alerts</h3><p>AI picks, destination tips & level updates.</p><a class="btn" href="/subscribe.html">Subscribe</a></div>
-  </div>
-</section>
-
-<footer class="container"><div>© STAYWORLD — stayworldbooking.com</div>
-<div style="margin-top:8px"><a href="/pay.html" class="btn btn-gold">Pay with Crypto (USDT)</a></div></footer>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>(function(){try{const m=L.map('map').setView([41.0082,28.9784],5);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(m);L.marker([41.0082,28.9784]).addTo(m).bindPopup('Istanbul');}catch(e){}})();</script>
-<script defer src="/assets/js/ai-concierge.js"></script>
-</body></html>
+</body>
+</html>
