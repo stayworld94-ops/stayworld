@@ -1,20 +1,88 @@
-:root{--bg:#0b0b0d;--panel:#101015;--panel2:#121216;--text:#eee;--muted:#b9b9c5;--line:#2b2b31;--gold:#d9b96e}
-*{box-sizing:border-box}
-html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
-.container{width:min(1200px,92vw);margin:0 auto}
-header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.3));backdrop-filter:blur(6px)}
-.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
-.brand{display:flex;align-items:center;gap:10px}.brand img{height:28px}
-.nav-links{display:flex;gap:18px;align-items:center}
-.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#151518;color:var(--text);cursor:pointer}
-.btn-gold{background:var(--gold);color:#111;border-color:var(--gold)}
-.hero{padding:56px 0 18px;background:radial-gradient(1200px 400px at 10% -10%,rgba(217,185,110,.12),transparent)}
-h1{font-size:56px;line-height:1.05;margin:10px 0 8px}.lead{color:var(--muted)}
-.searchbar{display:flex;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--line);padding:10px;border-radius:14px}
-.searchbar input{background:#0e0e12;border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:10px;outline:none}
-#map{width:100%;height:360px;border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-top:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
-footer{padding:40px 0 80px;color:#9f9fb0}
-#ai-concierge{position:fixed;right:24px;bottom:24px;z-index:9999}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fff;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #000;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+header img {
+  height: 40px;
+}
+
+nav a {
+  color: #fff;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+select {
+  padding: 5px;
+}
+
+.hero {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.search-bar {
+  margin-top: 20px;
+}
+
+.search-bar input {
+  padding: 10px;
+  width: 250px;
+}
+
+.search-bar button {
+  padding: 10px 15px;
+  background: gold;
+  border: none;
+  cursor: pointer;
+}
+
+/* Chatbot styles */
+#chatbot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+#chat-window {
+  display: none;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 300px;
+  height: 400px;
+}
+
+#chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+#chat-input {
+  border: none;
+  padding: 10px;
+  width: calc(100% - 60px);
+}
+
+#send-btn {
+  padding: 10px;
+}
+
+#chat-toggle {
+  background: gold;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
