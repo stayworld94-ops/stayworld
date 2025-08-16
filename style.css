@@ -91,3 +91,6 @@ img{max-width:100%;display:block}
   .search-bar{grid-template-columns:1fr 1fr 1fr auto}
   .features{grid-template-columns:1fr}
 }
+/* Search UX */
+.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
+.btn.loading{opacity:.65;pointer-events:none}
