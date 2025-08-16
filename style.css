@@ -106,3 +106,148 @@ footer{border-top:1px solid #1a1a22;padding:20px 0;margin-top:30px;color:#9ea3af
 #chatbot.open .chat-panel {
   display: block;
 }
+/* =========================
+   QUICK LAYOUT FIX PATCH
+   ========================= */
+
+/* 공통 컨테이너 */
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 헤더 */
+.site-header {
+  background: transparent;
+  backdrop-filter: blur(2px);
+}
+.site-header .nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+}
+.nav .brand { display: inline-flex; align-items: center; gap: 8px; }
+.nav .menu {
+  display: flex;               /* ← 가로 정렬 */
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;            /* ← 불릿 제거 */
+}
+.nav .menu a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 600;
+}
+#langSelect {
+  height: 36px;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+#btnSignUp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: linear-gradient(180deg,#e9c06b,#c79a3a);
+  color: #111;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+/* 히어로 */
+.hero {
+  position: relative;
+  padding: 56px 0 28px;
+  background: radial-gradient(1000px 400px at 60% -200px, rgba(255,215,128,.16), transparent 60%);
+}
+.hero h1 {
+  font-size: clamp(40px, 6vw, 74px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0 0 8px;
+}
+.hero .sub {
+  color: #c9cbd1;
+  margin: 8px 0 20px;
+  font-size: 18px;
+}
+
+/* 검색 바 */
+.search-bar {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr auto auto; /* 목적지 / 체크인 / 체크아웃 / 필터 / 검색 */
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(17,17,17,.55);
+  box-shadow: 0 12px 32px rgba(0,0,0,.3) inset, 0 10px 24px rgba(0,0,0,.2);
+}
+.search-bar input,
+.search-bar select,
+.search-bar button {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid #2a2d36;
+  background: #0f1116;
+  color: #e9ecf1;
+  padding: 0 12px;
+}
+.search-bar input::placeholder { color: #7b808a; }
+
+#filterBtn {
+  background: #171a21;
+  border: 1px solid #303543;
+  cursor: pointer;
+}
+#searchBtn {
+  background: linear-gradient(180deg,#e9c06b,#c79a3a);
+  color: #111;
+  font-weight: 800;
+  border: 0;
+  cursor: pointer;
+}
+
+/* 카드 섹션 기본 */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 28px 0 50px;
+}
+.card {
+  background: #111319;
+  color: #e9ecf1;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.28);
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .search-bar { grid-template-columns: 1fr 1fr; }
+  #filterBtn, #searchBtn { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .nav { gap: 10px; }
+  .nav .menu { gap: 14px; }
+  .search-bar { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr; }
+}
+
+/* 클릭 막는 레이어 무력화(유지) + 위계 */
+.hero::before, .hero::after,
+.page-overlay, .bg-gradient, .decor-blur { pointer-events: none !important; }
+header.site-header { position: sticky; top: 0; z-index: 9900; }
+.search-bar { position: relative; z-index: 9950; }
+#filterBtn { position: relative; z-index: 9960; }
+#filterModal { position: fixed; inset: 0; display: none; background: rgba(0,0,0,.55); z-index: 10020; }
+#chatToggleBtn { position: fixed; right: 22px; bottom: 22px; z-index: 10030; }
+#chatWindow   { position: fixed; right: 22px; bottom: 90px; z-index: 10035; }
