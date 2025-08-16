@@ -354,3 +354,50 @@
     bindEvents();
   });
 })();
+document.addEventListener('DOMContentLoaded', () => {
+  const btnFilters   = document.getElementById('btnFilters');    // Filters 버튼
+  const filtersPanel = document.getElementById('filtersPanel');  // 필터 패널 루트
+  const btnChat      = document.getElementById('btnChatToggle'); // 챗 열기 버튼(FAB)
+  const chatbot      = document.getElementById('chatbot');       // 챗봇 루트(패널 래퍼)
+
+  const safeClick = (el, handler) => {
+    if (!el) return;
+    el.addEventListener('click', (e) => {
+      // 버튼이 <a href="#"> 형태여도 네비게이션 막기
+      e.preventDefault();
+      // 배경으로 이벤트 버블링되어 다른 레이어가 먹지 않게
+      e.stopPropagation();
+      handler?.();
+    });
+  };
+
+  // Filters 토글
+  safeClick(btnFilters, () => {
+    if (!filtersPanel) return;
+    filtersPanel.classList.toggle('open');
+  });
+
+  // Chatbot 토글
+  safeClick(btnChat, () => {
+    if (!chatbot) return;
+    chatbot.classList.toggle('open');
+  });
+
+  // 바깥 클릭 시 닫기
+  document.addEventListener('click', (e) => {
+    // 필터
+    if (filtersPanel && !filtersPanel.contains(e.target) && !btnFilters?.contains(e.target)) {
+      filtersPanel.classList.remove('open');
+    }
+    // 챗봇
+    if (chatbot && !chatbot.contains(e.target) && !btnChat?.contains(e.target)) {
+      chatbot.classList.remove('open');
+    }
+  }, true); // capture 단계에서 먼저 잡아서 확실히 처리
+
+  // 버튼처럼 보이는 <a>에 접근성/키보드 보조
+  document.querySelectorAll('a.button, .btn-link').forEach(a => {
+    a.setAttribute('role', 'button');
+    a.setAttribute('tabindex', '0');
+  });
+});
