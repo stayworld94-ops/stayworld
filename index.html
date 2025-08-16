@@ -392,3 +392,122 @@ updateBadge();
 </html>
 
 </html>
+<script>
+// ====== SEARCH PATCH (replace old geocode function & click binding) ======
+
+// 0) 기존 클릭 리스너 제거(클론 교체 트릭)
+(function cleanOldListeners(){
+  const oldBtn = document.getElementById('btnSearch');
+  if(!oldBtn) return;
+  const clone = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(clone, oldBtn);
+
+  // 입력들도 엔터충돌 방지 위해 클론(선택)
+  ['searchDestination','checkIn','checkOut'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){
+      const c = el.cloneNode(true);
+      el.parentNode.replaceChild(c, el);
+    }
+  });
+})();
+
+// 1) 상태 라벨 삽입
+const searchBar = document.querySelector('.search-bar');
+let searchStatus = document.getElementById('searchStatus');
+if(!searchStatus){
+  searchStatus = document.createElement('div');
+  searchStatus.id = 'searchStatus';
+  searchStatus.className = 'search-status';
+  searchBar.after(searchStatus);
+}
+function setStatus(msg){
+  searchStatus.textContent = msg || '';
+  searchStatus.style.opacity = msg ? 1 : 0;
+  if(msg){
+    clearTimeout(searchStatus._t);
+    searchStatus._t = setTimeout(()=>searchStatus.style.opacity=0, 3000);
+  }
+}
+
+// 2) 지오코딩: Nominatim → 실패 시 Photon(komoot) 폴백
+async function geocodeAny(q){
+  const providers = [
+    (q)=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
+    (q)=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`
+  ];
+  for(const makeUrl of providers){
+    try{
+      const res = await fetch(makeUrl(q), { headers: { 'Accept':'application/json' }});
+      if(!res.ok) continue;
+      const data = await res.json();
+
+      // 표준화
+      if(Array.isArray(data) && data[0]) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lon: parseFloat(data[0].lon),
+          label: data[0].display_name || q
+        };
+      }
+      if(data && data.features && data.features[0]){
+        const f = data.features[0];
+        return {
+          lat: f.geometry.coordinates[1],
+          lon: f.geometry.coordinates[0],
+          label: f.properties.name || f.properties.city || f.properties.country || q
+        };
+      }
+    }catch(e){ /* 다음 공급자로 폴백 */ }
+  }
+  throw new Error('no_results');
+}
+
+// 3) 지도 이동 + 포커스
+function goTo(lat, lon, label){
+  if(window.marker) marker.remove();
+  marker = L.marker([lat, lon]).addTo(map).bindPopup(label || '').openPopup();
+  map.setView([lat, lon], 13, { animate: true });
+  document.getElementById('map').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// 4) UX 유틸
+const btnSearch = document.getElementById('btnSearch');
+const inputDest = document.getElementById('searchDestination');
+const inputIn   = document.getElementById('checkIn');
+const inputOut  = document.getElementById('checkOut');
+
+function setLoading(on){
+  if(!btnSearch) return;
+  btnSearch.disabled = on;
+  btnSearch.classList.toggle('loading', on);
+  btnSearch.textContent = on ? '…' : (I18N[document.getElementById('lang').value] || I18N.EN).search;
+}
+function pulse(el){ el.style.outline='2px solid #f4d78c'; setTimeout(()=>el.style.outline='', 600); }
+
+// 5) 실행
+async function runSearch(){
+  const q = (inputDest && inputDest.value || '').trim();
+  if(!q){ inputDest && inputDest.focus(); pulse(inputDest); return; }
+  try{
+    setLoading(true); setStatus('Searching…');
+    const { lat, lon, label } = await geocodeAny(q);
+    goTo(lat, lon, label);
+    setStatus(`Found: ${label}`);
+  }catch(e){
+    console.error(e);
+    setStatus('No results. Try another place.');
+    alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.');
+  }finally{
+    setLoading(false);
+  }
+}
+
+// 6) 바인딩(클릭 + 엔터키)
+btnSearch && btnSearch.addEventListener('click', runSearch);
+[inputDest, inputIn, inputOut].forEach(el=>{
+  el && el.addEventListener('keydown', e=>{ if(e.key === 'Enter') runSearch(); });
+});
+
+// ====== END SEARCH PATCH ======
+</script>
