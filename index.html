@@ -1,186 +1,484 @@
 <!doctype html>
 <html lang="en">
-<header class="site-header">
-  <div class="header-inner">
-    <!-- 로고/브랜드 -->
-    <a href="index.html" class="brand">
-      <img src="stayworld-logo.png" alt="StayWorld" class="brand-mark">
-      <span class="brand-text">STAYWORLD</span>
-    </a><!-- head 내부에 넣기 -->
-<link rel="preload" href="/style.css?v=20250815a" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/style.css?v=20250815a"></noscript>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STAYWORLD — Luxury Global Booking</title>
 
-<style>
-/* === Critical header styles (style.css가 실패해도 최소 형태 유지) === */
-:root{
-  --bg:#0d0f14;--card:#11131a;--text:#e9ecf1;--muted:#a6adbb;--brand:#d9b56f;--stroke:#232633;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-a{color:var(--text);text-decoration:none}
-a:hover{opacity:.9}
+  <!-- Main stylesheet (cache-bust) -->
+  <link rel="preload" href="/style.css?v=2025-08-15a" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="/style.css?v=2025-08-15a"></noscript>
 
-/* Header layout */
-.sw-header{position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.2));backdrop-filter:blur(8px);border-bottom:1px solid var(--stroke)}
-.sw-header .sw-wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:20px}
-.sw-brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
-.sw-brand img{height:28px;width:auto}
-.sw-nav{display:flex;align-items:center;gap:28px;margin-left:8px}
-.sw-nav a{opacity:.95}
-.sw-actions{margin-left:auto;display:inline-flex;align-items:center;gap:12px}
-.sw-btn{padding:10px 16px;border-radius:12px;background:linear-gradient(180deg,#e8cf92,#caa657);color:#1b1e27;font-weight:700;border:1px solid rgba(255,255,255,.08);box-shadow:0 6px 16px rgba(0,0,0,.25)}
-.sw-select{appearance:none;background:var(--card);color:var(--text);border:1px solid var(--stroke);border-radius:10px;padding:10px 34px 10px 12px;position:relative}
-.sw-icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--stroke);background:var(--card);display:inline-grid;place-items:center}
-@media (max-width:960px){
-  .sw-wrap{flex-wrap:wrap;row-gap:10px}
-  .sw-nav{order:3;width:100%;gap:20px}
-  .sw-actions{order:2;margin-left:auto}
-}
-
-/* 버튼/필터 클릭 막힘 방지 & 레이어 충돌 방지 */
-#filtersBtn,#searchBtn,#aiToggle{position:relative;z-index:5}
-.hero,.search-bar,.search-wrap{position:relative;z-index:1}
-[class*="chat"][class*="overlay"],[id*="chat"][class*="overlay"],
-[class*="ai-"][class*="overlay"],[id*="ai-"][class*="overlay"]{pointer-events:none!important}
-</style>
-
-
-    <!-- 메인 메뉴 -->
-    <nav class="main-nav" aria-label="Primary">
-      <a href="index.html">Home</a>
-      <a href="membership.html">Membership</a>
-      <a href="login.html">Login</a>
-    </nav>
-
-    <!-- 우측 액션: 언어/가입/모바일토글 -->
-    <div class="header-actions">
-      <label class="lang">
-        <select id="lang-select" aria-label="Language">
-          <option value="en">EN</option>
-          <option value="es">ES</option>
-          <option value="ko">KO</option>
-          <option value="ja">JA</option>
-          <option value="tr">TR</option>
-          <!-- 필요 언어 더 추가 -->
-        </select>
-      </label>
-      <a href="signup.html" class="btn btn-primary">Sign Up</a>
-      <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
-    </div>
-  </div>
-</header>
-
+  <!-- Tiny critical fallback so 화면이 벌거벗지 않도록 -->
+  <style>
+    body{margin:0;background:#0d0f14;color:#e9ecf1;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    a{text-decoration:none;color:inherit}
+    .sw-header{position:sticky;top:0;z-index:1000;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border-bottom:1px solid #232633}
+    .sw-header .sw-wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:20px}
+    .sw-brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .sw-brand img{height:28px}
+    .sw-nav{display:flex;gap:28px}
+    .sw-actions{margin-left:auto;display:flex;gap:12px;align-items:center}
+    .sw-btn{padding:10px 16px;border-radius:12px;background:linear-gradient(180deg,#e8cf92,#caa657);color:#1b1e27;font-weight:700;border:1px solid rgba(255,255,255,.08)}
+    .sw-select{background:#11131a;border:1px solid #232633;color:#e9ecf1;border-radius:10px;padding:10px 34px 10px 12px}
+  </style>
+</head>
 <body>
-  <!-- Top Nav -->
-  <header class="nav">
-    <div class="nav__inner container">
-      <a class="logo" href="/">
-        <img src="stayworld-logo.png" alt="StayWorld" height="28"/>
+  <!-- =================== HEADER =================== -->
+  <header class="sw-header" role="banner">
+    <div class="sw-wrap">
+      <a class="sw-brand" href="/" aria-label="StayWorld Home">
+        <img src="/stayworld-logo.png" alt="StayWorld">
+        <span>STAYWORLD</span>
       </a>
 
-      <nav aria-label="Primary">
-        <ul class="menu">
-          <li><a href="index.html" data-i18n="nav.home">Home</a></li>
-          <li><a href="membership.html" data-i18n="nav.membership">Membership</a></li>
-          <li><a href="login.html" data-i18n="nav.login">Login</a></li>
-          <li><a class="btn btn--ghost" href="signup.html" data-i18n="nav.signup">Sign Up</a></li>
-        </ul>
+      <nav class="sw-nav" aria-label="Primary">
+        <a href="/index.html" data-i18n="nav.home">Home</a>
+        <a href="/membership.html" data-i18n="nav.membership">Membership</a>
+        <a href="/login.html" data-i18n="nav.login">Login</a>
       </nav>
 
-      <div class="lang">
-        <label for="langSelect" class="sr-only" data-i18n="lang.label">Language</label>
-        <select id="langSelect" class="select">
-          <option value="en">EN</option>
-          <option value="ko">KO</option>
-          <option value="ja">JA</option>
-          <option value="zh">ZH</option>
-          <option value="es">ES</option>
-          <option value="fr">FR</option>
-          <option value="de">DE</option>
-          <option value="tr">TR</option>
-          <option value="ru">RU</option>
-          <option value="ar">AR</option>
+      <div class="sw-actions">
+        <label class="visually-hidden" for="langSelect" data-i18n="languageLabel">Language</label>
+        <select id="langSelect" class="sw-select" aria-label="Language">
+          <option value="en">EN</option><option value="ko">KO</option>
+          <option value="ja">JA</option><option value="zh">ZH</option>
+          <option value="tr">TR</option><option value="es">ES</option>
+          <option value="fr">FR</option><option value="de">DE</option>
+          <option value="pt">PT</option><option value="ru">RU</option>
         </select>
+        <a class="sw-btn" href="/signup.html" data-i18n="signup">Sign Up</a>
+        <button id="aiToggle" class="sw-icon-btn" aria-controls="aiPanel" aria-expanded="false" aria-label="AI">💬</button>
       </div>
     </div>
   </header>
 
-  <!-- Hero -->
+  <!-- =================== HERO / SEARCH =================== -->
   <section class="hero">
-    <div class="container">
-      <h1 class="hero__title">
-        <span data-i18n="hero.luxury">Luxury stays.</span><br/>
-        <span class="accent" data-i18n="hero.global">Global reach.</span>
+    <div class="hero-wrap">
+      <h1 class="hero-title">
+        <span data-i18n="hero.h1_top">Luxury stays.</span><br />
+        <span class="accent" data-i18n="hero.h1_bottom">Global reach.</span>
       </h1>
-      <p class="hero__sub" data-i18n="hero.tagline">
-        Cards, bank transfer &amp; crypto (BTC · ETH · USDT).
-      </p>
+      <p class="hero-sub" data-i18n="hero.tagline">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
-      <!-- Search Row -->
-      <div class="searchbar">
-        <input id="dest" class="input" type="text" placeholder="Paris, Tokyo, Istanbul…" data-i18n-ph="search.placeholder"/>
-        <input id="checkin" class="input" type="date" aria-label="Check-in" />
-        <input id="checkout" class="input" type="date" aria-label="Check-out" />
+      <div class="search-wrap">
+        <div class="search-bar">
+          <input id="destInput" class="i-text" type="text" autocomplete="off"
+                 placeholder="Paris, Tokyo, Istanbul…" data-i18n-ph="search.placeholder" />
+          <input id="checkinInput" class="i-date" type="date" data-i18n-ph="search.checkin" />
+          <input id="checkoutInput" class="i-date" type="date" data-i18n-ph="search.checkout" />
 
-        <button id="filterBtn" class="btn btn--ghost" type="button" aria-expanded="false" aria-controls="filterPanel" data-i18n="filters.title">
-          Filters
-        </button>
+          <button id="filtersBtn" class="btn secondary" type="button" data-i18n="filters.button">Filters</button>
+          <button id="searchBtn" class="btn primary" type="button" data-i18n="search.button">Search</button>
+        </div>
 
-        <button id="searchBtn" class="btn btn--primary" type="button" data-i18n="search.cta">
-          Search
-        </button>
+        <!-- Info cards -->
+        <div class="pill-grid">
+          <article class="pill">
+            <h3 data-i18n="cards.verified_title">Verified stays</h3>
+            <p data-i18n="cards.verified_desc">Top picks near you.</p>
+          </article>
+          <article class="pill">
+            <h3 data-i18n="cards.rewards_title">StayWorld+ Rewards</h3>
+            <p data-i18n="cards.rewards_desc">Earn points on every booking.</p>
+          </article>
+          <article class="pill">
+            <h3 data-i18n="cards.secure_title">Secure payments</h3>
+            <p data-i18n="cards.secure_desc">Visa, Mastercard, Amex & Crypto.</p>
+          </article>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Features -->
-  <section class="container features">
-    <article class="card">
-      <h3 data-i18n="feat.verified.title">Verified stays</h3>
-      <p data-i18n="feat.verified.desc">Top picks near you.</p>
-    </article>
+  <!-- =================== FILTERS PANEL =================== -->
+  <aside id="filtersPanel" class="filters-panel" aria-hidden="true" aria-labelledby="filtersTitle" role="dialog">
+    <div class="filters-sheet" role="document">
+      <div class="filters-head">
+        <h2 id="filtersTitle" data-i18n="filters.title">Filters</h2>
+        <button id="filtersClose" class="icon" aria-label="Close">✕</button>
+      </div>
 
-    <article class="card">
-      <h3 data-i18n="feat.rewards.title">StayWorld+ Rewards</h3>
-      <p data-i18n="feat.rewards.desc">Earn points on every booking.</p>
-    </article>
+      <div class="filters-body">
+        <!-- Property Type -->
+        <section class="filters-group">
+          <h3 data-i18n="filters.cat.propertyType">Property type</h3>
+          <div class="chips">
+            <label><input type="checkbox" value="apt"><span data-i18n="filters.opt.apt">Apartment</span></label>
+            <label><input type="checkbox" value="hotel"><span data-i18n="filters.opt.hotel">Hotel</span></label>
+            <label><input type="checkbox" value="villa"><span data-i18n="filters.opt.villa">Villa</span></label>
+            <label><input type="checkbox" value="hostel"><span data-i18n="filters.opt.hostel">Hostel</span></label>
+            <label><input type="checkbox" value="resort"><span data-i18n="filters.opt.resort">Resort</span></label>
+          </div>
+        </section>
 
-    <article class="card">
-      <h3 data-i18n="feat.pay.title">Secure payments</h3>
-      <p data-i18n="feat.pay.desc">Visa, Mastercard, Amex &amp; Crypto.</p>
-    </article>
-  </section>
+        <!-- Amenities (>= 20 options across groups) -->
+        <section class="filters-group">
+          <h3 data-i18n="filters.cat.amenities">Amenities</h3>
+          <div class="chips">
+            <label><input type="checkbox" value="pool"><span data-i18n="filters.opt.pool">Pool</span></label>
+            <label><input type="checkbox" value="spa"><span data-i18n="filters.opt.spa">Spa</span></label>
+            <label><input type="checkbox" value="gym"><span data-i18n="filters.opt.gym">Gym</span></label>
+            <label><input type="checkbox" value="parking"><span data-i18n="filters.opt.parking">Parking</span></label>
+            <label><input type="checkbox" value="breakfast"><span data-i18n="filters.opt.breakfast">Breakfast</span></label>
+            <label><input type="checkbox" value="kitchen"><span data-i18n="filters.opt.kitchen">Kitchen</span></label>
+            <label><input type="checkbox" value="washer"><span data-i18n="filters.opt.washer">Washer</span></label>
+            <label><input type="checkbox" value="dryer"><span data-i18n="filters.opt.dryer">Dryer</span></label>
+            <label><input type="checkbox" value="ac"><span data-i18n="filters.opt.ac">A/C</span></label>
+            <label><input type="checkbox" value="heating"><span data-i18n="filters.opt.heating">Heating</span></label>
+            <label><input type="checkbox" value="balcony"><span data-i18n="filters.opt.balcony">Balcony</span></label>
+            <label><input type="checkbox" value="oceanview"><span data-i18n="filters.opt.oceanview">Ocean view</span></label>
+            <label><input type="checkbox" value="cityview"><span data-i18n="filters.opt.cityview">City view</span></label>
+            <label><input type="checkbox" value="petfriendly"><span data-i18n="filters.opt.petfriendly">Pet-friendly</span></label>
+            <label><input type="checkbox" value="smoking"><span data-i18n="filters.opt.smoking">Smoking</span></label>
+            <label><input type="checkbox" value="nonsmoking"><span data-i18n="filters.opt.nonsmoking">Non-smoking</span></label>
+          </div>
+        </section>
 
-  <!-- Filter Panel -->
-  <div id="filterOverlay" class="overlay" hidden></div>
-  <aside id="filterPanel" class="panel" aria-hidden="true" role="dialog" aria-label="Filters">
-    <header class="panel__header">
-      <h3 data-i18n="filters.title">Filters</h3>
-      <button id="filterClose" class="iconbtn" aria-label="Close">✕</button>
-    </header>
+        <section class="filters-group">
+          <h3 data-i18n="filters.cat.access">Accessibility</h3>
+          <div class="chips">
+            <label><input type="checkbox" value="wheelchair"><span data-i18n="filters.opt.wheelchair">Wheelchair accessible</span></label>
+            <label><input type="checkbox" value="elevator"><span data-i18n="filters.opt.elevator">Elevator</span></label>
+            <label><input type="checkbox" value="concierge24"><span data-i18n="filters.opt.24h">24h front desk</span></label>
+            <label><input type="checkbox" value="selfcheckin"><span data-i18n="filters.opt.selfcheckin">Self check-in</span></label>
+          </div>
+        </section>
 
-    <div id="filterList" class="panel__body"><!-- JS 렌더링 --></div>
+        <section class="filters-group">
+          <h3 data-i18n="filters.cat.payment">Payment & Policy</h3>
+          <div class="chips">
+            <label><input type="checkbox" value="crypto"><span data-i18n="filters.opt.crypto">Pay with crypto</span></label>
+            <label><input type="checkbox" value="freecancel"><span data-i18n="filters.opt.freecancel">Free cancellation</span></label>
+            <label><input type="checkbox" value="refundable"><span data-i18n="filters.opt.refundable">Refundable</span></label>
+          </div>
+        </section>
 
-    <footer class="panel__footer">
-      <button id="filterClear" class="btn btn--ghost" type="button" data-i18n="filters.clear">Clear</button>
-      <button id="filterApply" class="btn btn--primary" type="button" data-i18n="filters.apply">Apply</button>
-    </footer>
+        <section class="filters-group">
+          <h3 data-i18n="filters.cat.rating">Rating</h3>
+          <div class="chips">
+            <label><input type="checkbox" value="4up"><span data-i18n="filters.opt.rating4up">★ 4.0+</span></label>
+            <label><input type="checkbox" value="45up"><span data-i18n="filters.opt.rating45up">★ 4.5+</span></label>
+            <label><input type="checkbox" value="5"><span data-i18n="filters.opt.rating5">★ 5.0</span></label>
+          </div>
+        </section>
+      </div>
+
+      <div class="filters-foot">
+        <button id="filtersClear" class="btn ghost" type="button" data-i18n="filters.clear">Clear</button>
+        <div class="spacer"></div>
+        <button id="filtersApply" class="btn primary" type="button" data-i18n="filters.apply">Apply</button>
+      </div>
+    </div>
   </aside>
 
-  <!-- Chatbot -->
-  <button id="ai-toggle" class="fab" aria-expanded="false" aria-controls="ai-widget">💬</button>
-  <section id="ai-widget" class="chat" aria-hidden="true">
-    <header class="chat__header">
-      <strong>StayWorld AI</strong>
-      <button id="ai-close" class="iconbtn" aria-label="Close">✕</button>
-    </header>
-    <div id="ai-log" class="chat__log" tabindex="0" aria-live="polite"></div>
-    <form id="ai-form" class="chat__form">
-      <input id="ai-input" class="input" type="text" autocomplete="off" data-i18n-ph="chat.placeholder" placeholder="Type a message…"/>
-      <button id="ai-send" class="btn btn--primary" type="submit" data-i18n="chat.send">Send</button>
-    </form>
-  </section>
+  <!-- =================== AI CHAT =================== -->
+  <aside id="aiPanel" class="ai-panel" aria-hidden="true" aria-labelledby="aiTitle" role="dialog">
+    <div class="ai-sheet" role="document">
+      <div class="ai-head">
+        <h2 id="aiTitle">StayWorld AI</h2>
+        <button id="aiClose" class="icon" aria-label="Close">✕</button>
+      </div>
+      <div id="aiMessages" class="ai-messages" aria-live="polite"></div>
+      <form id="aiForm" class="ai-form" autocomplete="off">
+        <input id="aiInput" class="i-text" type="text" placeholder="Type a message…" data-i18n-ph="chat.placeholder" />
+        <button class="btn primary" type="submit" data-i18n="chat.send">Send</button>
+      </form>
+    </div>
+  </aside>
 
-  <script src="app.js" type="module"></script>
+  <!-- =================== FOOTER =================== -->
+  <footer class="footer">
+    <div class="footer-wrap">© StayWorld — stayworldbooking.com</div>
+  </footer>
+
+  <!-- =================== SCRIPTS =================== -->
+  <script>
+  // ---------- i18n dictionary (10 languages) ----------
+  const i18n = {
+    en: {
+      "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","signup":"Sign Up","languageLabel":"Language",
+      "hero.h1_top":"Luxury stays.","hero.h1_bottom":"Global reach.","hero.tagline":"Cards, bank transfer & crypto (BTC · ETH · USDT).",
+      "search.placeholder":"Paris, Tokyo, Istanbul…","search.checkin":"Check-in","search.checkout":"Check-out","search.button":"Search",
+      "filters.button":"Filters","filters.title":"Filters","filters.apply":"Apply","filters.clear":"Clear",
+      "filters.cat.propertyType":"Property type","filters.cat.amenities":"Amenities","filters.cat.access":"Accessibility","filters.cat.payment":"Payment & Policy","filters.cat.rating":"Rating",
+      "filters.opt.apt":"Apartment","filters.opt.hotel":"Hotel","filters.opt.villa":"Villa","filters.opt.hostel":"Hostel","filters.opt.resort":"Resort",
+      "filters.opt.pool":"Pool","filters.opt.spa":"Spa","filters.opt.gym":"Gym","filters.opt.parking":"Parking","filters.opt.breakfast":"Breakfast",
+      "filters.opt.kitchen":"Kitchen","filters.opt.washer":"Washer","filters.opt.dryer":"Dryer","filters.opt.ac":"A/C","filters.opt.heating":"Heating",
+      "filters.opt.balcony":"Balcony","filters.opt.oceanview":"Ocean view","filters.opt.cityview":"City view","filters.opt.petfriendly":"Pet-friendly",
+      "filters.opt.smoking":"Smoking","filters.opt.nonsmoking":"Non-smoking","filters.opt.wheelchair":"Wheelchair accessible","filters.opt.elevator":"Elevator",
+      "filters.opt.24h":"24h front desk","filters.opt.selfcheckin":"Self check-in","filters.opt.crypto":"Pay with crypto","filters.opt.freecancel":"Free cancellation",
+      "filters.opt.refundable":"Refundable","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"Verified stays","cards.verified_desc":"Top picks near you.","cards.rewards_title":"StayWorld+ Rewards","cards.rewards_desc":"Earn points on every booking.",
+      "cards.secure_title":"Secure payments","cards.secure_desc":"Visa, Mastercard, Amex & Crypto.",
+      "chat.placeholder":"Type a message…","chat.send":"Send","chat.unavailable":"Sorry, the assistant is temporarily unavailable."
+    },
+    ko: {
+      "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","signup":"Sign Up","languageLabel":"언어",
+      "hero.h1_top":"럭셔리 스테이.","hero.h1_bottom":"글로벌 리치.","hero.tagline":"카드, 은행이체 & 암호화폐 (BTC · ETH · USDT).",
+      "search.placeholder":"파리, 도쿄, 이스탄불…","search.checkin":"체크인","search.checkout":"체크아웃","search.button":"검색",
+      "filters.button":"필터","filters.title":"필터","filters.apply":"적용","filters.clear":"초기화",
+      "filters.cat.propertyType":"숙소 유형","filters.cat.amenities":"편의시설","filters.cat.access":"접근성","filters.cat.payment":"결제/정책","filters.cat.rating":"평점",
+      "filters.opt.apt":"아파트","filters.opt.hotel":"호텔","filters.opt.villa":"빌라","filters.opt.hostel":"호스텔","filters.opt.resort":"리조트",
+      "filters.opt.pool":"수영장","filters.opt.spa":"스파","filters.opt.gym":"피트니스","filters.opt.parking":"주차","filters.opt.breakfast":"조식",
+      "filters.opt.kitchen":"주방","filters.opt.washer":"세탁기","filters.opt.dryer":"건조기","filters.opt.ac":"에어컨","filters.opt.heating":"난방",
+      "filters.opt.balcony":"발코니","filters.opt.oceanview":"오션뷰","filters.opt.cityview":"시티뷰","filters.opt.petfriendly":"반려동물 동반",
+      "filters.opt.smoking":"흡연","filters.opt.nonsmoking":"금연","filters.opt.wheelchair":"휠체어 접근","filters.opt.elevator":"엘리베이터",
+      "filters.opt.24h":"24시간 데스크","filters.opt.selfcheckin":"비대면 체크인","filters.opt.crypto":"암호화폐 결제","filters.opt.freecancel":"무료 취소",
+      "filters.opt.refundable":"환불 가능","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"검증된 숙소","cards.verified_desc":"가까운 인기 숙소를 추천합니다.","cards.rewards_title":"StayWorld+ 리워즈","cards.rewards_desc":"예약마다 포인트 적립.",
+      "cards.secure_title":"안전한 결제","cards.secure_desc":"비자, 마스터, 아멕스 & 크립토.",
+      "chat.placeholder":"메시지를 입력하세요…","chat.send":"보내기","chat.unavailable":"죄송해요. 챗봇이 일시적으로 사용 불가입니다."
+    },
+    ja: {
+      "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","signup":"Sign Up","languageLabel":"言語",
+      "hero.h1_top":"ラグジュアリーな滞在。","hero.h1_bottom":"グローバルに。","hero.tagline":"カード・銀行振込・暗号資産（BTC・ETH・USDT）対応。",
+      "search.placeholder":"パリ、東京、イスタンブール…","search.checkin":"チェックイン","search.checkout":"チェックアウト","search.button":"検索",
+      "filters.button":"フィルター","filters.title":"フィルター","filters.apply":"適用","filters.clear":"クリア",
+      "filters.cat.propertyType":"宿泊タイプ","filters.cat.amenities":"設備","filters.cat.access":"アクセシビリティ","filters.cat.payment":"支払い/ポリシー","filters.cat.rating":"評価",
+      "filters.opt.apt":"アパート","filters.opt.hotel":"ホテル","filters.opt.villa":"ヴィラ","filters.opt.hostel":"ホステル","filters.opt.resort":"リゾート",
+      "filters.opt.pool":"プール","filters.opt.spa":"スパ","filters.opt.gym":"ジム","filters.opt.parking":"駐車場","filters.opt.breakfast":"朝食",
+      "filters.opt.kitchen":"キッチン","filters.opt.washer":"洗濯機","filters.opt.dryer":"乾燥機","filters.opt.ac":"エアコン","filters.opt.heating":"暖房",
+      "filters.opt.balcony":"バルコニー","filters.opt.oceanview":"オーシャンビュー","filters.opt.cityview":"シティビュー","filters.opt.petfriendly":"ペット可",
+      "filters.opt.smoking":"喫煙可","filters.opt.nonsmoking":"禁煙","filters.opt.wheelchair":"車椅子対応","filters.opt.elevator":"エレベーター",
+      "filters.opt.24h":"24時間受付","filters.opt.selfcheckin":"セルフチェックイン","filters.opt.crypto":"暗号資産決済","filters.opt.freecancel":"無料キャンセル",
+      "filters.opt.refundable":"返金可","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"認定ステイ","cards.verified_desc":"近くのおすすめ宿泊先。","cards.rewards_title":"StayWorld+ リワード","cards.rewards_desc":"予約ごとにポイント。",
+      "cards.secure_title":"安全な支払い","cards.secure_desc":"Visa・Mastercard・Amex・暗号資産。",
+      "chat.placeholder":"メッセージを入力…","chat.send":"送信","chat.unavailable":"現在アシスタントはご利用いただけません。"
+    },
+    zh: {
+      "nav.home":"首页","nav.membership":"会员","nav.login":"登录","signup":"注册","languageLabel":"语言",
+      "hero.h1_top":"奢华住宿。","hero.h1_bottom":"全球触达。","hero.tagline":"支持银行卡、转账与加密货币（BTC · ETH · USDT）。",
+      "search.placeholder":"巴黎、东京、伊斯坦布尔…","search.checkin":"入住","search.checkout":"退房","search.button":"搜索",
+      "filters.button":"筛选","filters.title":"筛选","filters.apply":"应用","filters.clear":"清除",
+      "filters.cat.propertyType":"房源类型","filters.cat.amenities":"设施","filters.cat.access":"无障碍","filters.cat.payment":"支付/政策","filters.cat.rating":"评分",
+      "filters.opt.apt":"公寓","filters.opt.hotel":"酒店","filters.opt.villa":"别墅","filters.opt.hostel":"青旅","filters.opt.resort":"度假村",
+      "filters.opt.pool":"泳池","filters.opt.spa":"水疗","filters.opt.gym":"健身房","filters.opt.parking":"停车","filters.opt.breakfast":"早餐",
+      "filters.opt.kitchen":"厨房","filters.opt.washer":"洗衣机","filters.opt.dryer":"烘干机","filters.opt.ac":"空调","filters.opt.heating":"暖气",
+      "filters.opt.balcony":"阳台","filters.opt.oceanview":"海景","filters.opt.cityview":"城市景","filters.opt.petfriendly":"可带宠物",
+      "filters.opt.smoking":"可吸烟","filters.opt.nonsmoking":"禁烟","filters.opt.wheelchair":"无障碍通行","filters.opt.elevator":"电梯",
+      "filters.opt.24h":"24小时前台","filters.opt.selfcheckin":"自助入住","filters.opt.crypto":"加密货币支付","filters.opt.freecancel":"免费取消",
+      "filters.opt.refundable":"可退款","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"优选房源","cards.verified_desc":"附近热门好房。","cards.rewards_title":"StayWorld+ 积分","cards.rewards_desc":"每次预订赚积分。",
+      "cards.secure_title":"安全支付","cards.secure_desc":"Visa、Mastercard、Amex 与加密货币。",
+      "chat.placeholder":"输入消息…","chat.send":"发送","chat.unavailable":"抱歉，助手暂时不可用。"
+    },
+    tr: {
+      "nav.home":"Ana sayfa","nav.membership":"Üyelik","nav.login":"Giriş","signup":"Kayıt ol","languageLabel":"Dil",
+      "hero.h1_top":"Lüks konaklamalar.","hero.h1_bottom":"Küresel erişim.","hero.tagline":"Kart, havale ve kripto (BTC · ETH · USDT).",
+      "search.placeholder":"Paris, Tokyo, İstanbul…","search.checkin":"Giriş","search.checkout":"Çıkış","search.button":"Ara",
+      "filters.button":"Filtreler","filters.title":"Filtreler","filters.apply":"Uygula","filters.clear":"Temizle",
+      "filters.cat.propertyType":"Tesis türü","filters.cat.amenities":"Olanaklar","filters.cat.access":"Erişilebilirlik","filters.cat.payment":"Ödeme/Politika","filters.cat.rating":"Puan",
+      "filters.opt.apt":"Daire","filters.opt.hotel":"Otel","filters.opt.villa":"Villa","filters.opt.hostel":"Hostel","filters.opt.resort":"Tatil köyü",
+      "filters.opt.pool":"Havuz","filters.opt.spa":"Spa","filters.opt.gym":"Spor salonu","filters.opt.parking":"Otopark","filters.opt.breakfast":"Kahvaltı",
+      "filters.opt.kitchen":"Mutfak","filters.opt.washer":"Çamaşır mak.","filters.opt.dryer":"Kurutma mak.","filters.opt.ac":"Klima","filters.opt.heating":"Isıtma",
+      "filters.opt.balcony":"Balkon","filters.opt.oceanview":"Deniz manz.","filters.opt.cityview":"Şehir manz.","filters.opt.petfriendly":"Evcil hayvan dostu",
+      "filters.opt.smoking":"Sigara içilebilir","filters.opt.nonsmoking":"Sigara içilmez","filters.opt.wheelchair":"Tekerlekli sandalye","filters.opt.elevator":"Asansör",
+      "filters.opt.24h":"24s resepsiyon","filters.opt.selfcheckin":"Self check-in","filters.opt.crypto":"Kripto ile ödeme","filters.opt.freecancel":"Ücretsiz iptal",
+      "filters.opt.refundable":"İade edilebilir","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"Doğrulanmış konaklamalar","cards.verified_desc":"Yakınınızdaki en iyi seçenekler.","cards.rewards_title":"StayWorld+ Ödüller","cards.rewards_desc":"Her rezervasyonda puan kazanın.",
+      "cards.secure_title":"Güvenli ödemeler","cards.secure_desc":"Visa, Mastercard, Amex ve Kripto.",
+      "chat.placeholder":"Bir mesaj yazın…","chat.send":"Gönder","chat.unavailable":"Üzgünüz, asistan geçici olarak kullanılamıyor."
+    },
+    es: {
+      "nav.home":"Inicio","nav.membership":"Membresía","nav.login":"Acceder","signup":"Regístrate","languageLabel":"Idioma",
+      "hero.h1_top":"Estancias de lujo.","hero.h1_bottom":"Alcance global.","hero.tagline":"Tarjetas, transferencia y cripto (BTC · ETH · USDT).",
+      "search.placeholder":"París, Tokio, Estambul…","search.checkin":"Entrada","search.checkout":"Salida","search.button":"Buscar",
+      "filters.button":"Filtros","filters.title":"Filtros","filters.apply":"Aplicar","filters.clear":"Limpiar",
+      "filters.cat.propertyType":"Tipo de propiedad","filters.cat.amenities":"Servicios","filters.cat.access":"Accesibilidad","filters.cat.payment":"Pago/Política","filters.cat.rating":"Puntuación",
+      "filters.opt.apt":"Apartamento","filters.opt.hotel":"Hotel","filters.opt.villa":"Villa","filters.opt.hostel":"Hostal","filters.opt.resort":"Resort",
+      "filters.opt.pool":"Piscina","filters.opt.spa":"Spa","filters.opt.gym":"Gimnasio","filters.opt.parking":"Aparcamiento","filters.opt.breakfast":"Desayuno",
+      "filters.opt.kitchen":"Cocina","filters.opt.washer":"Lavadora","filters.opt.dryer":"Secadora","filters.opt.ac":"Aire acondicionado","filters.opt.heating":"Calefacción",
+      "filters.opt.balcony":"Balcón","filters.opt.oceanview":"Vista al mar","filters.opt.cityview":"Vista ciudad","filters.opt.petfriendly":"Admite mascotas",
+      "filters.opt.smoking":"Fumadores","filters.opt.nonsmoking":"No fumadores","filters.opt.wheelchair":"Acceso silla de ruedas","filters.opt.elevator":"Ascensor",
+      "filters.opt.24h":"Recepción 24h","filters.opt.selfcheckin":"Auto check-in","filters.opt.crypto":"Pagar con cripto","filters.opt.freecancel":"Cancelación gratuita",
+      "filters.opt.refundable":"Reembolsable","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"Alojamientos verificados","cards.verified_desc":"Selecciones cerca de ti.","cards.rewards_title":"Recompensas StayWorld+","cards.rewards_desc":"Gana puntos en cada reserva.",
+      "cards.secure_title":"Pagos seguros","cards.secure_desc":"Visa, Mastercard, Amex y Cripto.",
+      "chat.placeholder":"Escribe un mensaje…","chat.send":"Enviar","chat.unavailable":"Lo sentimos, el asistente no está disponible temporalmente."
+    },
+    fr: {
+      "nav.home":"Accueil","nav.membership":"Adhésion","nav.login":"Connexion","signup":"Inscription","languageLabel":"Langue",
+      "hero.h1_top":"Séjours de luxe.","hero.h1_bottom":"Portée mondiale.","hero.tagline":"Carte, virement & crypto (BTC · ETH · USDT).",
+      "search.placeholder":"Paris, Tokyo, Istanbul…","search.checkin":"Arrivée","search.checkout":"Départ","search.button":"Rechercher",
+      "filters.button":"Filtres","filters.title":"Filtres","filters.apply":"Appliquer","filters.clear":"Effacer",
+      "filters.cat.propertyType":"Type d’hébergement","filters.cat.amenities":"Équipements","filters.cat.access":"Accessibilité","filters.cat.payment":"Paiement/Politique","filters.cat.rating":"Note",
+      "filters.opt.apt":"Appartement","filters.opt.hotel":"Hôtel","filters.opt.villa":"Villa","filters.opt.hostel":"Auberge","filters.opt.resort":"Complexe",
+      "filters.opt.pool":"Piscine","filters.opt.spa":"Spa","filters.opt.gym":"Salle de sport","filters.opt.parking":"Parking","filters.opt.breakfast":"Petit-déjeuner",
+      "filters.opt.kitchen":"Cuisine","filters.opt.washer":"Lave-linge","filters.opt.dryer":"Sèche-linge","filters.opt.ac":"Clim.","filters.opt.heating":"Chauffage",
+      "filters.opt.balcony":"Balcon","filters.opt.oceanview":"Vue mer","filters.opt.cityview":"Vue ville","filters.opt.petfriendly":"Animaux admis",
+      "filters.opt.smoking":"Fumeurs","filters.opt.nonsmoking":"Non-fumeurs","filters.opt.wheelchair":"Accessible PMR","filters.opt.elevator":"Ascenseur",
+      "filters.opt.24h":"Réception 24h/24","filters.opt.selfcheckin":"Arrivée autonome","filters.opt.crypto":"Paiement crypto","filters.opt.freecancel":"Annulation gratuite",
+      "filters.opt.refundable":"Remboursable","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"Séjours vérifiés","cards.verified_desc":"Meilleurs choix près de chez vous.","cards.rewards_title":"Récompenses StayWorld+","cards.rewards_desc":"Des points à chaque réservation.",
+      "cards.secure_title":"Paiements sécurisés","cards.secure_desc":"Visa, Mastercard, Amex & Crypto.",
+      "chat.placeholder":"Écrivez un message…","chat.send":"Envoyer","chat.unavailable":"Désolé, l’assistant est temporairement indisponible."
+    },
+    de: {
+      "nav.home":"Start","nav.membership":"Mitgliedschaft","nav.login":"Anmelden","signup":"Registrieren","languageLabel":"Sprache",
+      "hero.h1_top":"Luxuriöse Aufenthalte.","hero.h1_bottom":"Weltweite Reichweite.","hero.tagline":"Karte, Überweisung & Krypto (BTC · ETH · USDT).",
+      "search.placeholder":"Paris, Tokio, Istanbul…","search.checkin":"Check-in","search.checkout":"Check-out","search.button":"Suchen",
+      "filters.button":"Filter","filters.title":"Filter","filters.apply":"Übernehmen","filters.clear":"Zurücksetzen",
+      "filters.cat.propertyType":"Unterkunftstyp","filters.cat.amenities":"Ausstattung","filters.cat.access":"Barrierefreiheit","filters.cat.payment":"Zahlung/Richtlinie","filters.cat.rating":"Bewertung",
+      "filters.opt.apt":"Apartment","filters.opt.hotel":"Hotel","filters.opt.villa":"Villa","filters.opt.hostel":"Hostel","filters.opt.resort":"Resort",
+      "filters.opt.pool":"Pool","filters.opt.spa":"Spa","filters.opt.gym":"Fitnessraum","filters.opt.parking":"Parken","filters.opt.breakfast":"Frühstück",
+      "filters.opt.kitchen":"Küche","filters.opt.washer":"Waschmaschine","filters.opt.dryer":"Trockner","filters.opt.ac":"Klimaanlage","filters.opt.heating":"Heizung",
+      "filters.opt.balcony":"Balkon","filters.opt.oceanview":"Meerblick","filters.opt.cityview":"Stadtblick","filters.opt.petfriendly":"Haustiere erlaubt",
+      "filters.opt.smoking":"Raucher","filters.opt.nonsmoking":"Nichtraucher","filters.opt.wheelchair":"Rollstuhlgerecht","filters.opt.elevator":"Aufzug",
+      "filters.opt.24h":"24h-Rezeption","filters.opt.selfcheckin":"Self Check-in","filters.opt.crypto":"Mit Krypto zahlen","filters.opt.freecancel":"Kostenlose Stornierung",
+      "filters.opt.refundable":"Erstattbar","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"Geprüfte Unterkünfte","cards.verified_desc":"Top-Empfehlungen in Ihrer Nähe.","cards.rewards_title":"StayWorld+ Prämien","cards.rewards_desc":"Punkte bei jeder Buchung.",
+      "cards.secure_title":"Sichere Zahlungen","cards.secure_desc":"Visa, Mastercard, Amex & Krypto.",
+      "chat.placeholder":"Nachricht eingeben…","chat.send":"Senden","chat.unavailable":"Assistent vorübergehend nicht verfügbar."
+    },
+    pt: {
+      "nav.home":"Início","nav.membership":"Assinatura","nav.login":"Entrar","signup":"Cadastrar","languageLabel":"Idioma",
+      "hero.h1_top":"Hospedagens de luxo.","hero.h1_bottom":"Alcance global.","hero.tagline":"Cartão, transferência e cripto (BTC · ETH · USDT).",
+      "search.placeholder":"Paris, Tóquio, Istambul…","search.checkin":"Check-in","search.checkout":"Check-out","search.button":"Buscar",
+      "filters.button":"Filtros","filters.title":"Filtros","filters.apply":"Aplicar","filters.clear":"Limpar",
+      "filters.cat.propertyType":"Tipo de imóvel","filters.cat.amenities":"Comodidades","filters.cat.access":"Acessibilidade","filters.cat.payment":"Pagamento/Política","filters.cat.rating":"Avaliação",
+      "filters.opt.apt":"Apartamento","filters.opt.hotel":"Hotel","filters.opt.villa":"Vila","filters.opt.hostel":"Hostel","filters.opt.resort":"Resort",
+      "filters.opt.pool":"Piscina","filters.opt.spa":"Spa","filters.opt.gym":"Academia","filters.opt.parking":"Estacionamento","filters.opt.breakfast":"Café da manhã",
+      "filters.opt.kitchen":"Cozinha","filters.opt.washer":"Lavadora","filters.opt.dryer":"Secadora","filters.opt.ac":"Ar-cond.","filters.opt.heating":"Aquecimento",
+      "filters.opt.balcony":"Varanda","filters.opt.oceanview":"Vista mar","filters.opt.cityview":"Vista cidade","filters.opt.petfriendly":"Aceita pets",
+      "filters.opt.smoking":"Fumantes","filters.opt.nonsmoking":"Não fumantes","filters.opt.wheelchair":"Acessível","filters.opt.elevator":"Elevador",
+      "filters.opt.24h":"Recepção 24h","filters.opt.selfcheckin":"Auto check-in","filters.opt.crypto":"Pagar com cripto","filters.opt.freecancel":"Cancelamento grátis",
+      "filters.opt.refundable":"Reembolsável","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"Hospedagens verificadas","cards.verified_desc":"Melhores opções perto de você.","cards.rewards_title":"Recompensas StayWorld+","cards.rewards_desc":"Ganhe pontos em cada reserva.",
+      "cards.secure_title":"Pagamentos seguros","cards.secure_desc":"Visa, Mastercard, Amex e Cripto.",
+      "chat.placeholder":"Digite uma mensagem…","chat.send":"Enviar","chat.unavailable":"Desculpe, o assistente está temporariamente indisponível."
+    },
+    ru: {
+      "nav.home":"Главная","nav.membership":"Подписка","nav.login":"Вход","signup":"Регистрация","languageLabel":"Язык",
+      "hero.h1_top":"Роскошное проживание.","hero.h1_bottom":"Мировой охват.","hero.tagline":"Карты, банковский перевод и крипто (BTC · ETH · USDT).",
+      "search.placeholder":"Париж, Токио, Стамбул…","search.checkin":"Заезд","search.checkout":"Выезд","search.button":"Поиск",
+      "filters.button":"Фильтры","filters.title":"Фильтры","filters.apply":"Применить","filters.clear":"Сброс",
+      "filters.cat.propertyType":"Тип жилья","filters.cat.amenities":"Удобства","filters.cat.access":"Доступность","filters.cat.payment":"Оплата/Политика","filters.cat.rating":"Рейтинг",
+      "filters.opt.apt":"Апартаменты","filters.opt.hotel":"Отель","filters.opt.villa":"Вилла","filters.opt.hostel":"Хостел","filters.opt.resort":"Курорт",
+      "filters.opt.pool":"Бассейн","filters.opt.spa":"Спа","filters.opt.gym":"Тренажёрный зал","filters.opt.parking":"Парковка","filters.opt.breakfast":"Завтрак",
+      "filters.opt.kitchen":"Кухня","filters.opt.washer":"Стиральная машина","filters.opt.dryer":"Сушилка","filters.opt.ac":"Кондиционер","filters.opt.heating":"Отопление",
+      "filters.opt.balcony":"Балкон","filters.opt.oceanview":"Вид на море","filters.opt.cityview":"Вид на город","filters.opt.petfriendly":"С животными",
+      "filters.opt.smoking":"Для курящих","filters.opt.nonsmoking":"Некурящие","filters.opt.wheelchair":"Доступно для кресел","filters.opt.elevator":"Лифт",
+      "filters.opt.24h":"Круглосуточная стойка","filters.opt.selfcheckin":"Самостоятельное заселение","filters.opt.crypto":"Оплата крипто","filters.opt.freecancel":"Бесплатная отмена",
+      "filters.opt.refundable":"Возврат","filters.opt.rating4up":"★ 4.0+","filters.opt.rating45up":"★ 4.5+","filters.opt.rating5":"★ 5.0",
+      "cards.verified_title":"Проверенное жильё","cards.verified_desc":"Лучшие варианты рядом.","cards.rewards_title":"Бонусы StayWorld+","cards.rewards_desc":"Баллы за каждое бронирование.",
+      "cards.secure_title":"Безопасные платежи","cards.secure_desc":"Visa, Mastercard, Amex и Крипто.",
+      "chat.placeholder":"Введите сообщение…","chat.send":"Отправить","chat.unavailable":"Ассистент временно недоступен."
+    }
+  };
+
+  // --------- helpers ---------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  let currentLang = localStorage.getItem('sw_lang') || 'en';
+
+  function applyI18n(lang){
+    const pack = i18n[lang] || i18n.en;
+    // text nodes
+    $$('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(pack[key]) el.textContent = pack[key];
+    });
+    // placeholders
+    $$('[data-i18n-ph]').forEach(el=>{
+      const key = el.getAttribute('data-i18n-ph');
+      if(pack[key]) el.setAttribute('placeholder', pack[key]);
+    });
+    // document lang
+    document.documentElement.lang = lang;
+  }
+
+  function safeClick(el, fn){
+    if(!el) return;
+    el.addEventListener('click', e=>{ e.stopPropagation(); fn(e); }, true);
+  }
+
+  // ---------- init ----------
+  window.addEventListener('DOMContentLoaded', ()=>{
+    // language
+    const sel = $('#langSelect');
+    sel.value = currentLang;
+    sel.addEventListener('change', e=>{
+      currentLang = e.target.value;
+      localStorage.setItem('sw_lang', currentLang);
+      applyI18n(currentLang);
+    });
+    applyI18n(currentLang);
+
+    // filters panel
+    const panel = $('#filtersPanel');
+    const sheet = panel.querySelector('.filters-sheet');
+    const openFilters = ()=>{ panel.setAttribute('aria-hidden','false'); panel.classList.add('open'); $('#filtersBtn')?.setAttribute('aria-expanded','true'); };
+    const closeFilters = ()=>{ panel.setAttribute('aria-hidden','true'); panel.classList.remove('open'); $('#filtersBtn')?.setAttribute('aria-expanded','false'); };
+    safeClick($('#filtersBtn'), openFilters);
+    safeClick($('#filtersClose'), closeFilters);
+    safeClick($('#filtersApply'), ()=>{ closeFilters(); /* TODO: apply filter logic */ });
+    safeClick($('#filtersClear'), ()=>{ panel.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=false); });
+    // close on backdrop click
+    panel.addEventListener('click', (e)=>{ if(e.target===panel) closeFilters(); });
+    // prevent clicks inside sheet from bubbling to backdrop
+    sheet.addEventListener('click', e=>e.stopPropagation());
+
+    // search button
+    safeClick($('#searchBtn'), ()=>{
+      // TODO: real search hookup
+      console.log('SEARCH', {
+        dest: $('#destInput').value,
+        checkin: $('#checkinInput').value,
+        checkout: $('#checkoutInput').value,
+        filters: panel.querySelectorAll('input[type="checkbox"]:checked')
+      });
+    });
+
+    // AI panel
+    const aiPanel = $('#aiPanel');
+    const aiOpen = ()=>{ aiPanel.classList.add('open'); aiPanel.setAttribute('aria-hidden','false'); $('#aiToggle')?.setAttribute('aria-expanded','true'); };
+    const aiClose = ()=>{ aiPanel.classList.remove('open'); aiPanel.setAttribute('aria-hidden','true'); $('#aiToggle')?.setAttribute('aria-expanded','false'); };
+    safeClick($('#aiToggle'), aiOpen);
+    safeClick($('#aiClose'), aiClose);
+    aiPanel.addEventListener('click', e=>{ if(e.target===aiPanel) aiClose(); });
+
+    // Chat send
+    $('#aiForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const input = $('#aiInput');
+      const text = input.value.trim();
+      if(!text) return;
+      addMsg('user', text);
+      input.value='';
+
+      try{
+        const res = await fetch('/.netlify/functions/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ message: text, lang: currentLang })
+        });
+        if(!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        addMsg('bot', data.reply || data.message || JSON.stringify(data));
+      }catch(err){
+        const pack = i18n[currentLang] || i18n.en;
+        addMsg('bot', pack['chat.unavailable']);
+      }
+    });
+
+    function addMsg(role, text){
+      const wrap = $('#aiMessages');
+      const item = document.createElement('div');
+      item.className = `msg ${role}`;
+      item.textContent = text;
+      wrap.appendChild(item);
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    // Guard: prevent random overlay trapping clicks
+    ['filtersBtn','searchBtn','aiToggle'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ el.style.position='relative'; el.style.zIndex=5; }
+    });
+  });
+  </script>
 </body>
 </html>
