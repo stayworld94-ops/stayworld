@@ -1,484 +1,318 @@
-/* app.js — front-end */
+/* ===========================
+   STAYWORLD UI FIX PACK (v2)
+   - Click 안먹는 문제(중복 리스너/오버레이) 방지
+   - 검색: 지오코딩(Nominatim → Photon 폴백) + 지도 이동
+   - 필터: 오버레이/패널 자동 생성 + 열기/닫기/적용
+   - 번역: lang / langSelect 둘 다 감지
+   - 챗봇: /api/chat → 실패 시 /.netlify/functions/chat → 둘 다 실패면 데모
+   =========================== */
 
-// -------------------- 1) 다국어 딕셔너리 --------------------
-const i18n = {
-  en: {
-    "lang.label": "Language",
-    "nav.home": "Home",
-    "nav.membership": "Membership",
-    "nav.login": "Login",
-    "nav.signup": "Sign Up",
-
-    "hero.luxury": "Luxury stays.",
-    "hero.global": "Global reach.",
-    "hero.tagline": "Cards, bank transfer & crypto (BTC · ETH · USDT).",
-
-    "search.placeholder": "Paris, Tokyo, Istanbul…",
-    "search.cta": "Search",
-
-    "filters.title": "Filters",
-    "filters.clear": "Clear",
-    "filters.apply": "Apply",
-
-    "feat.verified.title": "Verified stays",
-    "feat.verified.desc": "Top picks near you.",
-    "feat.rewards.title": "StayWorld+ Rewards",
-    "feat.rewards.desc": "Earn points on every booking.",
-    "feat.pay.title": "Secure payments",
-    "feat.pay.desc": "Visa, Mastercard, Amex & Crypto.",
-
-    "chat.placeholder": "Type a message…",
-    "chat.send": "Send",
-  },
-  ko: {
-    "lang.label": "언어",
-    "nav.home": "Home",
-    "nav.membership": "Membership",
-    "nav.login": "Login",
-    "nav.signup": "Sign Up",
-
-    "hero.luxury": "럭셔리 숙소.",
-    "hero.global": "전 세계 연결.",
-    "hero.tagline": "카드, 은행이체 & 암호화폐 (BTC · ETH · USDT).",
-
-    "search.placeholder": "파리, 도쿄, 이스탄불…",
-    "search.cta": "검색",
-
-    "filters.title": "필터",
-    "filters.clear": "초기화",
-    "filters.apply": "적용",
-
-    "feat.verified.title": "검증된 숙소",
-    "feat.verified.desc": "가까운 인기 추천.",
-    "feat.rewards.title": "StayWorld+ 리워드",
-    "feat.rewards.desc": "모든 예약에 포인트 적립.",
-    "feat.pay.title": "안전한 결제",
-    "feat.pay.desc": "비자, 마스터카드, 아멕스 & 크립토.",
-
-    "chat.placeholder": "메시지를 입력하세요…",
-    "chat.send": "전송",
-  },
-  ja: {
-    "lang.label": "言語",
-    "nav.home": "Home",
-    "nav.membership": "Membership",
-    "nav.login": "Login",
-    "nav.signup": "Sign Up",
-
-    "hero.luxury": "ラグジュアリーな滞在。",
-    "hero.global": "世界中へ。",
-    "hero.tagline": "カード、銀行振込、仮想通貨（BTC・ETH・USDT）。",
-
-    "search.placeholder": "パリ、東京、イスタンブール…",
-    "search.cta": "検索",
-
-    "filters.title": "フィルター",
-    "filters.clear": "クリア",
-    "filters.apply": "適用",
-
-    "feat.verified.title": "認証済み宿",
-    "feat.verified.desc": "近くのおすすめ。",
-    "feat.rewards.title": "StayWorld+ リワード",
-    "feat.rewards.desc": "すべての予約でポイント獲得。",
-    "feat.pay.title": "安全な決済",
-    "feat.pay.desc": "Visa、Mastercard、Amex と暗号資産。",
-    "chat.placeholder": "メッセージを入力…",
-    "chat.send": "送信",
-  },
-  zh: {
-    "lang.label": "语言",
-    "nav.home": "Home","nav.membership":"Membership","nav.login":"Login","nav.signup":"Sign Up",
-    "hero.luxury": "奢华住宿。","hero.global":"全球触达。","hero.tagline":"银行卡、银行转账与加密货币（BTC · ETH · USDT）。",
-    "search.placeholder":"巴黎、东京、伊斯坦布尔…","search.cta":"搜索",
-    "filters.title":"筛选","filters.clear":"清除","filters.apply":"应用",
-    "feat.verified.title":"已认证房源","feat.verified.desc":"附近精选推荐。",
-    "feat.rewards.title":"StayWorld+ 奖励","feat.rewards.desc":"每笔预订均可获积分。",
-    "feat.pay.title":"安全支付","feat.pay.desc":"Visa、Mastercard、Amex 与加密。",
-    "chat.placeholder":"输入消息…","chat.send":"发送",
-  },
-  es: {
-    "lang.label":"Idioma",
-    "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","nav.signup":"Sign Up",
-    "hero.luxury":"Estancias de lujo.","hero.global":"Alcance global.","hero.tagline":"Tarjetas, transferencia bancaria y cripto (BTC · ETH · USDT).",
-    "search.placeholder":"París, Tokio, Estambul…","search.cta":"Buscar",
-    "filters.title":"Filtros","filters.clear":"Limpiar","filters.apply":"Aplicar",
-    "feat.verified.title":"Alojamientos verificados","feat.verified.desc":"Selecciones cerca de ti.",
-    "feat.rewards.title":"Recompensas StayWorld+","feat.rewards.desc":"Gana puntos en cada reserva.",
-    "feat.pay.title":"Pagos seguros","feat.pay.desc":"Visa, Mastercard, Amex y Cripto.",
-    "chat.placeholder":"Escribe un mensaje…","chat.send":"Enviar",
-  },
-  fr: {
-    "lang.label":"Langue",
-    "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","nav.signup":"Sign Up",
-    "hero.luxury":"Séjours de luxe.","hero.global":"Portée mondiale.","hero.tagline":"Carte, virement & crypto (BTC · ETH · USDT).",
-    "search.placeholder":"Paris, Tokyo, Istanbul…","search.cta":"Rechercher",
-    "filters.title":"Filtres","filters.clear":"Réinitialiser","filters.apply":"Appliquer",
-    "feat.verified.title":"Logements vérifiés","feat.verified.desc":"Meilleurs choix près de chez vous.",
-    "feat.rewards.title":"Récompenses StayWorld+","feat.rewards.desc":"Des points à chaque réservation.",
-    "feat.pay.title":"Paiements sécurisés","feat.pay.desc":"Visa, Mastercard, Amex & Crypto.",
-    "chat.placeholder":"Tapez un message…","chat.send":"Envoyer",
-  },
-  de: {
-    "lang.label":"Sprache",
-    "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","nav.signup":"Sign Up",
-    "hero.luxury":"Luxuriöse Aufenthalte.","hero.global":"Weltweite Reichweite.","hero.tagline":"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
-    "search.placeholder":"Paris, Tokio, Istanbul…","search.cta":"Suchen",
-    "filters.title":"Filter","filters.clear":"Zurücksetzen","filters.apply":"Anwenden",
-    "feat.verified.title":"Verifizierte Unterkünfte","feat.verified.desc":"Top-Empfehlungen in Ihrer Nähe.",
-    "feat.rewards.title":"StayWorld+ Prämien","feat.rewards.desc":"Punkte bei jeder Buchung sammeln.",
-    "feat.pay.title":"Sichere Zahlungen","feat.pay.desc":"Visa, Mastercard, Amex & Krypto.",
-    "chat.placeholder":"Nachricht eingeben…","chat.send":"Senden",
-  },
-  tr: {
-    "lang.label":"Dil",
-    "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","nav.signup":"Sign Up",
-    "hero.luxury":"Lüks konaklamalar.","hero.global":"Küresel erişim.","hero.tagline":"Kart, havale ve kripto (BTC · ETH · USDT).",
-    "search.placeholder":"Paris, Tokyo, İstanbul…","search.cta":"Ara",
-    "filters.title":"Filtreler","filters.clear":"Temizle","filters.apply":"Uygula",
-    "feat.verified.title":"Doğrulanmış konaklamalar","feat.verified.desc":"Yakınınızdaki en iyi seçenekler.",
-    "feat.rewards.title":"StayWorld+ Ödülleri","feat.rewards.desc":"Her rezervasyondan puan kazanın.",
-    "feat.pay.title":"Güvenli ödemeler","feat.pay.desc":"Visa, Mastercard, Amex ve Kripto.",
-    "chat.placeholder":"Mesaj yazın…","chat.send":"Gönder",
-  },
-  ru: {
-    "lang.label":"Язык",
-    "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","nav.signup":"Sign Up",
-    "hero.luxury":"Роскошное размещение.","hero.global":"Мировой охват.","hero.tagline":"Карты, банковский перевод и крипто (BTC · ETH · USDT).",
-    "search.placeholder":"Париж, Токио, Стамбул…","search.cta":"Поиск",
-    "filters.title":"Фильтры","filters.clear":"Сброс","filters.apply":"Применить",
-    "feat.verified.title":"Проверенные варианты","feat.verified.desc":"Лучшие предложения рядом.",
-    "feat.rewards.title":"Бонусы StayWorld+","feat.rewards.desc":"Баллы за каждое бронирование.",
-    "feat.pay.title":"Безопасные платежи","feat.pay.desc":"Visa, Mastercard, Amex и Крипто.",
-    "chat.placeholder":"Введите сообщение…","chat.send":"Отправить",
-  },
-  ar: {
-    "lang.label":"اللغة",
-    "nav.home":"Home","nav.membership":"Membership","nav.login":"Login","nav.signup":"Sign Up",
-    "hero.luxury":"إقامات فاخرة.","hero.global":"انتشار عالمي.","hero.tagline":"بطاقات، حوالة بنكية وعُملات رقمية (BTC · ETH · USDT).",
-    "search.placeholder":"باريس، طوكيو، إسطنبول…","search.cta":"بحث",
-    "filters.title":"عوامل التصفية","filters.clear":"مسح","filters.apply":"تطبيق",
-    "feat.verified.title":"إقامات موثوقة","feat.verified.desc":"أفضل الخيارات بالقرب منك.",
-    "feat.rewards.title":"مكافآت StayWorld+","feat.rewards.desc":"اكسب نقاطًا مع كل حجز.",
-    "feat.pay.title":"مدفوعات آمنة","feat.pay.desc":"Visa وMastercard وAmex والعملات الرقمية.",
-    "chat.placeholder":"اكتب رسالة…","chat.send":"إرسال",
-  },
-};
-
-// -------------------- 2) 번역 적용 --------------------
-const $ = (sel, root=document) => root.querySelector(sel);
-const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-
-const getLang = () => localStorage.getItem("lang") || "en";
-const setLang = (lang) => localStorage.setItem("lang", lang);
-
-function applyI18n(lang){
-  const dict = i18n[lang] || i18n.en;
-  // data-i18n (텍스트)
-  $$("[data-i18n]").forEach(el=>{
-    const key = el.getAttribute("data-i18n");
-    if(dict[key]) el.textContent = dict[key];
-  });
-  // data-i18n-ph (placeholder)
-  $$("[data-i18n-ph]").forEach(el=>{
-    const key = el.getAttribute("data-i18n-ph");
-    if(dict[key]) el.setAttribute("placeholder", dict[key]);
-  });
-}
-
-const langSelect = $("#langSelect");
-langSelect.value = getLang();
-applyI18n(langSelect.value);
-langSelect.addEventListener("change", ()=>{
-  setLang(langSelect.value);
-  applyI18n(langSelect.value);
-});
-
-// -------------------- 3) 필터 (20개+) --------------------
-const FILTERS = [
-  "Free Wi-Fi","Breakfast","Parking","Pet-friendly","Kitchen","Washer","Dryer",
-  "Air conditioning","Heating","Elevator","Wheelchair accessible","Ocean view","City view",
-  "Mountain view","Balcony","Smoking allowed","Family rooms","Crib","Fitness center",
-  "Spa","Sauna","Hot tub","Airport shuttle","Late checkout","Early check-in",
-  "Self check-in","Free cancellation","Non-refundable","Business center","Workspace"
-];
-
-const filterBtn   = $("#filterBtn");
-const filterPanel = $("#filterPanel");
-const filterOverlay = $("#filterOverlay");
-const filterList = $("#filterList");
-const filterClose = $("#filterClose");
-const filterApply = $("#filterApply");
-const filterClear = $("#filterClear");
-
-let selectedFilters = new Set();
-
-function renderFilters(){
-  filterList.innerHTML = "";
-  FILTERS.forEach((name, idx)=>{
-    const id = `f-${idx}`;
-    const wrap = document.createElement("label");
-    wrap.className = "filter-chip";
-    wrap.innerHTML = `
-      <input type="checkbox" id="${id}" data-name="${name}" ${selectedFilters.has(name)?"checked":""}/>
-      <span>${name}</span>
-    `;
-    filterList.appendChild(wrap);
-  });
-}
-renderFilters();
-
-function updateFilterBtn(){
-  const n = selectedFilters.size;
-  const key = "filters.title";
-  const base = i18n[getLang()]?.[key] || "Filters";
-  filterBtn.textContent = n>0 ? `${base} (${n})` : base;
-}
-
-function openFilters(){
-  renderFilters();
-  filterPanel.setAttribute("aria-hidden","false");
-  filterOverlay.hidden = false;
-  filterBtn.setAttribute("aria-expanded","true");
-}
-function closeFilters(){
-  filterPanel.setAttribute("aria-hidden","true");
-  filterOverlay.hidden = true;
-  filterBtn.setAttribute("aria-expanded","false");
-}
-filterBtn.addEventListener("click", (e)=>{ e.stopPropagation(); openFilters(); });
-filterClose.addEventListener("click", (e)=>{ e.stopPropagation(); closeFilters(); });
-filterOverlay.addEventListener("click", ()=> closeFilters());
-// 패널 내부 클릭은 외부로 전파되지 않도록
-filterPanel.addEventListener("click", (e)=> e.stopPropagation());
-
-filterApply.addEventListener("click", ()=>{
-  selectedFilters = new Set(
-    $$("#filterList input[type=checkbox]:checked").map(i=>i.dataset.name)
-  );
-  updateFilterBtn();
-  closeFilters();
-});
-filterClear.addEventListener("click", ()=>{
-  selectedFilters.clear();
-  updateFilterBtn();
-  renderFilters();
-});
-updateFilterBtn();
-
-// -------------------- 4) 검색 버튼 (데모) --------------------
-$("#searchBtn").addEventListener("click", ()=>{
-  console.log("Search with:", {
-    dest: $("#dest").value,
-    checkin: $("#checkin").value,
-    checkout: $("#checkout").value,
-    filters: Array.from(selectedFilters)
-  });
-  alert("Search triggered ✔");
-});
-
-// -------------------- 5) 챗봇 위젯 --------------------
-const aiToggle = $("#ai-toggle");
-const aiWidget = $("#ai-widget");
-const aiClose  = $("#ai-close");
-const aiForm   = $("#ai-form");
-const aiInput  = $("#ai-input");
-const aiLog    = $("#ai-log");
-
-function openChat(){
-  aiWidget.setAttribute("aria-hidden","false");
-  aiToggle.setAttribute("aria-expanded","true");
-  aiInput.focus();
-}
-function closeChat(){
-  aiWidget.setAttribute("aria-hidden","true");
-  aiToggle.setAttribute("aria-expanded","false");
-}
-aiToggle.addEventListener("click",(e)=>{ e.stopPropagation(); openChat(); });
-aiClose.addEventListener("click",(e)=>{ e.stopPropagation(); closeChat(); });
-// 위젯 안에서의 클릭은 전파 금지 → 배경 레이어에 가로채이지 않음
-aiWidget.addEventListener("click",(e)=> e.stopPropagation());
-document.addEventListener("click", (e)=>{
-  // 다른곳 클릭 시 패널/챗봇 닫기 (버튼 오작동 방지 위해 조건)
-  if(!aiWidget.contains(e.target) && e.target!==aiToggle) closeChat();
-  if(!filterPanel.contains(e.target) && e.target!==filterBtn) closeFilters();
-});
-
-function pushMsg(text, mine=false){
-  const div=document.createElement("div");
-  div.className = "msg"+(mine?" msg--me":"");
-  div.textContent=text;
-  aiLog.appendChild(div);
-  aiLog.scrollTop = aiLog.scrollHeight;
-}
-
-aiForm.addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const text = aiInput.value.trim();
-  if(!text) return;
-  pushMsg(text,true);
-  aiInput.value="";
-
-  try{
-    const res = await fetch("/.netlify/functions/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        message: text,
-        locale: getLang()
-      })
-    });
-    if(!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-    pushMsg(data.reply);
-  }catch(err){
-    console.error(err);
-    pushMsg("Sorry, the assistant is temporarily unavailable.");
+/* ---------- small utils ---------- */
+const $ = (s, root=document)=>root.querySelector(s);
+const $$ = (s, root=document)=>Array.from(root.querySelectorAll(s));
+function byIdAny(...ids){ for(const id of ids){ const el = document.getElementById(id); if(el) return el; } return null; }
+function swapNode(el){ if(!el||!el.parentNode) return el; const c=el.cloneNode(true); el.parentNode.replaceChild(c,el); return c; }
+function setStatus(msg){
+  let status = byIdAny('searchStatus');
+  if(!status){
+    status = document.createElement('div');
+    status.id = 'searchStatus';
+    status.className = 'search-status';
+    const bar = $('.searchbar, .sw-searchbar, .search-bar') || $('#search')?.parentNode;
+    (bar?.parentNode || document.body).appendChild(status);
   }
-});
-<script>
-/* --------- 0) 기존 인라인 필터가 있으면 숨김 --------- */
-(function hideLegacyInlineFilters(){
-  const killers = [
-    '#filtersInline', 'section#filters', '.filters-inline',
-    '.filter', '.filters' // (모달 그리드가 아니면 숨김)
-  ];
-  killers.forEach(sel=>{
-    document.querySelectorAll(sel).forEach(el=>{
-      if(!el.closest('#filterModal')) el.style.display='none';
-    });
-  });
-})();
-
-/* --------- 1) 카테고리 정의(필요시 추가 가능) --------- */
-const FILTER_SETS = [
-  {
-    title: 'Amenities',
-    items: ['Wi-Fi','Pool','Spa','Gym','Kitchen','Balcony','Hot tub','Sauna','Air conditioning','Breakfast']
-  },
-  {
-    title: 'Property type',
-    items: ['Hotel','Apartment','Villa','Hostel','B&B']
-  },
-  {
-    title: 'Views & Outdoors',
-    items: ['Sea view','City view','Mountain view','Garden','Balcony']
-  },
-  {
-    title: 'Payments & Policies',
-    items: ['Crypto','Cards','Bank transfer','Free cancellation','Late checkout','Non-smoking']
-  },
-  {
-    title: 'Accessibility',
-    items: ['Accessible','Step-free access','Elevator','Family-friendly','24h check-in','Airport shuttle']
-  },
-  {
-    title: 'Pet & Etc.',
-    items: ['Pet-friendly']
+  status.textContent = msg || '';
+  status.style.opacity = msg ? 1 : 0;
+  if(msg){
+    clearTimeout(status._t);
+    status._t = setTimeout(()=>status.style.opacity=0, 3000);
   }
-];
+}
 
-/* --------- 2) 모달 DOM 주입 --------- */
-function ensureFilterModal(){
-  if(document.getElementById('filterModal')) return;
+/* ---------- language ---------- */
+function getLangSelect(){ return byIdAny('lang','langSelect'); }
+function getCurrentLang(){
+  const sel = getLangSelect(); return (sel && sel.value) || (localStorage.getItem('sw_lang')||'en');
+}
+function initLang(){
+  const sel = getLangSelect();
+  if(sel){
+    // remove old listeners by clone
+    const c = swapNode(sel);
+    c.addEventListener('change', e=>{
+      const v = e.target.value;
+      localStorage.setItem('sw_lang', v);
+      if (window.StayWorldI18n?.applyLang) {
+        window.StayWorldI18n.applyLang(v);
+      }
+    });
+  }
+  // 초기 적용
+  const init = localStorage.getItem('sw_lang');
+  if(init && window.StayWorldI18n?.applyLang){ window.StayWorldI18n.applyLang(init); }
+}
 
-  const wrap = document.createElement('div');
-  wrap.id = 'filterModal';
-  wrap.innerHTML = `
-    <div class="filter-dialog" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
-      <div class="filter-head">
-        <div id="filterTitle" class="filter-title">Filters</div>
-        <button id="filterClose" class="btn btn-ghost" aria-label="Close">✕</button>
+/* ---------- filter drawer (auto create if missing) ---------- */
+function ensureFilterDrawer(){
+  let drawer = byIdAny('filterDrawer');
+  if(drawer) return drawer;
+
+  drawer = document.createElement('div');
+  drawer.id = 'filterDrawer';
+  drawer.setAttribute('aria-hidden', 'true');
+  drawer.innerHTML = `
+    <div class="drawer-backdrop"></div>
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <h3>Filters</h3>
+        <button id="filterClose" aria-label="Close">✕</button>
       </div>
-      <div class="filter-body">
-        <div class="filters-grid" id="filtersGrid"></div>
+      <div class="drawer-body">
+        <div id="filterGrid" class="filter-grid"></div>
       </div>
-      <div class="filter-foot">
-        <button id="filterClear" class="btn btn-ghost">Clear</button>
-        <div style="display:flex; gap:10px;">
-          <button id="filterApply" class="btn btn-primary">Apply</button>
-        </div>
+      <div class="drawer-foot">
+        <button id="filterReset">Reset</button>
+        <button id="applyFilters" class="btn btn-gold">Apply</button>
       </div>
     </div>`;
-  document.body.appendChild(wrap);
+  document.body.appendChild(drawer);
 
-  // 그리드 렌더
-  const grid = wrap.querySelector('#filtersGrid');
-  FILTER_SETS.forEach((col, i)=>{
-    const colEl = document.createElement('div');
-    colEl.className = 'filters-col';
-    const list = col.items.map((name, idx)=>{
-      const id = `f_${i}_${idx}_${name.replace(/[^a-z0-9]+/gi,'_')}`;
-      return `
-        <li class="filter-item">
-          <input class="filter-check" type="checkbox" id="${id}" data-name="${name}">
-          <label class="filter-label" for="${id}">${name}</label>
-        </li>`;
+  // 기본 카테고리 (간단한 더미, 실제 옵션은 필요 시 확장)
+  const GRID = $('#filterGrid', drawer);
+  if(GRID){
+    GRID.style.display='grid';
+    GRID.style.gridTemplateColumns='repeat(3, minmax(0,1fr))';
+    GRID.style.gap='12px';
+    GRID.innerHTML = [
+      section('Stay type', ['hotel','motel','hostel','apartment','villa'], 'type'),
+      section('Review score', ['4.5+','4.0+','any'], 'rating', 'radio'),
+      section('Amenities', ['wifi','kitchen','parking','pool','ac','gym','workspace','washer','dryer'], 'amen'),
+      section('Booking', ['instant','request'], 'booking'),
+      section('Verification', ['verified_only'], 'verify'),
+      section('Long stay', ['long_stay'], 'long'),
+      section('Business', ['b2b'], 'biz'),
+      section('Accessibility', ['step_free','elevator'], 'access'),
+      section('Location', ['near_airport','near_station'], 'near')
+    ].join('');
+  }
+  function section(title, items, name, type='checkbox'){
+    const inputs = items.map(v=>{
+      const id = `flt_${name}_${v}`;
+      return `<label style="display:block;margin:6px 0"><input type="${type}" name="${name}" value="${v}" id="${id}"> ${labelize(v)}</label>`;
     }).join('');
-    colEl.innerHTML = `
-      <h4 class="filters-col-title">${col.title}</h4>
-      <ul class="filters-list">${list}</ul>`;
-    grid.appendChild(colEl);
-  });
-}
-ensureFilterModal();
+    return `
+      <div class="sw-filter-group card" style="padding:10px;border:1px solid #242430;border-radius:12px">
+        <h4>${title}</h4>
+        ${inputs}
+      </div>`;
+  }
+  function labelize(s){ return s.replace(/_/g,' ').replace(/\b\w/g,m=>m.toUpperCase()); }
 
-/* --------- 3) 열기/닫기 & 배지 & 동작 --------- */
-const modal = document.getElementById('filterModal');
-const dlg   = modal.querySelector('.filter-dialog');
-const btnFilters =
-  document.getElementById('btnFilters') ||
-  document.querySelector('[data-open-filters]') ||
-  (()=>{ // 버튼이 없다면 자동 생성(검색줄 끝에)
-    const bar = document.querySelector('.search') || document.querySelector('#searchBar');
-    if(!bar) return null;
-    const b = document.createElement('button');
-    b.id='btnFilters'; b.className='btn btn-chip'; b.textContent='Filters';
-    bar.appendChild(b); return b;
-  })();
+  return drawer;
+}
+function openDrawer(){ const d = ensureFilterDrawer(); d.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+function closeDrawer(){ const d = ensureFilterDrawer(); d.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
 
-function openFilters(){
-  modal.classList.add('open');
-  document.documentElement.classList.add('modal-open');
+/* ---------- map & geocoding ---------- */
+let map, marker;
+function initMap(){
+  const el = byIdAny('map');
+  if(!el || !window.L) return; // Leaflet 미포함이면 패스
+  if(map) return;
+  try{
+    map = L.map('map').setView([41.0082, 28.9784], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+    marker = L.marker([41.0082, 28.9784]).addTo(map).bindPopup('Istanbul');
+  }catch(e){ console.warn('Leaflet init failed', e); }
 }
-function closeFilters(){
-  modal.classList.remove('open');
-  document.documentElement.classList.remove('modal-open');
-  updateBadge(); // 닫힐 때도 배지 반영
+async function geocodeAny(q){
+  const providers = [
+    q=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
+    q=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`
+  ];
+  for(const url of providers){
+    try{
+      const r = await fetch(url(q), { headers:{'Accept':'application/json'}});
+      if(!r.ok) continue;
+      const data = await r.json();
+      if(Array.isArray(data) && data[0]) return {lat:+data[0].lat, lon:+data[0].lon, label:data[0].display_name};
+      if(data?.features?.[0]){
+        const f = data.features[0];
+        return { lat:f.geometry.coordinates[1], lon:f.geometry.coordinates[0], label:f.properties.name || q };
+      }
+    }catch(e){}
+  }
+  throw new Error('no_results');
 }
-
-// 배지 카운트
-function selectedCount(){
-  return modal.querySelectorAll('.filter-check:checked').length;
-}
-function updateBadge(){
-  if(!btnFilters) return;
-  const n = selectedCount();
-  if(n>0){
-    btnFilters.classList.add('badge');
-    btnFilters.setAttribute('data-badge', n);
-  }else{
-    btnFilters.classList.remove('badge');
-    btnFilters.removeAttribute('data-badge');
+function goTo(lat, lon, label){
+  if(map && window.L){
+    if(marker) marker.remove();
+    marker = L.marker([lat, lon]).addTo(map).bindPopup(label||'').openPopup();
+    map.setView([lat, lon], 13, { animate:true });
+    byIdAny('map')?.scrollIntoView({behavior:'smooth', block:'start'});
   }
 }
 
-// 이벤트 바인딩
-btnFilters && btnFilters.addEventListener('click', (e)=>{ e.preventDefault(); openFilters(); });
-modal.addEventListener('click', (e)=>{ if(e.target===modal) closeFilters(); }); // 바깥 클릭 닫기
-modal.querySelector('#filterClose').addEventListener('click', closeFilters);
-document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('open')) closeFilters(); });
+/* ---------- search wiring (dual-ID support) ---------- */
+function initSearch(){
+  // 다양한 템플릿 호환
+  let input = byIdAny('searchInput','searchDestination','search'); // index_inline / index
+  let btn = byIdAny('searchBtn','btnSearch');                       // index_inline
+  // index.html에선 a.btn으로 되어 있을 수 있음 → 대체 버튼 생성
+  if(!btn){
+    const linkBtn = $(`.btn.btn-gold[href="/results.html"]`) || $(`a.btn.btn-gold`);
+    if(linkBtn){
+      btn = document.createElement('button');
+      btn.id = 'btnSearch';
+      btn.className = linkBtn.className;
+      btn.textContent = (linkBtn.textContent||'Search').trim();
+      linkBtn.replaceWith(btn);
+    }
+  }
+  if(input) input = swapNode(input);
+  if(btn) btn = swapNode(btn);
 
-modal.addEventListener('change', (e)=>{
-  if(e.target.classList.contains('filter-check')) updateBadge();
-});
-modal.querySelector('#filterClear').addEventListener('click', ()=>{
-  modal.querySelectorAll('.filter-check:checked').forEach(el=> el.checked=false);
-  updateBadge();
-});
-modal.querySelector('#filterApply').addEventListener('click', ()=>{
-  // 선택값 가져가서 검색 파라미터로 쓰세요
-  const selected = Array.from(modal.querySelectorAll('.filter-check:checked')).map(el=> el.dataset.name);
-  console.log('APPLY filters:', selected);
-  closeFilters();
-});
-</script>
+  async function run(){
+    const q = (input?.value || '').trim();
+    if(!q){ input?.focus(); setStatus('Enter a city or destination.'); return; }
+    btn?.classList.add('loading'); setStatus('Searching…');
+    try{
+      const {lat, lon, label} = await geocodeAny(q);
+      goTo(lat, lon, label);
+      setStatus(`Found: ${label}`);
+    }catch(e){
+      console.error(e); setStatus('No results. Try another place.'); alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.');
+    }finally{
+      btn?.classList.remove('loading');
+    }
+  }
+
+  btn?.addEventListener('click', run);
+  input?.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); run(); } });
+}
+
+/* ---------- filters wiring ---------- */
+function initFilters(){
+  // 열기 트리거: 여러 ID 허용
+  let openBtn = byIdAny('filterOpen'); // index_inline
+  if(!openBtn){
+    // 대체: "Filters" 라벨 찾기
+    openBtn = $('#t_filters') || $$('button, a').find(x=>/filters/i.test(x.textContent||''));
+  }
+  let closeBtn, applyBtn, resetBtn;
+
+  // 안전하게 기존 리스너 제거
+  if(openBtn) openBtn = swapNode(openBtn);
+
+  const drawer = ensureFilterDrawer();
+  closeBtn = swapNode(byIdAny('filterClose'));
+  applyBtn = swapNode(byIdAny('applyFilters'));
+  resetBtn = swapNode(byIdAny('filterReset'));
+
+  openBtn?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); openDrawer(); });
+  closeBtn?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); closeDrawer(); });
+
+  // backdrop 클릭 시 닫기
+  $('.drawer-backdrop', drawer)?.addEventListener('click', closeDrawer);
+
+  // 내부 클릭은 전파 차단 (바깥 요소 클릭 불능 방지)
+  $('.drawer-panel', drawer)?.addEventListener('click', e=>e.stopPropagation());
+
+  applyBtn?.addEventListener('click', ()=>{
+    // 선택값 수집 (데모)
+    const checked = $$('input[type=checkbox]:checked, input[type=radio]:checked', drawer).map(el=>({name:el.name, value:el.value}));
+    console.log('Filters applied:', checked);
+    closeDrawer();
+    setStatus('Filters applied');
+  });
+  resetBtn?.addEventListener('click', ()=>{
+    $$('input[type=checkbox], input[type=radio]', drawer).forEach(el=>{ el.checked = false; });
+    setStatus('Filters reset');
+  });
+}
+
+/* ---------- bot wiring ---------- */
+function initBot(){
+  // 다양한 트리거 & 요소 지원
+  let open = byIdAny('openBot','open-ai','chatFab');
+  let panel = byIdAny('botPanel');
+  let btnClose = byIdAny('botClose');
+  let body = byIdAny('botBody');
+  let input = byIdAny('botInput');
+  let send = byIdAny('botSend');
+
+  // 없으면 최소 UI 자동 생성
+  if(!panel){
+    panel = document.createElement('div');
+    panel.id = 'botPanel';
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="sw-bot-head" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1b1b20">
+        <div class="sw-title">AI Concierge</div>
+        <button id="botClose" aria-label="Close">✕</button>
+      </div>
+      <div class="sw-bot-body" id="botBody" style="padding:12px;max-height:260px;overflow:auto">
+        <div class="sw-bot-msg sys">Hello! Ask me anything in your language.</div>
+      </div>
+      <div class="sw-bot-foot" style="display:flex;gap:8px;padding:10px;border-top:1px solid #1b1b20">
+        <input id="botInput" placeholder="Type a message…" style="flex:1"/>
+        <button class="sw-btn gold" id="botSend">Send</button>
+      </div>`;
+    document.body.appendChild(panel);
+    // 재쿼리
+    btnClose = byIdAny('botClose'); body = byIdAny('botBody'); input = byIdAny('botInput'); send = byIdAny('botSend');
+  }
+
+  // 안전하게 리스너 초기화
+  if(open) open = swapNode(open);
+  btnClose = swapNode(btnClose);
+  send = swapNode(send);
+
+  open?.addEventListener('click', ()=>{ panel.hidden=false; });
+  btnClose?.addEventListener('click', ()=>{ panel.hidden=true; });
+  send?.addEventListener('click', async ()=>{
+    const v = (input?.value||'').trim(); if(!v) return;
+    appendMsg(v);
+    input.value='';
+    try{
+      const text = await sendToAI(v, getCurrentLang());
+      appendMsg(text, true);
+    }catch(e){
+      appendMsg('(Demo) Got it! We’ll find you the best stays.', true);
+    }
+  });
+  input?.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); send?.click(); } });
+
+  function appendMsg(t, isSys=false){
+    const div = document.createElement('div');
+    div.className = 'sw-bot-msg' + (isSys?' sys':'');
+    div.textContent = t;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+}
+
+async function sendToAI(message, locale='en'){
+  const payload = { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ message, locale }) };
+  // 1) Vercel 우선
+  try{
+    const r = await fetch('/api/chat', payload);
+    if(r.ok){ const d = await r.json(); if(d?.ok) return d.text; }
+  }catch(_){}
+  // 2) Netlify 폴백
+  const r2 = await fetch('/.netlify/functions/chat', payload);
+  if(!r2.ok) throw new Error('AI endpoint not available');
+  const d2 = await r2.json();
+  if(!d2.ok) throw new Error('AI error');
+  return d2.text;
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  initLang();
+  initMap();
+  initSearch();
+  initFilters();
+  initBot();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
