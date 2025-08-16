@@ -1,304 +1,93 @@
-/* =========================
-   StayWorld — Global Styles
-   Author: You
-   Last update: 2025-08-15
-========================= */
-
-/* ---------- CSS Variables (Theme) ---------- */
-:root{
-  --bg: #0d1016;
-  --bg-2: #111521;
-  --card: #151a28;
-  --card-2: #0f1422;
-  --text: #e9eef8;
-  --muted: #b6bed1;
-  --line: rgba(255,255,255,.08);
-
-  --gold-1: #f6d889;
-  --gold-2: #d5b86a;
-  --gold-3: #a98a3e;
-
-  --primary: var(--gold-1);
-  --accent: #7aa9ff;
-
-  --radius-s: 10px;
-  --radius-m: 14px;
-  --radius-l: 18px;
-
-  --shadow-1: 0 6px 24px rgba(0,0,0,.25);
-  --shadow-2: 0 12px 40px rgba(0,0,0,.35);
-
-  --container: 1200px;
-}
-
-/* ---------- Base ---------- */
+/* Reset & base */
 *{box-sizing:border-box}
-html,body{height:100%}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  color:var(--text);
-  background:
-    radial-gradient(1200px 600px at 10% -10%, #1a2134 0%, transparent 60%),
-    radial-gradient(1000px 500px at 110% 10%, #1a1f2e 0%, transparent 60%),
-    var(--bg);
-  font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple SD Gothic Neo","Noto Sans KR",sans-serif;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
-
-/* Utilities */
-.container{width:min(100%, var(--container)); margin-inline:auto; padding-inline:20px}
-.hidden{display:none!important}
-.center{display:grid;place-items:center}
-.mt-20{margin-top:20px}
-.mb-20{margin-bottom:20px}
-
-/* Links & headings */
+html,body{margin:0;padding:0;background:#0b0f16;color:#e7e9ee;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Apple Color Emoji,Segoe UI Emoji,sans-serif;line-height:1.5}
 a{color:inherit;text-decoration:none}
-a:hover{opacity:.9}
-h1,h2,h3{margin:0 0 .5rem}
-h1{font-size: clamp(40px, 6vw, 68px); line-height:1.1; letter-spacing:-.02em}
-h2{font-size: clamp(28px, 4vw, 40px)}
-p.lead{color:var(--muted); font-size:18px}
+img{max-width:100%;display:block}
+.container{max-width:1120px;margin:0 auto;padding:0 16px}
 
-/* ---------- Header / Nav ---------- */
-.header{
-  position:sticky; top:0; z-index:1000;
-  backdrop-filter: blur(10px);
-  background:linear-gradient(180deg, rgba(10,12,18,.72), rgba(10,12,18,.38) 60%, transparent);
-  border-bottom:1px solid var(--line);
-}
-.header-inner{
-  display:flex; align-items:center; gap:20px;
-  height:72px;
-}
-.logo{
-  display:flex; align-items:center; gap:10px; min-width:140px;
-}
-.logo img{height:34px; width:auto; display:block}
-.brand{font-weight:700; letter-spacing:.4px}
+/* Header */
+.site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+.brand-text{font-weight:800;letter-spacing:.6px}
+.main-nav{display:flex;gap:28px;justify-content:center;flex:1}
+.main-nav a{opacity:.9}
+.main-nav a:hover{opacity:1}
+.header-cta{display:flex;align-items:center;gap:12px}
+.lang-wrap{display:flex;align-items:center;gap:8px}
+.lang-label{font-size:12px;opacity:.7}
+.lang-select{appearance:none;background:#101826;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:8px 32px 8px 10px;position:relative}
+.lang-select:focus{outline:2px solid rgba(255,255,255,.2)}
+.btn{border:0;padding:10px 14px;border-radius:12px;cursor:pointer}
+.btn-ghost{background:transparent;color:#cfcfcf}
+.btn-ghost:hover{background:rgba(255,255,255,.06)}
+.btn-primary{background:linear-gradient(180deg,#f2d484,#caa65a);color:#1a1205;font-weight:700;box-shadow:0 6px 20px rgba(202,166,90,.35)}
+.btn-gold{background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
+.btn-chip{background:#121a26;color:#dfe3ea;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 14px}
 
-.nav{
-  display:flex; align-items:center; gap:20px;
-  margin-left: 16px; /* 로고와 메뉴 간격 짧게 */
-}
-.nav a{
-  padding:10px 12px; border-radius:10px; color:var(--text);
-}
-.nav a:hover{background:rgba(255,255,255,.04)}
+/* Hero */
+.hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent), radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
+.hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}
+.hero-title .accent{color:#f1cf84}
+.hero-sub{opacity:.85;margin:8px 0 28px}
+.search-bar{display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;gap:10px;align-items:center}
+.input{background:#0f1621;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;padding:12px 14px;border-radius:12px}
+.input::placeholder{color:#a7b0bf}
 
-.header-right{margin-left:auto; display:flex; align-items:center; gap:14px}
+/* Feature cards */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+.card{background:#0f1420;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card h3{margin:0 0 6px}
+.card p{margin:0;opacity:.85}
 
-/* Language select */
-.lang{
-  position:relative;
-}
-.lang select{
-  appearance:none; -webkit-appearance:none; -moz-appearance:none;
-  background:var(--card);
-  color:var(--text);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:10px 36px 10px 14px;
-  font-weight:600;
-  box-shadow: var(--shadow-1);
-}
-.lang:after{
-  content:"▾"; position:absolute; right:12px; top:50%; transform:translateY(-50%);
-  pointer-events:none; color:var(--muted);
-}
+/* Map */
+.map-section{padding:36px 0 60px}
+#map{height:420px;border-radius:16px;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
 
-/* Buttons */
-.btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  gap:8px; border:1px solid transparent; cursor:pointer;
-  height:44px; padding:0 18px; border-radius:14px; font-weight:700;
-  transition: transform .05s ease, opacity .2s ease, box-shadow .2s ease;
-}
-.btn:active{transform:translateY(1px)}
-.btn-ghost{background:transparent; color:var(--text); border-color:var(--line)}
-.btn-ghost:hover{background:rgba(255,255,255,.05)}
-.btn-primary{
-  background: linear-gradient(180deg, var(--gold-1), var(--gold-2) 70%, var(--gold-3));
-  color:#1c1402;
-  box-shadow: 0 6px 14px rgba(246,216,137,.22);
-}
-.btn-primary:hover{filter:saturate(1.05) brightness(1.02)}
+/* Filters Modal */
+.modal-open, .modal-open body{overflow:hidden!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:1300}
+.modal.open{display:block}
+.filter-dialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(980px,92vw);max-height:min(78vh,720px);background:#0f1420;color:#eef;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.6);overflow:hidden}
+.filter-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.filter-title{font-size:18px;font-weight:800}
+.filter-body{padding:16px 20px;overflow:auto;max-height:calc(78vh - 120px)}
+.filter-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.filters-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:900px){.filters-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.filters-grid{grid-template-columns:1fr}}
+.filters-col-title{font-size:13px;font-weight:800;color:#c9c9c9;margin:0 0 6px}
+.filters-list{list-style:none;margin:0;padding:0}
+.filter-item{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:10px}
+.filter-item:hover{background:rgba(255,255,255,.05)}
+.filter-check{width:18px;height:18px}
+.filter-label{font-size:14px;cursor:pointer;user-select:none}
+/* Filters badge */
+#btnFilters.badge{position:relative}
+#btnFilters.badge::after{content:attr(data-badge);position:absolute;top:-8px;right:-8px;background:#ffd36e;color:#1a1205;border-radius:999px;font-size:11px;line-height:1;padding:4px 6px;border:1px solid #1a1205}
 
-/* ---------- Hero / Search ---------- */
-.hero{padding: 56px 0 28px}
-.hero .container{display:grid; gap:18px}
-.tagline{color:var(--muted)}
+/* Chat */
+.chat{position:fixed;right:24px;bottom:24px;z-index:1200}
+.chat-fab{width:48px;height:48px;border-radius:999px;background:linear-gradient(180deg,#f4d78c,#c9a35b);border:0;box-shadow:0 10px 28px rgba(201,163,91,.35);cursor:pointer}
+.chat-panel{position:absolute;right:0;bottom:56px;width:min(360px,84vw);height:460px;background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.5);display:none;overflow:hidden}
+.chat-panel.open{display:block}
+.chat-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.chat-title{font-weight:800}
+.chat-log{height:334px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:10px 12px;border-radius:12px}
+.msg.me{align-self:flex-end;background:#132132}
+.msg.ai{align-self:flex-start;background:#121820}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.08)}
+.chat-input{flex:1;background:#0f1621;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:10px 12px}
+.chat-input::placeholder{color:#9fb0c6}
 
-.search{
-  display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-  border:1px solid var(--line);
-  box-shadow: var(--shadow-1);
-  border-radius:16px; padding:12px;
-  width:100%;
-}
-.inp{
-  background:var(--card); color:var(--text);
-  border:1px solid var(--line);
-  border-radius:12px; height:44px; padding:0 12px;
-  outline:none; width: clamp(160px, 26vw, 260px);
-}
-.inp:focus{border-color:#2a6cff; box-shadow:0 0 0 3px rgba(42,108,255,.25)}
+/* Footer */
+.site-footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);opacity:.8}
 
-.btn-chip{
-  height:44px; padding:0 16px; border-radius:14px;
-  background:var(--card); color:var(--text); border:1px solid var(--line);
+/* Responsive */
+@media (max-width:920px){
+  .main-nav{display:none} /* 모바일에선 기본 네비 숨김(헤더 붕괴 방지) */
+  .search-bar{grid-template-columns:1fr 1fr 1fr auto}
+  .features{grid-template-columns:1fr}
 }
-.btn-chip:hover{background:#192032}
-
-.btn-search{min-width:120px}
-
-/* ---------- Feature Cards ---------- */
-.cards{display:grid; gap:16px; grid-template-columns: repeat(1, 1fr); margin:30px 0}
-@media (min-width:700px){ .cards{grid-template-columns: repeat(3, 1fr)} }
-.card{
-  background:linear-gradient(180deg, var(--card), var(--card-2));
-  border:1px solid var(--line);
-  border-radius:16px; padding:20px; box-shadow: var(--shadow-1);
-}
-.card h3{margin:0 0 8px}
-.card p{color:var(--muted)}
-
-/* ---------- Filters Modal ---------- */
-#filterModal{
-  position:fixed; inset:0; display:none;
-  background: rgba(0,0,0,.55);
-  z-index:1200;
-}
-#filterModal.open{display:block}
-.filter-dialog{
-  position:relative;
-  width:min(980px, 92vw);
-  margin: 8vh auto;
-  background: linear-gradient(180deg, #171c2b, #141a29);
-  color:var(--text);
-  border:1px solid var(--line);
-  border-radius: 18px;
-  box-shadow: var(--shadow-2);
-  max-height: 84vh; overflow: hidden;
-  display:flex; flex-direction:column;
-}
-.filter-head{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:18px 20px; border-bottom:1px solid var(--line);
-}
-.filter-title{font-size:20px; font-weight:800}
-.filter-body{
-  padding: 18px 16px 4px; overflow:auto; overscroll-behavior:contain;
-}
-.filters-grid{
-  display:grid; gap:16px;
-  grid-template-columns: 1fr;
-}
-@media (min-width:720px){ .filters-grid{grid-template-columns: repeat(2, 1fr)} }
-@media (min-width:980px){ .filters-grid{grid-template-columns: repeat(3, 1fr)} }
-@media (min-width:1200px){ .filters-grid{grid-template-columns: repeat(4, 1fr)} }
-
-.filters-col{
-  background: rgba(255,255,255,.02);
-  border:1px solid var(--line);
-  border-radius: 14px; padding:14px;
-}
-.filters-col-title{margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.08em; color:#cbd3e6}
-.filters-list{list-style:none; margin:0; padding:0}
-.filter-item{display:flex; align-items:center; gap:10px; padding:6px 4px}
-.filter-label{cursor:pointer}
-
-/* custom checkbox */
-.filter-check{
-  appearance:none; width:18px; height:18px; border-radius:5px;
-  border:1px solid var(--line); background:#0e1320; display:grid; place-items:center;
-}
-.filter-check:checked{
-  background: linear-gradient(180deg, var(--gold-1), var(--gold-2));
-  border-color: transparent;
-  box-shadow: 0 0 0 3px rgba(246,216,137,.18);
-}
-.filter-check:checked::after{
-  content:"✓"; color:#1e1603; font-weight:900; font-size:12px;
-}
-
-.filter-foot{
-  display:flex; justify-content:space-between; align-items:center;
-  gap:12px; padding:14px; border-top:1px solid var(--line); background:rgba(0,0,0,.15)
-}
-
-/* Buttons inside modal */
-#filterClear{color:#e2e8f5}
-#filterClear.btn-ghost:hover{background:rgba(255,255,255,.07)}
-#filterApply{min-width:120px}
-
-/* Filters button badge on header */
-#btnFilters[data-base-label]::after{
-  content: attr(data-count);
-}
-#btnFilters{position:relative}
-#btnFilters.badge::after{
-  content: attr(data-badge);
-  position:absolute; top:-8px; right:-8px;
-  min-width:20px; height:20px; padding:0 6px;
-  display:inline-grid; place-items:center;
-  background: linear-gradient(180deg, var(--gold-1), var(--gold-2));
-  color:#1f1605; border-radius:999px; border:1px solid rgba(0,0,0,.15);
-  font-size:12px; font-weight:800;
-}
-
-/* ---------- Footer ---------- */
-.footer{
-  border-top:1px solid var(--line);
-  margin-top:36px; padding:24px 0; color:var(--muted);
-}
-
-/* ---------- Chat widget (z-index 조정) ---------- */
-.chat-widget, #chat-widget, .ai-chat, #ai-chat{
-  position:fixed; right:24px; bottom:24px;
-  z-index: 900; /* 헤더(1000) 아래, 모달(1200) 위로 겹치지 않게 */
-}
-
-/* ---------- Forms / Helpers ---------- */
-input[type="text"], input[type="date"], select{
-  font: inherit;
-}
-::placeholder{color:#9aa5bf}
-
-/* ---------- Accessibility tweaks ---------- */
-:focus-visible{
-  outline:3px solid rgba(122,169,255,.7);
-  outline-offset:2px;
-  border-radius:12px;
-}
-
-/* ---------- Compact for mobile ---------- */
-@media (max-width: 760px){
-  .header-inner{height:64px}
-  .nav{gap:12px; margin-left:8px}
-  .btn{height:42px; padding:0 14px}
-  .inp{width:100%}
-  .btn-search{width:100%}
-}
-
-/* ---------- Demo spacing for hero headline ---------- */
-.hero h1 strong{color:var(--gold-1)}
-/* --- 강제 스크롤 잠금 --- */
-.modal-open, .modal-open body { overflow: hidden !important; }
-
-/* --- 혹시 남아있는 인라인 필터 강제 숨김(모달이 아닌 것만) --- */
-section#filters, .filters-inline { display:none !important; }
-div.filters:not(.filters-grid) { display:none !important; }
-
-/* --- 모달 z-index 확고히 (챗봇/헤더 위) --- */
-#filterModal{ z-index: 1300 !important; }
-.filter-dialog{ z-index: 1310 !important; }
-
-/* --- 검색줄 버튼이 둥둥 떠보이면 정렬 보강 --- */
-.search .btn-chip, .search .btn { vertical-align: middle; }
-
-/* --- 모바일에서 모달 내부 스크롤 부드럽게 --- */
-.filter-body{ overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
