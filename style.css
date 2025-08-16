@@ -245,3 +245,65 @@ html[lang="ar"] .searchbar{flex-direction:row-reverse}
    Key fix: background decorative layers should never intercept pointer events
    -------------------------------------------------------------------------- */
 .hero::before{pointer-events:none}
+/* ===== Header layout fix ===== */
+.site-header{
+  position: sticky; top:0; z-index: 50;
+  background: rgba(10,10,15,.75);
+  -webkit-backdrop-filter: blur(6px) saturate(140%);
+  backdrop-filter: blur(6px) saturate(140%);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.site-header .header-inner{
+  max-width: 1200px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* 로고 | 메뉴 | 액션 */
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+}
+
+/* 브랜드(로고) */
+.brand{ display:flex; align-items:center; gap:10px; min-width:0; text-decoration:none; }
+.brand-mark{ height:32px; width:auto; display:block; }
+.brand-text{ font-weight:700; letter-spacing:.5px; color:#fff; font-size:18px; }
+
+/* 메인 메뉴: 로고 옆에 붙이기 */
+.main-nav{
+  display:flex; align-items:center; gap:28px;
+  justify-self: start !important;  /* 가운데로 가는 습관 죽이기 */
+  margin: 0 !important;            /* 기존 margin: 0 auto 제거 */
+}
+.main-nav a{
+  color:#e9e9ee; text-decoration:none; font-weight:600;
+  font-size:15px; line-height:1;
+  padding:10px 6px; border-radius:10px;
+}
+.main-nav a:hover{ color:#fff; background:rgba(255,255,255,.06); }
+
+/* 우측 액션(언어, 로그인/가입 등) */
+.header-actions{ display:flex; align-items:center; gap:12px; justify-self:end; }
+.header-actions .btn{ padding:10px 14px; border-radius:12px; font-weight:700; }
+.btn-primary{
+  background: linear-gradient(180deg,#eacb84,#caa24e);
+  color:#121212; border:none; box-shadow: 0 6px 18px rgba(202,162,78,.25);
+}
+.btn-primary:hover{ filter:brightness(1.05); }
+
+/* 언어 셀렉트 최소 폭 */
+.header-actions select{
+  background:#15161a; color:#e9e9ee; border:1px solid rgba(255,255,255,.12);
+  padding:8px 10px; border-radius:10px; min-width:70px;
+}
+
+/* 모바일: 메뉴 숨기고 햄버거 표시 */
+.menu-toggle{ display:none; background:transparent; color:#fff; font-size:22px; }
+@media (max-width: 960px){
+  .main-nav{ display:none; }
+  .menu-toggle{ display:inline-flex; }
+}
+
+/* 혹시 기존 CSS에 헤더를 가운데로 미는 규칙이 있으면 강제로 해제 */
+.header, .navbar, nav.main, .top-nav {
+  margin-left:0 !important; margin-right:0 !important;
+  justify-content:flex-start !important;
+}
