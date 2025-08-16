@@ -4,93 +4,70 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>STAYWORLD — Luxury Global Stays</title>
-  <link rel="icon" href="/stayworld-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css"/>
+  <link rel="icon" href="/stayworld-logo.png"/>
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
+  <!-- 헤더 -->
+  <header>
     <div class="container nav">
-      <a class="brand" href="/index.html">
-        <img src="/assets/logo-gold.png" alt="STAYWORLD">
+      <div class="brand">
+        <img src="/stayworld-logo.png" alt="STAYWORLD"/>
         <strong>STAYWORLD</strong>
-      </a>
+      </div>
       <nav class="nav-links">
-        <a id="t_nav_home" href="#home">Home</a>
+        <a id="t_nav_home" href="/index.html#home">Home</a>
         <a id="t_nav_membership" href="/membership.html">Membership</a>
         <a id="t_nav_login" href="/login.html">Login</a>
-        <a id="t_nav_signup" class="btn btn-gold" href="/signup.html">Sign Up</a>
-      </nav>
-      <div class="pills">
-        <span id="authState" class="pill">Guest</span>
-        <select id="langSelect" class="lang" aria-label="Language">
-          <option value="en">EN</option><option value="ko">KO</option><option value="ja">JA</option>
-          <option value="fr">FR</option><option value="tr">TR</option><option value="de">DE</option>
-          <option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
+        <a class="btn btn-gold" id="t_nav_signup" href="/signup.html">Sign Up</a>
+        <!-- 언어 셀렉터 -->
+        <select id="langSelect" aria-label="Language">
+          <option value="en">EN</option><option value="ko">KO</option>
+          <option value="tr">TR</option><option value="fr">FR</option>
+          <option value="ja">JA</option><option value="de">DE</option>
+          <option value="es">ES</option><option value="it">IT</option>
+          <option value="zh">ZH</option><option value="ru">RU</option>
         </select>
-      </div>
+      </nav>
     </div>
   </header>
 
-  <main id="home" class="container hero">
-    <h1 id="t_h1">Luxury stays.<br><span class="gold">Global reach.</span></h1>
-    <p id="t_pay" class="lead">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+  <!-- 히어로 -->
+  <main class="container hero" id="home">
+    <h1 id="t_h1">Luxury stays.<br><span style="color:var(--gold)">Global reach.</span></h1>
+    <p class="lead" id="t_pay">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
-    <div class="searchbar" role="search">
-      <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off" aria-label="Destination"/>
-      <input id="dateFrom" type="date" aria-label="From"/>
-      <input id="dateTo" type="date" aria-label="To"/>
-      <button id="filterOpen" class="btn" type="button">Filters</button>
-      <a id="goSearch" class="btn btn-gold" href="/results.html">Search</a>
+    <div class="searchbar" style="margin-top:14px">
+      <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…"/>
+      <input type="date" id="dateFrom"/>
+      <input type="date" id="dateTo"/>
+      <a class="btn" id="t_filters">Filters</a>
+      <a class="btn btn-gold" id="t_search" href="/results.html">Search</a>
     </div>
 
-    <section style="margin-top:18px">
-      <div class="grid">
-        <div class="card">
-          <h3 id="dealTitle">Verified stays</h3>
-          <p id="dealSub" class="lead">Top picks near you.</p>
-        </div>
-        <div class="card">
-          <h3>StayWorld+ Rewards</h3>
-          <p class="lead">Earn points on every booking.</p>
-        </div>
-        <div class="card">
-          <h3>Secure payments</h3>
-          <p class="lead">Visa, Mastercard, Amex & Crypto.</p>
-        </div>
+    <!-- 특징 3카드 (문구 번역용 id만 부여) -->
+    <section class="grid" style="margin-top:18px">
+      <div class="card">
+        <h3 id="t_card1">Verified stays</h3>
+        <p id="t_card1sub">Top picks near you.</p>
+      </div>
+      <div class="card">
+        <h3 id="t_card2">StayWorld+ Rewards</h3>
+        <p id="t_card2sub">Earn points on every booking.</p>
+      </div>
+      <div class="card">
+        <h3 id="t_card3">Secure payments</h3>
+        <p id="t_card3sub">Visa, Mastercard, Amex & Crypto.</p>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="container">
-      © StayWorld — stayworldbooking.com
-    </div>
+  <footer class="container">
+    <div>© STAYWORLD — stayworldbooking.com</div>
   </footer>
 
-  <!-- Chatbot -->
-  <button id="chatFab" title="AI Concierge">💬</button>
-  <section id="botPanel" aria-hidden="true">
-    <div class="bot-head">
-      <div><strong>AI Concierge</strong></div>
-      <button id="botClose" class="btn" type="button">✕</button>
-    </div>
-    <div id="botBody" class="bot-body">
-      <div class="msg">Hello! Ask me anything.</div>
-    </div>
-    <div class="bot-foot">
-      <input id="botInput" placeholder="Type a message…" />
-      <button id="botSend" class="btn btn-gold">Send</button>
-    </div>
-  </section>
-
-  <!-- i18n + app -->
-  <script src="/lang.js"></script>
-  <!-- Firebase config (당신 레포의 파일 유지) -->
-  <script src="/firebase-config.js"></script>
-  <script src="/app.js"></script>
+  <!-- 번역 스크립트 -->
+  <script src="/lang.js?v=20250815"></script>
 </body>
 </html>
+>
