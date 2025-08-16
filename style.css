@@ -94,3 +94,36 @@ img{max-width:100%;display:block}
 /* Search UX */
 .search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
 .btn.loading{opacity:.65;pointer-events:none}
+/* ===== Clickability & Overlay safety ===== */
+header, nav, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-index: 20; }
+#filterDrawer { position: fixed; inset: 0; display: none; z-index: 40; }
+#filterDrawer[aria-hidden="false"] { display: flex; }
+#filterDrawer .drawer-backdrop {
+  position: absolute; inset: 0; background: rgba(0,0,0,.45);
+}
+#filterDrawer .drawer-panel {
+  position: relative; margin-left: auto; width: min(780px, 92vw);
+  max-height: 92vh; overflow: auto; background: var(--panel, #101018);
+  border-left: 1px solid rgba(255,255,255,.08); border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+}
+#filterDrawer .drawer-head, #filterDrawer .drawer-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+#filterDrawer .drawer-foot { border-bottom: 0; border-top: 1px solid rgba(255,255,255,.08); }
+#filterDrawer .drawer-body { padding: 14px; }
+#filterDrawer button, #filterDrawer input, #filterDrawer select, #filterDrawer label { pointer-events: auto; }
+
+/* prevent accidental overlay swallowing clicks elsewhere */
+* { -webkit-tap-highlight-color: transparent; }
+button, a, input, select, label { pointer-events: auto; }
+
+/* ===== Search UX ===== */
+.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
+.btn.loading{opacity:.65;pointer-events:none}
+
+/* ===== Bot panel layering ===== */
+#botPanel{ position: fixed; right: 16px; bottom: 86px; width: 360px;
+  border:1px solid #23232b; border-radius:18px; background:#101018; z-index: 50;
+  box-shadow:0 20px 60px rgba(0,0,0,.5) }
