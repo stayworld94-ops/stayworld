@@ -286,3 +286,19 @@ input[type="text"], input[type="date"], select{
 
 /* ---------- Demo spacing for hero headline ---------- */
 .hero h1 strong{color:var(--gold-1)}
+/* --- 강제 스크롤 잠금 --- */
+.modal-open, .modal-open body { overflow: hidden !important; }
+
+/* --- 혹시 남아있는 인라인 필터 강제 숨김(모달이 아닌 것만) --- */
+section#filters, .filters-inline { display:none !important; }
+div.filters:not(.filters-grid) { display:none !important; }
+
+/* --- 모달 z-index 확고히 (챗봇/헤더 위) --- */
+#filterModal{ z-index: 1300 !important; }
+.filter-dialog{ z-index: 1310 !important; }
+
+/* --- 검색줄 버튼이 둥둥 떠보이면 정렬 보강 --- */
+.search .btn-chip, .search .btn { vertical-align: middle; }
+
+/* --- 모바일에서 모달 내부 스크롤 부드럽게 --- */
+.filter-body{ overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
