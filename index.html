@@ -4,13 +4,86 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>STAYWORLD — Luxury Global Reach</title>
-  <link rel="stylesheet" href="style.css" />
+
   <!-- Leaflet (지도) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
+  <!-- 통합 CSS (헤더/히어로/검색/카드/지도/필터드로어/챗봇/반응형) -->
+  <style>
+    :root{--bg:#0b0f16;--panel:#101018;--text:#e7e9ee;--muted:#cfd6e6;--line:rgba(255,255,255,.08);--chip:#121a26;--gold1:#f4d78c;--gold2:#c9a35b}
+    *{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;line-height:1.5}
+    a{color:inherit;text-decoration:none}.container{max-width:1120px;margin:0 auto;padding:0 16px}
+    img{max-width:100%;display:block}
+
+    /* Header */
+    .site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
+    .brand{display:flex;align-items:center;gap:10px}.brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+    .brand-text{font-weight:800;letter-spacing:.6px}
+    .main-nav{display:flex;gap:28px;justify-content:center;flex:1}
+    .header-cta{display:flex;align-items:center;gap:12px}
+    .lang-label{font-size:12px;opacity:.7}
+    .lang-select{appearance:none;background:#101826;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:8px 32px 8px 10px}
+    .btn{border:0;padding:10px 14px;border-radius:12px;cursor:pointer}
+    .btn-ghost{background:transparent;color:#cfcfcf}.btn-ghost:hover{background:rgba(255,255,255,.06)}
+    .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
+    .btn-chip{background:var(--chip);color:#dfe3ea;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+
+    /* Hero */
+    .hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
+    .hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}.accent{color:#f1cf84}
+    .hero-sub{opacity:.85;margin:8px 0 28px}
+    .search-bar{display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;gap:10px;align-items:center}
+    .input{background:#0f1621;border:1px solid var(--line);color:var(--text);padding:12px 14px;border-radius:12px}
+    .input::placeholder{color:#a7b0bf}
+    .search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
+    .btn.loading{opacity:.65;pointer-events:none}
+
+    /* 카드 */
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+    .card{background:#0f1420;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+    .card h3{margin:0 0 6px}.card p{margin:0;opacity:.85}
+
+    /* Map */
+    .map-section{padding:36px 0 60px}
+    #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
+    /* 지도 레이어가 버튼 가리는 것 방지 */
+    .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
+
+    /* 필터 드로어(우측 슬라이드) */
+    #filterDrawer{position:fixed;inset:0;display:none;z-index:2147483637;align-items:stretch;justify-content:flex-end}
+    #filterDrawer[aria-hidden="false"]{display:flex}
+    #filterDrawer .back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+    #filterDrawer .panel{position:relative;margin-left:auto;width:min(780px,92vw);max-height:92vh;overflow:auto;background:var(--panel);border-left:1px solid var(--line);border-top-left-radius:16px;border-bottom-left-radius:16px;display:flex;flex-direction:column}
+    #filterDrawer .head,#filterDrawer .foot{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+    #filterDrawer .foot{border-bottom:0;border-top:1px solid var(--line)}
+    #filterGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px}
+    #filterDrawer .box{background:#0f1420;border:1px solid var(--line);border-radius:12px;padding:12px}
+    #filterDrawer h4{margin:0 0 8px;font-size:14px}
+    .sw-badge{position:absolute;top:-8px;right:-8px;background:#ffd36e;color:#1a1205;border-radius:999px;font-size:11px;padding:2px 6px}
+
+    /* 챗봇 (FAB + 패널) */
+    #chatFab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;z-index:2147483639;background:linear-gradient(180deg,var(--gold1),var(--gold2));box-shadow:0 14px 30px rgba(201,163,91,.35);font-size:22px}
+    #botPanel{position:fixed;right:20px;bottom:86px;width:min(360px,88vw);height:480px;background:#101018;border:1px solid #23232b;border-radius:16px;z-index:2147483638;display:none;box-shadow:0 20px 60px rgba(0,0,0,.5);color:var(--text)}
+    #botPanel .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
+    #botPanel .body{height:360px;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+    #botPanel .row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+    #botInput{flex:1;background:#0f1621;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px}
+    #botSend{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#1a1205;font-weight:700}
+    .msg{max-width:80%;padding:10px 12px;border-radius:12px}.me{align-self:flex-end;background:#132132}.ai{align-self:flex-start;background:#121820}
+
+    /* Footer */
+    .site-footer{padding:28px 0;border-top:1px solid var(--line);opacity:.8}
+
+    /* Responsive */
+    @media (max-width:920px){.main-nav{display:none}.hero-title{font-size:40px}.search-bar{grid-template-columns:1fr 1fr 1fr auto}}
+    @media (max-width:640px){.hero-title{font-size:34px}.features{grid-template-columns:1fr}}
+  </style>
 </head>
+
 <body>
-  <!-- ================= HEADER ================= -->
+  <!-- HEADER -->
   <header class="site-header">
     <div class="container header-row">
       <a href="/" class="brand">
@@ -25,489 +98,294 @@
       </nav>
 
       <div class="header-cta">
-        <div class="lang-wrap">
-          <label for="lang" class="lang-label" data-i18n="language">Language</label>
-          <select id="lang" class="lang-select" aria-label="Language">
-            <option value="EN" selected>EN</option>
-            <option value="KO">KO</option>
-            <option value="JA">JA</option>
-            <option value="ZH">ZH</option>
-            <option value="FR">FR</option>
-            <option value="ES">ES</option>
-            <option value="DE">DE</option>
-            <option value="TR">TR</option>
-            <option value="AR">AR</option>
-            <option value="RU">RU</option>
-          </select>
-        </div>
-        <a href="signup.html" class="btn btn-primary" data-i18n="nav_signup">Sign Up</a>
+        <label for="lang" class="lang-label" data-i18n="language">Language</label>
+        <select id="lang" class="lang-select">
+          <option value="EN" selected>EN</option><option>KO</option><option>JA</option><option>ZH</option><option>FR</option>
+          <option>ES</option><option>DE</option><option>TR</option><option>AR</option><option>RU</option>
+        </select>
+        <a href="signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign Up</a>
       </div>
     </div>
   </header>
 
-  <!-- ================= HERO ================= -->
+  <!-- HERO -->
   <section class="hero">
     <div class="container">
-      <h1 class="hero-title">
-        <span data-i18n="hero_luxury">Luxury stays.</span><br />
-        <span class="accent" data-i18n="hero_reach">Global reach.</span>
-      </h1>
+      <h1 class="hero-title"><span data-i18n="hero_luxury">Luxury stays.</span><br><span class="accent" data-i18n="hero_reach">Global reach.</span></h1>
       <p class="hero-sub" data-i18n="hero_sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
-      <div class="search-bar" id="searchBar">
-        <input type="text" class="input" id="searchDestination" placeholder="Paris, Tokyo, Istanbul…" data-i18n-placeholder="placeholder_city" />
-        <input type="date" class="input" id="checkIn" />
-        <input type="date" class="input" id="checkOut" />
+      <div class="search-bar">
+        <input class="input" id="searchDestination" type="text" placeholder="Paris, Tokyo, Istanbul…" data-i18n-placeholder="placeholder_city">
+        <input class="input" id="checkIn" type="date">
+        <input class="input" id="checkOut" type="date">
         <button class="btn btn-chip" id="btnFilters" type="button" data-i18n="filters">Filters</button>
         <button class="btn btn-gold" id="btnSearch" type="button" data-i18n="search">Search</button>
       </div>
+      <div id="searchStatus" class="search-status"></div>
 
       <div class="features">
-        <div class="card">
-          <h3 data-i18n="feat_verified">Verified stays</h3>
-          <p data-i18n="feat_verified_sub">Top picks near you.</p>
-        </div>
-        <div class="card">
-          <h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3>
-          <p data-i18n="feat_rewards_sub">Earn points on every booking.</p>
-        </div>
-        <div class="card">
-          <h3 data-i18n="feat_payments">Secure payments</h3>
-          <p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p>
-        </div>
+        <div class="card"><h3 data-i18n="feat_verified">Verified stays</h3><p data-i18n="feat_verified_sub">Top picks near you.</p></div>
+        <div class="card"><h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3><p data-i18n="feat_rewards_sub">Earn points on every booking.</p></div>
+        <div class="card"><h3 data-i18n="feat_payments">Secure payments</h3><p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- ================= MAP ================= -->
+  <!-- MAP -->
   <section class="map-section">
-    <div class="container">
-      <div id="map" aria-label="Map" role="region"></div>
-    </div>
+    <div class="container"><div id="map" aria-label="Map" role="region"></div></div>
   </section>
 
-  <!-- ================= FILTER MODAL ================= -->
-  <div id="filterModal" class="modal" aria-hidden="true">
-    <div class="filter-dialog" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
-      <div class="filter-head">
-        <div id="filterTitle" class="filter-title" data-i18n="filters">Filters</div>
-        <button id="filterClose" class="btn btn-ghost" aria-label="Close">✕</button>
-      </div>
-      <div class="filter-body">
-        <div class="filters-grid" id="filtersGrid"></div>
-      </div>
-      <div class="filter-foot">
-        <button id="filterClear" class="btn btn-ghost" data-i18n="clear">Clear</button>
-        <button id="filterApply" class="btn btn-primary" data-i18n="apply">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= CHATBOT ================= -->
-  <div id="chatWidget" class="chat">
-    <button id="chatToggle" class="chat-fab" aria-label="Open AI Chat">💬</button>
-    <div class="chat-panel" aria-live="polite" aria-label="StayWorld AI">
-      <div class="chat-head">
-        <div class="chat-title">StayWorld AI</div>
-        <button id="chatClose" class="btn btn-ghost" aria-label="Close">✕</button>
-      </div>
-      <div id="chatLog" class="chat-log"></div>
-      <div class="chat-input-row">
-        <input id="chatInput" class="chat-input" type="text" placeholder="Ask about stays, dates, or payments…" data-i18n-placeholder="chat_placeholder" />
-        <button id="chatSend" class="btn btn-gold" data-i18n="send">Send</button>
-      </div>
-    </div>
-  </div>
-
-  <footer class="site-footer">
-    <div class="container">
-      <small>© StayWorld — stayworldbooking.com</small>
-    </div>
-  </footer>
-
-  <!-- ================= SCRIPTS ================= -->
+  <!-- ====== 패치 스크립트 (필터/챗봇/오버레이가드/검색/지도/i18n) ====== -->
   <script>
-/* ---------------- I18N (10개 언어) ---------------- */
-const I18N = {
-  EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+  // ---------- I18N ----------
+  const I18N={
+    EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
       hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search",
       feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",
       feat_rewards:"StayWorld+ Rewards",feat_rewards_sub:"Earn points on every booking.",
-      feat_payments:"Secure payments",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
-      clear:"Clear",apply:"Apply",send:"Send",chat_placeholder:"Ask about stays, dates, or payments…"},
-  KO:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+      feat_payments:"Secure payments",feat_payments_sub:"Visa, Mastercard, Amex & Crypto."},
+    KO:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
       hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
       placeholder_city:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색",
       feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",feat_rewards:"StayWorld+ 리워드",feat_rewards_sub:"예약마다 포인트 적립.",
-      feat_payments:"안전한 결제",feat_payments_sub:"VISA, 마스터, 아멕스 & 크립토.",
-      clear:"지우기",apply:"적용",send:"전송",chat_placeholder:"숙소/날짜/결제에 대해 물어보세요…"},
-  JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+      feat_payments:"안전한 결제",feat_payments_sub:"VISA, 마스터, 아멕스 & 크립토."},
+    JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
       hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
       placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
       feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
-      feat_payments:"安全な支払い",feat_payments_sub:"VISA, Master, Amex & Crypto。",
-      clear:"クリア",apply:"適用",send:"送信",chat_placeholder:"宿・日程・支払いについて質問…"},
-  ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_signup:"注册",language:"语言",
+      feat_payments:"安全な支払い",feat_payments_sub:"VISA, Master, Amex & Crypto。"},
+    ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_signup:"注册",language:"语言",
       hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
       placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
       feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
-      feat_payments:"安全支付",feat_payments_sub:"Visa、Mastercard、Amex 与加密货币。",
-      clear:"清除",apply:"应用",send:"发送",chat_placeholder:"询问住宿、日期或支付…"},
-  FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_signup:"S’inscrire",language:"Langue",
+      feat_payments:"安全支付",feat_payments_sub:"Visa、Mastercard、Amex 与加密货币。"},
+    FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_signup:"S’inscrire",language:"Langue",
       hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher",
       feat_verified:"Logements vérifiés",feat_verified_sub:"Meilleurs choix près de chez vous.",
       feat_rewards:"Récompenses StayWorld+",feat_rewards_sub:"Des points à chaque réservation.",
-      feat_payments:"Paiements sécurisés",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
-      clear:"Effacer",apply:"Appliquer",send:"Envoyer",chat_placeholder:"Questions sur les séjours, dates ou paiements…"},
-  ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_signup:"Regístrate",language:"Idioma",
+      feat_payments:"Paiements sécurisés",feat_payments_sub:"Visa, Mastercard, Amex & Crypto."},
+    ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_signup:"Regístrate",language:"Idioma",
       hero_luxury:"Estancias de lujo.",hero_reach:"Alcance global.",hero_sub:"Tarjetas, transferencia bancaria y cripto (BTC · ETH · USDT).",
       placeholder_city:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar",
       feat_verified:"Alojamientos verificados",feat_verified_sub:"Mejores opciones cerca de ti.",
       feat_rewards:"Recompensas StayWorld+",feat_rewards_sub:"Puntos en cada reserva.",
-      feat_payments:"Pagos seguros",feat_payments_sub:"Visa, Mastercard, Amex y Cripto.",
-      clear:"Borrar",apply:"Aplicar",send:"Enviar",chat_placeholder:"Pregunta sobre estancias, fechas o pagos…"},
-  DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_signup:"Registrieren",language:"Sprache",
+      feat_payments:"Pagos seguros",feat_payments_sub:"Visa, Mastercard, Amex y Cripto."},
+    DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_signup:"Registrieren",language:"Sprache",
       hero_luxury:"Luxuriöse Aufenthalte.",hero_reach:"Globale Reichweite.",hero_sub:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen",
       feat_verified:"Verifizierte Unterkünfte",feat_verified_sub:"Top-Auswahl in deiner Nähe.",
       feat_rewards:"StayWorld+ Prämien",feat_rewards_sub:"Punkte bei jeder Buchung.",
-      feat_payments:"Sichere Zahlungen",feat_payments_sub:"Visa, Mastercard, Amex & Krypto.",
-      clear:"Löschen",apply:"Anwenden",send:"Senden",chat_placeholder:"Fragen zu Aufenthalt, Daten oder Zahlung…"},
-  TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_signup:"Kaydol",language:"Dil",
+      feat_payments:"Sichere Zahlungen",feat_payments_sub:"Visa, Mastercard, Amex & Krypto."},
+    TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_signup:"Kaydol",language:"Dil",
       hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara",
       feat_verified:"Doğrulanmış konaklamalar",feat_verified_sub:"Yakınınızdaki en iyi seçenekler.",
       feat_rewards:"StayWorld+ Ödülleri",feat_rewards_sub:"Her rezervasyonda puan kazanın.",
-      feat_payments:"Güvenli ödemeler",feat_payments_sub:"Visa, Mastercard, Amex & Kripto.",
-      clear:"Temizle",apply:"Uygula",send:"Gönder",chat_placeholder:"Konaklama, tarihler veya ödemeleri sorun…"},
-  AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_signup:"إنشاء حساب",language:"اللغة",
+      feat_payments:"Güvenli ödemeler",feat_payments_sub:"Visa, Mastercard, Amex & Kripto."},
+    AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_signup:"إنشاء حساب",language:"اللغة",
       hero_luxury:"إقامات فاخرة.",hero_reach:"انتشار عالمي.",hero_sub:"بطاقات، تحويل بنكي وعملات مشفرة (BTC · ETH · USDT).",
       placeholder_city:"باريس، طوكيو، إسطنبول…",filters:"الفلاتر",search:"بحث",
       feat_verified:"إقامات موثوقة",feat_verified_sub:"أفضل الخيارات بالقرب منك.",
       feat_rewards:"مكافآت StayWorld+",feat_rewards_sub:"اكسب نقاطًا مع كل حجز.",
-      feat_payments:"مدفوعات آمنة",feat_payments_sub:"Visa وMastercard وAmex والعملات المشفرة.",
-      clear:"مسح",apply:"تطبيق",send:"إرسال",chat_placeholder:"اسأل عن الإقامات أو التواريخ أو المدفوعات…"},
-  RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_signup:"Регистрация",language:"Язык",
+      feat_payments:"مدفوعات آمنة",feat_payments_sub:"Visa وMastercard وAmex والعملات المشفرة."},
+    RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_signup:"Регистрация",language:"Язык",
       hero_luxury:"Роскошное проживание.",hero_reach:"Глобальный охват.",hero_sub:"Карты, перевод и крипто (BTC · ETH · USDT).",
       placeholder_city:"Париж, Токио, Стамбул…",filters:"Фильтры",search:"Поиск",
       feat_verified:"Проверенные варианты",feat_verified_sub:"Лучшие места рядом с вами.",
       feat_rewards:"Бонусы StayWorld+",feat_rewards_sub:"Баллы за каждое бронирование.",
-      feat_payments:"Безопасные платежи",feat_payments_sub:"Visa, Mastercard, Amex и крипто.",
-      clear:"Очистить",apply:"Применить",send:"Отправить",chat_placeholder:"Спросите о проживании, датах или оплате…"},
-};
-
-function applyI18N(lang){
-  const dict = I18N[lang] || I18N.EN;
-  // text nodes
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k = el.getAttribute('data-i18n'); if(dict[k]) el.textContent = dict[k];
-  });
-  // placeholders
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-    const k = el.getAttribute('data-i18n-placeholder'); if(dict[k]) el.setAttribute('placeholder', dict[k]);
-  });
-}
-document.getElementById('lang').addEventListener('change', e=>{
-  applyI18N(e.target.value);
-});
-applyI18N('EN');
-
-/* ---------------- Filters (카테고리 렌더) ---------------- */
-const FILTER_SETS = [
-  { title:'Amenities', items:['Wi-Fi','Pool','Spa','Gym','Kitchen','Balcony','Hot tub','Sauna','Air conditioning','Breakfast']},
-  { title:'Property type', items:['Hotel','Apartment','Villa','Hostel','B&B']},
-  { title:'Views & Outdoors', items:['Sea view','City view','Mountain view','Garden']},
-  { title:'Payments & Policies', items:['Crypto','Cards','Bank transfer','Free cancellation','Late checkout','Non-smoking']},
-  { title:'Accessibility', items:['Accessible','Step-free access','Elevator','Family-friendly','24h check-in','Airport shuttle']},
-  { title:'Pets', items:['Pet-friendly']},
-];
-
-(function buildFilters(){
-  const grid = document.getElementById('filtersGrid');
-  grid.innerHTML = '';
-  FILTER_SETS.forEach((col,i)=>{
-    const colEl = document.createElement('div');
-    colEl.className = 'filters-col';
-    const list = col.items.map((name,idx)=>{
-      const id = `f_${i}_${idx}_${name.replace(/[^a-z0-9]+/gi,'_')}`;
-      return `<li class="filter-item">
-        <input class="filter-check" type="checkbox" id="${id}" data-name="${name}">
-        <label class="filter-label" for="${id}">${name}</label>
-      </li>`;
-    }).join('');
-    colEl.innerHTML = `<h4 class="filters-col-title">${col.title}</h4><ul class="filters-list">${list}</ul>`;
-    grid.appendChild(colEl);
-  });
-})();
-
-const modal = document.getElementById('filterModal');
-const btnFilters = document.getElementById('btnFilters');
-const btnApply = document.getElementById('filterApply');
-const btnClear = document.getElementById('filterClear');
-const btnClose = document.getElementById('filterClose');
-
-function selectedCount(){ return modal.querySelectorAll('.filter-check:checked').length; }
-function openFilters(){ modal.classList.add('open'); document.documentElement.classList.add('modal-open'); modal.setAttribute('aria-hidden','false'); }
-function closeFilters(){ modal.classList.remove('open'); document.documentElement.classList.remove('modal-open'); modal.setAttribute('aria-hidden','true'); updateBadge(); }
-function updateBadge(){
-  const n = selectedCount();
-  if(n>0){ btnFilters.classList.add('badge'); btnFilters.dataset.badge = n; }
-  else { btnFilters.classList.remove('badge'); delete btnFilters.dataset.badge; }
-}
-btnFilters.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); openFilters(); });
-btnClose.addEventListener('click', e=>{ e.preventDefault(); closeFilters(); });
-modal.addEventListener('click', e=>{ if(e.target===modal) closeFilters(); });
-btnClear.addEventListener('click', ()=>{ modal.querySelectorAll('.filter-check:checked').forEach(el=>el.checked=false); updateBadge(); });
-btnApply.addEventListener('click', ()=>{ closeFilters(); console.log('Filters:', Array.from(modal.querySelectorAll('.filter-check:checked')).map(x=>x.dataset.name)); });
-modal.addEventListener('change', e=>{ if(e.target.classList.contains('filter-check')) updateBadge(); });
-
-/* ---------------- 지도 (Leaflet + Nominatim) ---------------- */
-let map, marker;
-function initMap(){
-  map = L.map('map', { scrollWheelZoom: true }).setView([48.8566, 2.3522], 12); // Paris default
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
-}
-initMap();
-
-async function geocodeAndGo(q){
-  if(!q) return;
-  try{
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1&addressdetails=0`;
-    const res = await fetch(url, { headers: { 'Accept-Language': document.getElementById('lang').value }});
-    const data = await res.json();
-    if(data && data[0]){
-      const { lat, lon } = data[0];
-      const latf = parseFloat(lat), lonf = parseFloat(lon);
-      if(marker) marker.remove();
-      marker = L.marker([latf, lonf]).addTo(map);
-      map.setView([latf, lonf], 13);
-    } else {
-      alert('No results for that destination.');
-    }
-  }catch(e){
-    console.error(e);
-    alert('Map lookup failed.');
-  }
-}
-document.getElementById('btnSearch').addEventListener('click', ()=>{
-  geocodeAndGo(document.getElementById('searchDestination').value);
-});
-
-/* ---------------- 챗봇 ---------------- */
-const chat = {
-  elLog: document.getElementById('chatLog'),
-  elPanel: document.querySelector('.chat-panel'),
-  elToggle: document.getElementById('chatToggle'),
-  elClose: document.getElementById('chatClose'),
-  elInput: document.getElementById('chatInput'),
-  elSend: document.getElementById('chatSend'),
-  msgs: []
-};
-
-function addMsg(role, text){
-  const wrap = document.createElement('div');
-  wrap.className = 'msg ' + (role==='user' ? 'me' : 'ai');
-  wrap.textContent = text;
-  chat.elLog.appendChild(wrap);
-  chat.elLog.scrollTop = chat.elLog.scrollHeight;
-}
-function toggleChat(open){
-  if(open){ chat.elPanel.classList.add('open'); }
-  else { chat.elPanel.classList.remove('open'); }
-}
-chat.elToggle.addEventListener('click', e=>{ e.stopPropagation(); toggleChat(true); });
-chat.elClose.addEventListener('click', e=>{ e.stopPropagation(); toggleChat(false); });
-document.addEventListener('click', e=>{
-  // 패널 밖 클릭 시 닫기 (FAB, 입력영역 제외)
-  if(!e.target.closest('.chat-panel') && !e.target.closest('#chatToggle')){
-    toggleChat(false);
-  }
-});
-// 이벤트 전파로 다른 버튼이 죽지 않도록
-['btnFilters','btnSearch','chatToggle','chatClose','chatSend'].forEach(id=>{
-  const b = document.getElementById(id);
-  if(b) b.addEventListener('click', ev=>ev.stopPropagation(), {capture:true});
-});
-
-async function callAssistant(userText){
-  // 호출 가능한 엔드포인트 자동 탐색 (Netlify/Vercel/Generic)
-  const endpoints = ['/api/chat', '/.netlify/functions/chat', '/api/openai'];
-  let endpoint = null;
-  for(const ep of endpoints){
-    try{
-      const ping = await fetch(ep, { method:'OPTIONS' });
-      if (ping.ok || ping.status===405 || ping.status===404) { endpoint = ep; break; }
-    }catch(_){}
-  }
-  if(!endpoint){ throw new Error('No backend endpoint found.'); }
-
-  const payload = {
-    model: 'gpt-4.1',
-    messages: [
-      ...chat.msgs,
-      { role:'user', content: userText }
-    ],
-    // 선택 언어 힌트
-    metadata: { lang: document.getElementById('lang').value }
+      feat_payments:"Безопасные платежи",feat_payments_sub:"Visa, Mastercard, Amex и крипто."},
   };
-
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  });
-  if(!res.ok) throw new Error('Assistant error');
-  const data = await res.json();
-  return (data.reply || data.content || '').toString();
-}
-
-async function sendChat(){
-  const text = chat.elInput.value.trim();
-  if(!text) return;
-  chat.elInput.value = '';
-  addMsg('user', text);
-  chat.msgs.push({role:'user', content:text});
-  addMsg('assistant', '…');
-
-  try{
-    const reply = await callAssistant(text);
-    chat.elLog.lastChild.textContent = reply || '(no content)';
-    chat.msgs.push({role:'assistant', content: reply});
-  }catch(e){
-    console.error(e);
-    chat.elLog.lastChild.textContent = 'Assistant is unavailable. Please add the backend function and OPENAI_API_KEY.';
+  function applyI18N(lang){
+    const d=I18N[lang]||I18N.EN;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(d[k])el.textContent=d[k]})
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(d[k])el.setAttribute('placeholder',d[k])})
   }
-}
-chat.elSend.addEventListener('click', sendChat);
-chat.elInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+  document.getElementById('lang').addEventListener('change',e=>applyI18N(e.target.value));
+  applyI18N('EN');
 
-/* ---------------- 초기 상태 ---------------- */
-updateBadge();
+  // ---------- 오버레이 무력화(지도가 버튼 덮는 문제 차단) ----------
+  const mutedOverlays=new Set();
+  function muteFullscreenOverlays(){
+    document.querySelectorAll('body *').forEach(el=>{
+      try{
+        const cs=getComputedStyle(el); if(cs.position!=='fixed')return;
+        const r=el.getBoundingClientRect();
+        if(r.width>=innerWidth*0.96 && r.height>=innerHeight*0.96){
+          if(el.id==='filterDrawer' || el.id==='botPanel') return;
+          if(!mutedOverlays.has(el)){ el.dataset.swPe=cs.pointerEvents; el.style.pointerEvents='none'; mutedOverlays.add(el); }
+        }
+      }catch(_){}
+    });
+  }
+  function restoreOverlays(){ mutedOverlays.forEach(el=>{ if(el.dataset.swPe!=null){el.style.pointerEvents=el.dataset.swPe; delete el.dataset.swPe;} }); mutedOverlays.clear(); }
+
+  // ---------- 필터 드로어 ----------
+  const GROUPS=[
+    {t:'Price per night', inputs:[['range','priceMin',{min:0,max:1000,step:10}],['range','priceMax',{min:0,max:5000,step:50}]]},
+    {t:'Stay type', checks:['Hotel','Motel','Hostel','Apartment','Villa','Ryokan','Guesthouse','B&B']},
+    {t:'Review score', radios:['4.5+','4.0+','Any']},
+    {t:'Beds & Baths', inputs:[['number','beds',{min:1,value:1}],['number','baths',{min:1,value:1}]]},
+    {t:'Pets', checks:['Allowed']},
+    {t:'Check-in', checks:['Self check-in']},
+    {t:'Amenities', checks:['Wi-Fi','Kitchen','Parking','Pool','Air conditioning','Gym','Workspace','Washer','Dryer','Breakfast']},
+    {t:'Booking', checks:['Instant book','Request to book']},
+    {t:'Verification', checks:['Verified listings only','Verified reviews']},
+    {t:'Long-stay', checks:['Show long-stay deals']},
+    {t:'Business', checks:['B2B-ready','Invoice available']},
+    {t:'Location', checks:['Near airport','Near station','Near beach','City center']},
+    {t:'Accessibility', checks:['Step-free access','Elevator','Wide doorway','Accessible bathroom']},
+    {t:'Experiences', checks:['Nature','Camping','Traditional','Ski-in/out','Wine country']},
+    {t:'View', checks:['Sea view','City view','Mountain view']},
+    {t:'Safety', checks:['Carbon monoxide alarm','Smoke alarm','First aid kit']},
+    {t:'Family', checks:['Crib','High chair','Stroller friendly']},
+    {t:'Entertainment', checks:['TV','Netflix','Game console']},
+    {t:'Outdoor', checks:['BBQ grill','Patio','Private garden']},
+    {t:'Parking', checks:['On-site','Street','Paid garage']},
+  ];
+  function ensureDrawer(){
+    let d=document.getElementById('filterDrawer');
+    if(!d){
+      d=document.createElement('div'); d.id='filterDrawer'; d.setAttribute('aria-hidden','true');
+      d.innerHTML=`
+        <div class="back"></div>
+        <div class="panel">
+          <div class="head"><strong>Filters</strong><button id="swClose" class="btn btn-ghost">✕</button></div>
+          <div id="filterGrid"></div>
+          <div class="foot">
+            <button id="swReset" class="btn btn-ghost" style="border:1px solid rgba(255,255,255,.14)">Reset</button>
+            <button id="swApply" class="btn btn-gold">Apply</button>
+          </div>
+        </div>`;
+      document.body.appendChild(d);
+
+      const grid=d.querySelector('#filterGrid');
+      GROUPS.forEach((g,gi)=>{
+        const box=document.createElement('div'); box.className='box'; box.innerHTML=`<h4>${g.t}</h4>`;
+        (g.inputs||[]).forEach(([type,id,attrs])=>{
+          const wrap=document.createElement('div'); wrap.style.margin='6px 0';
+          wrap.innerHTML=`<label style="font-size:12px">${id}</label><input type="${type}" id="${id}" style="width:100%">`;
+          Object.entries(attrs||{}).forEach(([k,v])=>wrap.querySelector('input').setAttribute(k,v));
+          box.appendChild(wrap);
+        });
+        (g.radios||[]).forEach((name,ri)=>{
+          const id=`rg_${gi}_${ri}`; const checked=/Any/i.test(name)?'checked':'';
+          const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
+          lab.innerHTML=`<input type="radio" name="rg_${gi}" id="${id}" ${checked}> ${name}`; box.appendChild(lab);
+        });
+        (g.checks||[]).forEach((name,ci)=>{
+          const id=`ck_${gi}_${ci}`;
+          const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
+          lab.innerHTML=`<input type="checkbox" id="${id}"> ${name}`; box.appendChild(lab);
+        });
+        grid.appendChild(box);
+      });
+
+      const back=d.querySelector('.back');
+      const close=()=>{d.setAttribute('aria-hidden','true'); restoreOverlays();};
+      back.addEventListener('click',close);
+      d.querySelector('#swClose').addEventListener('click',close);
+      d.querySelector('.panel').addEventListener('click',e=>e.stopPropagation());
+      d.querySelector('#swReset').addEventListener('click',()=>{
+        d.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
+        d.querySelectorAll('input[type=radio]').forEach(i=>i.checked=/Any/i.test(i.nextSibling?.textContent||'Any'));
+        setBadge('');
+      });
+      d.querySelector('#swApply').addEventListener('click',()=>{
+        const n=d.querySelectorAll('input[type=checkbox]:checked, input[type=radio]:checked').length;
+        setBadge(n?n.toString():''); close();
+      });
+    }
+    return d;
+  }
+  function openDrawer(){ const d=ensureDrawer(); d.setAttribute('aria-hidden','false'); muteFullscreenOverlays(); }
+  function setBadge(text){ const btn=document.getElementById('btnFilters'); btn.style.position='relative'; let b=btn.querySelector('.sw-badge'); if(text){ if(!b){b=document.createElement('span');b.className='sw-badge';btn.appendChild(b);} b.textContent=text; } else if(b){b.remove();} }
+  document.getElementById('btnFilters').addEventListener('click',e=>{e.stopPropagation(); openDrawer();},{capture:true});
+
+  // ---------- 챗봇 ----------
+  function ensureChat(){
+    let fab=document.getElementById('chatFab');
+    if(!fab){ fab=document.createElement('button'); fab.id='chatFab'; fab.textContent='💬'; document.body.appendChild(fab); }
+    let panel=document.getElementById('botPanel');
+    if(!panel){
+      panel=document.createElement('div'); panel.id='botPanel';
+      panel.innerHTML=`<div class="hdr"><strong>AI Concierge</strong><button id="botClose" class="btn btn-ghost">✕</button></div>
+        <div id="botBody" class="body"><div class="msg ai">Hello! Ask in any language.</div></div>
+        <div class="row"><input id="botInput" placeholder="Type a message…"><button id="botSend">Send</button></div>`;
+      document.body.appendChild(panel);
+    }
+    const open=()=>{panel.style.display='block'; muteFullscreenOverlays();};
+    const close=()=>{panel.style.display='none'; restoreOverlays();};
+    fab.addEventListener('click',e=>{e.stopPropagation(); open();},{capture:true});
+    panel.querySelector('#botClose').addEventListener('click',e=>{e.stopPropagation(); close();});
+    document.addEventListener('click',e=>{
+      if(panel.style.display!=='block')return;
+      const r=panel.getBoundingClientRect(); const inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
+      if(!inside) close();
+    },{capture:true});
+
+    const body=panel.querySelector('#botBody'), input=panel.querySelector('#botInput'), send=panel.querySelector('#botSend');
+    const msgs=[];
+    const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
+    async function askAI(message,lang){
+      for(const ep of ['/.netlify/functions/sw-chat','/api/chat']){
+        try{
+          const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
+          if(r.ok){const d=await r.json(); if(d.reply) return d.reply;}
+        }catch(_){}
+      }
+      return '(Demo) Backend not found. Add Netlify/Vercel function.';
+    }
+    async function sendIt(){
+      const v=(input.value||'').trim(); if(!v) return; input.value='';
+      add(v,true); msgs.push({role:'user',content:v}); add('…',false); const dots=body.lastChild;
+      try{ const reply=await askAI(v,(document.getElementById('lang').value||'EN').toLowerCase()); dots.remove(); add(reply,false); msgs.push({role:'assistant',content:reply}); }
+      catch(_){ dots.remove(); add('Assistant is unavailable.',false); }
+    }
+    send.addEventListener('click',sendIt); input.addEventListener('keydown',e=>{if(e.key==='Enter') sendIt();});
+  }
+  ensureChat();
+
+  // ---------- 지도 + 검색 ----------
+  let map, marker;
+  function initMap(){
+    map=L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12); // Paris
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+  }
+  initMap();
+
+  const statusEl=document.getElementById('searchStatus');
+  function setStatus(msg){ statusEl.textContent=msg||''; statusEl.style.opacity=msg?1:0; if(msg){clearTimeout(statusEl._t); statusEl._t=setTimeout(()=>statusEl.style.opacity=0,3000);} }
+  function setLoading(on){ const b=document.getElementById('btnSearch'); const lang=document.getElementById('lang').value; const w=(I18N[lang]||I18N.EN).search||'Search'; b.disabled=on; b.classList.toggle('loading',on); b.textContent=on?'…':w;}
+
+  async function geocodeAny(q){
+    const prov=[q=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,q=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`];
+    for(const make of prov){
+      try{
+        const r=await fetch(make(q),{headers:{'Accept':'application/json'}}); if(!r.ok) continue; const data=await r.json();
+        if(Array.isArray(data)&&data[0]) return {lat:+data[0].lat,lon:+data[0].lon,label:data[0].display_name||q};
+        if(data?.features?.[0]){const f=data.features[0];return {lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],label:f.properties.name||f.properties.city||f.properties.country||q};}
+      }catch(_){}
+    }
+    throw new Error('no_results');
+  }
+  function goTo(lat,lon,label){ if(marker) marker.remove(); marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup(); map.setView([lat,lon],13,{animate:true}); document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'}); }
+
+  async function runSearch(){
+    const q=(document.getElementById('searchDestination').value||'').trim(); if(!q){document.getElementById('searchDestination').focus(); return;}
+    try{ setLoading(true); setStatus('Searching…'); const {lat,lon,label}=await geocodeAny(q); goTo(lat,lon,label); setStatus(`Found: ${label}`);}
+    catch(_){ setStatus('No results. Try another place.'); alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.'); }
+    finally{ setLoading(false); }
+  }
+  document.getElementById('btnSearch').addEventListener('click',runSearch,{capture:true});
+  ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
   </script>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container"><small>© StayWorld — stayworldbooking.com</small></div>
+  </footer>
 </body>
 </html>
-
-</html>
-<script>
-// ====== SEARCH PATCH (replace old geocode function & click binding) ======
-
-// 0) 기존 클릭 리스너 제거(클론 교체 트릭)
-(function cleanOldListeners(){
-  const oldBtn = document.getElementById('btnSearch');
-  if(!oldBtn) return;
-  const clone = oldBtn.cloneNode(true);
-  oldBtn.parentNode.replaceChild(clone, oldBtn);
-
-  // 입력들도 엔터충돌 방지 위해 클론(선택)
-  ['searchDestination','checkIn','checkOut'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el){
-      const c = el.cloneNode(true);
-      el.parentNode.replaceChild(c, el);
-    }
-  });
-})();
-
-// 1) 상태 라벨 삽입
-const searchBar = document.querySelector('.search-bar');
-let searchStatus = document.getElementById('searchStatus');
-if(!searchStatus){
-  searchStatus = document.createElement('div');
-  searchStatus.id = 'searchStatus';
-  searchStatus.className = 'search-status';
-  searchBar.after(searchStatus);
-}
-function setStatus(msg){
-  searchStatus.textContent = msg || '';
-  searchStatus.style.opacity = msg ? 1 : 0;
-  if(msg){
-    clearTimeout(searchStatus._t);
-    searchStatus._t = setTimeout(()=>searchStatus.style.opacity=0, 3000);
-  }
-}
-
-// 2) 지오코딩: Nominatim → 실패 시 Photon(komoot) 폴백
-async function geocodeAny(q){
-  const providers = [
-    (q)=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
-    (q)=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`
-  ];
-  for(const makeUrl of providers){
-    try{
-      const res = await fetch(makeUrl(q), { headers: { 'Accept':'application/json' }});
-      if(!res.ok) continue;
-      const data = await res.json();
-
-      // 표준화
-      if(Array.isArray(data) && data[0]) {
-        return {
-          lat: parseFloat(data[0].lat),
-          lon: parseFloat(data[0].lon),
-          label: data[0].display_name || q
-        };
-      }
-      if(data && data.features && data.features[0]){
-        const f = data.features[0];
-        return {
-          lat: f.geometry.coordinates[1],
-          lon: f.geometry.coordinates[0],
-          label: f.properties.name || f.properties.city || f.properties.country || q
-        };
-      }
-    }catch(e){ /* 다음 공급자로 폴백 */ }
-  }
-  throw new Error('no_results');
-}
-
-// 3) 지도 이동 + 포커스
-function goTo(lat, lon, label){
-  if(window.marker) marker.remove();
-  marker = L.marker([lat, lon]).addTo(map).bindPopup(label || '').openPopup();
-  map.setView([lat, lon], 13, { animate: true });
-  document.getElementById('map').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-// 4) UX 유틸
-const btnSearch = document.getElementById('btnSearch');
-const inputDest = document.getElementById('searchDestination');
-const inputIn   = document.getElementById('checkIn');
-const inputOut  = document.getElementById('checkOut');
-
-function setLoading(on){
-  if(!btnSearch) return;
-  btnSearch.disabled = on;
-  btnSearch.classList.toggle('loading', on);
-  btnSearch.textContent = on ? '…' : (I18N[document.getElementById('lang').value] || I18N.EN).search;
-}
-function pulse(el){ el.style.outline='2px solid #f4d78c'; setTimeout(()=>el.style.outline='', 600); }
-
-// 5) 실행
-async function runSearch(){
-  const q = (inputDest && inputDest.value || '').trim();
-  if(!q){ inputDest && inputDest.focus(); pulse(inputDest); return; }
-  try{
-    setLoading(true); setStatus('Searching…');
-    const { lat, lon, label } = await geocodeAny(q);
-    goTo(lat, lon, label);
-    setStatus(`Found: ${label}`);
-  }catch(e){
-    console.error(e);
-    setStatus('No results. Try another place.');
-    alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.');
-  }finally{
-    setLoading(false);
-  }
-}
-
-// 6) 바인딩(클릭 + 엔터키)
-btnSearch && btnSearch.addEventListener('click', runSearch);
-[inputDest, inputIn, inputOut].forEach(el=>{
-  el && el.addEventListener('keydown', e=>{ if(e.key === 'Enter') runSearch(); });
-});
-
-// ====== END SEARCH PATCH ======
-</script>
