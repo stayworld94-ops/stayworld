@@ -1,3 +1,10 @@
+<!-- =============================
+  STAYWORLD — index.html (2025-08-15)
+  - 충돌 스크립트 제거
+  - i18n(10언어) + 필터 모달 + 챗봇 + 검색바 유지
+  - 헤더 정렬/간격 수정
+  - 외부 style.css 사용 (아래에 전체 CSS 동봉)
+============================== -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,10 +12,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>STAYWORLD — Luxury Global Booking</title>
 
-  <!-- 가장 확실한 방식으로 CSS 연결 -->
-  <link rel="stylesheet" href="/style.css?v=2025-08-15b"/>
+  <!-- 캐시버스터 포함 CSS 링크 -->
+  <link rel="stylesheet" href="/style.css?v=2025-08-15c"/>
 
-  <!-- 최소 폴백 스타일(외부 CSS 못 불러와도 버튼/라벨 안깨지게) -->
+  <!-- 최소 폴백(외부 CSS 실패해도 접근성 라벨 유지) -->
   <style>
     .visually-hidden{position:absolute;clip:rect(0 0 0 0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
   </style>
@@ -31,7 +38,7 @@
       <div class="header-right">
         <label for="lang" class="visually-hidden" id="langLabel">Language</label>
         <div class="lang-select" aria-labelledby="langLabel">
-          <select id="lang">
+          <select id="lang" aria-label="Language">
             <option>EN</option><option>KO</option><option>JA</option><option>ZH</option>
             <option>FR</option><option>ES</option><option>DE</option><option>TR</option>
             <option>AR</option><option>PT</option>
@@ -49,14 +56,10 @@
         <span data-i18n="hero.line1">Luxury stays.</span><br/>
         <span class="gold" data-i18n="hero.line2">Global reach.</span>
       </h1>
-      <p class="tagline" data-i18n="hero.tagline">
-        Cards, bank transfer & crypto (BTC · ETH · USDT).
-      </p>
+      <p class="tagline" data-i18n="hero.tagline">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
       <form id="search-form" class="search-bar" onsubmit="return false;">
-        <input id="destination" class="i-text"
-               data-i18n-placeholder="search.placeholder"
-               placeholder="Paris, Tokyo, Istanbul..." />
+        <input id="destination" class="i-text" data-i18n-placeholder="search.placeholder" placeholder="Paris, Tokyo, Istanbul..." />
         <input id="checkin" class="i-date" type="date" aria-label="Check-in"/>
         <input id="checkout" class="i-date" type="date" aria-label="Check-out"/>
         <button id="filterBtn" type="button" class="btn secondary" data-i18n="search.filters">Filters</button>
@@ -65,7 +68,7 @@
     </div>
   </section>
 
-  <!-- 정보 카드 3개(예시) -->
+  <!-- USP 카드 -->
   <section class="usp container">
     <div class="card">
       <h3 data-i18n="usp.verifiedTitle">Verified stays</h3>
@@ -89,9 +92,8 @@
         <button class="icon-btn" data-close aria-label="Close">&times;</button>
       </header>
       <div class="modal-body">
-        <!-- 20개+ 체크옵션 -->
         <div class="filter-grid">
-          <!-- Amenities -->
+          <!-- 20개+ 체크 옵션 -->
           <label><input type="checkbox" value="wifi"/> Wi-Fi</label>
           <label><input type="checkbox" value="pool"/> Pool</label>
           <label><input type="checkbox" value="spa"/> Spa</label>
@@ -102,6 +104,11 @@
           <label><input type="checkbox" value="balcony"/> Balcony</label>
           <label><input type="checkbox" value="sea"/> Sea view</label>
           <label><input type="checkbox" value="city"/> City view</label>
+          <label><input type="checkbox" value="mountain"/> Mountain view</label>
+          <label><input type="checkbox" value="garden"/> Garden</label>
+          <label><input type="checkbox" value="hot_tub"/> Hot tub</label>
+          <label><input type="checkbox" value="sauna"/> Sauna</label>
+          <label><input type="checkbox" value="ac"/> Air conditioning</label>
           <!-- Property types -->
           <label><input type="checkbox" value="hotel"/> Hotel</label>
           <label><input type="checkbox" value="apartment"/> Apartment</label>
@@ -116,7 +123,12 @@
           <label><input type="checkbox" value="breakfast"/> Breakfast</label>
           <label><input type="checkbox" value="airport"/> Airport shuttle</label>
           <label><input type="checkbox" value="accessible"/> Accessible</label>
-          <label><input type="checkbox" value="24h"/> 24h check-in</label>
+          <label><input type="checkbox" value="step_free"/> Step-free access</label>
+          <label><input type="checkbox" value="elevator"/> Elevator</label>
+          <label><input type="checkbox" value="non_smoking"/> Non-smoking</label>
+          <label><input type="checkbox" value="late_checkout"/> Late checkout</label>
+          <label><input type="checkbox" value="family"/> Family-friendly</label>
+          <label><input type="checkbox" value="free_cancel"/> Free cancellation</label>
         </div>
       </div>
       <footer class="modal-foot">
@@ -126,9 +138,8 @@
     </div>
   </div>
 
-  <!-- 챗봇 플로팅 버튼 & 패널 -->
+  <!-- 챗봇 -->
   <button id="chat-toggle" class="chat-fab" aria-controls="chat-panel" aria-expanded="false" title="AI Concierge">💬</button>
-
   <aside id="chat-panel" class="chat-panel" aria-hidden="true">
     <header class="chat-head">
       <h3>StayWorld AI</h3>
@@ -154,7 +165,7 @@
                paymentsTitle:"Secure payments",paymentsText:"Visa, Mastercard, Amex & Crypto."},
           filter:{title:"Filters",clear:"Clear",apply:"Apply"},
           chat:{placeholder:"Ask about stays, dates, or payments…",send:"Send"}},
-      KO:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      KO:{nav:{home:"홈",membership:"멤버십",login:"로그인",signup:"가입하기"},
           hero:{line1:"럭셔리 스테이.",line2:"글로벌 리치.",tagline:"카드·계좌이체·암호화폐(BTC·ETH·USDT) 지원."},
           search:{placeholder:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색"},
           usp:{verifiedTitle:"검증된 숙소",verifiedText:"내 주변 추천 숙소.",
@@ -162,7 +173,7 @@
                paymentsTitle:"안전한 결제",paymentsText:"비자, 마스터카드, 아멕스 & 크립토."},
           filter:{title:"필터",clear:"초기화",apply:"적용"},
           chat:{placeholder:"숙소/날짜/결제 문의를 입력하세요…",send:"전송"}},
-      JA:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      JA:{nav:{home:"ホーム",membership:"メンバーシップ",login:"ログイン",signup:"登録"},
           hero:{line1:"ラグジュアリー滞在。",line2:"世界に広がるアクセス。",tagline:"カード・振込・暗号資産（BTC・ETH・USDT）。"},
           search:{placeholder:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索"},
           usp:{verifiedTitle:"厳選ステイ",verifiedText:"近場のおすすめ。",
@@ -170,7 +181,7 @@
                paymentsTitle:"安全な決済",paymentsText:"Visa, Mastercard, Amex & Crypto."},
           filter:{title:"フィルター",clear:"クリア",apply:"適用"},
           chat:{placeholder:"宿・日付・支払いを質問…",send:"送信"}},
-      ZH:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      ZH:{nav:{home:"主页",membership:"会员",login:"登录",signup:"注册"},
           hero:{line1:"奢华住宿。",line2:"全球触达。",tagline:"支持银行卡、转账和加密货币（BTC·ETH·USDT）。"},
           search:{placeholder:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索"},
           usp:{verifiedTitle:"优选住宿",verifiedText:"离你最近的精选。",
@@ -178,7 +189,7 @@
                paymentsTitle:"安全支付",paymentsText:"Visa、万事达、Amex 与加密货币。"},
           filter:{title:"筛选",clear:"清除",apply:"应用"},
           chat:{placeholder:"询问住宿、日期或支付…",send:"发送"}},
-      FR:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      FR:{nav:{home:"Accueil",membership:"Programme",login:"Connexion",signup:"Inscription"},
           hero:{line1:"Séjours de luxe.",line2:"Portée mondiale.",tagline:"Carte, virement & crypto (BTC · ETH · USDT)."},
           search:{placeholder:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher"},
           usp:{verifiedTitle:"Logements vérifiés",verifiedText:"Meilleurs choix près de vous.",
@@ -186,7 +197,7 @@
                paymentsTitle:"Paiements sécurisés",paymentsText:"Visa, Mastercard, Amex & Crypto."},
           filter:{title:"Filtres",clear:"Réinitialiser",apply:"Appliquer"},
           chat:{placeholder:"Demandez sur les séjours, dates ou paiements…",send:"Envoyer"}},
-      ES:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      ES:{nav:{home:"Inicio",membership:"Membresía",login:"Iniciar sesión",signup:"Registrarse"},
           hero:{line1:"Estancias de lujo.",line2:"Alcance global.",tagline:"Tarjeta, transferencia y cripto (BTC · ETH · USDT)."},
           search:{placeholder:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar"},
           usp:{verifiedTitle:"Alojamientos verificados",verifiedText:"Las mejores opciones cerca.",
@@ -194,7 +205,7 @@
                paymentsTitle:"Pagos seguros",paymentsText:"Visa, Mastercard, Amex y Cripto."},
           filter:{title:"Filtros",clear:"Limpiar",apply:"Aplicar"},
           chat:{placeholder:"Pregunta sobre estancias, fechas o pagos…",send:"Enviar"}},
-      DE:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      DE:{nav:{home:"Start",membership:"Mitgliedschaft",login:"Anmelden",signup:"Registrieren"},
           hero:{line1:"Luxuriöse Aufenthalte.",line2:"Globale Reichweite.",tagline:"Karten, Überweisung & Krypto (BTC · ETH · USDT)."},
           search:{placeholder:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen"},
           usp:{verifiedTitle:"Geprüfte Unterkünfte",verifiedText:"Top-Tipps in deiner Nähe.",
@@ -202,7 +213,7 @@
                paymentsTitle:"Sichere Zahlungen",paymentsText:"Visa, Mastercard, Amex & Krypto."},
           filter:{title:"Filter",clear:"Zurücksetzen",apply:"Übernehmen"},
           chat:{placeholder:"Fragen zu Aufenthalt, Datum oder Zahlung…",send:"Senden"}},
-      TR:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      TR:{nav:{home:"Ana Sayfa",membership:"Üyelik",login:"Giriş",signup:"Kayıt Ol"},
           hero:{line1:"Lüks konaklamalar.",line2:"Küresel erişim.",tagline:"Kart, havale ve kripto (BTC · ETH · USDT)."},
           search:{placeholder:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara"},
           usp:{verifiedTitle:"Doğrulanmış konaklamalar",verifiedText:"Yakınınızdaki en iyi seçenekler.",
@@ -210,7 +221,7 @@
                paymentsTitle:"Güvenli ödemeler",paymentsText:"Visa, Mastercard, Amex & Kripto."},
           filter:{title:"Filtreler",clear:"Temizle",apply:"Uygula"},
           chat:{placeholder:"Konaklama, tarih veya ödeme sor…",send:"Gönder"}},
-      AR:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      AR:{nav:{home:"الرئيسية",membership:"العضوية",login:"تسجيل الدخول",signup:"إنشاء حساب"},
           hero:{line1:"إقامات فاخرة.",line2:"انتشار عالمي.",tagline:"بطاقة، تحويل بنكي وعُملات رقمية (BTC · ETH · USDT)."},
           search:{placeholder:"باريس، طوكيو، إسطنبول…",filters:"عوامل التصفية",search:"بحث"},
           usp:{verifiedTitle:"إقامات موثوقة",verifiedText:"أفضل الخيارات بالقرب منك.",
@@ -218,7 +229,7 @@
                paymentsTitle:"مدفوعات آمنة",paymentsText:"Visa وMastercard وAmex والعملات الرقمية."},
           filter:{title:"عوامل التصفية",clear:"مسح",apply:"تطبيق"},
           chat:{placeholder:"اسأل عن الإقامة أو التواريخ أو الدفع…",send:"إرسال"}},
-      PT:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
+      PT:{nav:{home:"Início",membership:"Assinatura",login:"Entrar",signup:"Criar conta"},
           hero:{line1:"Estadias de luxo.",line2:"Alcance global.",tagline:"Cartão, transferência e cripto (BTC · ETH · USDT)."},
           search:{placeholder:"Paris, Tóquio, Istambul…",filters:"Filtros",search:"Buscar"},
           usp:{verifiedTitle:"Estadias verificadas",verifiedText:"Melhores opções perto de você.",
@@ -231,107 +242,98 @@
     function applyI18n(lang){
       const L = DICT[lang] || DICT.EN;
       document.documentElement.lang = (lang||'EN').toLowerCase();
-
-      // text
-      document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const path = el.getAttribute("data-i18n").split(".");
-        let cur = L; for (const k of path) cur = (cur||{})[k];
-        if (typeof cur === "string") el.textContent = cur;
+      document.querySelectorAll('[data-i18n]').forEach(el=>{
+        const path = el.getAttribute('data-i18n').split('.');
+        let cur = L; for(const k of path) cur = (cur||{})[k];
+        if (typeof cur === 'string') el.textContent = cur;
       });
-      // placeholders
-      document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
-        const path = el.getAttribute("data-i18n-placeholder").split(".");
-        let cur = L; for (const k of path) cur = (cur||{})[k];
-        if (typeof cur === "string") el.placeholder = cur;
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+        const path = el.getAttribute('data-i18n-placeholder').split('.');
+        let cur = L; for(const k of path) cur = (cur||{})[k];
+        if (typeof cur === 'string') el.placeholder = cur;
       });
     }
 
     /**************  필터 모달  **************/
-    const modal = document.getElementById("filtersModal");
-    const filterBtn = document.getElementById("filterBtn");
-    filterBtn.addEventListener("click", (e)=>{ e.stopPropagation(); openModal();});
-    modal.addEventListener("click", ()=> closeModal());
-    modal.querySelector(".modal-card").addEventListener("click", (e)=> e.stopPropagation());
-    modal.querySelector("[data-close]").addEventListener("click", closeModal);
-    modal.querySelector("[data-clear]").addEventListener("click", ()=>{
-      modal.querySelectorAll("input[type=checkbox]").forEach(c=> c.checked=false);
+    const modal = document.getElementById('filtersModal');
+    const filterBtn = document.getElementById('filterBtn');
+    filterBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openModal();});
+    modal.addEventListener('click',()=> closeModal());
+    modal.querySelector('.modal-card').addEventListener('click',(e)=> e.stopPropagation());
+    modal.querySelector('[data-close]').addEventListener('click', closeModal);
+    modal.querySelector('[data-clear]').addEventListener('click', ()=>{
+      modal.querySelectorAll('input[type=checkbox]').forEach(c=> c.checked=false);
     });
-    modal.querySelector("[data-apply]").addEventListener("click", ()=>{
-      const selected = [...modal.querySelectorAll("input[type=checkbox]:checked")].map(x=>x.value);
-      console.log("APPLIED FILTERS:", selected);
+    modal.querySelector('[data-apply]').addEventListener('click', ()=>{
+      const selected = [...modal.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.value);
+      console.log('APPLIED FILTERS:', selected);
       closeModal();
     });
-    function openModal(){ modal.setAttribute("aria-hidden","false"); document.body.classList.add("no-scroll"); }
-    function closeModal(){ modal.setAttribute("aria-hidden","true"); document.body.classList.remove("no-scroll"); }
+    function openModal(){ modal.setAttribute('aria-hidden','false'); document.body.classList.add('no-scroll'); }
+    function closeModal(){ modal.setAttribute('aria-hidden','true'); document.body.classList.remove('no-scroll'); }
 
     /**************  챗봇  **************/
-    const chatToggle = document.getElementById("chat-toggle");
-    const chatPanel  = document.getElementById("chat-panel");
-    const chatMask   = document.getElementById("chatMask");
-    const chatLog    = document.getElementById("chatLog");
-    const chatForm   = document.getElementById("chatForm");
-    const chatInput  = document.getElementById("chatInput");
-    const chatSend   = document.getElementById("chatSend");
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatPanel  = document.getElementById('chat-panel');
+    const chatMask   = document.getElementById('chatMask');
+    const chatLog    = document.getElementById('chatLog');
+    const chatForm   = document.getElementById('chatForm');
+    const chatInput  = document.getElementById('chatInput');
+    const chatSend   = document.getElementById('chatSend');
 
     function openChat(){
-      chatPanel.setAttribute("aria-hidden","false");
+      chatPanel.setAttribute('aria-hidden','false');
       chatMask.hidden = false;
-      chatToggle.setAttribute("aria-expanded","true");
+      chatToggle.setAttribute('aria-expanded','true');
       chatInput.focus();
     }
     function closeChat(){
-      chatPanel.setAttribute("aria-hidden","true");
+      chatPanel.setAttribute('aria-hidden','true');
       chatMask.hidden = true;
-      chatToggle.setAttribute("aria-expanded","false");
+      chatToggle.setAttribute('aria-expanded','false');
     }
-
-    chatToggle.addEventListener("click",(e)=>{ e.stopPropagation(); openChat(); });
-    chatMask.addEventListener("click", closeChat);
-    chatPanel.querySelector("[data-close-chat]").addEventListener("click", closeChat);
-    chatPanel.addEventListener("click",(e)=> e.stopPropagation());
+    chatToggle.addEventListener('click',(e)=>{ e.stopPropagation(); openChat(); });
+    chatMask.addEventListener('click', closeChat);
+    chatPanel.querySelector('[data-close-chat]').addEventListener('click', closeChat);
+    chatPanel.addEventListener('click',(e)=> e.stopPropagation());
 
     function addMsg(role, text){
-      const row = document.createElement("div");
-      row.className = "msg " + role;
+      const row = document.createElement('div');
+      row.className = 'msg ' + role;
       row.textContent = text;
       chatLog.appendChild(row);
       chatLog.scrollTop = chatLog.scrollHeight;
     }
 
-    chatForm.addEventListener("submit", async (e)=>{
+    chatForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const content = chatInput.value.trim();
       if (!content) return;
-      const lang = document.getElementById("lang").value || "EN";
-      addMsg("user", content);
-      chatInput.value = "";
+      const lang = document.getElementById('lang').value || 'EN';
+      addMsg('user', content);
+      chatInput.value = '';
       chatSend.disabled = true;
-
       try{
-        const res = await fetch("/.netlify/functions/chat",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
+        const res = await fetch('/.netlify/functions/chat',{
+          method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({message: content, lang})
         });
         if(!res.ok){
-          const t = await res.text();
-          console.error("Chat error:", t);
-          addMsg("bot", "Sorry, the assistant is temporarily unavailable.");
+          addMsg('bot', 'Sorry, the assistant is temporarily unavailable.');
         }else{
           const data = await res.json();
-          addMsg("bot", data.reply || "…");
+          addMsg('bot', data.reply || '…');
         }
       }catch(err){
-        console.error(err);
-        addMsg("bot", "Network error. Please try again.");
+        addMsg('bot', 'Network error. Please try again.');
       }finally{
         chatSend.disabled = false;
       }
     });
 
-    /**************  초기 설정  **************/
-    const langSel = document.getElementById("lang");
-    langSel.addEventListener("change",()=> applyI18n(langSel.value));
+    /**************  초기 적용  **************/
+    const langSel = document.getElementById('lang');
+    langSel.addEventListener('change',()=> applyI18n(langSel.value));
     applyI18n(langSel.value);
   </script>
 </body>
