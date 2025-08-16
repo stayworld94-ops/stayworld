@@ -579,3 +579,129 @@
   </footer>
 </body>
 </html>
+<script>
+// ===== Currency + Filter i18n patch =====
+
+// 10개 통화 선택(USD, EUR, KRW, JPY, CNY, TRY, GBP, AED, RUB, ARS)
+const CURRENCIES = ["USD","EUR","KRW","JPY","CNY","TRY","GBP","AED","RUB","ARS"];
+// 대략적인 환율(USD 기준) — 없으면 1로 동작, 나중에 갱신 가능
+let FX = { USD:1, EUR:0.92, KRW:1380, JPY:156, CNY:7.25, TRY:33, GBP:0.78, AED:3.67, RUB:90, ARS:920 };
+
+// 헤더에 통화 셀렉터 추가
+(function ensureCurrencySelect(){
+  const wrap = document.querySelector(".header-cta");
+  if (!wrap || document.getElementById("currency")) return;
+  const sel = document.createElement("select");
+  sel.id = "currency";
+  sel.className = "lang-select";
+  sel.style.marginLeft = "8px";
+  CURRENCIES.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c; o.textContent = c; sel.appendChild(o);
+  });
+  sel.value = "USD";
+  wrap.insertBefore(sel, wrap.lastElementChild); // Sign Up 앞에
+})();
+
+// 선택 통화의 NumberFormat
+function fmtMoney(v, cur) {
+  try {
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
+  } catch(_){ // 브라우저가 모르는 통화인 경우
+    return `${cur} ${Math.round(v).toLocaleString()}`;
+  }
+}
+// USD -> 선택통화 변환
+function toSelectedCurrency(usd) {
+  const cur = document.getElementById("currency")?.value || "USD";
+  const rate = FX[cur] || 1;
+  return { cur, value: usd * rate };
+}
+
+// 필터 드로어 생성 후 가격 슬라이더 수치 표시 연결
+function hookPriceLabels() {
+  const d = document.getElementById("filterDrawer");
+  if (!d) return;
+  const min = d.querySelector("#priceMin");
+  const max = d.querySelector("#priceMax");
+  if (!min || !max) return;
+
+  // 레이블 없으면 만들기
+  if (!min.nextElementSibling || !min.nextElementSibling.classList?.contains("sw-price-label")) {
+    const l1 = document.createElement("div"); l1.className = "sw-price-label"; l1.style.marginTop="6px"; min.after(l1);
+    const l2 = document.createElement("div"); l2.className = "sw-price-label"; l2.style.marginTop="6px"; max.after(l2);
+  }
+
+  const [lab1, lab2] = d.querySelectorAll(".sw-price-label");
+
+  function render() {
+    const a = toSelectedCurrency(Number(min.value));
+    const b = toSelectedCurrency(Number(max.value));
+    lab1.textContent = `Min: ${fmtMoney(a.value, a.cur)} / night`;
+    lab2.textContent = `Max: ${fmtMoney(b.value, b.cur)} / night`;
+  }
+  min.oninput = max.oninput = render;
+  document.getElementById("currency")?.addEventListener("change", render);
+  render();
+}
+
+// 드로어가 열릴 때마다 레이블 후킹
+const obs = new MutationObserver(()=> hookPriceLabels());
+obs.observe(document.documentElement,{ childList:true, subtree:true });
+
+// (선택) 환율을 한 번 시도해서 불러오기(실패해도 괜찮게)
+(async function tryFetchRates(){
+  try {
+    const r = await fetch("https://open.er-api.com/v6/latest/USD");
+    const j = await r.json();
+    if (j && j.rates) {
+      for (const c of CURRENCIES) if (j.rates[c]) FX[c] = j.rates[c];
+    }
+  } catch(_) { /* fallback FX 그대로 */ }
+})();
+
+// ---- 필터 타이틀 번역(자주 보이는 것 위주) ----
+const FILTER_I18N = {
+  filter_price: { KO:"1박 가격", JA:"1泊あたりの料金", ZH:"每晚价格", FR:"Prix par nuit", ES:"Precio por noche", DE:"Preis pro Nacht", TR:"Gecelik fiyat", AR:"السعر لكل ليلة", RU:"Цена за ночь", EN:"Price per night" },
+  filter_staytype: { KO:"숙소 유형", JA:"宿タイプ", ZH:"房源类型", FR:"Type de séjour", ES:"Tipo de estancia", DE:"Unterkunftstyp", TR:"Konaklama türü", AR:"نوع الإقامة", RU:"Тип размещения", EN:"Stay type" },
+  filter_reviews: { KO:"평점", JA:"レビュー", ZH:"评分", FR:"Note", ES:"Puntuación", DE:"Bewertung", TR:"Puan", AR:"التقييم", RU:"Оценка", EN:"Review score" },
+  filter_bedsbaths: { KO:"침대·욕실", JA:"ベッド・バス", ZH:"床位与浴室", FR:"Lits & Salles de bain", ES:"Camas y baños", DE:"Betten & Bäder", TR:"Yatak & Banyo", AR:"الأسِرّة والحمّامات", RU:"Кровати и ванные", EN:"Beds & Baths" },
+  filter_amenities: { KO:"편의시설", JA:"設備", ZH:"设施", FR:"Équipements", ES:"Servicios", DE:"Ausstattung", TR:"Olanaklar", AR:"المرافق", RU:"Удобства", EN:"Amenities" },
+  filter_view: { KO:"전망", JA:"眺望", ZH:"景观", FR:"Vue", ES:"Vistas", DE:"Aussicht", TR:"Manzara", AR:"الإطلالة", RU:"Вид", EN:"View" },
+  filter_access: { KO:"접근성", JA:"アクセシビリティ", ZH:"无障碍", FR:"Accessibilité", ES:"Accesibilidad", DE:"Barrierefreiheit", TR:"Erişilebilirlik", AR:"سهولة الوصول", RU:"Доступность", EN:"Accessibility" },
+  filter_booking: { KO:"예약", JA:"予約", ZH:"预订", FR:"Réservation", ES:"Reserva", DE:"Buchung", TR:"Rezervasyon", AR:"الحجز", RU:"Бронирование", EN:"Booking" },
+};
+
+function translateFilterHeadings() {
+  const lang = (document.getElementById("lang")?.value || "EN").toUpperCase();
+  const d = document.getElementById("filterDrawer");
+  if (!d) return;
+  // 헤더 strong 텍스트
+  const head = d.querySelector(".head strong");
+  if (head) head.textContent = (I18N[lang]?.filters || "Filters");
+
+  const map = {
+    "Price per night":"filter_price",
+    "Stay type":"filter_staytype",
+    "Review score":"filter_reviews",
+    "Beds & Baths":"filter_bedsbaths",
+    "Amenities":"filter_amenities",
+    "View":"filter_view",
+    "Accessibility":"filter_access",
+    "Booking":"filter_booking",
+  };
+  d.querySelectorAll("#filterGrid .box > h4").forEach(h=>{
+    const key = map[h.textContent.trim()];
+    if (!key) return;
+    h.textContent = FILTER_I18N[key]?.[lang] || FILTER_I18N[key]?.EN || h.textContent;
+  });
+
+  // 버튼
+  const reset = d.querySelector("#swReset");
+  const apply = d.querySelector("#swApply");
+  if (reset) reset.textContent = (I18N[lang]?.clear || "Clear");
+  if (apply) apply.textContent = (I18N[lang]?.apply || "Apply");
+}
+document.getElementById("lang")?.addEventListener("change", translateFilterHeadings);
+new MutationObserver(translateFilterHeadings).observe(document.documentElement,{childList:true,subtree:true});
+</script>
