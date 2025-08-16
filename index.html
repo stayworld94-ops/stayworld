@@ -1,137 +1,182 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>STAYWORLD — Luxury Global Stays</title>
-  <link rel="stylesheet" href="/style.css"/>
-  <link rel="icon" href="/stayworld-logo.png"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STAYWORLD — Luxury Global</title>
+
+  <!-- 메인 스타일 -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 클릭막는 오버레이/레이어 문제 해결용 핵심 패치 -->
   <style>
-    /* 클릭 막힘 방지 + 레이어 보정 */
-    .btn, button, [role="button"] { pointer-events:auto; cursor:pointer; }
-    .floating-chat { position:fixed; right:20px; bottom:20px; z-index:9999; }
-    .chat-toggle { width:56px; height:56px; border-radius:50%; border:0; }
-    .chat-panel {
-      position:fixed; right:20px; bottom:90px; width:340px; max-height:60vh;
-      display:none; flex-direction:column; border-radius:14px; overflow:hidden;
-      background:#111; color:#eee; box-shadow:0 10px 30px rgba(0,0,0,.4); z-index:9998;
+    /* 영웅배경/그라데이션/데코레이어가 클릭을 가로채지 않도록 */
+    .hero::before, .hero::after,
+    .page-overlay, .bg-gradient, .decor-blur {
+      pointer-events: none !important;
     }
-    .chat-header { padding:10px 12px; font-weight:700; background:#1a1a1a; }
-    .chat-body { padding:10px; gap:8px; display:flex; flex-direction:column; overflow:auto; }
-    .chat-msg { padding:10px 12px; border-radius:10px; line-height:1.35; }
-    .chat-msg.user { background:#2a2a2a; align-self:flex-end; }
-    .chat-msg.bot { background:#181818; border:1px solid #2b2b2b; }
-    .chat-input { display:flex; gap:8px; padding:10px; background:#1a1a1a; }
-    .chat-input input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid #333; background:#0e0e0e; color:#eee; }
-    .chat-input button { border:0; padding:10px 14px; border-radius:10px; background:var(--gold,#d6b46a); }
-    /* 간단 필터 모달 */
-    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9990; }
-    .modal.active{ display:flex; }
-    .modal .backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); }
-    .modal .dialog{ position:relative; width:min(560px,92vw); background:#111; color:#eee; border-radius:16px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
-    .modal .row{ display:grid; gap:10px; grid-template-columns:1fr 1fr; margin-top:10px; }
-    .modal label{ font-size:.9rem; opacity:.9 }
-    .modal input, .modal select{ width:100%; padding:10px; border-radius:10px; border:1px solid #2f2f2f; background:#0e0e0e; color:#eee; }
-    .modal .footer{ display:flex; justify-content:flex-end; gap:8px; margin-top:14px; }
-    .hide{ display:none !important; }
+
+    /* 상단바가 다른 요소에 가려지지 않도록 */
+    header.site-header { position: sticky; top: 0; z-index: 9900; }
+
+    /* 검색박스 영역 위계 보장 */
+    .search-bar { position: relative; z-index: 9950; }
+
+    /* 필터 버튼/모달/챗봇 위계 고정 */
+    #filterBtn { position: relative; z-index: 9960; }
+    #filterModal {
+      position: fixed; inset: 0; display: none;
+      background: rgba(0,0,0,.55);
+      z-index: 10020; /* 챗봇 창 아래로 두려면 10020, 위로 두려면 10040 */
+    }
+    #filterSheet {
+      position: absolute; right: 0; top: 0; bottom: 0; width: min(420px, 90vw);
+      background: #111; color: #fff; padding: 20px; overflow:auto;
+      box-shadow: -8px 0 24px rgba(0,0,0,.35);
+    }
+    #filterCloseBtn { position: absolute; top: 12px; right: 12px; }
+
+    /* 플로팅 챗봇 버튼/창은 항상 최상단 클릭 가능 */
+    #chatToggleBtn {
+      position: fixed; right: 22px; bottom: 22px;
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 0; cursor: pointer;
+      z-index: 10030;  /* 버튼이 항상 클릭되게 */
+    }
+    #chatWindow {
+      position: fixed; right: 22px; bottom: 90px;
+      width: min(360px, 92vw); height: 480px; display: none;
+      background: #101114; color:#fff; border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(0,0,0,.6);
+      z-index: 10035;  /* 모달보다 위에 두고 싶으면 10050 */
+      overflow: hidden;
+    }
+    #chatHeader { padding: 12px 16px; font-weight: 700; background: #181a1f; }
+    #chatMessages { height: calc(100% - 120px); overflow-y: auto; padding: 12px 16px; }
+    #chatComposer { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #24262c; background:#14161b; }
+    #chatInput { flex: 1; }
+    #chatSendBtn { white-space: nowrap; }
+
+    /* 버튼이 form submit로 바뀌지 않게 기본 type 명시 */
+    button { pointer-events: auto; }
+    button, select, input { position: relative; }
   </style>
+
+  <!-- 앱 스크립트: defer로 로드해서 DOM 완성 후 이벤트 바인딩 -->
+  <script src="app.js" defer></script>
 </head>
 <body>
-  <!-- 헤더 -->
-  <header>
-    <div class="container nav">
-      <div class="brand">
-        <img src="/stayworld-logo.png" alt="STAYWORLD"/>
-        <strong>STAYWORLD</strong>
-      </div>
-      <nav class="nav-links">
-        <a id="t_nav_home" href="/index.html#home">Home</a>
-        <a id="t_nav_membership" href="/membership.html">Membership</a>
-        <a id="t_nav_login" href="/login.html">Login</a>
-        <a class="btn btn-gold" id="t_nav_signup" href="/signup.html">Sign Up</a>
-        <!-- 언어 -->
-        <select id="langSelect" aria-label="Language">
-          <option value="en">EN</option><option value="ko">KO</option>
-          <option value="tr">TR</option><option value="fr">FR</option>
-          <option value="ja">JA</option><option value="de">DE</option>
-          <option value="es">ES</option><option value="it">IT</option>
-          <option value="zh">ZH</option><option value="ru">RU</option>
-        </select>
-      </nav>
-    </div>
+
+  <!-- ===== 헤더 ===== -->
+  <header class="site-header">
+    <nav class="nav wrap">
+      <a class="brand" href="index.html" aria-label="StayWorld Home">
+        <img src="stayworld-logo.png" alt="" height="28" />
+      </a>
+
+      <ul class="menu">
+        <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+        <li><a href="membership.html" data-i18n="nav.membership">Membership</a></li>
+        <li><a href="login.html" data-i18n="nav.login">Login</a></li>
+      </ul>
+
+      <!-- 언어 선택: ID는 langSelect (JS가 바인딩) -->
+      <label class="sr-only" for="langSelect">Language</label>
+      <select id="langSelect" aria-label="Language">
+        <option value="en">EN</option>
+        <option value="ko">KO</option>
+        <option value="ja">JA</option>
+        <option value="zh">ZH</option>
+        <option value="es">ES</option>
+        <option value="fr">FR</option>
+        <option value="de">DE</option>
+        <option value="tr">TR</option>
+        <option value="ru">RU</option>
+        <option value="ar">AR</option>
+      </select>
+
+      <a class="btn btn-primary" href="signup.html" id="btnSignUp" data-i18n="nav.signup">Sign Up</a>
+    </nav>
   </header>
 
-  <!-- 히어로 -->
-  <main class="container hero" id="home">
-    <h1 id="t_h1">Luxury stays.<br><span style="color:var(--gold)">Global reach.</span></h1>
-    <p class="lead" id="t_pay">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+  <!-- ===== 히어로 ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <h1><span data-i18n="hero.title1">Luxury stays.</span><br>
+          <span data-i18n="hero.title2">Global reach.</span></h1>
+      <p class="sub" data-i18n="hero.sub">
+        Cards, bank transfer &amp; crypto (BTC · ETH · USDT).
+      </p>
 
-    <div class="searchbar" style="margin-top:14px">
-      <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…"/>
-      <input type="date" id="dateFrom" />
-      <input type="date" id="dateTo" />
-      <!-- a → button 으로 교체 (네비게이션 부작용 제거) -->
-      <button class="btn" id="t_filters" type="button">Filters</button>
-      <button class="btn btn-gold" id="t_search" type="button">Search</button>
-    </div>
+      <!-- ===== 검색/필터 바 ===== -->
+      <div class="search-bar" role="search" aria-label="Property search">
+        <input id="searchInput" type="text" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off" />
+        <input id="checkInInput" type="date" aria-label="Check-in" />
+        <input id="checkOutInput" type="date" aria-label="Check-out" />
 
-    <section class="grid" style="margin-top:18px">
-      <div class="card"><h3 id="t_card1">Verified stays</h3><p id="t_card1sub">Top picks near you.</p></div>
-      <div class="card"><h3 id="t_card2">StayWorld+ Rewards</h3><p id="t_card2sub">Earn points on every booking.</p></div>
-      <div class="card"><h3 id="t_card3">Secure payments</h3><p id="t_card3sub">Visa, Mastercard, Amex & Crypto.</p></div>
-    </section>
-  </main>
+        <!-- 필터 버튼: type="button" + ID = filterBtn -->
+        <button id="filterBtn" type="button" aria-haspopup="dialog" aria-controls="filterModal" data-i18n="search.filters">
+          Filters
+        </button>
 
-  <footer class="container"><div>© STAYWORLD — stayworldbooking.com</div></footer>
-
-  <!-- 필터 모달 -->
-  <div id="filterModal" class="modal" aria-hidden="true">
-    <div class="backdrop" data-close></div>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
-      <h3 id="filterTitle">Filters</h3>
-      <div class="row">
-        <div>
-          <label>Guests</label>
-          <input id="fGuests" type="number" min="1" value="2"/>
-        </div>
-        <div>
-          <label>Rooms</label>
-          <input id="fRooms" type="number" min="1" value="1"/>
-        </div>
-        <div>
-          <label>Min Price</label>
-          <input id="fMin" type="number" min="0" value="0"/>
-        </div>
-        <div>
-          <label>Max Price</label>
-          <input id="fMax" type="number" min="0" value="2000"/>
-        </div>
-      </div>
-      <div class="footer">
-        <button class="btn" data-close>Close</button>
-        <button class="btn btn-gold" id="applyFilters">Apply</button>
+        <!-- 검색 버튼: type="button" + ID = searchBtn -->
+        <button id="searchBtn" type="button" class="btn btn-accent" data-i18n="search.search">
+          Search
+        </button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- 챗봇 -->
-  <div class="floating-chat">
-    <button class="chat-toggle btn btn-gold" id="chatOpen" aria-label="Open chat">💬</button>
-    <div class="chat-panel" id="chatPanel" aria-live="polite">
-      <div class="chat-header">AI Concierge</div>
-      <div class="chat-body" id="chatBody">
-        <div class="chat-msg bot">Hello! How can I help you today?</div>
-      </div>
-      <div class="chat-input">
-        <input id="chatInput" placeholder="Ask me anything…"/>
-        <button id="chatSend">Send</button>
-      </div>
+  <!-- ===== 필터 모달 ===== -->
+  <div id="filterModal" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+    <div id="filterSheet">
+      <button id="filterCloseBtn" type="button" aria-label="Close">✕</button>
+      <h2 id="filterTitle" data-i18n="filters.title">Filters</h2>
+
+      <form id="filterForm">
+        <label>
+          <span data-i18n="filters.guests">Guests</span>
+          <input id="filterGuests" type="number" min="1" value="2" />
+        </label>
+
+        <label>
+          <span data-i18n="filters.price">Max price</span>
+          <input id="filterMaxPrice" type="number" min="0" step="10" />
+        </label>
+
+        <fieldset>
+          <legend data-i18n="filters.amenities">Amenities</legend>
+          <label><input type="checkbox" name="amenity" value="wifi" /> Wi-Fi</label>
+          <label><input type="checkbox" name="amenity" value="pool" /> Pool</label>
+          <label><input type="checkbox" name="amenity" value="parking" /> Parking</label>
+        </fieldset>
+
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button id="filterApplyBtn" type="button" class="btn btn-accent" data-i18n="filters.apply">Apply</button>
+          <button id="filterResetBtn" type="button" class="btn" data-i18n="filters.reset">Reset</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- 스크립트 -->
- <script>window.STAY_CHAT_API='/.netlify/functions/chat';</script>
-  <script src="/lang.js?v=20250815"></script>
-  <script src="/app.js?v=20250815"></script>
+  <!-- ===== 콘텐츠 카드들 … (생략 가능) ===== -->
+
+  <!-- ===== 챗봇 버튼 & 창 ===== -->
+  <!-- 플로팅 토글 버튼: ID = chatToggleBtn -->
+  <button id="chatToggleBtn" type="button" aria-controls="chatWindow" aria-expanded="false" title="AI Concierge">
+    💬
+  </button>
+
+  <!-- 챗봇 창: 필수 ID들 (chatWindow, chatMessages, chatInput, chatSendBtn) -->
+  <aside id="chatWindow" role="dialog" aria-modal="false" aria-label="AI Concierge">
+    <div id="chatHeader">AI Concierge</div>
+    <div id="chatMessages" aria-live="polite"></div>
+    <div id="chatComposer">
+      <input id="chatInput" type="text" placeholder="Type a message…" autocomplete="off" />
+      <button id="chatSendBtn" type="button">Send</button>
+    </div>
+  </aside>
+
+  <!-- 푸터 등 기타… -->
 </body>
 </html>
