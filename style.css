@@ -127,3 +127,47 @@ button, a, input, select, label { pointer-events: auto; }
 #botPanel{ position: fixed; right: 16px; bottom: 86px; width: 360px;
   border:1px solid #23232b; border-radius:18px; background:#101018; z-index: 50;
   box-shadow:0 20px 60px rgba(0,0,0,.5) }
+/* ===== Fix: clickable layers & overlay ===== */
+header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-index: 20; }
+* { -webkit-tap-highlight-color: transparent; }
+button, a, input, select, label { pointer-events: auto; }
+
+/* ===== Filter Drawer (auto) ===== */
+#filterDrawer { position: fixed; inset: 0; display: none; z-index: 40; }
+#filterDrawer[aria-hidden="false"] { display: flex; }
+#filterDrawer .drawer-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
+#filterDrawer .drawer-panel {
+  position: relative; margin-left: auto; width: min(820px, 95vw);
+  max-height: 92vh; overflow: auto; background: var(--panel, #101018);
+  border-left: 1px solid rgba(255,255,255,.08); border-top-left-radius: 16px; border-bottom-left-radius: 16px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.6);
+}
+#filterDrawer .drawer-head, #filterDrawer .drawer-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+#filterDrawer .drawer-foot { border-bottom: 0; border-top: 1px solid rgba(255,255,255,.08); }
+#filterDrawer .drawer-body { padding: 14px; }
+#filterDrawer .filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+#filterDrawer .sw-filter-group { background: linear-gradient(180deg,#14141b,#0d0d13); border:1px solid #23232b; border-radius: 12px; padding: 12px; }
+#filterDrawer .sw-filter-group h4 { margin: 0 0 6px; font-size: 14px; opacity: .9; }
+
+/* ===== Search UX feedback ===== */
+.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
+.btn.loading{opacity:.65;pointer-events:none}
+
+/* ===== Bot panel & FAB ===== */
+#botPanel{
+  position: fixed; right: 16px; bottom: 86px; width: 360px;
+  border:1px solid #23232b; border-radius:18px; background:#101018; z-index: 50;
+  box-shadow:0 20px 60px rgba(0,0,0,.5)
+}
+#chatFab{
+  position: fixed; right: 16px; bottom: 16px; z-index: 50;
+  width: 56px; height: 56px; border-radius: 999px;
+  border:1px solid rgba(212,177,102,.45);
+  background: radial-gradient(70% 70% at 30% 30%, var(--gold, #d4b166), #b99142);
+  color:#111; font-size:22px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  box-shadow:0 10px 40px rgba(0,0,0,.45); transition:.2s
+}
+#chatFab:hover{ transform: translateY(-2px); box-shadow:0 16px 50px rgba(0,0,0,.55) }
