@@ -335,3 +335,150 @@ aiForm.addEventListener("submit", async (e)=>{
     pushMsg("Sorry, the assistant is temporarily unavailable.");
   }
 });
+<script>
+/* --------- 0) 기존 인라인 필터가 있으면 숨김 --------- */
+(function hideLegacyInlineFilters(){
+  const killers = [
+    '#filtersInline', 'section#filters', '.filters-inline',
+    '.filter', '.filters' // (모달 그리드가 아니면 숨김)
+  ];
+  killers.forEach(sel=>{
+    document.querySelectorAll(sel).forEach(el=>{
+      if(!el.closest('#filterModal')) el.style.display='none';
+    });
+  });
+})();
+
+/* --------- 1) 카테고리 정의(필요시 추가 가능) --------- */
+const FILTER_SETS = [
+  {
+    title: 'Amenities',
+    items: ['Wi-Fi','Pool','Spa','Gym','Kitchen','Balcony','Hot tub','Sauna','Air conditioning','Breakfast']
+  },
+  {
+    title: 'Property type',
+    items: ['Hotel','Apartment','Villa','Hostel','B&B']
+  },
+  {
+    title: 'Views & Outdoors',
+    items: ['Sea view','City view','Mountain view','Garden','Balcony']
+  },
+  {
+    title: 'Payments & Policies',
+    items: ['Crypto','Cards','Bank transfer','Free cancellation','Late checkout','Non-smoking']
+  },
+  {
+    title: 'Accessibility',
+    items: ['Accessible','Step-free access','Elevator','Family-friendly','24h check-in','Airport shuttle']
+  },
+  {
+    title: 'Pet & Etc.',
+    items: ['Pet-friendly']
+  }
+];
+
+/* --------- 2) 모달 DOM 주입 --------- */
+function ensureFilterModal(){
+  if(document.getElementById('filterModal')) return;
+
+  const wrap = document.createElement('div');
+  wrap.id = 'filterModal';
+  wrap.innerHTML = `
+    <div class="filter-dialog" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+      <div class="filter-head">
+        <div id="filterTitle" class="filter-title">Filters</div>
+        <button id="filterClose" class="btn btn-ghost" aria-label="Close">✕</button>
+      </div>
+      <div class="filter-body">
+        <div class="filters-grid" id="filtersGrid"></div>
+      </div>
+      <div class="filter-foot">
+        <button id="filterClear" class="btn btn-ghost">Clear</button>
+        <div style="display:flex; gap:10px;">
+          <button id="filterApply" class="btn btn-primary">Apply</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+
+  // 그리드 렌더
+  const grid = wrap.querySelector('#filtersGrid');
+  FILTER_SETS.forEach((col, i)=>{
+    const colEl = document.createElement('div');
+    colEl.className = 'filters-col';
+    const list = col.items.map((name, idx)=>{
+      const id = `f_${i}_${idx}_${name.replace(/[^a-z0-9]+/gi,'_')}`;
+      return `
+        <li class="filter-item">
+          <input class="filter-check" type="checkbox" id="${id}" data-name="${name}">
+          <label class="filter-label" for="${id}">${name}</label>
+        </li>`;
+    }).join('');
+    colEl.innerHTML = `
+      <h4 class="filters-col-title">${col.title}</h4>
+      <ul class="filters-list">${list}</ul>`;
+    grid.appendChild(colEl);
+  });
+}
+ensureFilterModal();
+
+/* --------- 3) 열기/닫기 & 배지 & 동작 --------- */
+const modal = document.getElementById('filterModal');
+const dlg   = modal.querySelector('.filter-dialog');
+const btnFilters =
+  document.getElementById('btnFilters') ||
+  document.querySelector('[data-open-filters]') ||
+  (()=>{ // 버튼이 없다면 자동 생성(검색줄 끝에)
+    const bar = document.querySelector('.search') || document.querySelector('#searchBar');
+    if(!bar) return null;
+    const b = document.createElement('button');
+    b.id='btnFilters'; b.className='btn btn-chip'; b.textContent='Filters';
+    bar.appendChild(b); return b;
+  })();
+
+function openFilters(){
+  modal.classList.add('open');
+  document.documentElement.classList.add('modal-open');
+}
+function closeFilters(){
+  modal.classList.remove('open');
+  document.documentElement.classList.remove('modal-open');
+  updateBadge(); // 닫힐 때도 배지 반영
+}
+
+// 배지 카운트
+function selectedCount(){
+  return modal.querySelectorAll('.filter-check:checked').length;
+}
+function updateBadge(){
+  if(!btnFilters) return;
+  const n = selectedCount();
+  if(n>0){
+    btnFilters.classList.add('badge');
+    btnFilters.setAttribute('data-badge', n);
+  }else{
+    btnFilters.classList.remove('badge');
+    btnFilters.removeAttribute('data-badge');
+  }
+}
+
+// 이벤트 바인딩
+btnFilters && btnFilters.addEventListener('click', (e)=>{ e.preventDefault(); openFilters(); });
+modal.addEventListener('click', (e)=>{ if(e.target===modal) closeFilters(); }); // 바깥 클릭 닫기
+modal.querySelector('#filterClose').addEventListener('click', closeFilters);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('open')) closeFilters(); });
+
+modal.addEventListener('change', (e)=>{
+  if(e.target.classList.contains('filter-check')) updateBadge();
+});
+modal.querySelector('#filterClear').addEventListener('click', ()=>{
+  modal.querySelectorAll('.filter-check:checked').forEach(el=> el.checked=false);
+  updateBadge();
+});
+modal.querySelector('#filterApply').addEventListener('click', ()=>{
+  // 선택값 가져가서 검색 파라미터로 쓰세요
+  const selected = Array.from(modal.querySelectorAll('.filter-check:checked')).map(el=> el.dataset.name);
+  console.log('APPLY filters:', selected);
+  closeFilters();
+});
+</script>
