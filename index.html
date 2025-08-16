@@ -6,7 +6,44 @@
     <a href="index.html" class="brand">
       <img src="stayworld-logo.png" alt="StayWorld" class="brand-mark">
       <span class="brand-text">STAYWORLD</span>
-    </a>
+    </a><!-- head 내부에 넣기 -->
+<link rel="preload" href="/style.css?v=20250815a" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/style.css?v=20250815a"></noscript>
+
+<style>
+/* === Critical header styles (style.css가 실패해도 최소 형태 유지) === */
+:root{
+  --bg:#0d0f14;--card:#11131a;--text:#e9ecf1;--muted:#a6adbb;--brand:#d9b56f;--stroke:#232633;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+a{color:var(--text);text-decoration:none}
+a:hover{opacity:.9}
+
+/* Header layout */
+.sw-header{position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.2));backdrop-filter:blur(8px);border-bottom:1px solid var(--stroke)}
+.sw-header .sw-wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:20px}
+.sw-brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
+.sw-brand img{height:28px;width:auto}
+.sw-nav{display:flex;align-items:center;gap:28px;margin-left:8px}
+.sw-nav a{opacity:.95}
+.sw-actions{margin-left:auto;display:inline-flex;align-items:center;gap:12px}
+.sw-btn{padding:10px 16px;border-radius:12px;background:linear-gradient(180deg,#e8cf92,#caa657);color:#1b1e27;font-weight:700;border:1px solid rgba(255,255,255,.08);box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.sw-select{appearance:none;background:var(--card);color:var(--text);border:1px solid var(--stroke);border-radius:10px;padding:10px 34px 10px 12px;position:relative}
+.sw-icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--stroke);background:var(--card);display:inline-grid;place-items:center}
+@media (max-width:960px){
+  .sw-wrap{flex-wrap:wrap;row-gap:10px}
+  .sw-nav{order:3;width:100%;gap:20px}
+  .sw-actions{order:2;margin-left:auto}
+}
+
+/* 버튼/필터 클릭 막힘 방지 & 레이어 충돌 방지 */
+#filtersBtn,#searchBtn,#aiToggle{position:relative;z-index:5}
+.hero,.search-bar,.search-wrap{position:relative;z-index:1}
+[class*="chat"][class*="overlay"],[id*="chat"][class*="overlay"],
+[class*="ai-"][class*="overlay"],[id*="ai-"][class*="overlay"]{pointer-events:none!important}
+</style>
+
 
     <!-- 메인 메뉴 -->
     <nav class="main-nav" aria-label="Primary">
