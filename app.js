@@ -1,20 +1,31 @@
-document.getElementById('chatFab')?.addEventListener('click', () => {
-  document.getElementById('botPanel').hidden = false;
+document.getElementById("chat-toggle").addEventListener("click", () => {
+  const win = document.getElementById("chat-window");
+  win.style.display = win.style.display === "flex" ? "none" : "flex";
 });
-document.getElementById('botClose')?.addEventListener('click', () => {
-  document.getElementById('botPanel').hidden = true;
+
+document.getElementById("send-btn").addEventListener("click", async () => {
+  const input = document.getElementById("chat-input");
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  appendMessage("user", msg);
+  input.value = "";
+
+  const res = await fetch("/.netlify/functions/chatbot", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg, lang: currentLang })
+  });
+
+  const data = await res.json();
+  appendMessage("bot", data.reply);
 });
-document.getElementById('botSend')?.addEventListener('click', () => {
-  const v = botInput.value.trim(); if(!v) return;
-  botBody.insertAdjacentHTML('beforeend', `<div class="sw-bot-msg">${v}</div>`);
-  botBody.insertAdjacentHTML('beforeend', `<div class="sw-bot-msg sys">(Demo) Got it! We’ll find you the best stays.</div>`);
-  botInput.value = ''; botBody.scrollTop = botBody.scrollHeight;
-});
-const ALIASES = {"인천":"Incheon","이스탄불":"Istanbul","서울":"Seoul"};
-function normalizeQuery(q){
-  const t = q.trim().toLowerCase();
-  for (const [k,v] of Object.entries(ALIASES)){
-    if (t === k.toLowerCase()) return v;
-  }
-  return q;
+
+function appendMessage(sender, text) {
+  const chat = document.getElementById("chat-messages");
+  const div = document.createElement("div");
+  div.className = sender;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
