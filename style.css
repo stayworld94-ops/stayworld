@@ -265,3 +265,28 @@ header.site-header { position: sticky; top: 0; z-index: 9900; }
   text-decoration: none !important;
   font-weight: 600;
 }
+/* app.js — front-end */
+
+// -------------------- 1) 다국어 딕셔너리 --------------------
+const i18n = {
+  en: {
+    "lang.label": "Language",
+    "nav.home": "Home",
+    "nav.membership": "Membership",
+    "nav.login": "Login",
+    "nav.signup": "Sign Up",
+
+    "hero.luxury": "Luxury stays.",
+    "hero.global": "Global reach.",
+    "hero.tagline": "Cards, bank transfer & crypto (BTC · ETH · USDT).",
+
+    "search.placeholder": "Paris, Tokyo, Istanbul…",
+    "search.cta": "Search",
+
+    "filters.title": "Filters",
+    "filters.clear": "Clear",
+    "filters.apply": "Apply",
+
+    "feat.verified.title": "Verified stays",
+    "feat.verified.desc": "Top picks near you.",
+    "feat.rewards
