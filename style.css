@@ -1,173 +1,215 @@
-/* Reset & base */
+/* ===================================================================
+   STAYWORLD — style.css (unified)
+   - Dark + Gold theme
+   - Header/hero/search/map/features/footer
+   - Filter Drawer (20+ groups) + legacy modal 안전 처리
+   - Chat FAB/Panel
+   - Clickability & z-index fixes (Leaflet, overlays)
+   =================================================================== */
+
+/* -------------------- Root & Reset -------------------- */
+:root{
+  --bg:#0b0f16;
+  --panel:#0f1420;
+  --panel-2:#101826;
+  --card:#0f1420;
+  --muted:#cfd6e6;
+  --text:#e7e9ee;
+  --gold:#c9a35b;
+  --gold-2:#f4d78c;
+  --ring:rgba(244,215,140,.28);
+  --border:rgba(255,255,255,.08);
+}
+
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#0b0f16;color:#e7e9ee;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Apple Color Emoji,Segoe UI Emoji,sans-serif;line-height:1.5}
+html,body{
+  margin:0; padding:0; background:var(--bg); color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Apple Color Emoji,Segoe UI Emoji,sans-serif;
+  line-height:1.5;
+}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
 .container{max-width:1120px;margin:0 auto;padding:0 16px}
+*{-webkit-tap-highlight-color:transparent}
 
-/* Header */
-.site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
-.header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
-.brand{display:flex;align-items:center;gap:10px}
-.brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
-.brand-text{font-weight:800;letter-spacing:.6px}
-.main-nav{display:flex;gap:28px;justify-content:center;flex:1}
+/* -------------------- Buttons & Inputs -------------------- */
+.btn{
+  border:0; padding:10px 14px; border-radius:12px; cursor:pointer;
+  background:linear-gradient(180deg,#202533,#151b28); color:var(--text);
+  border:1px solid var(--border)
+}
+.btn:hover{filter:brightness(1.02)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:#d7dbe3}
+.btn-primary{
+  background:linear-gradient(180deg,var(--gold-2),var(--gold));
+  color:#1a1205;font-weight:800;border:0;box-shadow:0 10px 28px rgba(201,163,91,.35)
+}
+.btn-gold{
+  background:linear-gradient(180deg,var(--gold-2),var(--gold));
+  color:#170f04;font-weight:800;border-radius:14px;padding:12px 18px; border:0;
+  box-shadow:0 10px 28px rgba(201,163,91,.35)
+}
+.btn-chip{background:#121a26;color:#dfe3ea;border:1px solid var(--border);border-radius:14px;padding:10px 14px}
+.btn.loading{opacity:.65;pointer-events:none}
+
+.input, select, .select, input[type="date"]{
+  background:#0f1621;border:1px solid var(--border);color:var(--text);
+  padding:12px 14px;border-radius:12px; outline:none
+}
+.input::placeholder{color:#9fb0c6}
+select{appearance:none}
+
+/* -------------------- Header -------------------- */
+.site-header,
+.sw-header,
+header.sticky-header{
+  position:sticky; top:0; z-index:1000;
+  background:rgba(11,15,22,.85);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.header-row{display:flex;align-items:center;gap:20px;height:72px}
+.brand{display:flex;align-items:center;gap:10px;min-width:180px}
+.brand-logo{
+  width:36px;height:36px;border-radius:8px;
+  background:radial-gradient(60% 60% at 40% 40%, var(--gold-2), var(--gold));
+  box-shadow:0 4px 18px rgba(0,0,0,.3)
+}
+.brand-text{font-weight:900;letter-spacing:.06em}
+
+.main-nav{display:flex;gap:24px;justify-content:center;flex:1}
 .main-nav a{opacity:.9}
 .main-nav a:hover{opacity:1}
-.header-cta{display:flex;align-items:center;gap:12px}
+
+.header-cta{display:flex;align-items:center;gap:12px;min-width:220px;justify-content:flex-end}
 .lang-wrap{display:flex;align-items:center;gap:8px}
 .lang-label{font-size:12px;opacity:.7}
-.lang-select{appearance:none;background:#101826;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:8px 32px 8px 10px;position:relative}
+.lang-select{
+  appearance:none;background:#101826;border:1px solid var(--border);color:var(--text);
+  border-radius:12px;padding:8px 32px 8px 10px
+}
 .lang-select:focus{outline:2px solid rgba(255,255,255,.2)}
-.btn{border:0;padding:10px 14px;border-radius:12px;cursor:pointer}
-.btn-ghost{background:transparent;color:#cfcfcf}
-.btn-ghost:hover{background:rgba(255,255,255,.06)}
-.btn-primary{background:linear-gradient(180deg,#f2d484,#caa65a);color:#1a1205;font-weight:700;box-shadow:0 6px 20px rgba(202,166,90,.35)}
-.btn-gold{background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
-.btn-chip{background:#121a26;color:#dfe3ea;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 14px}
 
-/* Hero */
-.hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent), radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
+/* 레이어 안전 (헤더는 항상 위) */
+header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-index: 20; }
+
+/* -------------------- Hero & Search -------------------- */
+.hero{
+  padding:48px 0 24px;
+  background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),
+             radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)
+}
 .hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}
-.hero-title .accent{color:#f1cf84}
+.hero-title .accent{color:var(--gold-2)}
 .hero-sub{opacity:.85;margin:8px 0 28px}
-.search-bar{display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;gap:10px;align-items:center}
-.input{background:#0f1621;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;padding:12px 14px;border-radius:12px}
-.input::placeholder{color:#a7b0bf}
 
-/* Feature cards */
+.search-bar{
+  display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;
+  gap:10px;align-items:center
+}
+.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
+
+/* -------------------- Feature cards -------------------- */
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
-.card{background:#0f1420;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card{
+  background:var(--card);border:1px solid rgba(255,255,255,.06);
+  border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)
+}
 .card h3{margin:0 0 6px}
 .card p{margin:0;opacity:.85}
 
-/* Map */
+/* -------------------- Map -------------------- */
 .map-section{padding:36px 0 60px}
-#map{height:420px;border-radius:16px;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
+#map{
+  height:420px;border-radius:16px;border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden
+}
+/* Leaflet z-index를 아래로 내려 버튼/패널을 덮지 않게 */
+.leaflet-container{z-index:0}
+.leaflet-pane, .leaflet-top, .leaflet-bottom{z-index:1}
 
-/* Filters Modal */
+/* -------------------- Filters — Drawer -------------------- */
+/* (JS가 동적으로 #filterDrawer 를 생성/제어) */
+#filterDrawer{ position: fixed; inset: 0; display: none; z-index: 1200; }
+#filterDrawer[aria-hidden="false"]{ display:flex; pointer-events:auto; }
+#filterDrawer[aria-hidden="true"]{ display:none; pointer-events:none; }
+#filterDrawer .drawer-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.55); pointer-events:auto; }
+#filterDrawer .drawer-panel{
+  position:relative; margin-left:auto; width:min(820px,95vw);
+  max-height:92vh; overflow:auto; background:var(--panel); color:var(--text);
+  border-left:1px solid var(--border);
+  border-top-left-radius:16px; border-bottom-left-radius:16px;
+  box-shadow:0 18px 60px rgba(0,0,0,.6); pointer-events:auto;
+}
+#filterDrawer .drawer-head, #filterDrawer .drawer-foot{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 14px; border-bottom:1px solid var(--border)
+}
+#filterDrawer .drawer-foot{ border-bottom:0; border-top:1px solid var(--border) }
+#filterDrawer .drawer-body{ padding:14px }
+
+/* 20+ 그룹 그리드 */
+#filterDrawer .filter-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px }
+#filterDrawer .sw-filter-group{
+  background:linear-gradient(180deg,#14141b,#0d0d13);
+  border:1px solid #23232b; border-radius:12px; padding:12px
+}
+#filterDrawer .sw-filter-group h4{ margin:0 0 6px; font-size:14px; opacity:.9 }
+#filterDrawer label{ display:block; margin:6px 0; }
+#filterDrawer input[type=checkbox], #filterDrawer input[type=radio]{ width:18px; height:18px; vertical-align:middle; }
+
+/* 레거시 .modal 시스템이 있더라도 'open' 아닐 때 클릭 못 하도록 안전 처리 */
+.modal{display:none !important; pointer-events:none !important;}
+.modal.open{display:block !important; pointer-events:auto !important;}
+
+/* 바디 스크롤 잠금 */
 .modal-open, .modal-open body{overflow:hidden!important}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:1300}
-.modal.open{display:block}
-.filter-dialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(980px,92vw);max-height:min(78vh,720px);background:#0f1420;color:#eef;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.6);overflow:hidden}
-.filter-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
-.filter-title{font-size:18px;font-weight:800}
-.filter-body{padding:16px 20px;overflow:auto;max-height:calc(78vh - 120px)}
-.filter-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.08)}
-.filters-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-@media (max-width:900px){.filters-grid{grid-template-columns:1fr 1fr}}
-@media (max-width:640px){.filters-grid{grid-template-columns:1fr}}
-.filters-col-title{font-size:13px;font-weight:800;color:#c9c9c9;margin:0 0 6px}
-.filters-list{list-style:none;margin:0;padding:0}
-.filter-item{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:10px}
-.filter-item:hover{background:rgba(255,255,255,.05)}
-.filter-check{width:18px;height:18px}
-.filter-label{font-size:14px;cursor:pointer;user-select:none}
-/* Filters badge */
-#btnFilters.badge{position:relative}
-#btnFilters.badge::after{content:attr(data-badge);position:absolute;top:-8px;right:-8px;background:#ffd36e;color:#1a1205;border-radius:999px;font-size:11px;line-height:1;padding:4px 6px;border:1px solid #1a1205}
 
-/* Chat */
-.chat{position:fixed;right:24px;bottom:24px;z-index:1200}
-.chat-fab{width:48px;height:48px;border-radius:999px;background:linear-gradient(180deg,#f4d78c,#c9a35b);border:0;box-shadow:0 10px 28px rgba(201,163,91,.35);cursor:pointer}
-.chat-panel{position:absolute;right:0;bottom:56px;width:min(360px,84vw);height:460px;background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.5);display:none;overflow:hidden}
-.chat-panel.open{display:block}
-.chat-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
-.chat-title{font-weight:800}
-.chat-log{height:334px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:80%;padding:10px 12px;border-radius:12px}
-.msg.me{align-self:flex-end;background:#132132}
-.msg.ai{align-self:flex-start;background:#121820}
-.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,.08)}
-.chat-input{flex:1;background:#0f1621;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:10px 12px}
-.chat-input::placeholder{color:#9fb0c6}
-
-/* Footer */
-.site-footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);opacity:.8}
-
-/* Responsive */
-@media (max-width:920px){
-  .main-nav{display:none} /* 모바일에선 기본 네비 숨김(헤더 붕괴 방지) */
-  .search-bar{grid-template-columns:1fr 1fr 1fr auto}
-  .features{grid-template-columns:1fr}
-}
-/* Search UX */
-.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
-.btn.loading{opacity:.65;pointer-events:none}
-/* ===== Clickability & Overlay safety ===== */
-header, nav, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-index: 20; }
-#filterDrawer { position: fixed; inset: 0; display: none; z-index: 40; }
-#filterDrawer[aria-hidden="false"] { display: flex; }
-#filterDrawer .drawer-backdrop {
-  position: absolute; inset: 0; background: rgba(0,0,0,.45);
-}
-#filterDrawer .drawer-panel {
-  position: relative; margin-left: auto; width: min(780px, 92vw);
-  max-height: 92vh; overflow: auto; background: var(--panel, #101018);
-  border-left: 1px solid rgba(255,255,255,.08); border-top-left-radius: 16px;
-  border-bottom-left-radius: 16px;
-}
-#filterDrawer .drawer-head, #filterDrawer .drawer-foot {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.08);
-}
-#filterDrawer .drawer-foot { border-bottom: 0; border-top: 1px solid rgba(255,255,255,.08); }
-#filterDrawer .drawer-body { padding: 14px; }
-#filterDrawer button, #filterDrawer input, #filterDrawer select, #filterDrawer label { pointer-events: auto; }
-
-/* prevent accidental overlay swallowing clicks elsewhere */
-* { -webkit-tap-highlight-color: transparent; }
-button, a, input, select, label { pointer-events: auto; }
-
-/* ===== Search UX ===== */
-.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
-.btn.loading{opacity:.65;pointer-events:none}
-
-/* ===== Bot panel layering ===== */
-#botPanel{ position: fixed; right: 16px; bottom: 86px; width: 360px;
-  border:1px solid #23232b; border-radius:18px; background:#101018; z-index: 50;
-  box-shadow:0 20px 60px rgba(0,0,0,.5) }
-/* ===== Fix: clickable layers & overlay ===== */
-header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-index: 20; }
-* { -webkit-tap-highlight-color: transparent; }
-button, a, input, select, label { pointer-events: auto; }
-
-/* ===== Filter Drawer (auto) ===== */
-#filterDrawer { position: fixed; inset: 0; display: none; z-index: 40; }
-#filterDrawer[aria-hidden="false"] { display: flex; }
-#filterDrawer .drawer-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
-#filterDrawer .drawer-panel {
-  position: relative; margin-left: auto; width: min(820px, 95vw);
-  max-height: 92vh; overflow: auto; background: var(--panel, #101018);
-  border-left: 1px solid rgba(255,255,255,.08); border-top-left-radius: 16px; border-bottom-left-radius: 16px;
-  box-shadow: 0 18px 60px rgba(0,0,0,.6);
-}
-#filterDrawer .drawer-head, #filterDrawer .drawer-foot {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.08);
-}
-#filterDrawer .drawer-foot { border-bottom: 0; border-top: 1px solid rgba(255,255,255,.08); }
-#filterDrawer .drawer-body { padding: 14px; }
-#filterDrawer .filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
-#filterDrawer .sw-filter-group { background: linear-gradient(180deg,#14141b,#0d0d13); border:1px solid #23232b; border-radius: 12px; padding: 12px; }
-#filterDrawer .sw-filter-group h4 { margin: 0 0 6px; font-size: 14px; opacity: .9; }
-
-/* ===== Search UX feedback ===== */
-.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
-.btn.loading{opacity:.65;pointer-events:none}
-
-/* ===== Bot panel & FAB ===== */
-#botPanel{
-  position: fixed; right: 16px; bottom: 86px; width: 360px;
-  border:1px solid #23232b; border-radius:18px; background:#101018; z-index: 50;
-  box-shadow:0 20px 60px rgba(0,0,0,.5)
-}
+/* -------------------- Chat (FAB + Panel) -------------------- */
 #chatFab{
-  position: fixed; right: 16px; bottom: 16px; z-index: 50;
-  width: 56px; height: 56px; border-radius: 999px;
-  border:1px solid rgba(212,177,102,.45);
-  background: radial-gradient(70% 70% at 30% 30%, var(--gold, #d4b166), #b99142);
-  color:#111; font-size:22px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  position:fixed; right:16px; bottom:16px; z-index:1300;
+  width:56px;height:56px;border-radius:999px; border:1px solid rgba(212,177,102,.45);
+  background:radial-gradient(70% 70% at 30% 30%, var(--gold-2), var(--gold));
+  color:#111;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;
   box-shadow:0 10px 40px rgba(0,0,0,.45); transition:.2s
 }
 #chatFab:hover{ transform: translateY(-2px); box-shadow:0 16px 50px rgba(0,0,0,.55) }
+
+#botPanel{
+  position:fixed; right:16px; bottom:86px; width:min(360px,92vw);
+  border:1px solid #23232b; border-radius:18px; background:#101018; z-index:1300;
+  box-shadow:0 20px 60px rgba(0,0,0,.5); overflow:hidden
+}
+#botPanel[hidden]{ display:none !important; }
+.sw-bot-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #1b1b20 }
+.sw-bot-body{ padding:12px; max-height:320px; overflow:auto }
+.sw-bot-foot{ display:flex; gap:8px; padding:10px; border-top:1px solid #1b1b20 }
+.sw-bot-msg{ background:#171723; border:1px solid #23232b; border-radius:16px; padding:10px 12px; margin:8px 0 }
+.sw-bot-msg.sys{ opacity:.85 }
+#botInput{ flex:1; background:#0f0f16; border:1px solid var(--border); border-radius:10px; color:var(--text); padding:10px }
+
+/* -------------------- Footer -------------------- */
+.site-footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);opacity:.85}
+
+/* -------------------- Responsive -------------------- */
+@media (max-width:1120px){
+  .search-bar{grid-template-columns:1fr 1fr 1fr auto}
+}
+@media (max-width:920px){
+  .main-nav{display:none} /* 모바일 네비 붕괴 방지 */
+  .header-cta{min-width:auto}
+  .hero-title{font-size:40px}
+}
+@media (max-width:640px){
+  .search-bar{grid-template-columns:1fr 1fr auto}
+}
+
+/* -------------------- Clickability & Safety -------------------- */
+/* 어디서든 버튼/폼은 항상 클릭 가능 */
+button, a, input, select, label { pointer-events:auto; }
+
+/* 혹시 전역 오버레이가 DOM에 남아 있더라도 비활성 시 클릭 차단 못 하게 */
+[data-overlay]:not(.open){ pointer-events:none !important; }
+
+/* 검색 UX */
+.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
