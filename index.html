@@ -2,126 +2,95 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>STAYWORLD — Luxury Global Stays</title>
-
-  <!-- Global styles (기존 유지) -->
-  <link rel="stylesheet" href="/style.css">
   <link rel="icon" href="/stayworld-logo.png">
-
-  <!-- Leaflet (지도) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <!-- Header -->
-  <header>
+  <header class="header">
     <div class="container nav">
-      <div class="brand">
-        <img src="/stayworld-logo.png" alt="STAYWORLD">
+      <a class="brand" href="/index.html">
+        <img src="/assets/logo-gold.png" alt="STAYWORLD">
         <strong>STAYWORLD</strong>
-      </div>
+      </a>
       <nav class="nav-links">
-        <a id="t_nav_home" href="/index.html">Home</a>
+        <a id="t_nav_home" href="#home">Home</a>
         <a id="t_nav_membership" href="/membership.html">Membership</a>
         <a id="t_nav_login" href="/login.html">Login</a>
         <a id="t_nav_signup" class="btn btn-gold" href="/signup.html">Sign Up</a>
       </nav>
-      <div>
-        <select id="langSelect" aria-label="Language">
-          <option value="en">EN</option><option value="ko">KO</option>
-          <option value="fr">FR</option><option value="tr">TR</option>
-          <option value="ja">JA</option><option value="de">DE</option>
-          <option value="es">ES</option><option value="it">IT</option>
-          <option value="zh">ZH</option><option value="ru">RU</option>
+      <div class="pills">
+        <span id="authState" class="pill">Guest</span>
+        <select id="langSelect" class="lang" aria-label="Language">
+          <option value="en">EN</option><option value="ko">KO</option><option value="ja">JA</option>
+          <option value="fr">FR</option><option value="tr">TR</option><option value="de">DE</option>
+          <option value="es">ES</option><option value="it">IT</option><option value="zh">ZH</option><option value="ru">RU</option>
         </select>
       </div>
     </div>
   </header>
 
-  <!-- Hero + Search -->
-  <main class="container hero" id="home">
-    <h1 id="t_h1">Luxury stays.<br><span style="color:var(--gold)">Global reach.</span></h1>
-    <p class="lead" id="t_pay">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+  <main id="home" class="container hero">
+    <h1 id="t_h1">Luxury stays.<br><span class="gold">Global reach.</span></h1>
+    <p id="t_pay" class="lead">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
-    <div class="searchbar" style="margin-top:14px">
-      <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off">
-      <input id="dateFrom" type="date">
-      <input id="dateTo" type="date">
-      <button class="btn" id="t_filters" type="button">Filters</button>
-      <a id="searchBtn" class="btn btn-gold" href="#">Search</a>
+    <div class="searchbar" role="search">
+      <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off" aria-label="Destination"/>
+      <input id="dateFrom" type="date" aria-label="From"/>
+      <input id="dateTo" type="date" aria-label="To"/>
+      <button id="filterOpen" class="btn" type="button">Filters</button>
+      <a id="goSearch" class="btn btn-gold" href="/results.html">Search</a>
     </div>
 
-    <div id="map"></div>
-  </main>
-
-  <!-- Support section -->
-  <section class="container" style="padding:24px 0 10px">
-    <h2 id="t_support_title">Support</h2>
-    <div class="grid">
-      <div class="card">
-        <h3 id="t_support_ai_title">AI Concierge</h3>
-        <p id="t_support_ai_desc">Chat in your language — 24/7.</p>
-        <button class="btn btn-gold" id="openBot">Open bot</button>
-      </div>
-      <div class="card">
-        <h3 id="t_support_faq_title">FAQ</h3>
-        <p id="t_support_faq_desc">Common questions & answers.</p>
-        <a class="btn" href="/support.html" id="t_support_faq_btn">View FAQs</a>
-      </div>
-      <div class="card">
-        <h3 id="t_support_alerts_title">Smart alerts</h3>
-        <p id="t_support_alerts_desc">AI picks, destination tips & level updates.</p>
-        <div class="row">
-          <span class="badge" id="t_support_badge_ai">AI picks</span>
-          <span class="badge" id="t_support_badge_dest">Top destinations</span>
-          <span class="badge" id="t_support_badge_lvl">Level-up</span>
+    <section style="margin-top:18px">
+      <div class="grid">
+        <div class="card">
+          <h3 id="dealTitle">Verified stays</h3>
+          <p id="dealSub" class="lead">Top picks near you.</p>
+        </div>
+        <div class="card">
+          <h3>StayWorld+ Rewards</h3>
+          <p class="lead">Earn points on every booking.</p>
+        </div>
+        <div class="card">
+          <h3>Secure payments</h3>
+          <p class="lead">Visa, Mastercard, Amex & Crypto.</p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <footer class="container">
-    <div>© STAYWORLD — stayworldbooking.com</div>
-    <div style="margin-top:8px">
-      <a href="/pay.html" class="btn btn-gold">Pay with Crypto (USDT)</a>
+  <footer>
+    <div class="container">
+      © StayWorld — stayworldbooking.com
     </div>
   </footer>
 
-  <!-- Floating Chat Button + Bot Panel -->
-  <button id="chatFab" class="sw-chat-fab" title="Chat with AI" style="position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:999px;border:1px solid rgba(212,177,102,.45);background:radial-gradient(70% 70% at 30% 30%, var(--gold), #caa951);color:#111;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.45)">💬</button>
-
-  <div class="sw-bot" id="botPanel" hidden
-       style="position:fixed;right:16px;bottom:86px;width:360px;border:1px solid #23232b;border-radius:18px;background:#101018;box-shadow:0 20px 60px rgba(0,0,0,.5)">
-    <div class="sw-bot-head" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1b1b20">
-      <div class="sw-title">AI Concierge</div>
-      <button class="sw-icon-btn" id="botClose" aria-label="Close">✕</button>
+  <!-- Chatbot -->
+  <button id="chatFab" title="AI Concierge">💬</button>
+  <section id="botPanel" aria-hidden="true">
+    <div class="bot-head">
+      <div><strong>AI Concierge</strong></div>
+      <button id="botClose" class="btn" type="button">✕</button>
     </div>
-    <div class="sw-bot-body" id="botBody" style="padding:12px;max-height:260px;overflow:auto">
-      <div class="sw-bot-msg sys" style="background:#171723;border:1px solid #23232b;border-radius:16px;padding:10px 12px;margin:8px 0;opacity:.9">
-        Hello! Ask me anything in your language.
-      </div>
+    <div id="botBody" class="bot-body">
+      <div class="msg">Hello! Ask me anything.</div>
     </div>
-    <div class="sw-bot-foot" style="display:flex;gap:8px;padding:10px;border-top:1px solid #1b1b20">
-      <input id="botInput" placeholder="Type a message…" style="flex:1;background:#0f0f16;border:1px solid #23232b;border-radius:10px;color:#fff;padding:10px">
-      <button class="btn btn-gold" id="botSend" style="border:0">Send</button>
+    <div class="bot-foot">
+      <input id="botInput" placeholder="Type a message…" />
+      <button id="botSend" class="btn btn-gold">Send</button>
     </div>
-  </div>
+  </section>
 
-  <!-- Scripts -->
-  <script defer src="/lang.js"></script>
-  <script defer src="/app.js"></script>
-
-  <!-- Inline map safe init -->
-  <script>
-  (function(){
-    try{
-      const m=L.map('map').setView([41.0082,28.9784],5);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(m);
-      L.marker([41.0082,28.9784]).addTo(m).bindPopup('Istanbul');
-    }catch(e){}
-  })();
-  </script>
+  <!-- i18n + app -->
+  <script src="/lang.js"></script>
+  <!-- Firebase config (당신 레포의 파일 유지) -->
+  <script src="/firebase-config.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
-
