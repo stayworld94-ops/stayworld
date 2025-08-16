@@ -1,37 +1,21 @@
-// netlify/functions/sw-chat.js
+/** netlify/functions/sw-chat.js */
+import OpenAI from "openai";
+
 export async function handler(event) {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors() };
-
-  try {
-    const { messages = [], lang = 'en' } = JSON.parse(event.body || '{}');
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return json(500, { error: 'Missing OPENAI_API_KEY' });
-
-    const r = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gpt-4.1',
-        input: [{ role: 'system', content: `You are StayWorld concierge. Reply in ${lang}.` }, ...messages]
-      })
-    });
-
-    if (!r.ok) return json(r.status, { error: await r.text() });
-    const data = await r.json();
-    return json(200, { reply: extractReply(data) });
-  } catch (e) {
-    return json(500, { error: e.message || 'Server error' });
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
   }
-}
-
-const cors = () => ({
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST,OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-});
-const json = (code, obj) => ({ statusCode: code, headers: cors(), body: JSON.stringify(obj) });
-
-function extractReply(data){
-  const c = data?.output_text || data?.choices?.[0]?.message?.content || data?.choices?.[0]?.message?.trim?.() || '';
-  return Array.isArray(c) ? c.map(p=>p.text||'').join('') : String(c);
+  try {
+    const { messages = [], model = "gpt-4.1" } = JSON.parse(event.body || "{}");
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const r = await client.chat.completions.create({
+      model,
+      messages: messages.map(m => ({ role: m.role, content: String(m.content || "") })),
+      temperature: 0.2,
+    });
+    const reply = r.choices?.[0]?.message?.content || "";
+    return { statusCode: 200, body: JSON.stringify({ reply }) };
+  } catch (e) {
+    return { statusCode: 500, body: JSON.stringify({ error: String(e) }) };
+  }
 }
