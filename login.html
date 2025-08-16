@@ -66,3 +66,16 @@
 </script>
 </body></html>
 v
+<script type="module">
+  import { auth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from './firebase-config.js';
+  const email = document.getElementById('li_email');
+  const pass  = document.getElementById('li_pass');
+  document.getElementById('btn_email_login').onclick = async ()=>{
+    try{ await signInWithEmailAndPassword(auth, email.value.trim(), pass.value); location.href='index.html'; }
+    catch(e){ alert(e.message); }
+  };
+  document.getElementById('btn_google_login').onclick = async ()=>{
+    try{ await signInWithPopup(auth, new GoogleAuthProvider()); location.href='index.html'; }
+    catch(e){ alert(e.message); }
+  };
+</script>
