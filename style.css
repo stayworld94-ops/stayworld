@@ -64,3 +64,45 @@ footer{border-top:1px solid #1a1a22;padding:20px 0;margin-top:30px;color:#9ea3af
   h1{font-size:40px}
   .nav-links{display:none}
 }
+/* 데코 오버레이는 클릭 차단 못 하게 */
+.hero::before,
+.hero::after,
+.gradient-overlay,
+.glass-overlay,
+.page-mask {
+  pointer-events: none !important;
+}
+
+/* 실제 클릭 타깃들은 맨 위로 */
+.header,
+.search-bar,
+#btnFilters,
+#btnChatToggle,
+#filtersPanel,
+#chatbot {
+  position: relative;
+  z-index: 10;
+}
+
+/* 떠 있는 챗버튼/챗창은 제일 위 */
+#btnChatToggle { z-index: 99999; }
+#chatbot       { z-index: 99998; }
+
+/* 챗봇 컨테이너는 기본적으로 클릭 통과, 내부 패널만 클릭 허용 */
+#chatbot { pointer-events: none; }
+#chatbot .chat-panel,
+#chatbot .chat-input,
+#chatbot button,
+#chatbot textarea {
+  pointer-events: auto;
+}
+
+/* 패널 show/hide */
+#filtersPanel,
+#chatbot .chat-panel {
+  display: none;
+}
+#filtersPanel.open,
+#chatbot.open .chat-panel {
+  display: block;
+}
