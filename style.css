@@ -144,3 +144,32 @@ img{max-width:100%;display:block}
   .main-nav{display:none}
   .usp{grid-template-columns:1fr}
 }
+/* ===== Filters – extended UI ===== */
+.pill-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:22px;padding:0 6px;border-radius:999px;
+  background:var(--accent);color:#fff;font-weight:800;font-size:12px;margin-left:8px
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--panel);border:1px solid var(--stroke);color:var(--text);
+  border-radius:999px;padding:6px 10px;font-size:13px
+}
+.chip button{all:unset;cursor:pointer;opacity:.8;padding:0 4px}
+.chip button:hover{opacity:1}
+.filters-container{display:flex;flex-direction:column;gap:18px}
+.filter-section{
+  border:1px solid var(--stroke);border-radius:14px;background:var(--panel);
+  padding:12px
+}
+.filter-section-header{
+  display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:10px
+}
+.section-title{font-weight:800}
+.section-actions{display:flex;gap:8px}
+.filter-grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:8px 16px}
+.filter-item{display:flex;align-items:center;gap:10px;padding:6px 4px}
+.filter-item input{width:18px;height:18px}
+@media (max-width:960px){.filter-grid{grid-template-columns:repeat(2,minmax(160px,1fr))}}
+@media (max-width:640px){.filter-grid{grid-template-columns:1fr}}
