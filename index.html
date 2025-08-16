@@ -1,340 +1,394 @@
-<!-- =============================
-  STAYWORLD — index.html (2025-08-15)
-  - 충돌 스크립트 제거
-  - i18n(10언어) + 필터 모달 + 챗봇 + 검색바 유지
-  - 헤더 정렬/간격 수정
-  - 외부 style.css 사용 (아래에 전체 CSS 동봉)
-============================== -->
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>STAYWORLD — Luxury Global Booking</title>
-
-  <!-- 캐시버스터 포함 CSS 링크 -->
-  <link rel="stylesheet" href="/style.css?v=2025-08-15c"/>
-
-  <!-- 최소 폴백(외부 CSS 실패해도 접근성 라벨 유지) -->
-  <style>
-    .visually-hidden{position:absolute;clip:rect(0 0 0 0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STAYWORLD — Luxury Global Reach</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Leaflet (지도) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
 </head>
 <body>
-  <!-- 헤더 -->
+  <!-- ================= HEADER ================= -->
   <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="brand" aria-label="StayWorld">
-        <img src="/stayworld-logo.png" class="logo" alt="StayWorld" />
+    <div class="container header-row">
+      <a href="/" class="brand">
+        <img src="stayworld-logo.png" alt="StayWorld" class="brand-logo" />
         <span class="brand-text">STAYWORLD</span>
       </a>
 
       <nav class="main-nav" aria-label="Primary">
-        <a href="/index.html" data-i18n="nav.home">Home</a>
-        <a href="/membership.html" data-i18n="nav.membership">Membership</a>
-        <a href="/login.html" data-i18n="nav.login">Login</a>
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="membership.html" data-i18n="nav_membership">Membership</a>
+        <a href="login.html" data-i18n="nav_login">Login</a>
       </nav>
 
-      <div class="header-right">
-        <label for="lang" class="visually-hidden" id="langLabel">Language</label>
-        <div class="lang-select" aria-labelledby="langLabel">
-          <select id="lang" aria-label="Language">
-            <option>EN</option><option>KO</option><option>JA</option><option>ZH</option>
-            <option>FR</option><option>ES</option><option>DE</option><option>TR</option>
-            <option>AR</option><option>PT</option>
+      <div class="header-cta">
+        <div class="lang-wrap">
+          <label for="lang" class="lang-label" data-i18n="language">Language</label>
+          <select id="lang" class="lang-select" aria-label="Language">
+            <option value="EN" selected>EN</option>
+            <option value="KO">KO</option>
+            <option value="JA">JA</option>
+            <option value="ZH">ZH</option>
+            <option value="FR">FR</option>
+            <option value="ES">ES</option>
+            <option value="DE">DE</option>
+            <option value="TR">TR</option>
+            <option value="AR">AR</option>
+            <option value="RU">RU</option>
           </select>
         </div>
-        <a class="btn primary" href="/signup.html" data-i18n="nav.signup">Sign Up</a>
+        <a href="signup.html" class="btn btn-primary" data-i18n="nav_signup">Sign Up</a>
       </div>
     </div>
   </header>
 
-  <!-- 히어로 + 검색바 -->
+  <!-- ================= HERO ================= -->
   <section class="hero">
     <div class="container">
       <h1 class="hero-title">
-        <span data-i18n="hero.line1">Luxury stays.</span><br/>
-        <span class="gold" data-i18n="hero.line2">Global reach.</span>
+        <span data-i18n="hero_luxury">Luxury stays.</span><br />
+        <span class="accent" data-i18n="hero_reach">Global reach.</span>
       </h1>
-      <p class="tagline" data-i18n="hero.tagline">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+      <p class="hero-sub" data-i18n="hero_sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
-      <form id="search-form" class="search-bar" onsubmit="return false;">
-        <input id="destination" class="i-text" data-i18n-placeholder="search.placeholder" placeholder="Paris, Tokyo, Istanbul..." />
-        <input id="checkin" class="i-date" type="date" aria-label="Check-in"/>
-        <input id="checkout" class="i-date" type="date" aria-label="Check-out"/>
-        <button id="filterBtn" type="button" class="btn secondary" data-i18n="search.filters">Filters</button>
-        <button id="searchBtn" type="button" class="btn primary" data-i18n="search.search">Search</button>
-      </form>
-    </div>
-  </section>
+      <div class="search-bar" id="searchBar">
+        <input type="text" class="input" id="searchDestination" placeholder="Paris, Tokyo, Istanbul…" data-i18n-placeholder="placeholder_city" />
+        <input type="date" class="input" id="checkIn" />
+        <input type="date" class="input" id="checkOut" />
+        <button class="btn btn-chip" id="btnFilters" type="button" data-i18n="filters">Filters</button>
+        <button class="btn btn-gold" id="btnSearch" type="button" data-i18n="search">Search</button>
+      </div>
 
-  <!-- USP 카드 -->
-  <section class="usp container">
-    <div class="card">
-      <h3 data-i18n="usp.verifiedTitle">Verified stays</h3>
-      <p data-i18n="usp.verifiedText">Top picks near you.</p>
-    </div>
-    <div class="card">
-      <h3 data-i18n="usp.rewardsTitle">StayWorld+ Rewards</h3>
-      <p data-i18n="usp.rewardsText">Earn points on every booking.</p>
-    </div>
-    <div class="card">
-      <h3 data-i18n="usp.paymentsTitle">Secure payments</h3>
-      <p data-i18n="usp.paymentsText">Visa, Mastercard, Amex & Crypto.</p>
-    </div>
-  </section>
-
-  <!-- 필터 모달 -->
-  <div id="filtersModal" class="modal" aria-hidden="true" role="dialog">
-    <div class="modal-card" role="document">
-      <header class="modal-head">
-        <h3 data-i18n="filter.title">Filters</h3>
-        <button class="icon-btn" data-close aria-label="Close">&times;</button>
-      </header>
-      <div class="modal-body">
-        <div class="filter-grid">
-          <!-- 20개+ 체크 옵션 -->
-          <label><input type="checkbox" value="wifi"/> Wi-Fi</label>
-          <label><input type="checkbox" value="pool"/> Pool</label>
-          <label><input type="checkbox" value="spa"/> Spa</label>
-          <label><input type="checkbox" value="gym"/> Gym</label>
-          <label><input type="checkbox" value="parking"/> Parking</label>
-          <label><input type="checkbox" value="pet"/> Pet-friendly</label>
-          <label><input type="checkbox" value="kitchen"/> Kitchen</label>
-          <label><input type="checkbox" value="balcony"/> Balcony</label>
-          <label><input type="checkbox" value="sea"/> Sea view</label>
-          <label><input type="checkbox" value="city"/> City view</label>
-          <label><input type="checkbox" value="mountain"/> Mountain view</label>
-          <label><input type="checkbox" value="garden"/> Garden</label>
-          <label><input type="checkbox" value="hot_tub"/> Hot tub</label>
-          <label><input type="checkbox" value="sauna"/> Sauna</label>
-          <label><input type="checkbox" value="ac"/> Air conditioning</label>
-          <!-- Property types -->
-          <label><input type="checkbox" value="hotel"/> Hotel</label>
-          <label><input type="checkbox" value="apartment"/> Apartment</label>
-          <label><input type="checkbox" value="villa"/> Villa</label>
-          <label><input type="checkbox" value="hostel"/> Hostel</label>
-          <label><input type="checkbox" value="bnb"/> B&B</label>
-          <!-- Payment -->
-          <label><input type="checkbox" value="crypto"/> Crypto</label>
-          <label><input type="checkbox" value="bank"/> Bank transfer</label>
-          <label><input type="checkbox" value="card"/> Cards</label>
-          <!-- Extras -->
-          <label><input type="checkbox" value="breakfast"/> Breakfast</label>
-          <label><input type="checkbox" value="airport"/> Airport shuttle</label>
-          <label><input type="checkbox" value="accessible"/> Accessible</label>
-          <label><input type="checkbox" value="step_free"/> Step-free access</label>
-          <label><input type="checkbox" value="elevator"/> Elevator</label>
-          <label><input type="checkbox" value="non_smoking"/> Non-smoking</label>
-          <label><input type="checkbox" value="late_checkout"/> Late checkout</label>
-          <label><input type="checkbox" value="family"/> Family-friendly</label>
-          <label><input type="checkbox" value="free_cancel"/> Free cancellation</label>
+      <div class="features">
+        <div class="card">
+          <h3 data-i18n="feat_verified">Verified stays</h3>
+          <p data-i18n="feat_verified_sub">Top picks near you.</p>
+        </div>
+        <div class="card">
+          <h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3>
+          <p data-i18n="feat_rewards_sub">Earn points on every booking.</p>
+        </div>
+        <div class="card">
+          <h3 data-i18n="feat_payments">Secure payments</h3>
+          <p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p>
         </div>
       </div>
-      <footer class="modal-foot">
-        <button class="btn secondary" data-clear data-i18n="filter.clear">Clear</button>
-        <button class="btn primary" data-apply data-i18n="filter.apply">Apply</button>
-      </footer>
+    </div>
+  </section>
+
+  <!-- ================= MAP ================= -->
+  <section class="map-section">
+    <div class="container">
+      <div id="map" aria-label="Map" role="region"></div>
+    </div>
+  </section>
+
+  <!-- ================= FILTER MODAL ================= -->
+  <div id="filterModal" class="modal" aria-hidden="true">
+    <div class="filter-dialog" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+      <div class="filter-head">
+        <div id="filterTitle" class="filter-title" data-i18n="filters">Filters</div>
+        <button id="filterClose" class="btn btn-ghost" aria-label="Close">✕</button>
+      </div>
+      <div class="filter-body">
+        <div class="filters-grid" id="filtersGrid"></div>
+      </div>
+      <div class="filter-foot">
+        <button id="filterClear" class="btn btn-ghost" data-i18n="clear">Clear</button>
+        <button id="filterApply" class="btn btn-primary" data-i18n="apply">Apply</button>
+      </div>
     </div>
   </div>
 
-  <!-- 챗봇 -->
-  <button id="chat-toggle" class="chat-fab" aria-controls="chat-panel" aria-expanded="false" title="AI Concierge">💬</button>
-  <aside id="chat-panel" class="chat-panel" aria-hidden="true">
-    <header class="chat-head">
-      <h3>StayWorld AI</h3>
-      <button class="icon-btn" data-close-chat aria-label="Close">&times;</button>
-    </header>
-    <div id="chatLog" class="chat-log" aria-live="polite"></div>
-    <form id="chatForm" class="chat-input">
-      <input id="chatInput" autocomplete="off" data-i18n-placeholder="chat.placeholder" placeholder="Type a message…"/>
-      <button id="chatSend" class="btn primary" type="submit" data-i18n="chat.send">Send</button>
-    </form>
-  </aside>
-  <div id="chatMask" class="mask" hidden></div>
+  <!-- ================= CHATBOT ================= -->
+  <div id="chatWidget" class="chat">
+    <button id="chatToggle" class="chat-fab" aria-label="Open AI Chat">💬</button>
+    <div class="chat-panel" aria-live="polite" aria-label="StayWorld AI">
+      <div class="chat-head">
+        <div class="chat-title">StayWorld AI</div>
+        <button id="chatClose" class="btn btn-ghost" aria-label="Close">✕</button>
+      </div>
+      <div id="chatLog" class="chat-log"></div>
+      <div class="chat-input-row">
+        <input id="chatInput" class="chat-input" type="text" placeholder="Ask about stays, dates, or payments…" data-i18n-placeholder="chat_placeholder" />
+        <button id="chatSend" class="btn btn-gold" data-i18n="send">Send</button>
+      </div>
+    </div>
+  </div>
 
-  <!-- 앱 스크립트 (i18n + 모달 + 챗봇) -->
+  <footer class="site-footer">
+    <div class="container">
+      <small>© StayWorld — stayworldbooking.com</small>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPTS ================= -->
   <script>
-    /**************  I18N (10개 언어)  **************/
-    const DICT = {
-      EN:{nav:{home:"Home",membership:"Membership",login:"Login",signup:"Sign Up"},
-          hero:{line1:"Luxury stays.",line2:"Global reach.",tagline:"Cards, bank transfer & crypto (BTC · ETH · USDT)."},
-          search:{placeholder:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search"},
-          usp:{verifiedTitle:"Verified stays",verifiedText:"Top picks near you.",
-               rewardsTitle:"StayWorld+ Rewards",rewardsText:"Earn points on every booking.",
-               paymentsTitle:"Secure payments",paymentsText:"Visa, Mastercard, Amex & Crypto."},
-          filter:{title:"Filters",clear:"Clear",apply:"Apply"},
-          chat:{placeholder:"Ask about stays, dates, or payments…",send:"Send"}},
-      KO:{nav:{home:"홈",membership:"멤버십",login:"로그인",signup:"가입하기"},
-          hero:{line1:"럭셔리 스테이.",line2:"글로벌 리치.",tagline:"카드·계좌이체·암호화폐(BTC·ETH·USDT) 지원."},
-          search:{placeholder:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색"},
-          usp:{verifiedTitle:"검증된 숙소",verifiedText:"내 주변 추천 숙소.",
-               rewardsTitle:"StayWorld+ 리워드",rewardsText:"예약마다 포인트 적립.",
-               paymentsTitle:"안전한 결제",paymentsText:"비자, 마스터카드, 아멕스 & 크립토."},
-          filter:{title:"필터",clear:"초기화",apply:"적용"},
-          chat:{placeholder:"숙소/날짜/결제 문의를 입력하세요…",send:"전송"}},
-      JA:{nav:{home:"ホーム",membership:"メンバーシップ",login:"ログイン",signup:"登録"},
-          hero:{line1:"ラグジュアリー滞在。",line2:"世界に広がるアクセス。",tagline:"カード・振込・暗号資産（BTC・ETH・USDT）。"},
-          search:{placeholder:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索"},
-          usp:{verifiedTitle:"厳選ステイ",verifiedText:"近場のおすすめ。",
-               rewardsTitle:"StayWorld+ リワード",rewardsText:"予約ごとにポイント。",
-               paymentsTitle:"安全な決済",paymentsText:"Visa, Mastercard, Amex & Crypto."},
-          filter:{title:"フィルター",clear:"クリア",apply:"適用"},
-          chat:{placeholder:"宿・日付・支払いを質問…",send:"送信"}},
-      ZH:{nav:{home:"主页",membership:"会员",login:"登录",signup:"注册"},
-          hero:{line1:"奢华住宿。",line2:"全球触达。",tagline:"支持银行卡、转账和加密货币（BTC·ETH·USDT）。"},
-          search:{placeholder:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索"},
-          usp:{verifiedTitle:"优选住宿",verifiedText:"离你最近的精选。",
-               rewardsTitle:"StayWorld+ 积分",rewardsText:"每次预订都能赚积分。",
-               paymentsTitle:"安全支付",paymentsText:"Visa、万事达、Amex 与加密货币。"},
-          filter:{title:"筛选",clear:"清除",apply:"应用"},
-          chat:{placeholder:"询问住宿、日期或支付…",send:"发送"}},
-      FR:{nav:{home:"Accueil",membership:"Programme",login:"Connexion",signup:"Inscription"},
-          hero:{line1:"Séjours de luxe.",line2:"Portée mondiale.",tagline:"Carte, virement & crypto (BTC · ETH · USDT)."},
-          search:{placeholder:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher"},
-          usp:{verifiedTitle:"Logements vérifiés",verifiedText:"Meilleurs choix près de vous.",
-               rewardsTitle:"Récompenses StayWorld+",rewardsText:"Des points à chaque réservation.",
-               paymentsTitle:"Paiements sécurisés",paymentsText:"Visa, Mastercard, Amex & Crypto."},
-          filter:{title:"Filtres",clear:"Réinitialiser",apply:"Appliquer"},
-          chat:{placeholder:"Demandez sur les séjours, dates ou paiements…",send:"Envoyer"}},
-      ES:{nav:{home:"Inicio",membership:"Membresía",login:"Iniciar sesión",signup:"Registrarse"},
-          hero:{line1:"Estancias de lujo.",line2:"Alcance global.",tagline:"Tarjeta, transferencia y cripto (BTC · ETH · USDT)."},
-          search:{placeholder:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar"},
-          usp:{verifiedTitle:"Alojamientos verificados",verifiedText:"Las mejores opciones cerca.",
-               rewardsTitle:"Recompensas StayWorld+",rewardsText:"Gana puntos en cada reserva.",
-               paymentsTitle:"Pagos seguros",paymentsText:"Visa, Mastercard, Amex y Cripto."},
-          filter:{title:"Filtros",clear:"Limpiar",apply:"Aplicar"},
-          chat:{placeholder:"Pregunta sobre estancias, fechas o pagos…",send:"Enviar"}},
-      DE:{nav:{home:"Start",membership:"Mitgliedschaft",login:"Anmelden",signup:"Registrieren"},
-          hero:{line1:"Luxuriöse Aufenthalte.",line2:"Globale Reichweite.",tagline:"Karten, Überweisung & Krypto (BTC · ETH · USDT)."},
-          search:{placeholder:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen"},
-          usp:{verifiedTitle:"Geprüfte Unterkünfte",verifiedText:"Top-Tipps in deiner Nähe.",
-               rewardsTitle:"StayWorld+ Prämien",rewardsText:"Punkte bei jeder Buchung.",
-               paymentsTitle:"Sichere Zahlungen",paymentsText:"Visa, Mastercard, Amex & Krypto."},
-          filter:{title:"Filter",clear:"Zurücksetzen",apply:"Übernehmen"},
-          chat:{placeholder:"Fragen zu Aufenthalt, Datum oder Zahlung…",send:"Senden"}},
-      TR:{nav:{home:"Ana Sayfa",membership:"Üyelik",login:"Giriş",signup:"Kayıt Ol"},
-          hero:{line1:"Lüks konaklamalar.",line2:"Küresel erişim.",tagline:"Kart, havale ve kripto (BTC · ETH · USDT)."},
-          search:{placeholder:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara"},
-          usp:{verifiedTitle:"Doğrulanmış konaklamalar",verifiedText:"Yakınınızdaki en iyi seçenekler.",
-               rewardsTitle:"StayWorld+ Ödüller",rewardsText:"Her rezervasyonda puan kazanın.",
-               paymentsTitle:"Güvenli ödemeler",paymentsText:"Visa, Mastercard, Amex & Kripto."},
-          filter:{title:"Filtreler",clear:"Temizle",apply:"Uygula"},
-          chat:{placeholder:"Konaklama, tarih veya ödeme sor…",send:"Gönder"}},
-      AR:{nav:{home:"الرئيسية",membership:"العضوية",login:"تسجيل الدخول",signup:"إنشاء حساب"},
-          hero:{line1:"إقامات فاخرة.",line2:"انتشار عالمي.",tagline:"بطاقة، تحويل بنكي وعُملات رقمية (BTC · ETH · USDT)."},
-          search:{placeholder:"باريس، طوكيو، إسطنبول…",filters:"عوامل التصفية",search:"بحث"},
-          usp:{verifiedTitle:"إقامات موثوقة",verifiedText:"أفضل الخيارات بالقرب منك.",
-               rewardsTitle:"مكافآت StayWorld+",rewardsText:"اكسب نقاطًا مع كل حجز.",
-               paymentsTitle:"مدفوعات آمنة",paymentsText:"Visa وMastercard وAmex والعملات الرقمية."},
-          filter:{title:"عوامل التصفية",clear:"مسح",apply:"تطبيق"},
-          chat:{placeholder:"اسأل عن الإقامة أو التواريخ أو الدفع…",send:"إرسال"}},
-      PT:{nav:{home:"Início",membership:"Assinatura",login:"Entrar",signup:"Criar conta"},
-          hero:{line1:"Estadias de luxo.",line2:"Alcance global.",tagline:"Cartão, transferência e cripto (BTC · ETH · USDT)."},
-          search:{placeholder:"Paris, Tóquio, Istambul…",filters:"Filtros",search:"Buscar"},
-          usp:{verifiedTitle:"Estadias verificadas",verifiedText:"Melhores opções perto de você.",
-               rewardsTitle:"Recompensas StayWorld+",rewardsText:"Ganhe pontos em cada reserva.",
-               paymentsTitle:"Pagamentos seguros",paymentsText:"Visa, Mastercard, Amex e Cripto."},
-          filter:{title:"Filtros",clear:"Limpar",apply:"Aplicar"},
-          chat:{placeholder:"Pergunte sobre estadias, datas ou pagamentos…",send:"Enviar"}},
-    };
+/* ---------------- I18N (10개 언어) ---------------- */
+const I18N = {
+  EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+      hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
+      placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search",
+      feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",
+      feat_rewards:"StayWorld+ Rewards",feat_rewards_sub:"Earn points on every booking.",
+      feat_payments:"Secure payments",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
+      clear:"Clear",apply:"Apply",send:"Send",chat_placeholder:"Ask about stays, dates, or payments…"},
+  KO:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+      hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
+      placeholder_city:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색",
+      feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",feat_rewards:"StayWorld+ 리워드",feat_rewards_sub:"예약마다 포인트 적립.",
+      feat_payments:"안전한 결제",feat_payments_sub:"VISA, 마스터, 아멕스 & 크립토.",
+      clear:"지우기",apply:"적용",send:"전송",chat_placeholder:"숙소/날짜/결제에 대해 물어보세요…"},
+  JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+      hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
+      placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
+      feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
+      feat_payments:"安全な支払い",feat_payments_sub:"VISA, Master, Amex & Crypto。",
+      clear:"クリア",apply:"適用",send:"送信",chat_placeholder:"宿・日程・支払いについて質問…"},
+  ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_signup:"注册",language:"语言",
+      hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
+      placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
+      feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
+      feat_payments:"安全支付",feat_payments_sub:"Visa、Mastercard、Amex 与加密货币。",
+      clear:"清除",apply:"应用",send:"发送",chat_placeholder:"询问住宿、日期或支付…"},
+  FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_signup:"S’inscrire",language:"Langue",
+      hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",
+      placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher",
+      feat_verified:"Logements vérifiés",feat_verified_sub:"Meilleurs choix près de chez vous.",
+      feat_rewards:"Récompenses StayWorld+",feat_rewards_sub:"Des points à chaque réservation.",
+      feat_payments:"Paiements sécurisés",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
+      clear:"Effacer",apply:"Appliquer",send:"Envoyer",chat_placeholder:"Questions sur les séjours, dates ou paiements…"},
+  ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_signup:"Regístrate",language:"Idioma",
+      hero_luxury:"Estancias de lujo.",hero_reach:"Alcance global.",hero_sub:"Tarjetas, transferencia bancaria y cripto (BTC · ETH · USDT).",
+      placeholder_city:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar",
+      feat_verified:"Alojamientos verificados",feat_verified_sub:"Mejores opciones cerca de ti.",
+      feat_rewards:"Recompensas StayWorld+",feat_rewards_sub:"Puntos en cada reserva.",
+      feat_payments:"Pagos seguros",feat_payments_sub:"Visa, Mastercard, Amex y Cripto.",
+      clear:"Borrar",apply:"Aplicar",send:"Enviar",chat_placeholder:"Pregunta sobre estancias, fechas o pagos…"},
+  DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_signup:"Registrieren",language:"Sprache",
+      hero_luxury:"Luxuriöse Aufenthalte.",hero_reach:"Globale Reichweite.",hero_sub:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
+      placeholder_city:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen",
+      feat_verified:"Verifizierte Unterkünfte",feat_verified_sub:"Top-Auswahl in deiner Nähe.",
+      feat_rewards:"StayWorld+ Prämien",feat_rewards_sub:"Punkte bei jeder Buchung.",
+      feat_payments:"Sichere Zahlungen",feat_payments_sub:"Visa, Mastercard, Amex & Krypto.",
+      clear:"Löschen",apply:"Anwenden",send:"Senden",chat_placeholder:"Fragen zu Aufenthalt, Daten oder Zahlung…"},
+  TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_signup:"Kaydol",language:"Dil",
+      hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",
+      placeholder_city:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara",
+      feat_verified:"Doğrulanmış konaklamalar",feat_verified_sub:"Yakınınızdaki en iyi seçenekler.",
+      feat_rewards:"StayWorld+ Ödülleri",feat_rewards_sub:"Her rezervasyonda puan kazanın.",
+      feat_payments:"Güvenli ödemeler",feat_payments_sub:"Visa, Mastercard, Amex & Kripto.",
+      clear:"Temizle",apply:"Uygula",send:"Gönder",chat_placeholder:"Konaklama, tarihler veya ödemeleri sorun…"},
+  AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_signup:"إنشاء حساب",language:"اللغة",
+      hero_luxury:"إقامات فاخرة.",hero_reach:"انتشار عالمي.",hero_sub:"بطاقات، تحويل بنكي وعملات مشفرة (BTC · ETH · USDT).",
+      placeholder_city:"باريس، طوكيو، إسطنبول…",filters:"الفلاتر",search:"بحث",
+      feat_verified:"إقامات موثوقة",feat_verified_sub:"أفضل الخيارات بالقرب منك.",
+      feat_rewards:"مكافآت StayWorld+",feat_rewards_sub:"اكسب نقاطًا مع كل حجز.",
+      feat_payments:"مدفوعات آمنة",feat_payments_sub:"Visa وMastercard وAmex والعملات المشفرة.",
+      clear:"مسح",apply:"تطبيق",send:"إرسال",chat_placeholder:"اسأل عن الإقامات أو التواريخ أو المدفوعات…"},
+  RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_signup:"Регистрация",language:"Язык",
+      hero_luxury:"Роскошное проживание.",hero_reach:"Глобальный охват.",hero_sub:"Карты, перевод и крипто (BTC · ETH · USDT).",
+      placeholder_city:"Париж, Токио, Стамбул…",filters:"Фильтры",search:"Поиск",
+      feat_verified:"Проверенные варианты",feat_verified_sub:"Лучшие места рядом с вами.",
+      feat_rewards:"Бонусы StayWorld+",feat_rewards_sub:"Баллы за каждое бронирование.",
+      feat_payments:"Безопасные платежи",feat_payments_sub:"Visa, Mastercard, Amex и крипто.",
+      clear:"Очистить",apply:"Применить",send:"Отправить",chat_placeholder:"Спросите о проживании, датах или оплате…"},
+};
 
-    function applyI18n(lang){
-      const L = DICT[lang] || DICT.EN;
-      document.documentElement.lang = (lang||'EN').toLowerCase();
-      document.querySelectorAll('[data-i18n]').forEach(el=>{
-        const path = el.getAttribute('data-i18n').split('.');
-        let cur = L; for(const k of path) cur = (cur||{})[k];
-        if (typeof cur === 'string') el.textContent = cur;
-      });
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-        const path = el.getAttribute('data-i18n-placeholder').split('.');
-        let cur = L; for(const k of path) cur = (cur||{})[k];
-        if (typeof cur === 'string') el.placeholder = cur;
-      });
+function applyI18N(lang){
+  const dict = I18N[lang] || I18N.EN;
+  // text nodes
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n'); if(dict[k]) el.textContent = dict[k];
+  });
+  // placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const k = el.getAttribute('data-i18n-placeholder'); if(dict[k]) el.setAttribute('placeholder', dict[k]);
+  });
+}
+document.getElementById('lang').addEventListener('change', e=>{
+  applyI18N(e.target.value);
+});
+applyI18N('EN');
+
+/* ---------------- Filters (카테고리 렌더) ---------------- */
+const FILTER_SETS = [
+  { title:'Amenities', items:['Wi-Fi','Pool','Spa','Gym','Kitchen','Balcony','Hot tub','Sauna','Air conditioning','Breakfast']},
+  { title:'Property type', items:['Hotel','Apartment','Villa','Hostel','B&B']},
+  { title:'Views & Outdoors', items:['Sea view','City view','Mountain view','Garden']},
+  { title:'Payments & Policies', items:['Crypto','Cards','Bank transfer','Free cancellation','Late checkout','Non-smoking']},
+  { title:'Accessibility', items:['Accessible','Step-free access','Elevator','Family-friendly','24h check-in','Airport shuttle']},
+  { title:'Pets', items:['Pet-friendly']},
+];
+
+(function buildFilters(){
+  const grid = document.getElementById('filtersGrid');
+  grid.innerHTML = '';
+  FILTER_SETS.forEach((col,i)=>{
+    const colEl = document.createElement('div');
+    colEl.className = 'filters-col';
+    const list = col.items.map((name,idx)=>{
+      const id = `f_${i}_${idx}_${name.replace(/[^a-z0-9]+/gi,'_')}`;
+      return `<li class="filter-item">
+        <input class="filter-check" type="checkbox" id="${id}" data-name="${name}">
+        <label class="filter-label" for="${id}">${name}</label>
+      </li>`;
+    }).join('');
+    colEl.innerHTML = `<h4 class="filters-col-title">${col.title}</h4><ul class="filters-list">${list}</ul>`;
+    grid.appendChild(colEl);
+  });
+})();
+
+const modal = document.getElementById('filterModal');
+const btnFilters = document.getElementById('btnFilters');
+const btnApply = document.getElementById('filterApply');
+const btnClear = document.getElementById('filterClear');
+const btnClose = document.getElementById('filterClose');
+
+function selectedCount(){ return modal.querySelectorAll('.filter-check:checked').length; }
+function openFilters(){ modal.classList.add('open'); document.documentElement.classList.add('modal-open'); modal.setAttribute('aria-hidden','false'); }
+function closeFilters(){ modal.classList.remove('open'); document.documentElement.classList.remove('modal-open'); modal.setAttribute('aria-hidden','true'); updateBadge(); }
+function updateBadge(){
+  const n = selectedCount();
+  if(n>0){ btnFilters.classList.add('badge'); btnFilters.dataset.badge = n; }
+  else { btnFilters.classList.remove('badge'); delete btnFilters.dataset.badge; }
+}
+btnFilters.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); openFilters(); });
+btnClose.addEventListener('click', e=>{ e.preventDefault(); closeFilters(); });
+modal.addEventListener('click', e=>{ if(e.target===modal) closeFilters(); });
+btnClear.addEventListener('click', ()=>{ modal.querySelectorAll('.filter-check:checked').forEach(el=>el.checked=false); updateBadge(); });
+btnApply.addEventListener('click', ()=>{ closeFilters(); console.log('Filters:', Array.from(modal.querySelectorAll('.filter-check:checked')).map(x=>x.dataset.name)); });
+modal.addEventListener('change', e=>{ if(e.target.classList.contains('filter-check')) updateBadge(); });
+
+/* ---------------- 지도 (Leaflet + Nominatim) ---------------- */
+let map, marker;
+function initMap(){
+  map = L.map('map', { scrollWheelZoom: true }).setView([48.8566, 2.3522], 12); // Paris default
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+}
+initMap();
+
+async function geocodeAndGo(q){
+  if(!q) return;
+  try{
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1&addressdetails=0`;
+    const res = await fetch(url, { headers: { 'Accept-Language': document.getElementById('lang').value }});
+    const data = await res.json();
+    if(data && data[0]){
+      const { lat, lon } = data[0];
+      const latf = parseFloat(lat), lonf = parseFloat(lon);
+      if(marker) marker.remove();
+      marker = L.marker([latf, lonf]).addTo(map);
+      map.setView([latf, lonf], 13);
+    } else {
+      alert('No results for that destination.');
     }
+  }catch(e){
+    console.error(e);
+    alert('Map lookup failed.');
+  }
+}
+document.getElementById('btnSearch').addEventListener('click', ()=>{
+  geocodeAndGo(document.getElementById('searchDestination').value);
+});
 
-    /**************  필터 모달  **************/
-    const modal = document.getElementById('filtersModal');
-    const filterBtn = document.getElementById('filterBtn');
-    filterBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openModal();});
-    modal.addEventListener('click',()=> closeModal());
-    modal.querySelector('.modal-card').addEventListener('click',(e)=> e.stopPropagation());
-    modal.querySelector('[data-close]').addEventListener('click', closeModal);
-    modal.querySelector('[data-clear]').addEventListener('click', ()=>{
-      modal.querySelectorAll('input[type=checkbox]').forEach(c=> c.checked=false);
-    });
-    modal.querySelector('[data-apply]').addEventListener('click', ()=>{
-      const selected = [...modal.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.value);
-      console.log('APPLIED FILTERS:', selected);
-      closeModal();
-    });
-    function openModal(){ modal.setAttribute('aria-hidden','false'); document.body.classList.add('no-scroll'); }
-    function closeModal(){ modal.setAttribute('aria-hidden','true'); document.body.classList.remove('no-scroll'); }
+/* ---------------- 챗봇 ---------------- */
+const chat = {
+  elLog: document.getElementById('chatLog'),
+  elPanel: document.querySelector('.chat-panel'),
+  elToggle: document.getElementById('chatToggle'),
+  elClose: document.getElementById('chatClose'),
+  elInput: document.getElementById('chatInput'),
+  elSend: document.getElementById('chatSend'),
+  msgs: []
+};
 
-    /**************  챗봇  **************/
-    const chatToggle = document.getElementById('chat-toggle');
-    const chatPanel  = document.getElementById('chat-panel');
-    const chatMask   = document.getElementById('chatMask');
-    const chatLog    = document.getElementById('chatLog');
-    const chatForm   = document.getElementById('chatForm');
-    const chatInput  = document.getElementById('chatInput');
-    const chatSend   = document.getElementById('chatSend');
+function addMsg(role, text){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role==='user' ? 'me' : 'ai');
+  wrap.textContent = text;
+  chat.elLog.appendChild(wrap);
+  chat.elLog.scrollTop = chat.elLog.scrollHeight;
+}
+function toggleChat(open){
+  if(open){ chat.elPanel.classList.add('open'); }
+  else { chat.elPanel.classList.remove('open'); }
+}
+chat.elToggle.addEventListener('click', e=>{ e.stopPropagation(); toggleChat(true); });
+chat.elClose.addEventListener('click', e=>{ e.stopPropagation(); toggleChat(false); });
+document.addEventListener('click', e=>{
+  // 패널 밖 클릭 시 닫기 (FAB, 입력영역 제외)
+  if(!e.target.closest('.chat-panel') && !e.target.closest('#chatToggle')){
+    toggleChat(false);
+  }
+});
+// 이벤트 전파로 다른 버튼이 죽지 않도록
+['btnFilters','btnSearch','chatToggle','chatClose','chatSend'].forEach(id=>{
+  const b = document.getElementById(id);
+  if(b) b.addEventListener('click', ev=>ev.stopPropagation(), {capture:true});
+});
 
-    function openChat(){
-      chatPanel.setAttribute('aria-hidden','false');
-      chatMask.hidden = false;
-      chatToggle.setAttribute('aria-expanded','true');
-      chatInput.focus();
-    }
-    function closeChat(){
-      chatPanel.setAttribute('aria-hidden','true');
-      chatMask.hidden = true;
-      chatToggle.setAttribute('aria-expanded','false');
-    }
-    chatToggle.addEventListener('click',(e)=>{ e.stopPropagation(); openChat(); });
-    chatMask.addEventListener('click', closeChat);
-    chatPanel.querySelector('[data-close-chat]').addEventListener('click', closeChat);
-    chatPanel.addEventListener('click',(e)=> e.stopPropagation());
+async function callAssistant(userText){
+  // 호출 가능한 엔드포인트 자동 탐색 (Netlify/Vercel/Generic)
+  const endpoints = ['/api/chat', '/.netlify/functions/chat', '/api/openai'];
+  let endpoint = null;
+  for(const ep of endpoints){
+    try{
+      const ping = await fetch(ep, { method:'OPTIONS' });
+      if (ping.ok || ping.status===405 || ping.status===404) { endpoint = ep; break; }
+    }catch(_){}
+  }
+  if(!endpoint){ throw new Error('No backend endpoint found.'); }
 
-    function addMsg(role, text){
-      const row = document.createElement('div');
-      row.className = 'msg ' + role;
-      row.textContent = text;
-      chatLog.appendChild(row);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
+  const payload = {
+    model: 'gpt-4.1',
+    messages: [
+      ...chat.msgs,
+      { role:'user', content: userText }
+    ],
+    // 선택 언어 힌트
+    metadata: { lang: document.getElementById('lang').value }
+  };
 
-    chatForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const content = chatInput.value.trim();
-      if (!content) return;
-      const lang = document.getElementById('lang').value || 'EN';
-      addMsg('user', content);
-      chatInput.value = '';
-      chatSend.disabled = true;
-      try{
-        const res = await fetch('/.netlify/functions/chat',{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({message: content, lang})
-        });
-        if(!res.ok){
-          addMsg('bot', 'Sorry, the assistant is temporarily unavailable.');
-        }else{
-          const data = await res.json();
-          addMsg('bot', data.reply || '…');
-        }
-      }catch(err){
-        addMsg('bot', 'Network error. Please try again.');
-      }finally{
-        chatSend.disabled = false;
-      }
-    });
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('Assistant error');
+  const data = await res.json();
+  return (data.reply || data.content || '').toString();
+}
 
-    /**************  초기 적용  **************/
-    const langSel = document.getElementById('lang');
-    langSel.addEventListener('change',()=> applyI18n(langSel.value));
-    applyI18n(langSel.value);
+async function sendChat(){
+  const text = chat.elInput.value.trim();
+  if(!text) return;
+  chat.elInput.value = '';
+  addMsg('user', text);
+  chat.msgs.push({role:'user', content:text});
+  addMsg('assistant', '…');
+
+  try{
+    const reply = await callAssistant(text);
+    chat.elLog.lastChild.textContent = reply || '(no content)';
+    chat.msgs.push({role:'assistant', content: reply});
+  }catch(e){
+    console.error(e);
+    chat.elLog.lastChild.textContent = 'Assistant is unavailable. Please add the backend function and OPENAI_API_KEY.';
+  }
+}
+chat.elSend.addEventListener('click', sendChat);
+chat.elInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+
+/* ---------------- 초기 상태 ---------------- */
+updateBadge();
   </script>
 </body>
+</html>
+
 </html>
