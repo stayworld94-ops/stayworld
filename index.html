@@ -1,11 +1,38 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>STAYWORLD — Luxury Global</title>
-  <link rel="stylesheet" href="style.css"/>
-</head>
+<header class="site-header">
+  <div class="header-inner">
+    <!-- 로고/브랜드 -->
+    <a href="index.html" class="brand">
+      <img src="stayworld-logo.png" alt="StayWorld" class="brand-mark">
+      <span class="brand-text">STAYWORLD</span>
+    </a>
+
+    <!-- 메인 메뉴 -->
+    <nav class="main-nav" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="membership.html">Membership</a>
+      <a href="login.html">Login</a>
+    </nav>
+
+    <!-- 우측 액션: 언어/가입/모바일토글 -->
+    <div class="header-actions">
+      <label class="lang">
+        <select id="lang-select" aria-label="Language">
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+          <option value="ko">KO</option>
+          <option value="ja">JA</option>
+          <option value="tr">TR</option>
+          <!-- 필요 언어 더 추가 -->
+        </select>
+      </label>
+      <a href="signup.html" class="btn btn-primary">Sign Up</a>
+      <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
 <body>
   <!-- Top Nav -->
   <header class="nav">
