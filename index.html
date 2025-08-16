@@ -6,6 +6,35 @@
   <title>STAYWORLD — Luxury Global Stays</title>
   <link rel="stylesheet" href="/style.css"/>
   <link rel="icon" href="/stayworld-logo.png"/>
+  <style>
+    /* 클릭 막힘 방지 + 레이어 보정 */
+    .btn, button, [role="button"] { pointer-events:auto; cursor:pointer; }
+    .floating-chat { position:fixed; right:20px; bottom:20px; z-index:9999; }
+    .chat-toggle { width:56px; height:56px; border-radius:50%; border:0; }
+    .chat-panel {
+      position:fixed; right:20px; bottom:90px; width:340px; max-height:60vh;
+      display:none; flex-direction:column; border-radius:14px; overflow:hidden;
+      background:#111; color:#eee; box-shadow:0 10px 30px rgba(0,0,0,.4); z-index:9998;
+    }
+    .chat-header { padding:10px 12px; font-weight:700; background:#1a1a1a; }
+    .chat-body { padding:10px; gap:8px; display:flex; flex-direction:column; overflow:auto; }
+    .chat-msg { padding:10px 12px; border-radius:10px; line-height:1.35; }
+    .chat-msg.user { background:#2a2a2a; align-self:flex-end; }
+    .chat-msg.bot { background:#181818; border:1px solid #2b2b2b; }
+    .chat-input { display:flex; gap:8px; padding:10px; background:#1a1a1a; }
+    .chat-input input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid #333; background:#0e0e0e; color:#eee; }
+    .chat-input button { border:0; padding:10px 14px; border-radius:10px; background:var(--gold,#d6b46a); }
+    /* 간단 필터 모달 */
+    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9990; }
+    .modal.active{ display:flex; }
+    .modal .backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); }
+    .modal .dialog{ position:relative; width:min(560px,92vw); background:#111; color:#eee; border-radius:16px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+    .modal .row{ display:grid; gap:10px; grid-template-columns:1fr 1fr; margin-top:10px; }
+    .modal label{ font-size:.9rem; opacity:.9 }
+    .modal input, .modal select{ width:100%; padding:10px; border-radius:10px; border:1px solid #2f2f2f; background:#0e0e0e; color:#eee; }
+    .modal .footer{ display:flex; justify-content:flex-end; gap:8px; margin-top:14px; }
+    .hide{ display:none !important; }
+  </style>
 </head>
 <body>
   <!-- 헤더 -->
@@ -20,7 +49,7 @@
         <a id="t_nav_membership" href="/membership.html">Membership</a>
         <a id="t_nav_login" href="/login.html">Login</a>
         <a class="btn btn-gold" id="t_nav_signup" href="/signup.html">Sign Up</a>
-        <!-- 언어 셀렉터 -->
+        <!-- 언어 -->
         <select id="langSelect" aria-label="Language">
           <option value="en">EN</option><option value="ko">KO</option>
           <option value="tr">TR</option><option value="fr">FR</option>
@@ -39,35 +68,70 @@
 
     <div class="searchbar" style="margin-top:14px">
       <input id="searchInput" placeholder="Paris, Tokyo, Istanbul…"/>
-      <input type="date" id="dateFrom"/>
-      <input type="date" id="dateTo"/>
-      <a class="btn" id="t_filters">Filters</a>
-      <a class="btn btn-gold" id="t_search" href="/results.html">Search</a>
+      <input type="date" id="dateFrom" />
+      <input type="date" id="dateTo" />
+      <!-- a → button 으로 교체 (네비게이션 부작용 제거) -->
+      <button class="btn" id="t_filters" type="button">Filters</button>
+      <button class="btn btn-gold" id="t_search" type="button">Search</button>
     </div>
 
-    <!-- 특징 3카드 (문구 번역용 id만 부여) -->
     <section class="grid" style="margin-top:18px">
-      <div class="card">
-        <h3 id="t_card1">Verified stays</h3>
-        <p id="t_card1sub">Top picks near you.</p>
-      </div>
-      <div class="card">
-        <h3 id="t_card2">StayWorld+ Rewards</h3>
-        <p id="t_card2sub">Earn points on every booking.</p>
-      </div>
-      <div class="card">
-        <h3 id="t_card3">Secure payments</h3>
-        <p id="t_card3sub">Visa, Mastercard, Amex & Crypto.</p>
-      </div>
+      <div class="card"><h3 id="t_card1">Verified stays</h3><p id="t_card1sub">Top picks near you.</p></div>
+      <div class="card"><h3 id="t_card2">StayWorld+ Rewards</h3><p id="t_card2sub">Earn points on every booking.</p></div>
+      <div class="card"><h3 id="t_card3">Secure payments</h3><p id="t_card3sub">Visa, Mastercard, Amex & Crypto.</p></div>
     </section>
   </main>
 
-  <footer class="container">
-    <div>© STAYWORLD — stayworldbooking.com</div>
-  </footer>
+  <footer class="container"><div>© STAYWORLD — stayworldbooking.com</div></footer>
 
-  <!-- 번역 스크립트 -->
+  <!-- 필터 모달 -->
+  <div id="filterModal" class="modal" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+      <h3 id="filterTitle">Filters</h3>
+      <div class="row">
+        <div>
+          <label>Guests</label>
+          <input id="fGuests" type="number" min="1" value="2"/>
+        </div>
+        <div>
+          <label>Rooms</label>
+          <input id="fRooms" type="number" min="1" value="1"/>
+        </div>
+        <div>
+          <label>Min Price</label>
+          <input id="fMin" type="number" min="0" value="0"/>
+        </div>
+        <div>
+          <label>Max Price</label>
+          <input id="fMax" type="number" min="0" value="2000"/>
+        </div>
+      </div>
+      <div class="footer">
+        <button class="btn" data-close>Close</button>
+        <button class="btn btn-gold" id="applyFilters">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 챗봇 -->
+  <div class="floating-chat">
+    <button class="chat-toggle btn btn-gold" id="chatOpen" aria-label="Open chat">💬</button>
+    <div class="chat-panel" id="chatPanel" aria-live="polite">
+      <div class="chat-header">AI Concierge</div>
+      <div class="chat-body" id="chatBody">
+        <div class="chat-msg bot">Hello! How can I help you today?</div>
+      </div>
+      <div class="chat-input">
+        <input id="chatInput" placeholder="Ask me anything…"/>
+        <button id="chatSend">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 -->
+  <script>window.STAY_CHAT_API = window.STAY_CHAT_API || ""; /* 필요시 백엔드 URL */</script>
   <script src="/lang.js?v=20250815"></script>
+  <script src="/app.js?v=20250815"></script>
 </body>
 </html>
->
