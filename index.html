@@ -1,182 +1,122 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>STAYWORLD — Luxury Global</title>
-
-  <!-- 메인 스타일 -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- 클릭막는 오버레이/레이어 문제 해결용 핵심 패치 -->
-  <style>
-    /* 영웅배경/그라데이션/데코레이어가 클릭을 가로채지 않도록 */
-    .hero::before, .hero::after,
-    .page-overlay, .bg-gradient, .decor-blur {
-      pointer-events: none !important;
-    }
-
-    /* 상단바가 다른 요소에 가려지지 않도록 */
-    header.site-header { position: sticky; top: 0; z-index: 9900; }
-
-    /* 검색박스 영역 위계 보장 */
-    .search-bar { position: relative; z-index: 9950; }
-
-    /* 필터 버튼/모달/챗봇 위계 고정 */
-    #filterBtn { position: relative; z-index: 9960; }
-    #filterModal {
-      position: fixed; inset: 0; display: none;
-      background: rgba(0,0,0,.55);
-      z-index: 10020; /* 챗봇 창 아래로 두려면 10020, 위로 두려면 10040 */
-    }
-    #filterSheet {
-      position: absolute; right: 0; top: 0; bottom: 0; width: min(420px, 90vw);
-      background: #111; color: #fff; padding: 20px; overflow:auto;
-      box-shadow: -8px 0 24px rgba(0,0,0,.35);
-    }
-    #filterCloseBtn { position: absolute; top: 12px; right: 12px; }
-
-    /* 플로팅 챗봇 버튼/창은 항상 최상단 클릭 가능 */
-    #chatToggleBtn {
-      position: fixed; right: 22px; bottom: 22px;
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 0; cursor: pointer;
-      z-index: 10030;  /* 버튼이 항상 클릭되게 */
-    }
-    #chatWindow {
-      position: fixed; right: 22px; bottom: 90px;
-      width: min(360px, 92vw); height: 480px; display: none;
-      background: #101114; color:#fff; border-radius: 16px;
-      box-shadow: 0 12px 36px rgba(0,0,0,.6);
-      z-index: 10035;  /* 모달보다 위에 두고 싶으면 10050 */
-      overflow: hidden;
-    }
-    #chatHeader { padding: 12px 16px; font-weight: 700; background: #181a1f; }
-    #chatMessages { height: calc(100% - 120px); overflow-y: auto; padding: 12px 16px; }
-    #chatComposer { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #24262c; background:#14161b; }
-    #chatInput { flex: 1; }
-    #chatSendBtn { white-space: nowrap; }
-
-    /* 버튼이 form submit로 바뀌지 않게 기본 type 명시 */
-    button { pointer-events: auto; }
-    button, select, input { position: relative; }
-  </style>
-
-  <!-- 앱 스크립트: defer로 로드해서 DOM 완성 후 이벤트 바인딩 -->
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-  <!-- ===== 헤더 ===== -->
-  <header class="site-header">
-    <nav class="nav wrap">
-      <a class="brand" href="index.html" aria-label="StayWorld Home">
-        <img src="stayworld-logo.png" alt="" height="28" />
+  <!-- Top Nav -->
+  <header class="nav">
+    <div class="nav__inner container">
+      <a class="logo" href="/">
+        <img src="stayworld-logo.png" alt="StayWorld" height="28"/>
       </a>
 
-      <ul class="menu">
-        <li><a href="index.html" data-i18n="nav.home">Home</a></li>
-        <li><a href="membership.html" data-i18n="nav.membership">Membership</a></li>
-        <li><a href="login.html" data-i18n="nav.login">Login</a></li>
-      </ul>
+      <nav aria-label="Primary">
+        <ul class="menu">
+          <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+          <li><a href="membership.html" data-i18n="nav.membership">Membership</a></li>
+          <li><a href="login.html" data-i18n="nav.login">Login</a></li>
+          <li><a class="btn btn--ghost" href="signup.html" data-i18n="nav.signup">Sign Up</a></li>
+        </ul>
+      </nav>
 
-      <!-- 언어 선택: ID는 langSelect (JS가 바인딩) -->
-      <label class="sr-only" for="langSelect">Language</label>
-      <select id="langSelect" aria-label="Language">
-        <option value="en">EN</option>
-        <option value="ko">KO</option>
-        <option value="ja">JA</option>
-        <option value="zh">ZH</option>
-        <option value="es">ES</option>
-        <option value="fr">FR</option>
-        <option value="de">DE</option>
-        <option value="tr">TR</option>
-        <option value="ru">RU</option>
-        <option value="ar">AR</option>
-      </select>
-
-      <a class="btn btn-primary" href="signup.html" id="btnSignUp" data-i18n="nav.signup">Sign Up</a>
-    </nav>
+      <div class="lang">
+        <label for="langSelect" class="sr-only" data-i18n="lang.label">Language</label>
+        <select id="langSelect" class="select">
+          <option value="en">EN</option>
+          <option value="ko">KO</option>
+          <option value="ja">JA</option>
+          <option value="zh">ZH</option>
+          <option value="es">ES</option>
+          <option value="fr">FR</option>
+          <option value="de">DE</option>
+          <option value="tr">TR</option>
+          <option value="ru">RU</option>
+          <option value="ar">AR</option>
+        </select>
+      </div>
+    </div>
   </header>
 
-  <!-- ===== 히어로 ===== -->
+  <!-- Hero -->
   <section class="hero">
-    <div class="wrap">
-      <h1><span data-i18n="hero.title1">Luxury stays.</span><br>
-          <span data-i18n="hero.title2">Global reach.</span></h1>
-      <p class="sub" data-i18n="hero.sub">
+    <div class="container">
+      <h1 class="hero__title">
+        <span data-i18n="hero.luxury">Luxury stays.</span><br/>
+        <span class="accent" data-i18n="hero.global">Global reach.</span>
+      </h1>
+      <p class="hero__sub" data-i18n="hero.tagline">
         Cards, bank transfer &amp; crypto (BTC · ETH · USDT).
       </p>
 
-      <!-- ===== 검색/필터 바 ===== -->
-      <div class="search-bar" role="search" aria-label="Property search">
-        <input id="searchInput" type="text" placeholder="Paris, Tokyo, Istanbul…" autocomplete="off" />
-        <input id="checkInInput" type="date" aria-label="Check-in" />
-        <input id="checkOutInput" type="date" aria-label="Check-out" />
+      <!-- Search Row -->
+      <div class="searchbar">
+        <input id="dest" class="input" type="text" placeholder="Paris, Tokyo, Istanbul…" data-i18n-ph="search.placeholder"/>
+        <input id="checkin" class="input" type="date" aria-label="Check-in" />
+        <input id="checkout" class="input" type="date" aria-label="Check-out" />
 
-        <!-- 필터 버튼: type="button" + ID = filterBtn -->
-        <button id="filterBtn" type="button" aria-haspopup="dialog" aria-controls="filterModal" data-i18n="search.filters">
+        <button id="filterBtn" class="btn btn--ghost" type="button" aria-expanded="false" aria-controls="filterPanel" data-i18n="filters.title">
           Filters
         </button>
 
-        <!-- 검색 버튼: type="button" + ID = searchBtn -->
-        <button id="searchBtn" type="button" class="btn btn-accent" data-i18n="search.search">
+        <button id="searchBtn" class="btn btn--primary" type="button" data-i18n="search.cta">
           Search
         </button>
       </div>
     </div>
   </section>
 
-  <!-- ===== 필터 모달 ===== -->
-  <div id="filterModal" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
-    <div id="filterSheet">
-      <button id="filterCloseBtn" type="button" aria-label="Close">✕</button>
-      <h2 id="filterTitle" data-i18n="filters.title">Filters</h2>
+  <!-- Features -->
+  <section class="container features">
+    <article class="card">
+      <h3 data-i18n="feat.verified.title">Verified stays</h3>
+      <p data-i18n="feat.verified.desc">Top picks near you.</p>
+    </article>
 
-      <form id="filterForm">
-        <label>
-          <span data-i18n="filters.guests">Guests</span>
-          <input id="filterGuests" type="number" min="1" value="2" />
-        </label>
+    <article class="card">
+      <h3 data-i18n="feat.rewards.title">StayWorld+ Rewards</h3>
+      <p data-i18n="feat.rewards.desc">Earn points on every booking.</p>
+    </article>
 
-        <label>
-          <span data-i18n="filters.price">Max price</span>
-          <input id="filterMaxPrice" type="number" min="0" step="10" />
-        </label>
+    <article class="card">
+      <h3 data-i18n="feat.pay.title">Secure payments</h3>
+      <p data-i18n="feat.pay.desc">Visa, Mastercard, Amex &amp; Crypto.</p>
+    </article>
+  </section>
 
-        <fieldset>
-          <legend data-i18n="filters.amenities">Amenities</legend>
-          <label><input type="checkbox" name="amenity" value="wifi" /> Wi-Fi</label>
-          <label><input type="checkbox" name="amenity" value="pool" /> Pool</label>
-          <label><input type="checkbox" name="amenity" value="parking" /> Parking</label>
-        </fieldset>
+  <!-- Filter Panel -->
+  <div id="filterOverlay" class="overlay" hidden></div>
+  <aside id="filterPanel" class="panel" aria-hidden="true" role="dialog" aria-label="Filters">
+    <header class="panel__header">
+      <h3 data-i18n="filters.title">Filters</h3>
+      <button id="filterClose" class="iconbtn" aria-label="Close">✕</button>
+    </header>
 
-        <div style="display:flex; gap:10px; margin-top:16px;">
-          <button id="filterApplyBtn" type="button" class="btn btn-accent" data-i18n="filters.apply">Apply</button>
-          <button id="filterResetBtn" type="button" class="btn" data-i18n="filters.reset">Reset</button>
-        </div>
-      </form>
-    </div>
-  </div>
+    <div id="filterList" class="panel__body"><!-- JS 렌더링 --></div>
 
-  <!-- ===== 콘텐츠 카드들 … (생략 가능) ===== -->
-
-  <!-- ===== 챗봇 버튼 & 창 ===== -->
-  <!-- 플로팅 토글 버튼: ID = chatToggleBtn -->
-  <button id="chatToggleBtn" type="button" aria-controls="chatWindow" aria-expanded="false" title="AI Concierge">
-    💬
-  </button>
-
-  <!-- 챗봇 창: 필수 ID들 (chatWindow, chatMessages, chatInput, chatSendBtn) -->
-  <aside id="chatWindow" role="dialog" aria-modal="false" aria-label="AI Concierge">
-    <div id="chatHeader">AI Concierge</div>
-    <div id="chatMessages" aria-live="polite"></div>
-    <div id="chatComposer">
-      <input id="chatInput" type="text" placeholder="Type a message…" autocomplete="off" />
-      <button id="chatSendBtn" type="button">Send</button>
-    </div>
+    <footer class="panel__footer">
+      <button id="filterClear" class="btn btn--ghost" type="button" data-i18n="filters.clear">Clear</button>
+      <button id="filterApply" class="btn btn--primary" type="button" data-i18n="filters.apply">Apply</button>
+    </footer>
   </aside>
 
-  <!-- 푸터 등 기타… -->
+  <!-- Chatbot -->
+  <button id="ai-toggle" class="fab" aria-expanded="false" aria-controls="ai-widget">💬</button>
+  <section id="ai-widget" class="chat" aria-hidden="true">
+    <header class="chat__header">
+      <strong>StayWorld AI</strong>
+      <button id="ai-close" class="iconbtn" aria-label="Close">✕</button>
+    </header>
+    <div id="ai-log" class="chat__log" tabindex="0" aria-live="polite"></div>
+    <form id="ai-form" class="chat__form">
+      <input id="ai-input" class="input" type="text" autocomplete="off" data-i18n-ph="chat.placeholder" placeholder="Type a message…"/>
+      <button id="ai-send" class="btn btn--primary" type="submit" data-i18n="chat.send">Send</button>
+    </form>
+  </section>
+
+  <script src="app.js" type="module"></script>
 </body>
 </html>
