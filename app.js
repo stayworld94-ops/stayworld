@@ -1,94 +1,99 @@
-document.getElementById("chat-toggle").addEventListener("click", () => {
-  const win = document.getElementById("chat-window");
-  win.style.display = win.style.display === "flex" ? "none" : "flex";
-});
-
-document.getElementById("send-btn").addEventListener("click", async () => {
-  const input = document.getElementById("chat-input");
-  const msg = input.value.trim();
-  if (!msg) return;
-
-  appendMessage("user", msg);
-  input.value = "";
-
-  const res = await fetch("/.netlify/functions/chatbot", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: msg, lang: currentLang })
-  });
-// ====== Search ======
-document.getElementById('searchBtn')?.addEventListener('click', (e)=>{
-  e.preventDefault();
-  const q = (document.getElementById('searchInput')?.value || '').trim();
-  const df = document.getElementById('dateFrom')?.value || '';
-  const dt = document.getElementById('dateTo')?.value || '';
-  const url = new URL('/results.html', location.origin);
-  if (q) url.searchParams.set('query', q);
-  if (df) url.searchParams.set('from', df);
-  if (dt) url.searchParams.set('to', dt);
-  location.href = url.toString();
-});
-
-// ====== Language (persist + 적용) ======
+/* 클릭 문제 해결 + 필터/검색/챗봇 동작 */
 (function(){
-  const sel = document.getElementById('langSelect');
-  const saved = localStorage.getItem('sw_lang') || 'en';
-  if (sel){ sel.value = saved; sel.addEventListener('change', e=>{
-    const v = e.target.value; localStorage.setItem('sw_lang', v);
-    if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(v);
-  });}
-  // load now
-  if (window.StayWorldI18n?.applyLang) window.StayWorldI18n.applyLang(saved);
-})();
+  // 안전 클릭 바인딩 도우미
+  const on = (id, ev, fn) => { const el = document.getElementById(id); if(el) el.addEventListener(ev, fn, {passive:true}); };
 
-// ====== Chatbot (Netlify Function via POST) ======
-const chatFab  = document.getElementById('chatFab');
-const botPanel = document.getElementById('botPanel');
-const botBody  = document.getElementById('botBody');
-const botInput = document.getElementById('botInput');
+  // Filters 모달
+  const modal = document.getElementById('filterModal');
+  function openModal(){ modal?.classList.add('active'); modal?.setAttribute('aria-hidden','false'); }
+  function closeModal(){ modal?.classList.remove('active'); modal?.setAttribute('aria-hidden','true'); }
 
-document.getElementById('openBot')?.addEventListener('click', ()=> botPanel.hidden = false);
-chatFab?.addEventListener('click', ()=> botPanel.hidden = false);
-document.getElementById('botClose')?.addEventListener('click', ()=> botPanel.hidden = true);
+  on('t_filters','click', openModal);
+  modal?.querySelectorAll('[data-close]').forEach(b=> b.addEventListener('click', closeModal));
+  on('applyFilters','click', () => {
+    const filters = {
+      guests: +document.getElementById('fGuests').value || 2,
+      rooms: +document.getElementById('fRooms').value || 1,
+      min: +document.getElementById('fMin').value || 0,
+      max: +document.getElementById('fMax').value || 0
+    };
+    localStorage.setItem('sw_filters', JSON.stringify(filters));
+    closeModal();
+    alert('Filters applied ✅');
+  });
 
-document.getElementById('botSend')?.addEventListener('click', async ()=>{
-  const msg = (botInput.value||'').trim();
-  if (!msg) return;
-  appendMsg('you', msg);
-  botInput.value = '';
+  // Search 버튼 (데모 라우팅)
+  on('t_search','click', () => {
+    const q = (document.getElementById('searchInput').value || '').trim();
+    const from = document.getElementById('dateFrom').value || '';
+    const to = document.getElementById('dateTo').value || '';
+    const url = `/results.html?q=${encodeURIComponent(q)}&from=${from}&to=${to}`;
+    window.location.href = url;
+  });
 
-  try{
-    const lang = localStorage.getItem('sw_lang') || 'en';
-    const r = await fetch('/.netlify/functions/chatbot', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ message: msg, lang })
-    });
-    const data = await r.json();
-    appendMsg('bot', data.reply || '(No reply)');
-  }catch(err){
-    appendMsg('bot', 'Error: ' + (err.message||err));
+  // ==== Chatbot ====
+  const chatPanel = document.getElementById('chatPanel');
+  const chatOpen = document.getElementById('chatOpen');
+  const chatBody = document.getElementById('chatBody');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+
+  function toggleChat(){
+    if(!chatPanel) return;
+    const v = getComputedStyle(chatPanel).display === 'none';
+    chatPanel.style.display = v ? 'flex' : 'none';
+    if(v) chatInput?.focus();
   }
-});
+  chatOpen?.addEventListener('click', toggleChat);
 
-function appendMsg(who, text){
-  const div = document.createElement('div');
-  div.className = 'sw-bot-msg' + (who==='bot' ? ' sys':'');
-  div.style.cssText = 'background:#171723;border:1px solid #23232b;border-radius:16px;padding:10px 12px;margin:8px 0';
-  div.textContent = text;
-  botBody.appendChild(div);
-  botBody.scrollTop = botBody.scrollHeight;
-}
+  function appendMsg(role, text){
+    const el = document.createElement('div');
+    el.className = 'chat-msg ' + (role === 'user' ? 'user' : 'bot');
+    el.innerText = text;
+    chatBody.appendChild(el);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
 
-  const data = await res.json();
-  appendMessage("bot", data.reply);
-});
+  async function botReply(prompt){
+    // 1) 백엔드가 있으면 사용
+    if (window.STAY_CHAT_API) {
+      try {
+        const res = await fetch(window.STAY_CHAT_API, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({message: prompt})
+        });
+        const data = await res.json();
+        return data.reply || 'Sorry, I could not get a response.';
+      } catch(e){
+        console.error(e);
+        return 'Network error. Please try again.';
+      }
+    }
+    // 2) 없으면 프론트 내장 규칙형 답변 (즉시 동작)
+    prompt = prompt.toLowerCase();
+    if(/hello|hi|안녕|merhaba|hola/.test(prompt)) return 'Hi! Need help finding stays or using crypto payments?';
+    if(/price|가격|fiyat/.test(prompt)) return 'You can set min/max price in Filters. I can also suggest budget vs. luxury options.';
+    if(/pay|결제|ödeme|crypto|btc|eth/.test(prompt)) return 'We accept Visa, Mastercard, Amex, bank transfer, and crypto (BTC • ETH • USDT).';
+    if(/help|도움|yardım/.test(prompt)) return 'Tell me your city and dates. I’ll prepare a quick search for you.';
+    return 'Got it. I will pass this to our concierge shortly.';
+  }
 
-function appendMessage(sender, text) {
-  const chat = document.getElementById("chat-messages");
-  const div = document.createElement("div");
-  div.className = sender;
-  div.textContent = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
+  async function sendMsg(){
+    const text = (chatInput.value || '').trim();
+    if(!text) return;
+    appendMsg('user', text);
+    chatInput.value = '';
+    const reply = await botReply(text);
+    appendMsg('bot', reply);
+  }
+
+  chatSend?.addEventListener('click', sendMsg);
+  chatInput?.addEventListener('keydown', e=> { if(e.key==='Enter'){ e.preventDefault(); sendMsg(); } });
+
+  // 언어 변경 시 챗봇 간단한 인사 재적용 (lang.js가 먼저 로드됨)
+  const sel = document.getElementById('langSelect');
+  sel?.addEventListener('change', ()=>{
+    // 필요시 다른 언어 문구도 여기서 조정 가능
+    // 현재는 본문 텍스트만 lang.js에서 처리
+  });
+})();
