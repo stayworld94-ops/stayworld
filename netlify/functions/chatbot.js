@@ -1,35 +1,35 @@
-const fetch = require("node-fetch");
+// netlify/functions/chatbot.js
+import fetch from "node-fetch";
 
-exports.handler = async (event) => {
-  try {
-    const { message, lang } = JSON.parse(event.body);
+export const handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+  try{
+    const { message, lang = 'en' } = JSON.parse(event.body || '{}');
+    if (!message) return { statusCode: 400, body: JSON.stringify({ error: 'message required' }) };
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+    const prompt = [
+      { role: "system", content: `You are StayWorld concierge. Reply in ${lang}. Keep answers short and helpful.` },
+      { role: "user", content: message }
+    ];
+
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: "gpt-4.1",
-        messages: [
-          { role: "system", content: `You are a helpful assistant that replies in ${lang}.` },
-          { role: "user", content: message }
-        ]
+        messages: prompt,
+        temperature: 0.4
       })
     });
-
-    const data = await response.json();
-    const reply = data.choices[0].message.content;
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ reply })
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
+    const data = await r.json();
+    const reply = data?.choices?.[0]?.message?.content || '(no reply)';
+    return { statusCode: 200, body: JSON.stringify({ reply }) };
+  }catch(err){
+    return { statusCode: 500, body: JSON.stringify({ error: String(err) }) };
   }
 };
