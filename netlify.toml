@@ -1,8 +1,6 @@
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+[build]
+  publish = "."
+  functions = "netlify/functions"
 
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
+[functions]
+  node_bundler = "esbuild"
