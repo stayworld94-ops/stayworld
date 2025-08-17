@@ -7,34 +7,27 @@ exports.handler = async (event) => {
     const headers = event.headers;
     const hmac = headers["x-nowpayments-sig"]; // 시그니처
 
-    const body = event.body;
-    const bodyObj = JSON.parse(body);
+    const body = event.body;const crypto = require("crypto");
 
-    // 시그니처 검증
-    const hmacCheck = crypto
-      .createHmac("sha512", ipnSecret)
-      .update(body)
-      .digest("hex");
+exports.handler = async (event) => {
+  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
-    if (hmac !== hmacCheck) {
-      return {
-        statusCode: 403,
-        body: JSON.stringify({ message: "Invalid signature" }),
-      };
-    }
+  try {
+    const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET || "";
+    if (!ipnSecret) return { statusCode: 500, body: "Missing NOWPAYMENTS_IPN_SECRET" };
 
-    // 여기서 결제 상태(bodyObj.payment_status 등) 처리
-    console.log("✅ Payment notification:", bodyObj);
+    const signature = event.headers["x-nowpayments-sig"] || event.headers["X-Nowpayments-Sig"] || "";
+    const body = event.body || "";
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "IPN received" }),
-    };
-  } catch (err) {
-    console.error("❌ IPN error:", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: "Server error" }),
-    };
+    // Verify HMAC-SHA512
+    const h = crypto.createHmac("sha512", ipnSecret).update(body).digest("hex");
+    if (h !== signature) return { statusCode: 401, body: "Invalid signature" };
+
+    const payload = JSON.parse(body || "{}");
+
+    // TODO: 결제 성공 처리
+    return { statusCode: 200, body: "ok" };
+  } catch (e) {
+    return { statusCode: 500, body: e.message };
   }
 };
