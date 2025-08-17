@@ -103,6 +103,7 @@
           <option value="EN" selected>EN</option><option>KO</option><option>JA</option><option>ZH</option><option>FR</option>
           <option>ES</option><option>DE</option><option>TR</option><option>AR</option><option>RU</option>
         </select>
+        <!-- 헤더 통화 선택자: JS에서 주입/동기화 -->
         <a href="signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign Up</a>
       </div>
     </div>
@@ -124,9 +125,10 @@
       <div id="searchStatus" class="search-status"></div>
 
       <div class="features">
-        <div class="card><h3 data-i18n="feat_verified">Verified stays</h3><p data-i18n="feat_verified_sub">Top picks near you.</p></div>
-        <div class="card><h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3><p data-i18n="feat_rewards_sub">Earn points on every booking.</p></div>
-        <div class="card><h3 data-i18n="feat_payments">Secure payments</h3><p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p></div>
+        <!-- 카드 마크업 오타 수정 (class 닫는 따옴표/태그 고침) -->
+        <div class="card"><h3 data-i18n="feat_verified">Verified stays</h3><p data-i18n="feat_verified_sub">Top picks near you.</p></div>
+        <div class="card"><h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3><p data-i18n="feat_rewards_sub">Earn points on every booking.</p></div>
+        <div class="card"><h3 data-i18n="feat_payments">Secure payments</h3><p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p></div>
       </div>
     </div>
   </section>
@@ -136,7 +138,7 @@
     <div class="container"><div id="map" aria-label="Map" role="region"></div></div>
   </section>
 
-  <!-- ====== SW FIX PATCH: 필터/가격통화/내부 번역/오버레이 가드/검색/지도/챗봇 ====== -->
+  <!-- ====== JS: I18N / 통화 / 필터드로어 / 챗봇 / 지도·검색 ====== -->
   <script>
   /* ------------------ I18N (UI + 필터) ------------------ */
   const I18N={
@@ -151,7 +153,7 @@
       f_amen:"Amenities", f_booking:"Booking", f_verify:"Verification", f_long:"Long-stay", f_biz:"Business",
       f_loc:"Location", f_access:"Accessibility", f_ex:"Experiences", f_view:"View", f_safe:"Safety",
       f_family:"Family", f_ent:"Entertainment", f_out:"Outdoor", f_park:"Parking",
-      w:{ // 항목 번역(대표만)
+      w:{
         "Wi-Fi":"Wi-Fi","Pool":"Pool","Spa":"Spa","Gym":"Gym","Kitchen":"Kitchen","Balcony":"Balcony","Hot tub":"Hot tub","Sauna":"Sauna","Air conditioning":"Air conditioning","Breakfast":"Breakfast",
         "Hotel":"Hotel","Motel":"Motel","Hostel":"Hostel","Apartment":"Apartment","Villa":"Villa","Ryokan":"Ryokan","Guesthouse":"Guesthouse","B&B":"B&B",
         "Sea view":"Sea view","City view":"City view","Mountain view":"Mountain view","Garden":"Garden",
@@ -292,7 +294,6 @@
     const d=I18N[lang]||I18N.EN;
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n'); if(d[k]) el.textContent=d[k];});
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder'); if(d[k]) el.setAttribute('placeholder', d[k]);});
-    // 드로어가 있으면 내부 텍스트도 즉시 갱신
     localizeDrawer();
   }
   document.getElementById('lang').addEventListener('change', e=>{
@@ -301,7 +302,10 @@
   });
   applyI18NPage('EN');
 
-  /* ------------------ 통화(10개) & 가격 표시 ------------------ */
+  /* ------------------ 통화(헤더 + 드로어) ------------------ */
+  // 헤더 통화 리스트(10개)
+  const HEADER_CURRENCIES = ["USD","EUR","KRW","JPY","CNY","TRY","GBP","AED","RUB","ARS"];
+  // 상세 통화 메타(드로어 표시용) — ARS/CAD 모두 포함해 사용처 유연성 ↑
   const CURRENCIES = {
     USD:{symbol:'$',  rate:1,      locale:'en-US', name:'USD'},
     EUR:{symbol:'€',  rate:0.92,   locale:'fr-FR', name:'EUR'},
@@ -312,21 +316,65 @@
     RUB:{symbol:'₽',  rate:90,     locale:'ru-RU', name:'RUB'},
     GBP:{symbol:'£',  rate:0.78,   locale:'en-GB', name:'GBP'},
     AED:{symbol:'د.إ',rate:3.67,   locale:'ar-AE', name:'AED'},
-    CAD:{symbol:'$',  rate:1.36,   locale:'en-CA', name:'CAD'}
+    CAD:{symbol:'$',  rate:1.36,   locale:'en-CA', name:'CAD'},
+    ARS:{symbol:'$',  rate:920,    locale:'es-AR', name:'ARS'}
   };
   const LANG_TO_CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
+
+  // 환율(선택) 업데이트 — 실패해도 기본값 사용
+  let FX = { USD:1, EUR:0.92, KRW:1380, JPY:156, CNY:7.25, TRY:33, GBP:0.78, AED:3.67, RUB:90, ARS:920, CAD:1.36 };
+  (async function tryFetchRates(){
+    try{
+      const r=await fetch("https://open.er-api.com/v6/latest/USD");
+      const j=await r.json();
+      if(j && j.rates){
+        Object.keys(FX).forEach(c=>{ if(j.rates[c]) FX[c]=j.rates[c]; });
+        // CURRENCIES.rate도 최신화
+        Object.keys(CURRENCIES).forEach(c=>{ if(j.rates[c]) CURRENCIES[c].rate=j.rates[c]; });
+        updatePriceLabels();
+      }
+    }catch(_){}
+  })();
+
+  // 헤더 통화 셀렉터 생성
+  (function ensureHeaderCurrency(){
+    const wrap=document.querySelector(".header-cta");
+    if(!wrap || document.getElementById("currency")) return;
+    const sel=document.createElement("select");
+    sel.id="currency";
+    sel.className="lang-select";
+    sel.style.marginLeft="8px";
+    HEADER_CURRENCIES.forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); });
+    sel.value=LANG_TO_CUR[document.getElementById('lang').value||'EN']||'USD';
+    // 드로어와 동기화
+    sel.addEventListener('change',()=>{
+      const curSel=document.getElementById('currencySelect');
+      if(curSel && curSel.value!==sel.value){ curSel.value=sel.value; updatePriceLabels(); }
+      // 헤더 currency 기준으로 페이지 내 금액 표시가 있다면 여기서 갱신 로직 추가 가능
+    });
+    wrap.insertBefore(sel, wrap.lastElementChild); // Sign Up 앞에
+  })();
+
   function setCurrencyByLang(lang){
-    const curSel=document.getElementById('currencySelect');
-    if(!curSel) return;
     const code = LANG_TO_CUR[lang] || 'USD';
-    curSel.value = code;
+    const headerSel=document.getElementById('currency');
+    const drawerSel=document.getElementById('currencySelect');
+    if(headerSel) headerSel.value=code;
+    if(drawerSel) drawerSel.value=code;
     updatePriceLabels();
   }
   function fmtMoney(usd){
-    const curSel=document.getElementById('currencySelect'); if(!curSel) return '$'+usd.toFixed(0);
-    const cur=CURRENCIES[curSel.value]||CURRENCIES.USD;
-    const val=usd*cur.rate;
-    return new Intl.NumberFormat(cur.locale,{style:'currency',currency:cur.name,maximumFractionDigits:(cur.name==='JPY'||cur.name==='KRW')?0:0}).format(val);
+    // 헤더 선택 통화를 우선, 없으면 드로어 통화 사용
+    const headerSel=document.getElementById('currency');
+    const curCode = headerSel?.value || document.getElementById('currencySelect')?.value || 'USD';
+    const cur=CURRENCIES[curCode]||CURRENCIES.USD;
+    const val=usd*(FX[curCode] || cur.rate || 1);
+    const maxFrac = (cur.name==='JPY'||cur.name==='KRW')?0:0;
+    try{
+      return new Intl.NumberFormat(cur.locale,{style:'currency',currency:cur.name,maximumFractionDigits:maxFrac}).format(val);
+    }catch(_){
+      return `${curCode} ${Math.round(val).toLocaleString()}`;
+    }
   }
 
   /* ------------------ 오버레이 가드 ------------------ */
@@ -398,7 +446,6 @@
         const box=document.createElement('div'); box.className='box';
         box.innerHTML=`<h4 data-title="${g.t}">${tkey(g.t)}</h4>`;
         if(g.kind==='price'){
-          // 가격: 슬라이더(USD 기준) + 통화 변환된 표시
           const html=`
             <div style="display:grid;gap:10px">
               <div style="display:flex;justify-content:space-between;font-size:13px">
@@ -452,7 +499,16 @@
         const n=d.querySelectorAll('input[type=checkbox]:checked, input[type=radio]:checked').length;
         setBadge(n?n.toString():''); close();
       });
-      document.getElementById('currencySelect').addEventListener('change', updatePriceLabels);
+
+      // 드로어/헤더 통화 동기화
+      const drawerSel=d.querySelector('#currencySelect');
+      if(drawerSel){
+        drawerSel.addEventListener('change',()=>{
+          const headerSel=document.getElementById('currency');
+          if(headerSel && headerSel.value!==drawerSel.value){ headerSel.value=drawerSel.value; }
+          updatePriceLabels();
+        });
+      }
       ['priceMin','priceMax'].forEach(id=>{
         d.querySelector('#'+id).addEventListener('input',()=>{
           const min=+d.querySelector('#priceMin').value;
@@ -475,6 +531,8 @@
     const minEl=d.querySelector('#priceMinVal'); const maxEl=d.querySelector('#priceMaxVal');
     if(minEl) minEl.textContent = fmtMoney(min);
     if(maxEl) maxEl.textContent = fmtMoney(max);
+    // 추가: 슬라이더 아래 보조 레이블(선택)
+    // 필요 시 확장 가능
   }
   function localizeDrawer(){
     const d=document.getElementById('filterDrawer'); if(!d) return;
@@ -484,7 +542,6 @@
     d.querySelector('#swApply').textContent=tkey('f_apply');
     d.querySelectorAll('[data-title]').forEach(el=>{ el.textContent=tkey(el.getAttribute('data-title')); });
     d.querySelectorAll('[data-word]').forEach(el=>{ el.textContent=wkey(el.getAttribute('data-word')); });
-    // 가격 타이틀
     const priceBox = Array.from(d.querySelectorAll('h4')).find(h=>h.getAttribute('data-title')==='f_price');
     if(priceBox) priceBox.textContent = tkey('f_price');
     updatePriceLabels();
@@ -492,6 +549,46 @@
   function openDrawer(){ const d=ensureDrawer(); d.setAttribute('aria-hidden','false'); muteFullscreenOverlays(); localizeDrawer(); }
   function setBadge(text){ const btn=document.getElementById('btnFilters'); btn.style.position='relative'; let b=btn.querySelector('.sw-badge'); if(text){ if(!b){b=document.createElement('span');b.className='sw-badge';btn.appendChild(b);} b.textContent=text; } else if(b){b.remove();} }
   document.getElementById('btnFilters').addEventListener('click',e=>{e.stopPropagation(); openDrawer();},{capture:true});
+
+  // 필터 헤딩 보조 번역(안전장치) — 드로어 내부 텍스트가 영어로 남았을 때 대응
+  const FILTER_I18N = {
+    filter_price: { KO:"1박 가격", JA:"1泊あたりの料金", ZH:"每晚价格", FR:"Prix par nuit", ES:"Precio por noche", DE:"Preis pro Nacht", TR:"Gecelik fiyat", AR:"السعر لكل ليلة", RU:"Цена за ночь", EN:"Price per night" },
+    filter_staytype: { KO:"숙소 유형", JA:"宿タイプ", ZH:"房源类型", FR:"Type de séjour", ES:"Tipo de estancia", DE:"Unterkunftstyp", TR:"Konaklama türü", AR:"نوع الإقامة", RU:"Тип размещения", EN:"Stay type" },
+    filter_reviews: { KO:"평점", JA:"レビュー", ZH:"评分", FR:"Note", ES:"Puntuación", DE:"Bewertung", TR:"Puan", AR:"التقييم", RU:"Оценка", EN:"Review score" },
+    filter_bedsbaths: { KO:"침대·욕실", JA:"ベッド・バス", ZH:"床位与浴室", FR:"Lits & Salles de bain", ES:"Camas y baños", DE:"Betten & Bäder", TR:"Yatak & Banyo", AR:"الأسِرّة والحمّامات", RU:"Кровати и ванные", EN:"Beds & Baths" },
+    filter_amenities: { KO:"편의시설", JA:"設備", ZH:"设施", FR:"Équipements", ES:"Servicios", DE:"Ausstattung", TR:"Olanaklar", AR:"المرافق", RU:"Удобства", EN:"Amenities" },
+    filter_view: { KO:"전망", JA:"眺望", ZH:"景观", FR:"Vue", ES:"Vistas", DE:"Aussicht", TR:"Manzara", AR:"الإطلالة", RU:"Вид", EN:"View" },
+    filter_access: { KO:"접근성", JA:"アクセシビリティ", ZH:"无障碍", FR:"Accessibilité", ES:"Accesibilidad", DE:"Barrierefreiheit", TR:"Erişilebilirlik", AR:"سهولة الوصول", RU:"Доступность", EN:"Accessibility" },
+    filter_booking: { KO:"예약", JA:"予約", ZH:"预订", FR:"Réservation", ES:"Reserva", DE:"Buchung", TR:"Rezervasyon", AR:"الحجز", RU:"Бронирование", EN:"Booking" },
+  };
+  function translateFilterHeadings() {
+    const lang = (document.getElementById("lang")?.value || "EN").toUpperCase();
+    const d = document.getElementById("filterDrawer");
+    if (!d) return;
+    const head = d.querySelector(".head strong");
+    if (head) head.textContent = (I18N[lang]?.filters || "Filters");
+    const map = {
+      "Price per night":"filter_price",
+      "Stay type":"filter_staytype",
+      "Review score":"filter_reviews",
+      "Beds & Baths":"filter_bedsbaths",
+      "Amenities":"filter_amenities",
+      "View":"filter_view",
+      "Accessibility":"filter_access",
+      "Booking":"filter_booking",
+    };
+    d.querySelectorAll("#filterGrid .box > h4").forEach(h=>{
+      const key = map[h.textContent.trim()];
+      if (!key) return;
+      h.textContent = FILTER_I18N[key]?.[lang] || FILTER_I18N[key]?.EN || h.textContent;
+    });
+    const reset = d.querySelector("#swReset");
+    const apply = d.querySelector("#swApply");
+    if (reset) reset.textContent = (I18N[lang]?.f_reset || "Reset");
+    if (apply) apply.textContent = (I18N[lang]?.f_apply || "Apply");
+  }
+  document.getElementById("lang")?.addEventListener("change", translateFilterHeadings);
+  new MutationObserver(translateFilterHeadings).observe(document.documentElement,{childList:true,subtree:true});
 
   /* ------------------ 챗봇 ------------------ */
   function ensureChat(){
@@ -519,7 +616,6 @@
     const msgs=[];
     const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
     async function askAI(message,lang){
-      // 백엔드 자동 탐색(둘 중 하나만 배포해도 됨)
       for(const ep of ['/.netlify/functions/sw-chat','/api/chat']){
         try{
           const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
@@ -579,129 +675,3 @@
   </footer>
 </body>
 </html>
-<script>
-// ===== Currency + Filter i18n patch =====
-
-// 10개 통화 선택(USD, EUR, KRW, JPY, CNY, TRY, GBP, AED, RUB, ARS)
-const CURRENCIES = ["USD","EUR","KRW","JPY","CNY","TRY","GBP","AED","RUB","ARS"];
-// 대략적인 환율(USD 기준) — 없으면 1로 동작, 나중에 갱신 가능
-let FX = { USD:1, EUR:0.92, KRW:1380, JPY:156, CNY:7.25, TRY:33, GBP:0.78, AED:3.67, RUB:90, ARS:920 };
-
-// 헤더에 통화 셀렉터 추가
-(function ensureCurrencySelect(){
-  const wrap = document.querySelector(".header-cta");
-  if (!wrap || document.getElementById("currency")) return;
-  const sel = document.createElement("select");
-  sel.id = "currency";
-  sel.className = "lang-select";
-  sel.style.marginLeft = "8px";
-  CURRENCIES.forEach(c => {
-    const o = document.createElement("option");
-    o.value = c; o.textContent = c; sel.appendChild(o);
-  });
-  sel.value = "USD";
-  wrap.insertBefore(sel, wrap.lastElementChild); // Sign Up 앞에
-})();
-
-// 선택 통화의 NumberFormat
-function fmtMoney(v, cur) {
-  try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(v);
-  } catch(_){ // 브라우저가 모르는 통화인 경우
-    return `${cur} ${Math.round(v).toLocaleString()}`;
-  }
-}
-// USD -> 선택통화 변환
-function toSelectedCurrency(usd) {
-  const cur = document.getElementById("currency")?.value || "USD";
-  const rate = FX[cur] || 1;
-  return { cur, value: usd * rate };
-}
-
-// 필터 드로어 생성 후 가격 슬라이더 수치 표시 연결
-function hookPriceLabels() {
-  const d = document.getElementById("filterDrawer");
-  if (!d) return;
-  const min = d.querySelector("#priceMin");
-  const max = d.querySelector("#priceMax");
-  if (!min || !max) return;
-
-  // 레이블 없으면 만들기
-  if (!min.nextElementSibling || !min.nextElementSibling.classList?.contains("sw-price-label")) {
-    const l1 = document.createElement("div"); l1.className = "sw-price-label"; l1.style.marginTop="6px"; min.after(l1);
-    const l2 = document.createElement("div"); l2.className = "sw-price-label"; l2.style.marginTop="6px"; max.after(l2);
-  }
-
-  const [lab1, lab2] = d.querySelectorAll(".sw-price-label");
-
-  function render() {
-    const a = toSelectedCurrency(Number(min.value));
-    const b = toSelectedCurrency(Number(max.value));
-    lab1.textContent = `Min: ${fmtMoney(a.value, a.cur)} / night`;
-    lab2.textContent = `Max: ${fmtMoney(b.value, b.cur)} / night`;
-  }
-  min.oninput = max.oninput = render;
-  document.getElementById("currency")?.addEventListener("change", render);
-  render();
-}
-
-// 드로어가 열릴 때마다 레이블 후킹
-const obs = new MutationObserver(()=> hookPriceLabels());
-obs.observe(document.documentElement,{ childList:true, subtree:true });
-
-// (선택) 환율을 한 번 시도해서 불러오기(실패해도 괜찮게)
-(async function tryFetchRates(){
-  try {
-    const r = await fetch("https://open.er-api.com/v6/latest/USD");
-    const j = await r.json();
-    if (j && j.rates) {
-      for (const c of CURRENCIES) if (j.rates[c]) FX[c] = j.rates[c];
-    }
-  } catch(_) { /* fallback FX 그대로 */ }
-})();
-
-// ---- 필터 타이틀 번역(자주 보이는 것 위주) ----
-const FILTER_I18N = {
-  filter_price: { KO:"1박 가격", JA:"1泊あたりの料金", ZH:"每晚价格", FR:"Prix par nuit", ES:"Precio por noche", DE:"Preis pro Nacht", TR:"Gecelik fiyat", AR:"السعر لكل ليلة", RU:"Цена за ночь", EN:"Price per night" },
-  filter_staytype: { KO:"숙소 유형", JA:"宿タイプ", ZH:"房源类型", FR:"Type de séjour", ES:"Tipo de estancia", DE:"Unterkunftstyp", TR:"Konaklama türü", AR:"نوع الإقامة", RU:"Тип размещения", EN:"Stay type" },
-  filter_reviews: { KO:"평점", JA:"レビュー", ZH:"评分", FR:"Note", ES:"Puntuación", DE:"Bewertung", TR:"Puan", AR:"التقييم", RU:"Оценка", EN:"Review score" },
-  filter_bedsbaths: { KO:"침대·욕실", JA:"ベッド・バス", ZH:"床位与浴室", FR:"Lits & Salles de bain", ES:"Camas y baños", DE:"Betten & Bäder", TR:"Yatak & Banyo", AR:"الأسِرّة والحمّامات", RU:"Кровати и ванные", EN:"Beds & Baths" },
-  filter_amenities: { KO:"편의시설", JA:"設備", ZH:"设施", FR:"Équipements", ES:"Servicios", DE:"Ausstattung", TR:"Olanaklar", AR:"المرافق", RU:"Удобства", EN:"Amenities" },
-  filter_view: { KO:"전망", JA:"眺望", ZH:"景观", FR:"Vue", ES:"Vistas", DE:"Aussicht", TR:"Manzara", AR:"الإطلالة", RU:"Вид", EN:"View" },
-  filter_access: { KO:"접근성", JA:"アクセシビリティ", ZH:"无障碍", FR:"Accessibilité", ES:"Accesibilidad", DE:"Barrierefreiheit", TR:"Erişilebilirlik", AR:"سهولة الوصول", RU:"Доступность", EN:"Accessibility" },
-  filter_booking: { KO:"예약", JA:"予約", ZH:"预订", FR:"Réservation", ES:"Reserva", DE:"Buchung", TR:"Rezervasyon", AR:"الحجز", RU:"Бронирование", EN:"Booking" },
-};
-
-function translateFilterHeadings() {
-  const lang = (document.getElementById("lang")?.value || "EN").toUpperCase();
-  const d = document.getElementById("filterDrawer");
-  if (!d) return;
-  // 헤더 strong 텍스트
-  const head = d.querySelector(".head strong");
-  if (head) head.textContent = (I18N[lang]?.filters || "Filters");
-
-  const map = {
-    "Price per night":"filter_price",
-    "Stay type":"filter_staytype",
-    "Review score":"filter_reviews",
-    "Beds & Baths":"filter_bedsbaths",
-    "Amenities":"filter_amenities",
-    "View":"filter_view",
-    "Accessibility":"filter_access",
-    "Booking":"filter_booking",
-  };
-  d.querySelectorAll("#filterGrid .box > h4").forEach(h=>{
-    const key = map[h.textContent.trim()];
-    if (!key) return;
-    h.textContent = FILTER_I18N[key]?.[lang] || FILTER_I18N[key]?.EN || h.textContent;
-  });
-
-  // 버튼
-  const reset = d.querySelector("#swReset");
-  const apply = d.querySelector("#swApply");
-  if (reset) reset.textContent = (I18N[lang]?.clear || "Clear");
-  if (apply) apply.textContent = (I18N[lang]?.apply || "Apply");
-}
-document.getElementById("lang")?.addEventListener("change", translateFilterHeadings);
-new MutationObserver(translateFilterHeadings).observe(document.documentElement,{childList:true,subtree:true});
-</script>
