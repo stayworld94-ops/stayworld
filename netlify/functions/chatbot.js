@@ -1,42 +1,57 @@
-// netlify/functions/chat.js
-import OpenAI from "openai";
+// 파일 위치: netlify/functions/chatbot.js
 
-export async function handler(event) {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
+import fetch from "node-fetch";
 
+export async function handler(event, context) {
   try {
-    const { message, locale = "en" } = JSON.parse(event.body || "{}");
-    if (!message) {
-      return { statusCode: 400, body: "Missing message" };
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "Method Not Allowed" })
+      };
     }
 
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const { message, lang } = JSON.parse(event.body);
 
-    const sys = `You are StayWorld's travel concierge. 
-- Answer as a helpful, concise hotel booking assistant.
-- Detect and respond in the user's locale (${locale}). If the user asks in one language, answer in that language.
-- Keep responses short and polite unless the user asks for details.`;
+    if (!message) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No message provided" })
+      };
+    }
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4.1", // 요청하신 4.1
-      messages: [
-        { role: "system", content: sys },
-        { role: "user", content: message }
-      ],
-      temperature: 0.3,
+    // OpenAI API 호출
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}` // Netlify 환경변수에 설정 필요
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini", // 비용 효율적인 모델
+        messages: [
+          {
+            role: "system",
+            content: `You are an AI assistant for StayWorld. Always answer in ${lang || "English"}.`
+          },
+          { role: "user", content: message }
+        ],
+        max_tokens: 300
+      })
     });
 
-    const reply = completion.choices?.[0]?.message?.content?.trim() || "…";
+    const data = await response.json();
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reply })
+      body: JSON.stringify({
+        reply: data.choices?.[0]?.message?.content || "Sorry, I could not generate a response."
+      })
     };
-  } catch (err) {
-    console.error(err);
-    return { statusCode: 500, body: "Server error" };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message })
+    };
   }
 }
