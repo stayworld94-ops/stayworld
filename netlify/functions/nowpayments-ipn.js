@@ -1,32 +1,40 @@
-// Receives NOWPayments IPN (webhook) and verifies signature (HMAC-SHA512)
-// ENV needed: NOWPAYMENTS_IPN_SECRET
-// Set your IPN URL in NOWPayments dashboard to: https://<your-domain>/.netlify/functions/nowpayments-ipn
-
+// netlify/functions/nowpayments-ipn.js
 const crypto = require("crypto");
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
-
   try {
-    const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET || "";
-    if (!ipnSecret) return { statusCode: 500, body: "Missing NOWPAYMENTS_IPN_SECRET" };
+    const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET; // 네 IPN secret
+    const headers = event.headers;
+    const hmac = headers["x-nowpayments-sig"]; // 시그니처
 
-    const signature = event.headers["x-nowpayments-sig"] || event.headers["X-Nowpayments-Sig"] || "";
-    const body = event.body || "";
+    const body = event.body;
+    const bodyObj = JSON.parse(body);
 
-    // Verify HMAC-SHA512
-    const h = crypto.createHmac("sha512", ipnSecret).update(body).digest("hex");
-    if (h !== signature) return { statusCode: 401, body: "Invalid signature" };
+    // 시그니처 검증
+    const hmacCheck = crypto
+      .createHmac("sha512", ipnSecret)
+      .update(body)
+      .digest("hex");
 
-    const payload = JSON.parse(body || "{}");
+    if (hmac !== hmacCheck) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({ message: "Invalid signature" }),
+      };
+    }
 
-    // TODO: Update your DB here (example fields)
-    // const { payment_status, payment_id, order_id, pay_amount, pay_currency, price_amount, price_currency } = payload;
-    // - When payment_status === "finished", mark booking as paid
-    // - Save platform_fee/host_due if you compute them
+    // 여기서 결제 상태(bodyObj.payment_status 등) 처리
+    console.log("✅ Payment notification:", bodyObj);
 
-    return { statusCode: 200, body: "ok" };
-  } catch (e) {
-    return { statusCode: 500, body: e.message };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "IPN received" }),
+    };
+  } catch (err) {
+    console.error("❌ IPN error:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "Server error" }),
+    };
   }
 };
