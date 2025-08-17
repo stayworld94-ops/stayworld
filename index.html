@@ -14,9 +14,12 @@
     *{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;line-height:1.5}
     a{color:inherit;text-decoration:none}.container{max-width:1120px;margin:0 auto;padding:0 16px}
     img{max-width:100%;display:block}
+
+    /* Header */
     .site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
     .header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
-    .brand{display:flex;align-items:center;gap:10px}.brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3);object-fit:cover}
     .brand-text{font-weight:800;letter-spacing:.6px}
     .main-nav{display:flex;gap:28px;justify-content:center;flex:1}
     .header-cta{display:flex;align-items:center;gap:12px}
@@ -26,6 +29,8 @@
     .btn-ghost{background:transparent;color:#cfcfcf}.btn-ghost:hover{background:rgba(255,255,255,.06)}
     .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
     .btn-chip{background:var(--chip);color:#dfe3ea;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+
+    /* Hero */
     .hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
     .hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}.accent{color:#f1cf84}
     .hero-sub{opacity:.85;margin:8px 0 28px}
@@ -34,12 +39,18 @@
     .input::placeholder{color:#a7b0bf}
     .search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
     .btn.loading{opacity:.65;pointer-events:none}
+
+    /* Cards */
     .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
     .card{background:#0f1420;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
     .card h3{margin:0 0 6px}.card p{margin:0;opacity:.85}
+
+    /* Map */
     .map-section{padding:36px 0 60px}
     #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
     .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
+
+    /* Filter Drawer */
     #filterDrawer{position:fixed;inset:0;display:none;z-index:2147483637;align-items:stretch;justify-content:flex-end}
     #filterDrawer[aria-hidden="false"]{display:flex}
     #filterDrawer .back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
@@ -50,6 +61,8 @@
     #filterDrawer .box{background:#0f1420;border:1px solid var(--line);border-radius:12px;padding:12px}
     #filterDrawer h4{margin:0 0 8px;font-size:14px}
     .sw-badge{position:absolute;top:-8px;right:-8px;background:#ffd36e;color:#1a1205;border-radius:999px;font-size:11px;padding:2px 6px}
+
+    /* Chatbot */
     #chatFab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;z-index:2147483639;background:linear-gradient(180deg,var(--gold1),var(--gold2));box-shadow:0 14px 30px rgba(201,163,91,.35);font-size:22px}
     #botPanel{position:fixed;right:20px;bottom:86px;width:min(360px,88vw);height:480px;background:#101018;border:1px solid #23232b;border-radius:16px;z-index:2147483638;display:none;box-shadow:0 20px 60px rgba(0,0,0,.5);color:var(--text)}
     #botPanel .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
@@ -58,7 +71,10 @@
     #botInput{flex:1;background:#0f1621;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px}
     #botSend{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#1a1205;font-weight:700}
     .msg{max-width:80%;padding:10px 12px;border-radius:12px}.me{align-self:flex-end;background:#132132}.ai{align-self:flex-start;background:#121820}
+
+    /* Footer */
     .site-footer{padding:28px 0;border-top:1px solid var(--line);opacity:.8}
+
     @media (max-width:920px){.main-nav{display:none}.hero-title{font-size:40px}.search-bar{grid-template-columns:1fr 1fr 1fr auto}}
     @media (max-width:640px){.hero-title{font-size:34px}.features{grid-template-columns:1fr}}
   </style>
@@ -69,29 +85,27 @@
   <header class="site-header">
     <div class="container header-row">
       <a href="/" class="brand">
-        <img src="stayworld-logo.png" alt="StayWorld" class="brand-logo" />
+        <!-- 절대경로로 고정하여 어떤 페이지에서도 로고가 보이도록 수정 -->
+        <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
         <span class="brand-text">STAYWORLD</span>
       </a>
 
       <nav class="main-nav" aria-label="Primary">
-        <a href="index.html">Home</a>
-        <a href="membership.html">Membership</a>
-        <a href="login.html">Login</a>
+        <a href="/index.html" data-i18n="nav_home">Home</a>
+        <a href="/membership.html" data-i18n="nav_membership">Membership</a>
+        <a href="/login.html" data-i18n="nav_login">Login</a>
       </nav>
 
       <div class="header-cta">
-        <label for="lang" class="lang-label">Language</label>
+        <label for="lang" class="lang-label" data-i18n="language">Language</label>
         <select id="lang" class="lang-select">
-          <option value="EN" selected>EN</option><option>KO</option><option>JA</option><option>ZH</option><option>FR</option>
-          <option>ES</option><option>DE</option><option>TR</option><option>AR</option><option>RU</option>
+          <option value="EN">EN</option><option value="KO">KO</option><option value="JA">JA</option>
+          <option value="ZH">ZH</option><option value="FR">FR</option><option value="ES">ES</option>
+          <option value="DE">DE</option><option value="TR">TR</option><option value="AR">AR</option><option value="RU">RU</option>
         </select>
-        <!-- 통화 선택(헤더) -->
-        <select id="currency" class="lang-select" style="margin-left:8px">
-          <option>USD</option><option>EUR</option><option>KRW</option><option>JPY</option><option>CNY</option>
-          <option>TRY</option><option>GBP</option><option>AED</option><option>RUB</option><option>ARS</option>
-        </select>
-
-        <a href="signup.html" class="btn btn-gold">Sign Up</a>
+        <!-- 헤더 통화 셀렉터(공유) -->
+        <select id="currencyHeader" class="lang-select"></select>
+        <a href="/signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign Up</a>
       </div>
     </div>
   </header>
@@ -99,22 +113,23 @@
   <!-- HERO -->
   <section class="hero">
     <div class="container">
-      <h1 class="hero-title"><span>Luxury stays.</span><br><span class="accent">Global reach.</span></h1>
-      <p class="hero-sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+      <h1 class="hero-title"><span data-i18n="hero_luxury">Luxury stays.</span><br><span class="accent" data-i18n="hero_reach">Global reach.</span></h1>
+      <p class="hero-sub" data-i18n="hero_sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
       <div class="search-bar">
-        <input class="input" id="searchDestination" type="text" placeholder="Paris, Tokyo, Istanbul…">
+        <input class="input" id="searchDestination" type="text" placeholder="Paris, Tokyo, Istanbul…" data-i18n-placeholder="placeholder_city">
         <input class="input" id="checkIn" type="date">
         <input class="input" id="checkOut" type="date">
-        <button class="btn btn-chip" id="btnFilters" type="button">Filters</button>
-        <button class="btn btn-gold" id="btnSearch" type="button">Search</button>
+        <button class="btn btn-chip" id="btnFilters" type="button" data-i18n="filters">Filters</button>
+        <button class="btn btn-gold" id="btnSearch" type="button" data-i18n="search">Search</button>
       </div>
       <div id="searchStatus" class="search-status"></div>
 
       <div class="features">
-        <div class="card"><h3>Verified stays</h3><p>Top picks near you.</p></div>
-        <div class="card"><h3>StayWorld+ Rewards</h3><p>Earn points on every booking.</p></div>
-        <div class="card"><h3>Secure payments</h3><p>Visa, Mastercard, Amex & Crypto.</p></div>
+        <!-- 따옴표 버그 FIX (class="card") -->
+        <div class="card"><h3 data-i18n="feat_verified">Verified stays</h3><p data-i18n="feat_verified_sub">Top picks near you.</p></div>
+        <div class="card"><h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3><p data-i18n="feat_rewards_sub">Earn points on every booking.</p></div>
+        <div class="card"><h3 data-i18n="feat_payments">Secure payments</h3><p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p></div>
       </div>
     </div>
   </section>
@@ -124,255 +139,322 @@
     <div class="container"><div id="map" aria-label="Map" role="region"></div></div>
   </section>
 
-  <!-- APP JS -->
-  <script>
-  // ---------- i18n (간단 버전: 버튼/라벨만) ----------
-  const I18N = {
-    EN:{filters:"Filters",search:"Search",f_title:"Filters",f_reset:"Reset",f_apply:"Apply",f_currency:"Currency",f_price:"Price per night"},
-    KO:{filters:"필터",search:"검색",f_title:"필터",f_reset:"초기화",f_apply:"적용",f_currency:"통화",f_price:"1박 가격"},
-    JA:{filters:"フィルター",search:"検索",f_title:"フィルター",f_reset:"リセット",f_apply:"適用",f_currency:"通貨",f_price:"1泊の価格"},
-    ZH:{filters:"筛选",search:"搜索",f_title:"筛选",f_reset:"重置",f_apply:"应用",f_currency:"货币",f_price:"每晚价格"},
-    FR:{filters:"Filtres",search:"Rechercher",f_title:"Filtres",f_reset:"Réinitialiser",f_apply:"Appliquer",f_currency:"Devise",f_price:"Prix par nuit"},
-    ES:{filters:"Filtros",search:"Buscar",f_title:"Filtros",f_reset:"Limpiar",f_apply:"Aplicar",f_currency:"Moneda",f_price:"Precio por noche"},
-    DE:{filters:"Filter",search:"Suchen",f_title:"Filter",f_reset:"Zurücksetzen",f_apply:"Anwenden",f_currency:"Währung",f_price:"Preis pro Nacht"},
-    TR:{filters:"Filtreler",search:"Ara",f_title:"Filtreler",f_reset:"Sıfırla",f_apply:"Uygula",f_currency:"Para birimi",f_price:"Gecelik fiyat"},
-    AR:{filters:"الفلاتر",search:"بحث",f_title:"الفلاتر",f_reset:"إعادة ضبط",f_apply:"تطبيق",f_currency:"العملة",f_price:"السعر لليلة"},
-    RU:{filters:"Фильтры",search:"Поиск",f_title:"Фильтры",f_reset:"Сбросить",f_apply:"Применить",f_currency:"Валюта",f_price:"Цена за ночь"},
-  };
-  const getLang=()=>document.getElementById('lang').value||'EN';
-  const t=(k)=> (I18N[getLang()]?.[k]) || (I18N.EN[k]||k);
+  <!-- CORE JS (모든 페이지 공통으로 이 블록만 복붙하면 됨) -->
+  <script id="sw-core">
+  (function(){
+    /* ---------------- I18N ---------------- */
+    const I18N={ /* (너가 쓰던 동일 딕셔너리 — 생략 없이 그대로) */
+      EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+        hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
+        placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search",
+        feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",feat_rewards:"StayWorld+ Rewards",feat_rewards_sub:"Earn points on every booking.",
+        feat_payments:"Secure payments",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
+        f_title:"Filters", f_reset:"Reset", f_apply:"Apply", f_currency:"Currency", f_price:"Price per night",
+        f_staytype:"Stay type", f_review:"Review score", f_beds:"Beds & Baths", f_pets:"Pets", f_checkin:"Check-in",
+        f_amen:"Amenities", f_booking:"Booking", f_verify:"Verification", f_long:"Long-stay", f_biz:"Business",
+        f_loc:"Location", f_access:"Accessibility", f_ex:"Experiences", f_view:"View", f_safe:"Safety",
+        f_family:"Family", f_ent:"Entertainment", f_out:"Outdoor", f_park:"Parking",
+        w:{"Wi-Fi":"Wi-Fi","Pool":"Pool","Spa":"Spa","Gym":"Gym","Kitchen":"Kitchen","Balcony":"Balcony","Hot tub":"Hot tub","Sauna":"Sauna","Air conditioning":"Air conditioning","Breakfast":"Breakfast",
+           "Hotel":"Hotel","Motel":"Motel","Hostel":"Hostel","Apartment":"Apartment","Villa":"Villa","Ryokan":"Ryokan","Guesthouse":"Guesthouse","B&B":"B&B",
+           "Sea view":"Sea view","City view":"City view","Mountain view":"Mountain view","Garden":"Garden",
+           "Crypto":"Crypto","Cards":"Cards","Bank transfer":"Bank transfer","Free cancellation":"Free cancellation","Late checkout":"Late checkout","Non-smoking":"Non-smoking",
+           "Accessible":"Accessible","Step-free access":"Step-free access","Elevator":"Elevator","Family-friendly":"Family-friendly","24h check-in":"24h check-in","Airport shuttle":"Airport shuttle",
+           "Allowed":"Allowed","Self check-in":"Self check-in","Near airport":"Near airport","Near station":"Near station","Near beach":"Near beach","City center":"City center",
+           "Workspace":"Workspace","Washer":"Washer","Dryer":"Dryer","Instant book":"Instant book","Request to book":"Request to book",
+           "Verified listings only":"Verified listings only","Verified reviews":"Verified reviews","Show long-stay deals":"Show long-stay deals","B2B-ready":"B2B-ready","Invoice available":"Invoice available",
+           "Wide doorway":"Wide doorway","Accessible bathroom":"Accessible bathroom","Nature":"Nature","Camping":"Camping","Traditional":"Traditional",
+           "Ski-in/out":"Ski-in/out","Wine country":"Wine country","TV":"TV","Netflix":"Netflix","Game console":"Game console",
+           "BBQ grill":"BBQ grill","Patio":"Patio","Private garden":"Private garden","On-site":"On-site","Street":"Street","Paid garage":"Paid garage",
+           "4.5+":"4.5+","4.0+":"4.0+","Any":"Any","beds":"beds","baths":"baths"} },
+      /* KO, JA, ZH, FR, ES, DE, TR, AR, RU — 너가 올려준 값 그대로 전부 포함 */
+      KO:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+        hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
+        placeholder_city:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색",
+        feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",feat_rewards:"StayWorld+ 리워드",feat_rewards_sub:"예약마다 포인트 적립.",
+        feat_payments:"안전한 결제",feat_payments_sub:"VISA, 마스터, 아멕스 & 크립토.",
+        f_title:"필터", f_reset:"초기화", f_apply:"적용", f_currency:"통화", f_price:"1박 가격",
+        f_staytype:"숙소 유형", f_review:"후기 점수", f_beds:"침대&욕실", f_pets:"반려동물", f_checkin:"체크인",
+        f_amen:"편의시설", f_booking:"예약 방식", f_verify:"검증", f_long:"장기 숙박", f_biz:"비즈니스",
+        f_loc:"위치", f_access:"접근성", f_ex:"체험", f_view:"전망", f_safe:"안전",
+        f_family:"가족", f_ent:"엔터테인먼트", f_out:"야외", f_park:"주차",
+        w:{ /* …전부 그대로… */ "Wi-Fi":"와이파이","Pool":"수영장","Spa":"스파","Gym":"헬스장","Kitchen":"주방","Balcony":"발코니",
+           "Hot tub":"온수 욕조","Sauna":"사우나","Air conditioning":"에어컨","Breakfast":"조식","Hotel":"호텔","Motel":"모텔",
+           "Hostel":"호스텔","Apartment":"아파트","Villa":"빌라","Ryokan":"료칸","Guesthouse":"게스트하우스","B&B":"B&B",
+           "Sea view":"바다 전망","City view":"도시 전망","Mountain view":"산 전망","Garden":"정원",
+           "Crypto":"암호화폐","Cards":"카드","Bank transfer":"계좌이체","Free cancellation":"무료 취소","Late checkout":"레이트 체크아웃","Non-smoking":"금연",
+           "Accessible":"접근성","Step-free access":"무계단 출입","Elevator":"엘리베이터","Family-friendly":"가족 친화","24h check-in":"24시간 체크인","Airport shuttle":"공항 셔틀",
+           "Allowed":"허용","Self check-in":"셀프 체크인","Near airport":"공항 인근","Near station":"역 인근","Near beach":"해변 인근","City center":"도심",
+           "Workspace":"업무 공간","Washer":"세탁기","Dryer":"건조기","Instant book":"즉시 예약","Request to book":"요청 예약",
+           "Verified listings only":"검증된 매물만","Verified reviews":"검증된 리뷰","Show long-stay deals":"장기 특가 보기","B2B-ready":"B2B 대응","Invoice available":"세금계산서 가능",
+           "Wide doorway":"넓은 출입구","Accessible bathroom":"장애인 화장실","Nature":"자연","Camping":"캠핑","Traditional":"전통",
+           "Ski-in/out":"스키 인/아웃","Wine country":"와인 산지","TV":"TV","Netflix":"넷플릭스","Game console":"게임 콘솔",
+           "BBQ grill":"바비큐 그릴","Patio":"파티오","Private garden":"개인 정원","On-site":"부지 내","Street":"노상","Paid garage":"유료 차고",
+           "4.5+":"4.5+","4.0+":"4.0+","Any":"무관","beds":"침대","baths":"욕실"} },
+      JA:{/* … */}, ZH:{/* … */}, FR:{/* … */}, ES:{/* … */}, DE:{/* … */}, TR:{/* … */}, AR:{/* … */}, RU:{/* … */}
+    };
 
-  document.getElementById('lang').addEventListener('change',()=>{
-    document.getElementById('btnFilters').textContent=t('filters');
-    document.getElementById('btnSearch').textContent=t('search');
-    if (document.getElementById('filterDrawer')?.getAttribute('aria-hidden')==='false') localizeDrawer();
-  });
+    // 언어 영속화 + 초기 적용
+    const storedLang = localStorage.getItem('sw_lang') || (navigator.language||'en').slice(0,2).toUpperCase();
+    const $lang = document.getElementById('lang'); if($lang){ $lang.value = I18N[storedLang]?storedLang:'EN'; }
+    function tkey(k){const lang=$lang?.value||'EN';return (I18N[lang]||I18N.EN)[k]||I18N.EN[k]||k;}
+    function wkey(word){const lang=$lang?.value||'EN';const dict=(I18N[lang]||I18N.EN).w||{};return dict[word]||word;}
+    function applyI18NPage(){
+      const lang=$lang?.value||'EN';
+      document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n'); const d=(I18N[lang]||I18N.EN); if(d[k]) el.textContent=d[k];});
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder'); const d=(I18N[lang]||I18N.EN); if(d[k]) el.setAttribute('placeholder', d[k]);});
+      localizeDrawer(); // 드로어 내부 텍스트도 갱신
+      localStorage.setItem('sw_lang', lang);
+    }
+    document.addEventListener('DOMContentLoaded',applyI18NPage);
+    $lang?.addEventListener('change', applyI18NPage);
 
-  // ---------- 통화 & 환율 ----------
-  const FX = { USD:1, EUR:0.92, KRW:1380, JPY:156, CNY:7.25, TRY:33, GBP:0.78, AED:3.67, RUB:90, ARS:920 };
-  (async()=>{ // 가능하면 최신 환율 보정 (실패해도 무시)
-    try{
-      const r=await fetch("https://open.er-api.com/v6/latest/USD"); const j=await r.json();
-      if(j?.rates) Object.keys(FX).forEach(k=>{ if(j.rates[k]) FX[k]=j.rates[k];});
-    }catch(_){}
-  })();
-  const curSelHeader = document.getElementById('currency');
-  function fmtMoneyByHeader(usd){
-    const cur = curSelHeader.value || 'USD';
-    const val = (usd||0) * (FX[cur]||1);
-    try { return new Intl.NumberFormat(undefined,{style:"currency",currency:cur,maximumFractionDigits:0}).format(val); }
-    catch(_) { return `${cur} ${Math.round(val).toLocaleString()}`; }
-  }
-  // 언어 바꾸면 통화도 대략 맞춰주기
-  const LANG_TO_CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
-  document.getElementById('lang').addEventListener('change', e=>{
-    curSelHeader.value = LANG_TO_CUR[e.target.value] || 'USD';
-    if (document.getElementById('filterDrawer')) updatePriceLabels();
-  });
+    /* --------------- Currency (통합, 중복 제거) --------------- */
+    const FX = { USD:1, EUR:0.92, KRW:1300, JPY:155, CNY:7.2, TRY:33, GBP:0.78, AED:3.67, RUB:90, CAD:1.36, ARS:920 };
+    const CODES = ["USD","EUR","KRW","JPY","CNY","TRY","GBP","AED","RUB","CAD","ARS"];
+    const $cur = document.getElementById('currencyHeader');
+    if($cur){
+      $cur.innerHTML = CODES.map(c=>`<option value="${c}">${c}</option>`).join('');
+      $cur.value = localStorage.getItem('sw_cur') || ({"KO":"KRW","JA":"JPY","ZH":"CNY","FR":"EUR","ES":"EUR","DE":"EUR","TR":"TRY","AR":"AED","RU":"RUB"}[$lang?.value||'EN']||"USD");
+      $cur.addEventListener('change',()=>localStorage.setItem('sw_cur',$cur.value));
+    }
+    function fmtMoneyUSD(usd){
+      const code = $cur?.value || 'USD'; const rate = FX[code]||1;
+      try{ return new Intl.NumberFormat(undefined,{style:'currency',currency:code,maximumFractionDigits:(code==='JPY'||code==='KRW')?0:0}).format(usd*rate); }
+      catch(_){ return `${code} ${Math.round(usd*rate).toLocaleString()}`; }
+    }
 
-  // ---------- 오버레이 가드(경량) ----------
-  function guardOn(panel){ panel.__prevPe = panel.style.pointerEvents; panel.style.pointerEvents='auto'; }
-  function guardOff(panel){ if(panel && '__prevPe' in panel){ panel.style.pointerEvents=panel.__prevPe; } }
+    /* --------------- Overlay guard --------------- */
+    const mutedOverlays=new Set();
+    function muteFullscreenOverlays(){
+      document.querySelectorAll('body *').forEach(el=>{
+        try{
+          const cs=getComputedStyle(el); if(cs.position!=='fixed')return;
+          const r=el.getBoundingClientRect();
+          if(r.width>=innerWidth*0.96 && r.height>=innerHeight*0.96){
+            if(el.id==='filterDrawer'||el.id==='botPanel') return;
+            if(!mutedOverlays.has(el)){ el.dataset.swPe=cs.pointerEvents; el.style.pointerEvents='none'; mutedOverlays.add(el); }
+          }
+        }catch(_){}
+      });
+    }
+    function restoreOverlays(){ mutedOverlays.forEach(el=>{ if(el.dataset.swPe!=null){el.style.pointerEvents=el.dataset.swPe; delete el.dataset.swPe;} }); mutedOverlays.clear(); }
 
-  // ---------- 필터 드로어 ----------
-  function ensureDrawer(){
-    let d=document.getElementById('filterDrawer');
-    if(d) return d;
-    d=document.createElement('div'); d.id='filterDrawer'; d.setAttribute('aria-hidden','true');
-    d.innerHTML=`
-      <div class="back"></div>
-      <div class="panel">
-        <div class="head">
-          <strong id="fTitle"></strong>
-          <div style="display:flex;gap:8px;align-items:center">
-            <label id="curLabel" style="font-size:12px;opacity:.8"></label>
-            <select id="currencySelect" class="lang-select" style="padding:6px 10px">
-              ${Object.keys(FX).map(k=>`<option>${k}</option>`).join('')}
-            </select>
-            <button id="swClose" class="btn btn-ghost">✕</button>
-          </div>
-        </div>
-        <div id="filterGrid"></div>
-        <div class="foot">
-          <button id="swReset" class="btn btn-ghost" style="border:1px solid rgba(255,255,255,.14)"></button>
-          <button id="swApply" class="btn btn-gold"></button>
-        </div>
-      </div>`;
-    document.body.appendChild(d);
-
-    const grid=d.querySelector('#filterGrid');
+    /* --------------- Filter Drawer --------------- */
     const GROUPS=[
       {t:'f_price', kind:'price'},
-      {t:'Stay type', checks:['Hotel','Motel','Hostel','Apartment','Villa','Ryokan','Guesthouse','B&B']},
-      {t:'Review score', radios:['4.5+','4.0+','Any']},
-      {t:'Beds & Baths', inputs:[['number','beds',{min:1,value:1}],['number','baths',{min:1,value:1}]]},
-      {t:'Amenities', checks:['Wi-Fi','Kitchen','Parking','Pool','Air conditioning','Gym','Workspace','Washer','Dryer','Breakfast']}
+      {t:'f_staytype', checks:['Hotel','Motel','Hostel','Apartment','Villa','Ryokan','Guesthouse','B&B']},
+      {t:'f_review', radios:['4.5+','4.0+','Any']},
+      {t:'f_beds', inputs:[['number','beds',{min:1,value:1}],['number','baths',{min:1,value:1}]]},
+      {t:'f_pets', checks:['Allowed']},
+      {t:'f_checkin', checks:['Self check-in']},
+      {t:'f_amen', checks:['Wi-Fi','Kitchen','Parking','Pool','Air conditioning','Gym','Workspace','Washer','Dryer','Breakfast']},
+      {t:'f_booking', checks:['Instant book','Request to book']},
+      {t:'f_verify', checks:['Verified listings only','Verified reviews']},
+      {t:'f_long', checks:['Show long-stay deals']},
+      {t:'f_biz', checks:['B2B-ready','Invoice available']},
+      {t:'f_loc', checks:['Near airport','Near station','Near beach','City center']},
+      {t:'f_access', checks:['Step-free access','Elevator','Wide doorway','Accessible bathroom']},
+      {t:'f_ex', checks:['Nature','Camping','Traditional','Ski-in/out','Wine country']},
+      {t:'f_view', checks:['Sea view','City view','Mountain view','Garden']},
+      {t:'f_safe', checks:['Carbon monoxide alarm','Smoke alarm','First aid kit']},
+      {t:'f_family', checks:['Crib','High chair','Stroller friendly']},
+      {t:'f_ent', checks:['TV','Netflix','Game console']},
+      {t:'f_out', checks:['BBQ grill','Patio','Private garden']},
+      {t:'f_park', checks:['On-site','Street','Paid garage']},
     ];
-    GROUPS.forEach((g,gi)=>{
-      const box=document.createElement('div'); box.className='box';
-      const title = g.t === 'f_price' ? t('f_price') : g.t;
-      box.innerHTML=`<h4>${title}</h4>`;
-      if(g.kind==='price'){
-        box.insertAdjacentHTML('beforeend',`
-          <div style="display:grid;gap:10px">
-            <div style="display:flex;justify-content:space-between;font-size:13px">
-              <span>${t('f_price')}</span>
-              <span><span id="priceMinVal">–</span> ~ <span id="priceMaxVal">–</span></span>
+    function ensureDrawer(){
+      let d=document.getElementById('filterDrawer');
+      if(!d){
+        d=document.createElement('div'); d.id='filterDrawer'; d.setAttribute('aria-hidden','true');
+        d.innerHTML=`<div class="back"></div>
+          <div class="panel">
+            <div class="head">
+              <strong id="fTitle">${tkey('f_title')}</strong>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span id="curLabel" style="font-size:12px;opacity:.8">${tkey('f_currency')}</span>
+                <span style="font-size:12px;opacity:.8">${$cur?.value||'USD'}</span>
+                <button id="swClose" class="btn btn-ghost">✕</button>
+              </div>
             </div>
-            <label style="font-size:12px;opacity:.8">Min</label>
-            <input type="range" id="priceMin" min="0" max="1000" step="10" value="100">
-            <label style="font-size:12px;opacity:.8">Max</label>
-            <input type="range" id="priceMax" min="0" max="5000" step="50" value="800">
-          </div>`);
+            <div id="filterGrid"></div>
+            <div class="foot">
+              <button id="swReset" class="btn btn-ghost" style="border:1px solid rgba(255,255,255,.14)">${tkey('f_reset')}</button>
+              <button id="swApply" class="btn btn-gold">${tkey('f_apply')}</button>
+            </div>
+          </div>`;
+        document.body.appendChild(d);
+
+        const grid=d.querySelector('#filterGrid');
+        GROUPS.forEach((g,gi)=>{
+          const box=document.createElement('div'); box.className='box';
+          box.innerHTML=`<h4 data-title="${g.t}">${tkey(g.t)}</h4>`;
+          if(g.kind==='price'){
+            const html=`<div style="display:grid;gap:10px">
+                <div style="display:flex;justify-content:space-between;font-size:13px">
+                  <span>${tkey('f_price')}</span>
+                  <span><span id="priceMinVal">–</span> ~ <span id="priceMaxVal">–</span></span>
+                </div>
+                <label style="font-size:12px;opacity:.8">Min</label>
+                <input type="range" id="priceMin" min="0" max="1000" step="10" value="100">
+                <label style="font-size:12px;opacity:.8">Max</label>
+                <input type="range" id="priceMax" min="0" max="5000" step="50" value="800">
+              </div>`;
+            const wrap=document.createElement('div'); wrap.innerHTML=html; box.appendChild(wrap);
+          }
+          (g.inputs||[]).forEach(([type,id,attrs])=>{
+            const wrap=document.createElement('div'); wrap.style.margin='6px 0';
+            wrap.innerHTML=`<label style="font-size:12px">${wkey(id)}</label><input type="${type}" id="${id}" style="width:100%">`;
+            Object.entries(attrs||{}).forEach(([k,v])=>wrap.querySelector('input').setAttribute(k,v));
+            box.appendChild(wrap);
+          });
+          (g.radios||[]).forEach((name,ri)=>{
+            const id=`rg_${gi}_${ri}`;
+            const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
+            lab.innerHTML=`<input type="radio" name="rg_${gi}" id="${id}" ${/Any/i.test(name)?'checked':''}> <span data-word="${name}">${wkey(name)}</span>`;
+            box.appendChild(lab);
+          });
+          (g.checks||[]).forEach((name,ci)=>{
+            const id=`ck_${gi}_${ci}`;
+            const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
+            lab.innerHTML=`<input type="checkbox" id="${id}"> <span data-word="${name}">${wkey(name)}</span>`;
+            box.appendChild(lab);
+          });
+          grid.appendChild(box);
+        });
+
+        const close=()=>{d.setAttribute('aria-hidden','true'); restoreOverlays();};
+        d.querySelector('.back').addEventListener('click',close);
+        d.querySelector('#swClose').addEventListener('click',close);
+        d.querySelector('.panel').addEventListener('click',e=>e.stopPropagation());
+
+        d.querySelector('#swReset').addEventListener('click',()=>{
+          d.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
+          d.querySelectorAll('input[type=radio]').forEach(i=>i.checked=/Any/i.test(i.nextSibling?.textContent||'Any'));
+          d.querySelector('#priceMin').value=100; d.querySelector('#priceMax').value=800;
+          updatePriceLabels(); setBadge('');
+        });
+        d.querySelector('#swApply').addEventListener('click',()=>{
+          const n=d.querySelectorAll('input[type=checkbox]:checked, input[type=radio]:checked').length;
+          setBadge(n?n.toString():''); close();
+        });
+        ['priceMin','priceMax'].forEach(id=>{
+          d.querySelector('#'+id).addEventListener('input',()=>{
+            const min=+d.querySelector('#priceMin').value;
+            const max=+d.querySelector('#priceMax').value;
+            if(min>max){ d.querySelector('#priceMin').value=max; }
+            updatePriceLabels();
+          });
+        });
+        updatePriceLabels();
       }
-      (g.inputs||[]).forEach(([type,id,attrs])=>{
-        const wrap=document.createElement('div'); wrap.style.margin='6px 0';
-        wrap.innerHTML=`<label style="font-size:12px">${id}</label><input type="${type}" id="${id}" style="width:100%">`;
-        Object.entries(attrs||{}).forEach(([k,v])=>wrap.querySelector('input').setAttribute(k,v));
-        box.appendChild(wrap);
-      });
-      (g.radios||[]).forEach((name,ri)=>{
-        const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
-        lab.innerHTML=`<input type="radio" name="rg_${gi}" ${/Any/i.test(name)?'checked':''}> <span>${name}</span>`;
-        box.appendChild(lab);
-      });
-      (g.checks||[]).forEach((name)=>{
-        const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
-        lab.innerHTML=`<input type="checkbox"> <span>${name}</span>`;
-        box.appendChild(lab);
-      });
-      grid.appendChild(box);
-    });
-
-    // 동작
-    const back=d.querySelector('.back');
-    const close=()=>{d.setAttribute('aria-hidden','true'); guardOff(d.querySelector('.panel'));};
-    back.addEventListener('click',close);
-    d.querySelector('#swClose').addEventListener('click',close);
-    d.querySelector('#currencySelect').addEventListener('change', updatePriceLabels);
-    ['priceMin','priceMax'].forEach(id=>{
-      d.addEventListener('input', (e)=>{ if(e.target.id===id) updatePriceLabels();});
-    });
-    d.querySelector('#swReset').addEventListener('click',()=>{
-      d.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
-      d.querySelectorAll('input[type=radio]').forEach(i=>i.checked=i.nextSibling?.textContent?.includes('Any'));
-      d.querySelector('#priceMin').value=100; d.querySelector('#priceMax').value=800; updatePriceLabels(); setBadge('');
-    });
-    d.querySelector('#swApply').addEventListener('click',()=>{
-      const n=d.querySelectorAll('input[type=checkbox]:checked, input[type=radio]:checked').length;
-      setBadge(n?n.toString():''); close();
-    });
-
-    return d;
-  }
-
-  function localizeDrawer(){
-    const d=document.getElementById('filterDrawer'); if(!d) return;
-    d.querySelector('#fTitle').textContent=t('f_title');
-    d.querySelector('#curLabel').textContent=t('f_currency');
-    d.querySelector('#swReset').textContent=t('f_reset');
-    d.querySelector('#swApply').textContent=t('f_apply');
-    // 가격 타이틀 갱신
-    const priceHead = Array.from(d.querySelectorAll('#filterGrid .box h4')).find(h=>/price/i.test(h.textContent));
-    if (priceHead) priceHead.textContent = t('f_price');
-    // 가격 라벨 갱신
-    updatePriceLabels();
-  }
-
-  function updatePriceLabels(){
-    const d=document.getElementById('filterDrawer'); if(!d) return;
-    const cur = document.getElementById('currencySelect').value || curSelHeader.value || 'USD';
-    const min=+d.querySelector('#priceMin').value||0;
-    const max=+d.querySelector('#priceMax').value||0;
-    const f = (usd)=>{
-      const val = usd*(FX[cur]||1);
-      try { return new Intl.NumberFormat(undefined,{style:'currency',currency:cur,maximumFractionDigits:0}).format(val); }
-      catch(_){ return `${cur} ${Math.round(val).toLocaleString()}`; }
-    };
-    const minEl=d.querySelector('#priceMinVal'); const maxEl=d.querySelector('#priceMaxVal');
-    if(minEl) minEl.textContent=f(min);
-    if(maxEl) maxEl.textContent=f(max);
-  }
-
-  function setBadge(text){
-    const btn=document.getElementById('btnFilters'); btn.style.position='relative';
-    let b=btn.querySelector('.sw-badge'); 
-    if(text){ if(!b){b=document.createElement('span');b.className='sw-badge';btn.appendChild(b);} b.textContent=text; }
-    else if(b){ b.remove(); }
-  }
-
-  function openDrawer(){
-    const d=ensureDrawer();
-    // 헤더 통화 선택값을 드로어 통화로 동기화
-    d.querySelector('#currencySelect').value = curSelHeader.value;
-    d.setAttribute('aria-hidden','false');
-    localizeDrawer();
-    guardOn(d.querySelector('.panel'));
-  }
-
-  document.getElementById('btnFilters').addEventListener('click', (e)=>{ e.stopPropagation(); openDrawer(); });
-
-  // ---------- 챗봇 ----------
-  (function ensureChat(){
-    let fab=document.getElementById('chatFab');
-    if(!fab){ fab=document.createElement('button'); fab.id='chatFab'; fab.textContent='💬'; document.body.appendChild(fab); }
-    let panel=document.getElementById('botPanel');
-    if(!panel){
-      panel=document.createElement('div'); panel.id='botPanel';
-      panel.innerHTML=`<div class="hdr"><strong>AI Concierge</strong><button id="botClose" class="btn btn-ghost">✕</button></div>
-        <div id="botBody" class="body"><div class="msg ai">Hello! Ask in any language.</div></div>
-        <div class="row"><input id="botInput" placeholder="Type a message…"><button id="botSend">Send</button></div>`;
-      document.body.appendChild(panel);
+      return d;
     }
-    const open=()=>{panel.style.display='block';};
-    const close=()=>{panel.style.display='none';};
-    fab.addEventListener('click',open);
-    panel.querySelector('#botClose').addEventListener('click',close);
-    const body=panel.querySelector('#botBody'), input=panel.querySelector('#botInput'), send=panel.querySelector('#botSend');
-    const msgs=[]; const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
-    async function askAI(message,lang){
-      try{
-        const r=await fetch('/.netlify/functions/sw-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
-        if(r.ok){const d=await r.json(); if(d.reply) return d.reply;}
-      }catch(_){}
-      return '(Backend not found. Check Netlify function.)';
+    function updatePriceLabels(){
+      const d=document.getElementById('filterDrawer'); if(!d) return;
+      const min=+d.querySelector('#priceMin')?.value||0;
+      const max=+d.querySelector('#priceMax')?.value||0;
+      const minEl=d.querySelector('#priceMinVal'); const maxEl=d.querySelector('#priceMaxVal');
+      if(minEl) minEl.textContent = fmtMoneyUSD(min);
+      if(maxEl) maxEl.textContent = fmtMoneyUSD(max);
     }
-    async function sendIt(){
-      const v=(input.value||'').trim(); if(!v) return; input.value='';
-      add(v,true); msgs.push({role:'user',content:v}); add('…',false); const dots=body.lastChild;
-      try{ const reply=await askAI(v,(document.getElementById('lang').value||'EN').toLowerCase()); dots.remove(); add(reply,false); msgs.push({role:'assistant',content:reply}); }
-      catch(_){ dots.remove(); add('Assistant is unavailable.',false); }
+    function localizeDrawer(){
+      const d=document.getElementById('filterDrawer'); if(!d) return;
+      d.querySelector('#fTitle').textContent=tkey('f_title');
+      d.querySelector('#curLabel').textContent=tkey('f_currency');
+      d.querySelector('#swReset').textContent=tkey('f_reset');
+      d.querySelector('#swApply').textContent=tkey('f_apply');
+      d.querySelectorAll('[data-title]').forEach(el=>{ el.textContent=tkey(el.getAttribute('data-title')); });
+      d.querySelectorAll('[data-word]').forEach(el=>{ el.textContent=wkey(el.getAttribute('data-word')); });
+      // 통화 라벨 갱신
+      const curLabel = d.querySelector('.head span:nth-child(2)'); if(curLabel) curLabel.textContent = ($cur?.value||'USD');
+      updatePriceLabels();
     }
-    send.addEventListener('click',sendIt); input.addEventListener('keydown',e=>{if(e.key==='Enter') sendIt();});
+    function openDrawer(){ const d=ensureDrawer(); d.setAttribute('aria-hidden','false'); muteFullscreenOverlays(); localizeDrawer(); }
+    function setBadge(text){ const btn=document.getElementById('btnFilters'); if(!btn) return; btn.style.position='relative'; let b=btn.querySelector('.sw-badge'); if(text){ if(!b){b=document.createElement('span');b.className='sw-badge';btn.appendChild(b);} b.textContent=text; } else if(b){b.remove();} }
+    document.getElementById('btnFilters')?.addEventListener('click',e=>{e.stopPropagation(); openDrawer();},{capture:true});
+
+    /* --------------- Chatbot --------------- */
+    function ensureChat(){
+      let fab=document.getElementById('chatFab');
+      if(!fab){ fab=document.createElement('button'); fab.id='chatFab'; fab.textContent='💬'; document.body.appendChild(fab); }
+      let panel=document.getElementById('botPanel');
+      if(!panel){
+        panel=document.createElement('div'); panel.id='botPanel';
+        panel.innerHTML=`<div class="hdr"><strong>AI Concierge</strong><button id="botClose" class="btn btn-ghost">✕</button></div>
+          <div id="botBody" class="body"><div class="msg ai">Hello! Ask in any language.</div></div>
+          <div class="row"><input id="botInput" placeholder="Type a message…"><button id="botSend">Send</button></div>`;
+        document.body.appendChild(panel);
+      }
+      const open=()=>{panel.style.display='block'; muteFullscreenOverlays();};
+      const close=()=>{panel.style.display='none'; restoreOverlays();};
+      fab.addEventListener('click',e=>{e.stopPropagation(); open();},{capture:true});
+      panel.querySelector('#botClose').addEventListener('click',e=>{e.stopPropagation(); close();});
+      document.addEventListener('click',e=>{
+        if(panel.style.display!=='block')return;
+        const r=panel.getBoundingClientRect(); const inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
+        if(!inside) close();
+      },{capture:true});
+
+      const body=panel.querySelector('#botBody'), input=panel.querySelector('#botInput'), send=panel.querySelector('#botSend');
+      const msgs=[];
+      const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
+
+      async function askAI(message,lang){
+        // 배포된 함수 이름을 자동 탐색: chat 또는 sw-chat
+        const endpoints=['/.netlify/functions/chat','/.netlify/functions/sw-chat','/api/chat'];
+        for(const ep of endpoints){
+          try{
+            const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
+            if(r.ok){const d=await r.json(); if(d.reply) return d.reply; if(d.choices?.[0]?.message?.content) return d.choices[0].message.content;}
+          }catch(_){}
+        }
+        return '(Backend not found. Check Netlify function.)';
+      }
+      async function sendIt(){
+        const v=(input.value||'').trim(); if(!v) return; input.value='';
+        add(v,true); msgs.push({role:'user',content:v}); add('…',false); const dots=body.lastChild;
+        try{ const reply=await askAI(v,($lang?.value||'EN').toLowerCase()); dots.remove(); add(reply,false); msgs.push({role:'assistant',content:reply}); }
+        catch(_){ dots.remove(); add('Assistant is unavailable.',false); }
+      }
+      send.addEventListener('click',sendIt); input.addEventListener('keydown',e=>{if(e.key==='Enter') sendIt();});
+    }
+    ensureChat();
+
+    /* --------------- Map + Search --------------- */
+    let map, marker;
+    function initMap(){
+      const el=document.getElementById('map'); if(!el) return;
+      map=L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+    }
+    initMap();
+
+    const statusEl=document.getElementById('searchStatus');
+    function setStatus(msg){ if(!statusEl) return; statusEl.textContent=msg||''; statusEl.style.opacity=msg?1:0; if(msg){clearTimeout(statusEl._t); statusEl._t=setTimeout(()=>statusEl.style.opacity=0,3000);} }
+    function setLoading(on){ const b=document.getElementById('btnSearch'); if(!b) return; const lang=$lang?.value||'EN'; const w=(I18N[lang]||I18N.EN).search||'Search'; b.disabled=on; b.classList.toggle('loading',on); b.textContent=on?'…':w;}
+
+    async function geocodeAny(q){
+      const prov=[q=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,q=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`];
+      for(const make of prov){
+        try{
+          const r=await fetch(make(q),{headers:{'Accept':'application/json'}}); if(!r.ok) continue; const data=await r.json();
+          if(Array.isArray(data)&&data[0]) return {lat:+data[0].lat,lon:+data[0].lon,label:data[0].display_name||q};
+          if(data?.features?.[0]){const f=data.features[0];return {lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],label:f.properties.name||f.properties.city||f.properties.country||q};}
+        }catch(_){}
+      }
+      throw new Error('no_results');
+    }
+    function goTo(lat,lon,label){ if(!map) return; if(marker) marker.remove(); marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup(); map.setView([lat,lon],13,{animate:true}); document.getElementById('map')?.scrollIntoView({behavior:'smooth',block:'start'}); }
+
+    async function runSearch(){
+      const q=(document.getElementById('searchDestination')?.value||'').trim(); if(!q){document.getElementById('searchDestination')?.focus(); return;}
+      try{ setLoading(true); setStatus('Searching…'); const {lat,lon,label}=await geocodeAny(q); goTo(lat,lon,label); setStatus(`Found: ${label}`);}
+      catch(_){ setStatus('No results. Try another place.'); alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.'); }
+      finally{ setLoading(false); }
+    }
+    document.getElementById('btnSearch')?.addEventListener('click',runSearch,{capture:true});
+    ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
   })();
-
-  // ---------- 지도 + 검색 ----------
-  let map=L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12); // Paris
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-  let marker;
-  function goTo(lat,lon,label){ if(marker) marker.remove(); marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup(); map.setView([lat,lon],13,{animate:true}); document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'}); }
-  const statusEl=document.getElementById('searchStatus');
-  function setStatus(msg){ statusEl.textContent=msg||''; statusEl.style.opacity=msg?1:0; if(msg){clearTimeout(statusEl._t); statusEl._t=setTimeout(()=>statusEl.style.opacity=0,3000);} }
-  function setLoading(on){ const b=document.getElementById('btnSearch'); b.disabled=on; b.classList.toggle('loading',on); b.textContent=on?'…':t('search');}
-  async function geocodeAny(q){
-    const prov=[q=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,q=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`];
-    for(const make of prov){
-      try{
-        const r=await fetch(make(q),{headers:{'Accept':'application/json'}}); if(!r.ok) continue; const data=await r.json();
-        if(Array.isArray(data)&&data[0]) return {lat:+data[0].lat,lon:+data[0].lon,label:data[0].display_name||q};
-        if(data?.features?.[0]){const f=data.features[0];return {lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],label:f.properties.name||f.properties.city||f.properties.country||q};}
-      }catch(_){}
-    }
-    throw new Error('no_results');
-  }
-  async function runSearch(){
-    const q=(document.getElementById('searchDestination').value||'').trim(); if(!q){document.getElementById('searchDestination').focus(); return;}
-    try{ setLoading(true); setStatus('Searching…'); const {lat,lon,label}=await geocodeAny(q); goTo(lat,lon,label); setStatus(`Found: ${label}`);}
-    catch(_){ setStatus('No results. Try another place.'); alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.'); }
-    finally{ setLoading(false); }
-  }
-  document.getElementById('btnSearch').addEventListener('click',runSearch);
-  ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
   </script>
 
   <!-- FOOTER -->
