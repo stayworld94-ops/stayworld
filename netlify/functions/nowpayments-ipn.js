@@ -119,3 +119,4 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: e.message || "error" };
   }
 };
+console.log("IPN payload:", payload);
