@@ -5,18 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>STAYWORLD — Luxury Global Reach</title>
 
-  <!-- Leaflet (지도) -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 
-  <!-- 통합 CSS (헤더/히어로/검색/카드/지도/필터드로어/챗봇/반응형) -->
   <style>
     :root{--bg:#0b0f16;--panel:#101018;--text:#e7e9ee;--muted:#cfd6e6;--line:rgba(255,255,255,.08);--chip:#121a26;--gold1:#f4d78c;--gold2:#c9a35b}
     *{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;line-height:1.5}
     a{color:inherit;text-decoration:none}.container{max-width:1120px;margin:0 auto;padding:0 16px}
     img{max-width:100%;display:block}
-
-    /* Header */
     .site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
     .header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
     .brand{display:flex;align-items:center;gap:10px}.brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
@@ -29,8 +26,6 @@
     .btn-ghost{background:transparent;color:#cfcfcf}.btn-ghost:hover{background:rgba(255,255,255,.06)}
     .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
     .btn-chip{background:var(--chip);color:#dfe3ea;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
-
-    /* Hero */
     .hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
     .hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}.accent{color:#f1cf84}
     .hero-sub{opacity:.85;margin:8px 0 28px}
@@ -39,19 +34,12 @@
     .input::placeholder{color:#a7b0bf}
     .search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
     .btn.loading{opacity:.65;pointer-events:none}
-
-    /* 카드 */
     .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
     .card{background:#0f1420;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
     .card h3{margin:0 0 6px}.card p{margin:0;opacity:.85}
-
-    /* Map */
     .map-section{padding:36px 0 60px}
     #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
-    /* 지도 레이어가 버튼 가리는 것 방지 */
     .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
-
-    /* 필터 드로어(우측 슬라이드) */
     #filterDrawer{position:fixed;inset:0;display:none;z-index:2147483637;align-items:stretch;justify-content:flex-end}
     #filterDrawer[aria-hidden="false"]{display:flex}
     #filterDrawer .back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
@@ -62,8 +50,6 @@
     #filterDrawer .box{background:#0f1420;border:1px solid var(--line);border-radius:12px;padding:12px}
     #filterDrawer h4{margin:0 0 8px;font-size:14px}
     .sw-badge{position:absolute;top:-8px;right:-8px;background:#ffd36e;color:#1a1205;border-radius:999px;font-size:11px;padding:2px 6px}
-
-    /* 챗봇 (FAB + 패널) */
     #chatFab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;z-index:2147483639;background:linear-gradient(180deg,var(--gold1),var(--gold2));box-shadow:0 14px 30px rgba(201,163,91,.35);font-size:22px}
     #botPanel{position:fixed;right:20px;bottom:86px;width:min(360px,88vw);height:480px;background:#101018;border:1px solid #23232b;border-radius:16px;z-index:2147483638;display:none;box-shadow:0 20px 60px rgba(0,0,0,.5);color:var(--text)}
     #botPanel .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
@@ -72,11 +58,7 @@
     #botInput{flex:1;background:#0f1621;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px}
     #botSend{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#1a1205;font-weight:700}
     .msg{max-width:80%;padding:10px 12px;border-radius:12px}.me{align-self:flex-end;background:#132132}.ai{align-self:flex-start;background:#121820}
-
-    /* Footer */
     .site-footer{padding:28px 0;border-top:1px solid var(--line);opacity:.8}
-
-    /* Responsive */
     @media (max-width:920px){.main-nav{display:none}.hero-title{font-size:40px}.search-bar{grid-template-columns:1fr 1fr 1fr auto}}
     @media (max-width:640px){.hero-title{font-size:34px}.features{grid-template-columns:1fr}}
   </style>
@@ -92,19 +74,24 @@
       </a>
 
       <nav class="main-nav" aria-label="Primary">
-        <a href="index.html" data-i18n="nav_home">Home</a>
-        <a href="membership.html" data-i18n="nav_membership">Membership</a>
-        <a href="login.html" data-i18n="nav_login">Login</a>
+        <a href="index.html">Home</a>
+        <a href="membership.html">Membership</a>
+        <a href="login.html">Login</a>
       </nav>
 
       <div class="header-cta">
-        <label for="lang" class="lang-label" data-i18n="language">Language</label>
+        <label for="lang" class="lang-label">Language</label>
         <select id="lang" class="lang-select">
           <option value="EN" selected>EN</option><option>KO</option><option>JA</option><option>ZH</option><option>FR</option>
           <option>ES</option><option>DE</option><option>TR</option><option>AR</option><option>RU</option>
         </select>
-        <!-- 헤더 통화 선택자: JS에서 주입/동기화 -->
-        <a href="signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign Up</a>
+        <!-- 통화 선택(헤더) -->
+        <select id="currency" class="lang-select" style="margin-left:8px">
+          <option>USD</option><option>EUR</option><option>KRW</option><option>JPY</option><option>CNY</option>
+          <option>TRY</option><option>GBP</option><option>AED</option><option>RUB</option><option>ARS</option>
+        </select>
+
+        <a href="signup.html" class="btn btn-gold">Sign Up</a>
       </div>
     </div>
   </header>
@@ -112,23 +99,22 @@
   <!-- HERO -->
   <section class="hero">
     <div class="container">
-      <h1 class="hero-title"><span data-i18n="hero_luxury">Luxury stays.</span><br><span class="accent" data-i18n="hero_reach">Global reach.</span></h1>
-      <p class="hero-sub" data-i18n="hero_sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
+      <h1 class="hero-title"><span>Luxury stays.</span><br><span class="accent">Global reach.</span></h1>
+      <p class="hero-sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
 
       <div class="search-bar">
-        <input class="input" id="searchDestination" type="text" placeholder="Paris, Tokyo, Istanbul…" data-i18n-placeholder="placeholder_city">
+        <input class="input" id="searchDestination" type="text" placeholder="Paris, Tokyo, Istanbul…">
         <input class="input" id="checkIn" type="date">
         <input class="input" id="checkOut" type="date">
-        <button class="btn btn-chip" id="btnFilters" type="button" data-i18n="filters">Filters</button>
-        <button class="btn btn-gold" id="btnSearch" type="button" data-i18n="search">Search</button>
+        <button class="btn btn-chip" id="btnFilters" type="button">Filters</button>
+        <button class="btn btn-gold" id="btnSearch" type="button">Search</button>
       </div>
       <div id="searchStatus" class="search-status"></div>
 
       <div class="features">
-        <!-- 카드 마크업 오타 수정 (class 닫는 따옴표/태그 고침) -->
-        <div class="card"><h3 data-i18n="feat_verified">Verified stays</h3><p data-i18n="feat_verified_sub">Top picks near you.</p></div>
-        <div class="card"><h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3><p data-i18n="feat_rewards_sub">Earn points on every booking.</p></div>
-        <div class="card"><h3 data-i18n="feat_payments">Secure payments</h3><p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p></div>
+        <div class="card"><h3>Verified stays</h3><p>Top picks near you.</p></div>
+        <div class="card"><h3>StayWorld+ Rewards</h3><p>Earn points on every booking.</p></div>
+        <div class="card"><h3>Secure payments</h3><p>Visa, Mastercard, Amex & Crypto.</p></div>
       </div>
     </div>
   </section>
@@ -138,460 +124,196 @@
     <div class="container"><div id="map" aria-label="Map" role="region"></div></div>
   </section>
 
-  <!-- ====== JS: I18N / 통화 / 필터드로어 / 챗봇 / 지도·검색 ====== -->
+  <!-- APP JS -->
   <script>
-  /* ------------------ I18N (UI + 필터) ------------------ */
-  const I18N={
-    EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
-      hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
-      placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search",
-      feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",
-      feat_rewards:"StayWorld+ Rewards",feat_rewards_sub:"Earn points on every booking.",
-      feat_payments:"Secure payments",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
-      f_title:"Filters", f_reset:"Reset", f_apply:"Apply", f_currency:"Currency", f_price:"Price per night",
-      f_staytype:"Stay type", f_review:"Review score", f_beds:"Beds & Baths", f_pets:"Pets", f_checkin:"Check-in",
-      f_amen:"Amenities", f_booking:"Booking", f_verify:"Verification", f_long:"Long-stay", f_biz:"Business",
-      f_loc:"Location", f_access:"Accessibility", f_ex:"Experiences", f_view:"View", f_safe:"Safety",
-      f_family:"Family", f_ent:"Entertainment", f_out:"Outdoor", f_park:"Parking",
-      w:{
-        "Wi-Fi":"Wi-Fi","Pool":"Pool","Spa":"Spa","Gym":"Gym","Kitchen":"Kitchen","Balcony":"Balcony","Hot tub":"Hot tub","Sauna":"Sauna","Air conditioning":"Air conditioning","Breakfast":"Breakfast",
-        "Hotel":"Hotel","Motel":"Motel","Hostel":"Hostel","Apartment":"Apartment","Villa":"Villa","Ryokan":"Ryokan","Guesthouse":"Guesthouse","B&B":"B&B",
-        "Sea view":"Sea view","City view":"City view","Mountain view":"Mountain view","Garden":"Garden",
-        "Crypto":"Crypto","Cards":"Cards","Bank transfer":"Bank transfer","Free cancellation":"Free cancellation","Late checkout":"Late checkout","Non-smoking":"Non-smoking",
-        "Accessible":"Accessible","Step-free access":"Step-free access","Elevator":"Elevator","Family-friendly":"Family-friendly","24h check-in":"24h check-in","Airport shuttle":"Airport shuttle",
-        "Allowed":"Allowed","Self check-in":"Self check-in",
-        "Near airport":"Near airport","Near station":"Near station","Near beach":"Near beach","City center":"City center",
-        "Workspace":"Workspace","Washer":"Washer","Dryer":"Dryer","Instant book":"Instant book","Request to book":"Request to book",
-        "Verified listings only":"Verified listings only","Verified reviews":"Verified reviews","Show long-stay deals":"Show long-stay deals","B2B-ready":"B2B-ready","Invoice available":"Invoice available",
-        "Wide doorway":"Wide doorway","Accessible bathroom":"Accessible bathroom","Nature":"Nature","Camping":"Camping","Traditional":"Traditional",
-        "Ski-in/out":"Ski-in/out","Wine country":"Wine country","TV":"TV","Netflix":"Netflix","Game console":"Game console",
-        "BBQ grill":"BBQ grill","Patio":"Patio","Private garden":"Private garden","On-site":"On-site","Street":"Street","Paid garage":"Paid garage",
-        "4.5+":"4.5+","4.0+":"4.0+","Any":"Any","beds":"beds","baths":"baths"
-      }},
-    KO:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
-      hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
-      placeholder_city:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색",
-      feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",feat_rewards:"StayWorld+ 리워드",feat_rewards_sub:"예약마다 포인트 적립.",
-      feat_payments:"안전한 결제",feat_payments_sub:"VISA, 마스터, 아멕스 & 크립토.",
-      f_title:"필터", f_reset:"초기화", f_apply:"적용", f_currency:"통화", f_price:"1박 가격",
-      f_staytype:"숙소 유형", f_review:"후기 점수", f_beds:"침대&욕실", f_pets:"반려동물", f_checkin:"체크인",
-      f_amen:"편의시설", f_booking:"예약 방식", f_verify:"검증", f_long:"장기 숙박", f_biz:"비즈니스",
-      f_loc:"위치", f_access:"접근성", f_ex:"체험", f_view:"전망", f_safe:"안전",
-      f_family:"가족", f_ent:"엔터테인먼트", f_out:"야외", f_park:"주차",
-      w:{
-        "Wi-Fi":"와이파이","Pool":"수영장","Spa":"스파","Gym":"헬스장","Kitchen":"주방","Balcony":"발코니","Hot tub":"온수 욕조","Sauna":"사우나","Air conditioning":"에어컨","Breakfast":"조식",
-        "Hotel":"호텔","Motel":"모텔","Hostel":"호스텔","Apartment":"아파트","Villa":"빌라","Ryokan":"료칸","Guesthouse":"게스트하우스","B&B":"B&B",
-        "Sea view":"바다 전망","City view":"도시 전망","Mountain view":"산 전망","Garden":"정원",
-        "Crypto":"암호화폐","Cards":"카드","Bank transfer":"계좌이체","Free cancellation":"무료 취소","Late checkout":"레이트 체크아웃","Non-smoking":"금연",
-        "Accessible":"접근성","Step-free access":"무계단 출입","Elevator":"엘리베이터","Family-friendly":"가족 친화","24h check-in":"24시간 체크인","Airport shuttle":"공항 셔틀",
-        "Allowed":"허용","Self check-in":"셀프 체크인",
-        "Near airport":"공항 인근","Near station":"역 인근","Near beach":"해변 인근","City center":"도심",
-        "Workspace":"업무 공간","Washer":"세탁기","Dryer":"건조기","Instant book":"즉시 예약","Request to book":"요청 예약",
-        "Verified listings only":"검증된 매물만","Verified reviews":"검증된 리뷰","Show long-stay deals":"장기 특가 보기","B2B-ready":"B2B 대응","Invoice available":"세금계산서 가능",
-        "Wide doorway":"넓은 출입구","Accessible bathroom":"장애인 화장실","Nature":"자연","Camping":"캠핑","Traditional":"전통",
-        "Ski-in/out":"스키 인/아웃","Wine country":"와인 산지","TV":"TV","Netflix":"넷플릭스","Game console":"게임 콘솔",
-        "BBQ grill":"바비큐 그릴","Patio":"파티오","Private garden":"개인 정원","On-site":"부지 내","Street":"노상","Paid garage":"유료 차고",
-        "4.5+":"4.5+","4.0+":"4.0+","Any":"무관","beds":"침대","baths":"욕실"
-      }},
-    JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
-      hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
-      placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
-      feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
-      feat_payments:"安全な支払い",feat_payments_sub:"VISA, Master, Amex & Crypto。",
-      f_title:"フィルター", f_reset:"リセット", f_apply:"適用", f_currency:"通貨", f_price:"1泊の価格",
-      f_staytype:"宿タイプ", f_review:"レビュー評価", f_beds:"ベッド&バス", f_pets:"ペット", f_checkin:"チェックイン",
-      f_amen:"アメニティ", f_booking:"予約方法", f_verify:"認証", f_long:"長期滞在", f_biz:"ビジネス",
-      f_loc:"場所", f_access:"アクセシビリティ", f_ex:"体験", f_view:"眺望", f_safe:"安全",
-      f_family:"家族向け", f_ent:"エンタメ", f_out:"屋外", f_park:"駐車"
-    },
-    ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_signup:"注册",language:"语言",
-      hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
-      placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
-      feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
-      feat_payments:"安全支付",feat_payments_sub:"Visa、Mastercard、Amex 与加密货币。",
-      f_title:"筛选", f_reset:"重置", f_apply:"应用", f_currency:"货币", f_price:"每晚价格",
-      f_staytype:"房源类型", f_review:"评分", f_beds:"床&浴室", f_pets:"宠物", f_checkin:"入住",
-      f_amen:"设施", f_booking:"预订方式", f_verify:"认证", f_long:"长住", f_biz:"商务",
-      f_loc:"位置", f_access:"无障碍", f_ex:"体验", f_view:"景观", f_safe:"安全",
-      f_family:"亲子", f_ent:"娱乐", f_out:"户外", f_park:"停车"
-    },
-    FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_signup:"S’inscrire",language:"Langue",
-      hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",
-      placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher",
-      feat_verified:"Logements vérifiés",feat_verified_sub:"Meilleurs choix près de chez vous.",
-      feat_rewards:"Récompenses StayWorld+",feat_rewards_sub:"Des points à chaque réservation.",
-      feat_payments:"Paiements sécurisés",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
-      f_title:"Filtres", f_reset:"Réinitialiser", f_apply:"Appliquer", f_currency:"Devise", f_price:"Prix par nuit",
-      f_staytype:"Type d’hébergement", f_review:"Note", f_beds:"Lits & Salles de bain", f_pets:"Animaux", f_checkin:"Arrivée",
-      f_amen:"Équipements", f_booking:"Réservation", f_verify:"Vérification", f_long:"Long séjour", f_biz:"Affaires",
-      f_loc:"Emplacement", f_access:"Accessibilité", f_ex:"Expériences", f_view:"Vue", f_safe:"Sécurité",
-      f_family:"Famille", f_ent:"Divertissement", f_out:"Extérieur", f_park:"Parking"
-    },
-    ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_signup:"Regístrate",language:"Idioma",
-      hero_luxury:"Estancias de lujo.",hero_reach:"Alcance global.",hero_sub:"Tarjetas, transferencia bancaria y cripto (BTC · ETH · USDT).",
-      placeholder_city:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar",
-      feat_verified:"Alojamientos verificados",feat_verified_sub:"Mejores opciones cerca de ti.",
-      feat_rewards:"Recompensas StayWorld+",feat_rewards_sub:"Puntos en cada reserva.",
-      feat_payments:"Pagos seguros",feat_payments_sub:"Visa, Mastercard, Amex y Cripto.",
-      f_title:"Filtros", f_reset:"Limpiar", f_apply:"Aplicar", f_currency:"Moneda", f_price:"Precio por noche",
-      f_staytype:"Tipo de alojamiento", f_review:"Puntuación", f_beds:"Camas y baños", f_pets:"Mascotas", f_checkin:"Check-in",
-      f_amen:"Servicios", f_booking:"Reserva", f_verify:"Verificación", f_long:"Larga estancia", f_biz:"Negocios",
-      f_loc:"Ubicación", f_access:"Accesibilidad", f_ex:"Experiencias", f_view:"Vista", f_safe:"Seguridad",
-      f_family:"Familia", f_ent:"Entretenimiento", f_out:"Exterior", f_park:"Aparcamiento"
-    },
-    DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_signup:"Registrieren",language:"Sprache",
-      hero_luxury:"Luxuriöse Aufenthalte.",hero_reach:"Globale Reichweite.",hero_sub:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
-      placeholder_city:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen",
-      feat_verified:"Verifizierte Unterkünfte",feat_verified_sub:"Top-Auswahl in deiner Nähe.",
-      feat_rewards:"StayWorld+ Prämien",feat_rewards_sub:"Punkte bei jeder Buchung.",
-      feat_payments:"Sichere Zahlungen",feat_payments_sub:"Visa, Mastercard, Amex & Krypto.",
-      f_title:"Filter", f_reset:"Zurücksetzen", f_apply:"Anwenden", f_currency:"Währung", f_price:"Preis pro Nacht",
-      f_staytype:"Unterkunftstyp", f_review:"Bewertung", f_beds:"Betten & Bäder", f_pets:"Haustiere", f_checkin:"Check-in",
-      f_amen:"Ausstattung", f_booking:"Buchung", f_verify:"Verifizierung", f_long:"Langzeit", f_biz:"Geschäft",
-      f_loc:"Lage", f_access:"Barrierefreiheit", f_ex:"Erlebnisse", f_view:"Aussicht", f_safe:"Sicherheit",
-      f_family:"Familie", f_ent:"Entertainment", f_out:"Außenbereich", f_park:"Parken"
-    },
-    TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_signup:"Kaydol",language:"Dil",
-      hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",
-      placeholder_city:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara",
-      feat_verified:"Doğrulanmış konaklamalar",feat_verified_sub:"Yakınınızdaki en iyi seçenekler.",
-      feat_rewards:"StayWorld+ Ödülleri",feat_rewards_sub:"Her rezervasyonda puan kazanın.",
-      feat_payments:"Güvenli ödemeler",feat_payments_sub:"Visa, Mastercard, Amex & Kripto.",
-      f_title:"Filtreler", f_reset:"Sıfırla", f_apply:"Uygula", f_currency:"Para birimi", f_price:"Gecelik fiyat",
-      f_staytype:"Konaklama türü", f_review:"Puan", f_beds:"Yatak & Banyo", f_pets:"Evcil", f_checkin:"Giriş",
-      f_amen:"Olanaklar", f_booking:"Rezervasyon", f_verify:"Doğrulama", f_long:"Uzun konaklama", f_biz:"İş",
-      f_loc:"Konum", f_access:"Erişilebilirlik", f_ex:"Deneyimler", f_view:"Manzara", f_safe:"Güvenlik",
-      f_family:"Aile", f_ent:"Eğlence", f_out:"Açık alan", f_park:"Otopark"
-    },
-    AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_signup:"إنشاء حساب",language:"اللغة",
-      hero_luxury:"إقامات فاخرة.",hero_reach:"انتشار عالمي.",hero_sub:"بطاقات، تحويل بنكي وعملات مشفرة (BTC · ETH · USDT).",
-      placeholder_city:"باريس، طوكيو، إسطنبول…",filters:"الفلاتر",search:"بحث",
-      feat_verified:"إقامات موثوقة",feat_verified_sub:"أفضل الخيارات بالقرب منك.",
-      feat_rewards:"مكافآت StayWorld+",feat_rewards_sub:"نقاط مع كل حجز.",
-      feat_payments:"مدفوعات آمنة",feat_payments_sub:"Visa وMastercard وAmex والعملات المشفرة.",
-      f_title:"الفلاتر", f_reset:"إعادة ضبط", f_apply:"تطبيق", f_currency:"العملة", f_price:"السعر لليلة",
-      f_staytype:"نوع الإقامة", f_review:"التقييم", f_beds:"الأسرة والحمامات", f_pets:"الحيوانات الأليفة", f_checkin:"تسجيل الوصول",
-      f_amen:"المرافق", f_booking:"الحجز", f_verify:"التحقق", f_long:"إقامة طويلة", f_biz:"أعمال",
-      f_loc:"الموقع", f_access:"إمكانية الوصول", f_ex:"الخبرات", f_view:"الإطلالة", f_safe:"السلامة",
-      f_family:"العائلة", f_ent:"الترفيه", f_out:"خارجي", f_park:"موقف سيارات"
-    },
-    RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_signup:"Регистрация",language:"Язык",
-      hero_luxury:"Роскошное проживание.",hero_reach:"Глобальный охват.",hero_sub:"Карты, перевод и крипто (BTC · ETH · USDT).",
-      placeholder_city:"Париж, Токио, Стамбул…",filters:"Фильтры",search:"Поиск",
-      feat_verified:"Проверенные варианты",feat_verified_sub:"Лучшие места рядом с вами.",
-      feat_rewards:"Бонусы StayWorld+",feat_rewards_sub:"Баллы за каждое бронирование.",
-      feat_payments:"Безопасные платежи",feat_payments_sub:"Visa, Mastercard, Amex и крипто.",
-      f_title:"Фильтры", f_reset:"Сбросить", f_apply:"Применить", f_currency:"Валюта", f_price:"Цена за ночь",
-      f_staytype:"Тип жилья", f_review:"Оценка", f_beds:"Кровати и ванные", f_pets:"Питомцы", f_checkin:"Заезд",
-      f_amen:"Удобства", f_booking:"Бронирование", f_verify:"Проверка", f_long:"Длительное проживание", f_biz:"Бизнес",
-      f_loc:"Расположение", f_access:"Доступность", f_ex:"Впечатления", f_view:"Вид", f_safe:"Безопасность",
-      f_family:"Семья", f_ent:"Развлечения", f_out:"На улице", f_park:"Парковка"
-    }
+  // ---------- i18n (간단 버전: 버튼/라벨만) ----------
+  const I18N = {
+    EN:{filters:"Filters",search:"Search",f_title:"Filters",f_reset:"Reset",f_apply:"Apply",f_currency:"Currency",f_price:"Price per night"},
+    KO:{filters:"필터",search:"검색",f_title:"필터",f_reset:"초기화",f_apply:"적용",f_currency:"통화",f_price:"1박 가격"},
+    JA:{filters:"フィルター",search:"検索",f_title:"フィルター",f_reset:"リセット",f_apply:"適用",f_currency:"通貨",f_price:"1泊の価格"},
+    ZH:{filters:"筛选",search:"搜索",f_title:"筛选",f_reset:"重置",f_apply:"应用",f_currency:"货币",f_price:"每晚价格"},
+    FR:{filters:"Filtres",search:"Rechercher",f_title:"Filtres",f_reset:"Réinitialiser",f_apply:"Appliquer",f_currency:"Devise",f_price:"Prix par nuit"},
+    ES:{filters:"Filtros",search:"Buscar",f_title:"Filtros",f_reset:"Limpiar",f_apply:"Aplicar",f_currency:"Moneda",f_price:"Precio por noche"},
+    DE:{filters:"Filter",search:"Suchen",f_title:"Filter",f_reset:"Zurücksetzen",f_apply:"Anwenden",f_currency:"Währung",f_price:"Preis pro Nacht"},
+    TR:{filters:"Filtreler",search:"Ara",f_title:"Filtreler",f_reset:"Sıfırla",f_apply:"Uygula",f_currency:"Para birimi",f_price:"Gecelik fiyat"},
+    AR:{filters:"الفلاتر",search:"بحث",f_title:"الفلاتر",f_reset:"إعادة ضبط",f_apply:"تطبيق",f_currency:"العملة",f_price:"السعر لليلة"},
+    RU:{filters:"Фильтры",search:"Поиск",f_title:"Фильтры",f_reset:"Сбросить",f_apply:"Применить",f_currency:"Валюта",f_price:"Цена за ночь"},
   };
-  function tkey(k){const lang=document.getElementById('lang').value||'EN';return (I18N[lang]||I18N.EN)[k]||I18N.EN[k]||k;}
-  function wkey(word){const lang=document.getElementById('lang').value||'EN';const dict=(I18N[lang]||I18N.EN).w||{};return dict[word]||word;}
-  function applyI18NPage(lang){
-    const d=I18N[lang]||I18N.EN;
-    document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n'); if(d[k]) el.textContent=d[k];});
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder'); if(d[k]) el.setAttribute('placeholder', d[k]);});
-    localizeDrawer();
-  }
-  document.getElementById('lang').addEventListener('change', e=>{
-    applyI18NPage(e.target.value);
-    setCurrencyByLang(e.target.value);
+  const getLang=()=>document.getElementById('lang').value||'EN';
+  const t=(k)=> (I18N[getLang()]?.[k]) || (I18N.EN[k]||k);
+
+  document.getElementById('lang').addEventListener('change',()=>{
+    document.getElementById('btnFilters').textContent=t('filters');
+    document.getElementById('btnSearch').textContent=t('search');
+    if (document.getElementById('filterDrawer')?.getAttribute('aria-hidden')==='false') localizeDrawer();
   });
-  applyI18NPage('EN');
 
-  /* ------------------ 통화(헤더 + 드로어) ------------------ */
-  // 헤더 통화 리스트(10개)
-  const HEADER_CURRENCIES = ["USD","EUR","KRW","JPY","CNY","TRY","GBP","AED","RUB","ARS"];
-  // 상세 통화 메타(드로어 표시용) — ARS/CAD 모두 포함해 사용처 유연성 ↑
-  const CURRENCIES = {
-    USD:{symbol:'$',  rate:1,      locale:'en-US', name:'USD'},
-    EUR:{symbol:'€',  rate:0.92,   locale:'fr-FR', name:'EUR'},
-    KRW:{symbol:'₩',  rate:1300,   locale:'ko-KR', name:'KRW'},
-    JPY:{symbol:'¥',  rate:155,    locale:'ja-JP', name:'JPY'},
-    CNY:{symbol:'¥',  rate:7.2,    locale:'zh-CN', name:'CNY'},
-    TRY:{symbol:'₺',  rate:33,     locale:'tr-TR', name:'TRY'},
-    RUB:{symbol:'₽',  rate:90,     locale:'ru-RU', name:'RUB'},
-    GBP:{symbol:'£',  rate:0.78,   locale:'en-GB', name:'GBP'},
-    AED:{symbol:'د.إ',rate:3.67,   locale:'ar-AE', name:'AED'},
-    CAD:{symbol:'$',  rate:1.36,   locale:'en-CA', name:'CAD'},
-    ARS:{symbol:'$',  rate:920,    locale:'es-AR', name:'ARS'}
-  };
-  const LANG_TO_CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
-
-  // 환율(선택) 업데이트 — 실패해도 기본값 사용
-  let FX = { USD:1, EUR:0.92, KRW:1380, JPY:156, CNY:7.25, TRY:33, GBP:0.78, AED:3.67, RUB:90, ARS:920, CAD:1.36 };
-  (async function tryFetchRates(){
+  // ---------- 통화 & 환율 ----------
+  const FX = { USD:1, EUR:0.92, KRW:1380, JPY:156, CNY:7.25, TRY:33, GBP:0.78, AED:3.67, RUB:90, ARS:920 };
+  (async()=>{ // 가능하면 최신 환율 보정 (실패해도 무시)
     try{
-      const r=await fetch("https://open.er-api.com/v6/latest/USD");
-      const j=await r.json();
-      if(j && j.rates){
-        Object.keys(FX).forEach(c=>{ if(j.rates[c]) FX[c]=j.rates[c]; });
-        // CURRENCIES.rate도 최신화
-        Object.keys(CURRENCIES).forEach(c=>{ if(j.rates[c]) CURRENCIES[c].rate=j.rates[c]; });
-        updatePriceLabels();
-      }
+      const r=await fetch("https://open.er-api.com/v6/latest/USD"); const j=await r.json();
+      if(j?.rates) Object.keys(FX).forEach(k=>{ if(j.rates[k]) FX[k]=j.rates[k];});
     }catch(_){}
   })();
-
-  // 헤더 통화 셀렉터 생성
-  (function ensureHeaderCurrency(){
-    const wrap=document.querySelector(".header-cta");
-    if(!wrap || document.getElementById("currency")) return;
-    const sel=document.createElement("select");
-    sel.id="currency";
-    sel.className="lang-select";
-    sel.style.marginLeft="8px";
-    HEADER_CURRENCIES.forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); });
-    sel.value=LANG_TO_CUR[document.getElementById('lang').value||'EN']||'USD';
-    // 드로어와 동기화
-    sel.addEventListener('change',()=>{
-      const curSel=document.getElementById('currencySelect');
-      if(curSel && curSel.value!==sel.value){ curSel.value=sel.value; updatePriceLabels(); }
-      // 헤더 currency 기준으로 페이지 내 금액 표시가 있다면 여기서 갱신 로직 추가 가능
-    });
-    wrap.insertBefore(sel, wrap.lastElementChild); // Sign Up 앞에
-  })();
-
-  function setCurrencyByLang(lang){
-    const code = LANG_TO_CUR[lang] || 'USD';
-    const headerSel=document.getElementById('currency');
-    const drawerSel=document.getElementById('currencySelect');
-    if(headerSel) headerSel.value=code;
-    if(drawerSel) drawerSel.value=code;
-    updatePriceLabels();
+  const curSelHeader = document.getElementById('currency');
+  function fmtMoneyByHeader(usd){
+    const cur = curSelHeader.value || 'USD';
+    const val = (usd||0) * (FX[cur]||1);
+    try { return new Intl.NumberFormat(undefined,{style:"currency",currency:cur,maximumFractionDigits:0}).format(val); }
+    catch(_) { return `${cur} ${Math.round(val).toLocaleString()}`; }
   }
-  function fmtMoney(usd){
-    // 헤더 선택 통화를 우선, 없으면 드로어 통화 사용
-    const headerSel=document.getElementById('currency');
-    const curCode = headerSel?.value || document.getElementById('currencySelect')?.value || 'USD';
-    const cur=CURRENCIES[curCode]||CURRENCIES.USD;
-    const val=usd*(FX[curCode] || cur.rate || 1);
-    const maxFrac = (cur.name==='JPY'||cur.name==='KRW')?0:0;
-    try{
-      return new Intl.NumberFormat(cur.locale,{style:'currency',currency:cur.name,maximumFractionDigits:maxFrac}).format(val);
-    }catch(_){
-      return `${curCode} ${Math.round(val).toLocaleString()}`;
-    }
-  }
+  // 언어 바꾸면 통화도 대략 맞춰주기
+  const LANG_TO_CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
+  document.getElementById('lang').addEventListener('change', e=>{
+    curSelHeader.value = LANG_TO_CUR[e.target.value] || 'USD';
+    if (document.getElementById('filterDrawer')) updatePriceLabels();
+  });
 
-  /* ------------------ 오버레이 가드 ------------------ */
-  const mutedOverlays=new Set();
-  function muteFullscreenOverlays(){
-    document.querySelectorAll('body *').forEach(el=>{
-      try{
-        const cs=getComputedStyle(el); if(cs.position!=='fixed')return;
-        const r=el.getBoundingClientRect();
-        if(r.width>=innerWidth*0.96 && r.height>=innerHeight*0.96){
-          if(el.id==='filterDrawer'||el.id==='botPanel') return;
-          if(!mutedOverlays.has(el)){ el.dataset.swPe=cs.pointerEvents; el.style.pointerEvents='none'; mutedOverlays.add(el); }
-        }
-      }catch(_){}
-    });
-  }
-  function restoreOverlays(){ mutedOverlays.forEach(el=>{ if(el.dataset.swPe!=null){el.style.pointerEvents=el.dataset.swPe; delete el.dataset.swPe;} }); mutedOverlays.clear(); }
+  // ---------- 오버레이 가드(경량) ----------
+  function guardOn(panel){ panel.__prevPe = panel.style.pointerEvents; panel.style.pointerEvents='auto'; }
+  function guardOff(panel){ if(panel && '__prevPe' in panel){ panel.style.pointerEvents=panel.__prevPe; } }
 
-  /* ------------------ 필터 드로어 + 렌더 ------------------ */
-  const GROUPS=[
-    {t:'f_price', kind:'price'},
-    {t:'f_staytype', checks:['Hotel','Motel','Hostel','Apartment','Villa','Ryokan','Guesthouse','B&B']},
-    {t:'f_review', radios:['4.5+','4.0+','Any']},
-    {t:'f_beds', inputs:[['number','beds',{min:1,value:1}],['number','baths',{min:1,value:1}]]},
-    {t:'f_pets', checks:['Allowed']},
-    {t:'f_checkin', checks:['Self check-in']},
-    {t:'f_amen', checks:['Wi-Fi','Kitchen','Parking','Pool','Air conditioning','Gym','Workspace','Washer','Dryer','Breakfast']},
-    {t:'f_booking', checks:['Instant book','Request to book']},
-    {t:'f_verify', checks:['Verified listings only','Verified reviews']},
-    {t:'f_long', checks:['Show long-stay deals']},
-    {t:'f_biz', checks:['B2B-ready','Invoice available']},
-    {t:'f_loc', checks:['Near airport','Near station','Near beach','City center']},
-    {t:'f_access', checks:['Step-free access','Elevator','Wide doorway','Accessible bathroom']},
-    {t:'f_ex', checks:['Nature','Camping','Traditional','Ski-in/out','Wine country']},
-    {t:'f_view', checks:['Sea view','City view','Mountain view','Garden']},
-    {t:'f_safe', checks:['Carbon monoxide alarm','Smoke alarm','First aid kit']},
-    {t:'f_family', checks:['Crib','High chair','Stroller friendly']},
-    {t:'f_ent', checks:['TV','Netflix','Game console']},
-    {t:'f_out', checks:['BBQ grill','Patio','Private garden']},
-    {t:'f_park', checks:['On-site','Street','Paid garage']},
-  ];
+  // ---------- 필터 드로어 ----------
   function ensureDrawer(){
     let d=document.getElementById('filterDrawer');
-    if(!d){
-      d=document.createElement('div'); d.id='filterDrawer'; d.setAttribute('aria-hidden','true');
-      d.innerHTML=`
-        <div class="back"></div>
-        <div class="panel">
-          <div class="head">
-            <strong id="fTitle">${tkey('f_title')}</strong>
-            <div style="display:flex;gap:8px;align-items:center">
-              <label for="currencySelect" id="curLabel" style="font-size:12px;opacity:.8">${tkey('f_currency')}</label>
-              <select id="currencySelect" class="lang-select" style="padding:6px 10px">
-                ${Object.keys(CURRENCIES).map(k=>`<option value="${k}">${k}</option>`).join('')}
-              </select>
-              <button id="swClose" class="btn btn-ghost">✕</button>
+    if(d) return d;
+    d=document.createElement('div'); d.id='filterDrawer'; d.setAttribute('aria-hidden','true');
+    d.innerHTML=`
+      <div class="back"></div>
+      <div class="panel">
+        <div class="head">
+          <strong id="fTitle"></strong>
+          <div style="display:flex;gap:8px;align-items:center">
+            <label id="curLabel" style="font-size:12px;opacity:.8"></label>
+            <select id="currencySelect" class="lang-select" style="padding:6px 10px">
+              ${Object.keys(FX).map(k=>`<option>${k}</option>`).join('')}
+            </select>
+            <button id="swClose" class="btn btn-ghost">✕</button>
+          </div>
+        </div>
+        <div id="filterGrid"></div>
+        <div class="foot">
+          <button id="swReset" class="btn btn-ghost" style="border:1px solid rgba(255,255,255,.14)"></button>
+          <button id="swApply" class="btn btn-gold"></button>
+        </div>
+      </div>`;
+    document.body.appendChild(d);
+
+    const grid=d.querySelector('#filterGrid');
+    const GROUPS=[
+      {t:'f_price', kind:'price'},
+      {t:'Stay type', checks:['Hotel','Motel','Hostel','Apartment','Villa','Ryokan','Guesthouse','B&B']},
+      {t:'Review score', radios:['4.5+','4.0+','Any']},
+      {t:'Beds & Baths', inputs:[['number','beds',{min:1,value:1}],['number','baths',{min:1,value:1}]]},
+      {t:'Amenities', checks:['Wi-Fi','Kitchen','Parking','Pool','Air conditioning','Gym','Workspace','Washer','Dryer','Breakfast']}
+    ];
+    GROUPS.forEach((g,gi)=>{
+      const box=document.createElement('div'); box.className='box';
+      const title = g.t === 'f_price' ? t('f_price') : g.t;
+      box.innerHTML=`<h4>${title}</h4>`;
+      if(g.kind==='price'){
+        box.insertAdjacentHTML('beforeend',`
+          <div style="display:grid;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span>${t('f_price')}</span>
+              <span><span id="priceMinVal">–</span> ~ <span id="priceMaxVal">–</span></span>
             </div>
-          </div>
-          <div id="filterGrid"></div>
-          <div class="foot">
-            <button id="swReset" class="btn btn-ghost" style="border:1px solid rgba(255,255,255,.14)">${tkey('f_reset')}</button>
-            <button id="swApply" class="btn btn-gold">${tkey('f_apply')}</button>
-          </div>
-        </div>`;
-      document.body.appendChild(d);
-
-      const grid=d.querySelector('#filterGrid');
-      GROUPS.forEach((g,gi)=>{
-        const box=document.createElement('div'); box.className='box';
-        box.innerHTML=`<h4 data-title="${g.t}">${tkey(g.t)}</h4>`;
-        if(g.kind==='price'){
-          const html=`
-            <div style="display:grid;gap:10px">
-              <div style="display:flex;justify-content:space-between;font-size:13px">
-                <span>${tkey('f_price')}</span>
-                <span><span id="priceMinVal">–</span> ~ <span id="priceMaxVal">–</span></span>
-              </div>
-              <label style="font-size:12px;opacity:.8">Min</label>
-              <input type="range" id="priceMin" min="0" max="1000" step="10" value="100">
-              <label style="font-size:12px;opacity:.8">Max</label>
-              <input type="range" id="priceMax" min="0" max="5000" step="50" value="800">
-            </div>`;
-          const wrap=document.createElement('div'); wrap.innerHTML=html; box.appendChild(wrap);
-        }
-        (g.inputs||[]).forEach(([type,id,attrs])=>{
-          const wrap=document.createElement('div'); wrap.style.margin='6px 0';
-          wrap.innerHTML=`<label style="font-size:12px">${wkey(id)}</label><input type="${type}" id="${id}" style="width:100%">`;
-          Object.entries(attrs||{}).forEach(([k,v])=>wrap.querySelector('input').setAttribute(k,v));
-          box.appendChild(wrap);
-        });
-        (g.radios||[]).forEach((name,ri)=>{
-          const id=`rg_${gi}_${ri}`;
-          const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
-          lab.innerHTML=`<input type="radio" name="rg_${gi}" id="${id}" ${/Any/i.test(name)?'checked':''}> <span data-word="${name}">${wkey(name)}</span>`;
-          box.appendChild(lab);
-        });
-        (g.checks||[]).forEach((name,ci)=>{
-          const id=`ck_${gi}_${ci}`;
-          const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
-          lab.innerHTML=`<input type="checkbox" id="${id}"> <span data-word="${name}">${wkey(name)}</span>`;
-          box.appendChild(lab);
-        });
-        grid.appendChild(box);
-      });
-
-      // 동작
-      const back=d.querySelector('.back');
-      const close=()=>{d.setAttribute('aria-hidden','true'); restoreOverlays();};
-      back.addEventListener('click',close);
-      d.querySelector('#swClose').addEventListener('click',close);
-      d.querySelector('.panel').addEventListener('click',e=>e.stopPropagation());
-
-      d.querySelector('#swReset').addEventListener('click',()=>{
-        d.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
-        d.querySelectorAll('input[type=radio]').forEach(i=>i.checked=/Any/i.test(i.nextSibling?.textContent||'Any'));
-        document.getElementById('priceMin').value=100;
-        document.getElementById('priceMax').value=800;
-        updatePriceLabels();
-        setBadge('');
-      });
-      d.querySelector('#swApply').addEventListener('click',()=>{
-        const n=d.querySelectorAll('input[type=checkbox]:checked, input[type=radio]:checked').length;
-        setBadge(n?n.toString():''); close();
-      });
-
-      // 드로어/헤더 통화 동기화
-      const drawerSel=d.querySelector('#currencySelect');
-      if(drawerSel){
-        drawerSel.addEventListener('change',()=>{
-          const headerSel=document.getElementById('currency');
-          if(headerSel && headerSel.value!==drawerSel.value){ headerSel.value=drawerSel.value; }
-          updatePriceLabels();
-        });
+            <label style="font-size:12px;opacity:.8">Min</label>
+            <input type="range" id="priceMin" min="0" max="1000" step="10" value="100">
+            <label style="font-size:12px;opacity:.8">Max</label>
+            <input type="range" id="priceMax" min="0" max="5000" step="50" value="800">
+          </div>`);
       }
-      ['priceMin','priceMax'].forEach(id=>{
-        d.querySelector('#'+id).addEventListener('input',()=>{
-          const min=+d.querySelector('#priceMin').value;
-          const max=+d.querySelector('#priceMax').value;
-          if(min>max){ d.querySelector('#priceMin').value=max; }
-          updatePriceLabels();
-        });
+      (g.inputs||[]).forEach(([type,id,attrs])=>{
+        const wrap=document.createElement('div'); wrap.style.margin='6px 0';
+        wrap.innerHTML=`<label style="font-size:12px">${id}</label><input type="${type}" id="${id}" style="width:100%">`;
+        Object.entries(attrs||{}).forEach(([k,v])=>wrap.querySelector('input').setAttribute(k,v));
+        box.appendChild(wrap);
       });
+      (g.radios||[]).forEach((name,ri)=>{
+        const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
+        lab.innerHTML=`<input type="radio" name="rg_${gi}" ${/Any/i.test(name)?'checked':''}> <span>${name}</span>`;
+        box.appendChild(lab);
+      });
+      (g.checks||[]).forEach((name)=>{
+        const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0';
+        lab.innerHTML=`<input type="checkbox"> <span>${name}</span>`;
+        box.appendChild(lab);
+      });
+      grid.appendChild(box);
+    });
 
-      // 초기 통화(언어 기반) & 가격 표시
-      setCurrencyByLang(document.getElementById('lang').value || 'EN');
-      updatePriceLabels();
-    }
+    // 동작
+    const back=d.querySelector('.back');
+    const close=()=>{d.setAttribute('aria-hidden','true'); guardOff(d.querySelector('.panel'));};
+    back.addEventListener('click',close);
+    d.querySelector('#swClose').addEventListener('click',close);
+    d.querySelector('#currencySelect').addEventListener('change', updatePriceLabels);
+    ['priceMin','priceMax'].forEach(id=>{
+      d.addEventListener('input', (e)=>{ if(e.target.id===id) updatePriceLabels();});
+    });
+    d.querySelector('#swReset').addEventListener('click',()=>{
+      d.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
+      d.querySelectorAll('input[type=radio]').forEach(i=>i.checked=i.nextSibling?.textContent?.includes('Any'));
+      d.querySelector('#priceMin').value=100; d.querySelector('#priceMax').value=800; updatePriceLabels(); setBadge('');
+    });
+    d.querySelector('#swApply').addEventListener('click',()=>{
+      const n=d.querySelectorAll('input[type=checkbox]:checked, input[type=radio]:checked').length;
+      setBadge(n?n.toString():''); close();
+    });
+
     return d;
   }
-  function updatePriceLabels(){
-    const d=document.getElementById('filterDrawer'); if(!d) return;
-    const min=+d.querySelector('#priceMin').value||0;
-    const max=+d.querySelector('#priceMax').value||0;
-    const minEl=d.querySelector('#priceMinVal'); const maxEl=d.querySelector('#priceMaxVal');
-    if(minEl) minEl.textContent = fmtMoney(min);
-    if(maxEl) maxEl.textContent = fmtMoney(max);
-    // 추가: 슬라이더 아래 보조 레이블(선택)
-    // 필요 시 확장 가능
-  }
+
   function localizeDrawer(){
     const d=document.getElementById('filterDrawer'); if(!d) return;
-    d.querySelector('#fTitle').textContent=tkey('f_title');
-    d.querySelector('#curLabel').textContent=tkey('f_currency');
-    d.querySelector('#swReset').textContent=tkey('f_reset');
-    d.querySelector('#swApply').textContent=tkey('f_apply');
-    d.querySelectorAll('[data-title]').forEach(el=>{ el.textContent=tkey(el.getAttribute('data-title')); });
-    d.querySelectorAll('[data-word]').forEach(el=>{ el.textContent=wkey(el.getAttribute('data-word')); });
-    const priceBox = Array.from(d.querySelectorAll('h4')).find(h=>h.getAttribute('data-title')==='f_price');
-    if(priceBox) priceBox.textContent = tkey('f_price');
+    d.querySelector('#fTitle').textContent=t('f_title');
+    d.querySelector('#curLabel').textContent=t('f_currency');
+    d.querySelector('#swReset').textContent=t('f_reset');
+    d.querySelector('#swApply').textContent=t('f_apply');
+    // 가격 타이틀 갱신
+    const priceHead = Array.from(d.querySelectorAll('#filterGrid .box h4')).find(h=>/price/i.test(h.textContent));
+    if (priceHead) priceHead.textContent = t('f_price');
+    // 가격 라벨 갱신
     updatePriceLabels();
   }
-  function openDrawer(){ const d=ensureDrawer(); d.setAttribute('aria-hidden','false'); muteFullscreenOverlays(); localizeDrawer(); }
-  function setBadge(text){ const btn=document.getElementById('btnFilters'); btn.style.position='relative'; let b=btn.querySelector('.sw-badge'); if(text){ if(!b){b=document.createElement('span');b.className='sw-badge';btn.appendChild(b);} b.textContent=text; } else if(b){b.remove();} }
-  document.getElementById('btnFilters').addEventListener('click',e=>{e.stopPropagation(); openDrawer();},{capture:true});
 
-  // 필터 헤딩 보조 번역(안전장치) — 드로어 내부 텍스트가 영어로 남았을 때 대응
-  const FILTER_I18N = {
-    filter_price: { KO:"1박 가격", JA:"1泊あたりの料金", ZH:"每晚价格", FR:"Prix par nuit", ES:"Precio por noche", DE:"Preis pro Nacht", TR:"Gecelik fiyat", AR:"السعر لكل ليلة", RU:"Цена за ночь", EN:"Price per night" },
-    filter_staytype: { KO:"숙소 유형", JA:"宿タイプ", ZH:"房源类型", FR:"Type de séjour", ES:"Tipo de estancia", DE:"Unterkunftstyp", TR:"Konaklama türü", AR:"نوع الإقامة", RU:"Тип размещения", EN:"Stay type" },
-    filter_reviews: { KO:"평점", JA:"レビュー", ZH:"评分", FR:"Note", ES:"Puntuación", DE:"Bewertung", TR:"Puan", AR:"التقييم", RU:"Оценка", EN:"Review score" },
-    filter_bedsbaths: { KO:"침대·욕실", JA:"ベッド・バス", ZH:"床位与浴室", FR:"Lits & Salles de bain", ES:"Camas y baños", DE:"Betten & Bäder", TR:"Yatak & Banyo", AR:"الأسِرّة والحمّامات", RU:"Кровати и ванные", EN:"Beds & Baths" },
-    filter_amenities: { KO:"편의시설", JA:"設備", ZH:"设施", FR:"Équipements", ES:"Servicios", DE:"Ausstattung", TR:"Olanaklar", AR:"المرافق", RU:"Удобства", EN:"Amenities" },
-    filter_view: { KO:"전망", JA:"眺望", ZH:"景观", FR:"Vue", ES:"Vistas", DE:"Aussicht", TR:"Manzara", AR:"الإطلالة", RU:"Вид", EN:"View" },
-    filter_access: { KO:"접근성", JA:"アクセシビリティ", ZH:"无障碍", FR:"Accessibilité", ES:"Accesibilidad", DE:"Barrierefreiheit", TR:"Erişilebilirlik", AR:"سهولة الوصول", RU:"Доступность", EN:"Accessibility" },
-    filter_booking: { KO:"예약", JA:"予約", ZH:"预订", FR:"Réservation", ES:"Reserva", DE:"Buchung", TR:"Rezervasyon", AR:"الحجز", RU:"Бронирование", EN:"Booking" },
-  };
-  function translateFilterHeadings() {
-    const lang = (document.getElementById("lang")?.value || "EN").toUpperCase();
-    const d = document.getElementById("filterDrawer");
-    if (!d) return;
-    const head = d.querySelector(".head strong");
-    if (head) head.textContent = (I18N[lang]?.filters || "Filters");
-    const map = {
-      "Price per night":"filter_price",
-      "Stay type":"filter_staytype",
-      "Review score":"filter_reviews",
-      "Beds & Baths":"filter_bedsbaths",
-      "Amenities":"filter_amenities",
-      "View":"filter_view",
-      "Accessibility":"filter_access",
-      "Booking":"filter_booking",
+  function updatePriceLabels(){
+    const d=document.getElementById('filterDrawer'); if(!d) return;
+    const cur = document.getElementById('currencySelect').value || curSelHeader.value || 'USD';
+    const min=+d.querySelector('#priceMin').value||0;
+    const max=+d.querySelector('#priceMax').value||0;
+    const f = (usd)=>{
+      const val = usd*(FX[cur]||1);
+      try { return new Intl.NumberFormat(undefined,{style:'currency',currency:cur,maximumFractionDigits:0}).format(val); }
+      catch(_){ return `${cur} ${Math.round(val).toLocaleString()}`; }
     };
-    d.querySelectorAll("#filterGrid .box > h4").forEach(h=>{
-      const key = map[h.textContent.trim()];
-      if (!key) return;
-      h.textContent = FILTER_I18N[key]?.[lang] || FILTER_I18N[key]?.EN || h.textContent;
-    });
-    const reset = d.querySelector("#swReset");
-    const apply = d.querySelector("#swApply");
-    if (reset) reset.textContent = (I18N[lang]?.f_reset || "Reset");
-    if (apply) apply.textContent = (I18N[lang]?.f_apply || "Apply");
+    const minEl=d.querySelector('#priceMinVal'); const maxEl=d.querySelector('#priceMaxVal');
+    if(minEl) minEl.textContent=f(min);
+    if(maxEl) maxEl.textContent=f(max);
   }
-  document.getElementById("lang")?.addEventListener("change", translateFilterHeadings);
-  new MutationObserver(translateFilterHeadings).observe(document.documentElement,{childList:true,subtree:true});
 
-  /* ------------------ 챗봇 ------------------ */
-  function ensureChat(){
+  function setBadge(text){
+    const btn=document.getElementById('btnFilters'); btn.style.position='relative';
+    let b=btn.querySelector('.sw-badge'); 
+    if(text){ if(!b){b=document.createElement('span');b.className='sw-badge';btn.appendChild(b);} b.textContent=text; }
+    else if(b){ b.remove(); }
+  }
+
+  function openDrawer(){
+    const d=ensureDrawer();
+    // 헤더 통화 선택값을 드로어 통화로 동기화
+    d.querySelector('#currencySelect').value = curSelHeader.value;
+    d.setAttribute('aria-hidden','false');
+    localizeDrawer();
+    guardOn(d.querySelector('.panel'));
+  }
+
+  document.getElementById('btnFilters').addEventListener('click', (e)=>{ e.stopPropagation(); openDrawer(); });
+
+  // ---------- 챗봇 ----------
+  (function ensureChat(){
     let fab=document.getElementById('chatFab');
     if(!fab){ fab=document.createElement('button'); fab.id='chatFab'; fab.textContent='💬'; document.body.appendChild(fab); }
     let panel=document.getElementById('botPanel');
@@ -602,27 +324,18 @@
         <div class="row"><input id="botInput" placeholder="Type a message…"><button id="botSend">Send</button></div>`;
       document.body.appendChild(panel);
     }
-    const open=()=>{panel.style.display='block'; muteFullscreenOverlays();};
-    const close=()=>{panel.style.display='none'; restoreOverlays();};
-    fab.addEventListener('click',e=>{e.stopPropagation(); open();},{capture:true});
-    panel.querySelector('#botClose').addEventListener('click',e=>{e.stopPropagation(); close();});
-    document.addEventListener('click',e=>{
-      if(panel.style.display!=='block')return;
-      const r=panel.getBoundingClientRect(); const inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
-      if(!inside) close();
-    },{capture:true});
-
+    const open=()=>{panel.style.display='block';};
+    const close=()=>{panel.style.display='none';};
+    fab.addEventListener('click',open);
+    panel.querySelector('#botClose').addEventListener('click',close);
     const body=panel.querySelector('#botBody'), input=panel.querySelector('#botInput'), send=panel.querySelector('#botSend');
-    const msgs=[];
-    const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
+    const msgs=[]; const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
     async function askAI(message,lang){
-      for(const ep of ['/.netlify/functions/sw-chat','/api/chat']){
-        try{
-          const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
-          if(r.ok){const d=await r.json(); if(d.reply) return d.reply;}
-        }catch(_){}
-      }
-      return '(Demo) Backend not found. Add Netlify/Vercel function.';
+      try{
+        const r=await fetch('/.netlify/functions/sw-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
+        if(r.ok){const d=await r.json(); if(d.reply) return d.reply;}
+      }catch(_){}
+      return '(Backend not found. Check Netlify function.)';
     }
     async function sendIt(){
       const v=(input.value||'').trim(); if(!v) return; input.value='';
@@ -631,21 +344,16 @@
       catch(_){ dots.remove(); add('Assistant is unavailable.',false); }
     }
     send.addEventListener('click',sendIt); input.addEventListener('keydown',e=>{if(e.key==='Enter') sendIt();});
-  }
-  ensureChat();
+  })();
 
-  /* ------------------ 지도 + 검색 ------------------ */
-  let map, marker;
-  function initMap(){
-    map=L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12); // Paris
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-  }
-  initMap();
-
+  // ---------- 지도 + 검색 ----------
+  let map=L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12); // Paris
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+  let marker;
+  function goTo(lat,lon,label){ if(marker) marker.remove(); marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup(); map.setView([lat,lon],13,{animate:true}); document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'}); }
   const statusEl=document.getElementById('searchStatus');
   function setStatus(msg){ statusEl.textContent=msg||''; statusEl.style.opacity=msg?1:0; if(msg){clearTimeout(statusEl._t); statusEl._t=setTimeout(()=>statusEl.style.opacity=0,3000);} }
-  function setLoading(on){ const b=document.getElementById('btnSearch'); const lang=document.getElementById('lang').value; const w=(I18N[lang]||I18N.EN).search||'Search'; b.disabled=on; b.classList.toggle('loading',on); b.textContent=on?'…':w;}
-
+  function setLoading(on){ const b=document.getElementById('btnSearch'); b.disabled=on; b.classList.toggle('loading',on); b.textContent=on?'…':t('search');}
   async function geocodeAny(q){
     const prov=[q=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,q=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`];
     for(const make of prov){
@@ -657,15 +365,13 @@
     }
     throw new Error('no_results');
   }
-  function goTo(lat,lon,label){ if(marker) marker.remove(); marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup(); map.setView([lat,lon],13,{animate:true}); document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'}); }
-
   async function runSearch(){
     const q=(document.getElementById('searchDestination').value||'').trim(); if(!q){document.getElementById('searchDestination').focus(); return;}
     try{ setLoading(true); setStatus('Searching…'); const {lat,lon,label}=await geocodeAny(q); goTo(lat,lon,label); setStatus(`Found: ${label}`);}
     catch(_){ setStatus('No results. Try another place.'); alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.'); }
     finally{ setLoading(false); }
   }
-  document.getElementById('btnSearch').addEventListener('click',runSearch,{capture:true});
+  document.getElementById('btnSearch').addEventListener('click',runSearch);
   ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
   </script>
 
