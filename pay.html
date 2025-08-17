@@ -1,22 +1,68 @@
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pay with Crypto — STAYWORLD</title><link rel="stylesheet" href="/style.css">
-</head><body>
-<main class="container hero"><h1>Pay with Crypto (USDT · TRC20)</h1>
-<div class="card" style="max-width:720px"><label>Amount (USD)</label>
-<input id="amount" type="number" step="0.01" min="1" placeholder="199.00" style="width:100%">
-<div style="display:flex;gap:10px;margin-top:10px"><button id="go" class="btn btn-gold">Continue to checkout</button><a href="/" class="btn">Back</a></div>
-<div id="msg" style="color:#b9b9c5;margin-top:10px"></div></div></main>
-<script>
-document.getElementById('go').addEventListener('click', async () => {
-  const a = document.getElementById('amount').value.trim();
-  if(!a || Number(a)<=0){ document.getElementById('msg').textContent='Enter a valid amount.'; return; }
-  document.getElementById('msg').textContent='Creating secure checkout...';
-  try{
-    const r = await fetch('/.netlify/functions/np-create-invoice', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount: Number(a) })});
-    const d = await r.json();
-    if(!r.ok || !d.invoice_url) throw new Error(d?.message || 'Failed to create invoice');
-    location.href = d.invoice_url;
-  }catch(e){ document.getElementById('msg').textContent='Error: ' + (e.message||e); }
-});
-</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld Crypto Pay Test</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+    button { padding: 12px 18px; font-size: 16px; cursor: pointer; }
+    #log { margin-top: 16px; padding: 12px; background: #f6f7f9; border-radius: 8px; white-space: pre-wrap; }
+    input { padding: 10px; font-size: 16px; width: 140px; }
+  </style>
+</head>
+<body>
+  <h1>StayWorld – Crypto 결제 테스트</h1>
+
+  <label>금액(USD): 
+    <input id="amount" type="number" value="1" min="1" step="1" />
+  </label>
+  <br/><br/>
+
+  <button id="payBtn">크립토로 결제하기</button>
+
+  <div id="log"></div>
+
+  <script>
+    const log = (msg) => document.getElementById('log').textContent = msg;
+
+    document.getElementById('payBtn').onclick = async () => {
+      const amount = Number(document.getElementById('amount').value || 1);
+
+      log('인보이스 생성 중…');
+
+      try {
+        const res = await fetch('/.netlify/functions/create-nowpayments-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: 'StayWorld 테스트 결제',
+            amount,
+            success_url: location.origin + '/success.html',
+            cancel_url: location.origin + '/cancel.html'
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          log('생성 실패: ' + (data?.error || 'unknown'));
+          return;
+        }
+
+        // 콘솔에도 출력
+        console.log('invoice response:', data);
+        log('인보이스 생성됨. 결제 페이지로 이동합니다…\n' + JSON.stringify(data, null, 2));
+
+        if (data.invoice_url) {
+          location.href = data.invoice_url; // NOWPayments 결제 페이지로 이동
+        } else {
+          log('invoice_url 없음: ' + JSON.stringify(data));
+        }
+      } catch (e) {
+        console.error(e);
+        log('오류: ' + e.message);
+      }
+    };
+  </script>
+</body>
+</html>
