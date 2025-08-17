@@ -1,28 +1,30 @@
-// netlify/functions/nowpayments-ipn.js
-// NOWPayments IPN webhook → 서명검증(HMAC-SHA512) → Firestore에 결제/예약 반영
+// Receives NOWPayments IPN (webhook) and verifies signature (HMAC-SHA512)
+// ENV needed:
+//  - NOWPAYMENTS_IPN_SECRET
+//  - FIREBASE_SERVICE_ACCOUNT  (service account JSON; private_key에 들어있는 \n은 그대로 붙여도 됨)
 
 const crypto = require("crypto");
 const admin = require("firebase-admin");
 
-// --- Firebase Admin 초기화(함수 Cold Start마다 1회) ---
-function getFirestore() {
+function initFirebase() {
   if (!admin.apps.length) {
-    const saStr = process.env.FIREBASE_SERVICE_ACCOUNT || "";
-    if (!saStr) throw new Error("Missing FIREBASE_SERVICE_ACCOUNT");
+    const raw = process.env.FIREBASE_SERVICE_ACCOUNT || "";
+    if (!raw) throw new Error("Missing FIREBASE_SERVICE_ACCOUNT");
 
-    // 환경변수에 들어있는 JSON 문자열을 객체로 변환
-    const serviceAccount = JSON.parse(saStr);
+    let svc;
+    try {
+      svc = JSON.parse(raw);
+    } catch (e) {
+      throw new Error("FIREBASE_SERVICE_ACCOUNT is not valid JSON");
+    }
+    // private_key 줄바꿈 처리
+    if (svc.private_key && typeof svc.private_key === "string") {
+      svc.private_key = svc.private_key.replace(/\\n/g, "\n");
+    }
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    admin.initializeApp({ credential: admin.credential.cert(svc) });
   }
   return admin.firestore();
-}
-
-// --- 유틸: 콘솔 로깅(디버깅 편의) ---
-function log(...args) {
-  console.log("[NOWP-IPN]", ...args);
 }
 
 exports.handler = async (event) => {
@@ -31,134 +33,100 @@ exports.handler = async (event) => {
   }
 
   try {
+    // 1) HMAC 서명 검증
     const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET || "";
-    if (!ipnSecret) {
-      return { statusCode: 500, body: "Missing NOWPAYMENTS_IPN_SECRET" };
-    }
+    if (!ipnSecret) return { statusCode: 500, body: "Missing NOWPAYMENTS_IPN_SECRET" };
 
-    const rawBody = event.body || "";
-    // NOWPayments가 보내는 헤더 (대/소문자 케이스 대응)
     const signature =
       event.headers["x-nowpayments-sig"] ||
       event.headers["X-Nowpayments-Sig"] ||
-      event.headers["x-NowPayments-Sig"] ||
       "";
+    const body = event.body || "";
 
-    // 1) 서명 검증 (문서대로 raw body에 대한 sha512 HMAC)
-    const expected = crypto.createHmac("sha512", ipnSecret).update(rawBody).digest("hex");
-    if (signature !== expected) {
-      log("Invalid signature", { signature, expected });
+    const h = crypto.createHmac("sha512", ipnSecret).update(body).digest("hex");
+    if (h !== signature) {
+      console.warn("Invalid signature");
       return { statusCode: 401, body: "Invalid signature" };
     }
 
-    // 2) 페이로드 파싱
-    const payload = JSON.parse(rawBody || "{}");
-    log("IPN payload:", payload);
-
-    // NOWPayments 주요 필드(문서 기준)
+    // 2) Payload 파싱
+    const p = JSON.parse(body || "{}");
+    // 대표 필드들 (문서화 기준 – 없는 것도 있을 수 있음)
     const {
-      payment_id,           // NOWPayments 고유 결제 id
-      payment_status,       // waiting, confirming, finished, failed, refunded, expired, partially_paid
-      pay_currency,         // 예: USDTTRX
-      pay_amount,           // 실제 송금된 암호화폐 수량
-      price_amount,         // 원화가 아님! '결제 통화(USD)' 기준 금액
-      price_currency,       // 보통 USD
-      order_id,             // 인보이스 만들 때 우리가 넣은 값 (예약ID로 쓰면 최고)
-      invoice_id,           // 인보이스 ID
-      ipn_type,             // 상태종류
-      created_at,           // 생성시각
-      actually_paid,        // 실제 입금액(체인 오차 포함)
-      purchase_id,          // (있을 수도)
-      transaction_id,       // 체인 txid (있으면 저장하면 좋아요)
-    } = payload;
+      payment_id,
+      order_id,
+      invoice_id,
+      payment_status,
+      price_amount,
+      price_currency,
+      pay_amount,
+      pay_currency,
+      actually_paid,
+      actually_amount,
+      update_time,
+      created_at,
+      // …필요한 것 더 추가 가능
+    } = p;
 
-    // 3) Firestore에 반영
-    const db = getFirestore();
+    // 3) Firestore 저장
+    const db = initFirebase();
 
-    // (1) payments 콜렉션에 결제 레코드 upsert (idempotent: payment_id 고정)
-    const paymentDocId = String(payment_id || invoice_id || `np_${Date.now()}`);
-    const paymentRef = db.collection("payments").doc(paymentDocId);
+    const payDocId =
+      String(payment_id ?? invoice_id ?? order_id ?? `np_${Date.now()}`);
 
-    const paymentData = {
-      provider: "NOWPayments",
-      payment_id: payment_id || null,
-      invoice_id: invoice_id || null,
-      order_id: order_id || null,
-      status: payment_status || null,
+    const paymentRef = db.collection("payments").doc(payDocId);
 
-      pay_currency: pay_currency || null,
-      pay_amount: pay_amount != null ? Number(pay_amount) : null,
+    await paymentRef.set(
+      {
+        source: "NOWPayments",
+        payment_id: payment_id ?? null,
+        order_id: order_id ?? null,
+        invoice_id: invoice_id ?? null,
+        status: payment_status ?? null,
+        price_amount: price_amount ?? null,
+        price_currency: price_currency ?? null,
+        pay_amount: pay_amount ?? null,
+        pay_currency: pay_currency ?? null,
+        actually_paid: actually_paid ?? null,
+        actually_amount: actually_amount ?? null,
+        update_time: update_time ?? null,
+        created_at: created_at ?? null,
+        raw: p,
+        receivedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
 
-      price_amount: price_amount != null ? Number(price_amount) : null, // USD 기준 청구액
-      price_currency: price_currency || "USD",
-
-      actually_paid: actually_paid != null ? Number(actually_paid) : null,
-      transaction_id: transaction_id || null,
-
-      ipn_type: ipn_type || null,
-      created_at: created_at || null,
-      received_at: admin.firestore.FieldValue.serverTimestamp(),
-      raw: payload, // 원본 백업(문제 발생시 분석용)
-    };
-
-    await paymentRef.set(paymentData, { merge: true });
-    log("payments upserted:", paymentDocId);
-
-    // (2) 예약 문서 업데이트: order_id 를 예약ID로 쓰는 방식 권장
-    //    - 인보이스 생성할 때 order_id 에 예약ID를 심어 두셨다면 여기서 그대로 사용됩니다.
-    if (order_id) {
+    // 4) 결제 완료면 예약 확정
+    if (payment_status === "finished" && order_id) {
       const bookingRef = db.collection("bookings").doc(String(order_id));
-
-      // status 매핑
-      let bookingStatus = "pending";
-      if (payment_status === "finished") bookingStatus = "paid";
-      else if (payment_status === "partially_paid") bookingStatus = "partially_paid";
-      else if (payment_status === "failed" || payment_status === "refunded" || payment_status === "expired")
-        bookingStatus = "payment_error";
-
-      const bookingUpdate = {
-        status: bookingStatus,
-        payment: {
-          provider: "NOWPayments",
-          payment_id: payment_id || null,
-          invoice_id: invoice_id || null,
-          pay_currency: pay_currency || null,
-          pay_amount: pay_amount != null ? Number(pay_amount) : null,
-          price_amount: price_amount != null ? Number(price_amount) : null,
-          price_currency: price_currency || "USD",
-          actually_paid: actually_paid != null ? Number(actually_paid) : null,
-          transaction_id: transaction_id || null,
-          updated_at: admin.firestore.FieldValue.serverTimestamp(),
-        },
-      };
-
-      // paidAt 타임스탬프는 결제 완료시에만 기록
-      if (payment_status === "finished") {
-        bookingUpdate.paidAt = admin.firestore.FieldValue.serverTimestamp();
-      }
-
-      await bookingRef.set(bookingUpdate, { merge: true });
-      log("booking updated:", order_id, bookingStatus);
-
-      // (선택) 서브콜렉션으로 결제 히스토리 적재
-      await bookingRef
-        .collection("payments")
-        .doc(paymentDocId)
-        .set(
-          {
-            ...paymentData,
-            linkedAt: admin.firestore.FieldValue.serverTimestamp(),
+      await bookingRef.set(
+        {
+          status: "paid",
+          paidAt: admin.firestore.FieldValue.serverTimestamp(),
+          payment: {
+            provider: "NOWPayments",
+            payment_id: payment_id ?? null,
+            invoice_id: invoice_id ?? null,
+            pay_amount: pay_amount ?? null,
+            pay_currency: pay_currency ?? null,
+            price_amount: price_amount ?? null,
+            price_currency: price_currency ?? null,
           },
-          { merge: true }
-        );
-      log("booking payments history appended:", order_id, paymentDocId);
-    } else {
-      log("order_id is missing in payload. bookings 업데이트는 생략.");
+        },
+        { merge: true }
+      );
     }
+
+    console.log("IPN handled:", {
+      payment_status,
+      order_id,
+      payment_id,
+    });
 
     return { statusCode: 200, body: "ok" };
   } catch (e) {
-    console.error("[NOWP-IPN] error:", e);
+    console.error("IPN error:", e);
     return { statusCode: 500, body: e.message };
   }
 };
