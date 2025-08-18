@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,42 +7,24 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <h1>🔍 Search Results</h1>
-      <a href="index.html">← Back to Home</a>
-    </div>
-  </header>
+  <!-- 공통 헤더 주입 -->
+  <div id="site-header"></div>
+  <script src="/scripts/header.js"></script>
 
   <section class="section">
     <div class="container">
-      <h2 id="results-title">Results for: </h2>
-      <ul id="results-list" class="results-list">
-        <!-- Results will be injected here -->
-      </ul>
+      <h1>🔍 Search Results</h1>
+      <a href="index.html">➜ Back to Home</a>
     </div>
   </section>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const query = params.get('query');
-
-    document.getElementById('results-title').innerText += query;
-
-    // Sample data (would come from DB or API in real use)
-    const dummyResults = [
-      `Modern Apartment in ${query}`,
-      `Cozy Hostel near center of ${query}`,
-      `Luxury Hotel with view in ${query}`,
-      `Budget Stay in ${query}`
-    ];
-
-    const list = document.getElementById('results-list');
-    dummyResults.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = item;
-      list.appendChild(li);
-    });
-  </script>
+  <section class="section">
+    <div class="container">
+      <h2 id="results-title">Results for:</h2>
+      <ul id="results-list" class="results-list">
+        <!-- 숙소 검색 결과 아이템이 JS(app.js)에서 자동 주입 -->
+      </ul>
+    </div>
+  </section>
 </body>
 </html>
