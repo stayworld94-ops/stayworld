@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: sw-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: sw
+      POSTGRES_PASSWORD: swpass
+      POSTGRES_DB: swdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
