@@ -71,9 +71,11 @@
     </section>
   </main>
 
-  <!-- 로드 순서 고정: header -> lang -> membership -->
+  <!-- 스크립트 로드 순서 반드시 고정 -->
   <script src="/scripts/header.js" defer></script>
   <script src="/lang.js" defer></script>
+  <!-- 🔹 추가: 각 언어 membership 번역 패치 -->
+  <script src="/scripts/lang.membership.patch.js" defer></script>
   <script src="/membership.js" defer></script>
 </body>
 </html>
