@@ -5,17 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StayWorld | Membership</title>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* 간단한 카드/배지 스타일 보강 */
+    .tier-card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
+    .tier-active{outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
+    .tier-muted{opacity:.6}
+    .benefit{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+    .benefit i{font-style:normal}
+    .note{opacity:.85}
+  </style>
 </head>
 <body>
-  <!-- 공통 헤더 주입 -->
+  <!-- 공통 헤더 (로고/언어 선택 유지) -->
   <div id="site-header"></div>
-  <!-- ❗️GitHub Pages면 절대경로(/scripts/...)가 404 날 수 있으니 상대경로 사용 -->
   <script src="scripts/header.js"></script>
 
   <section class="section">
     <div class="container">
       <h1>🌟 StayWorld Membership</h1>
-      <p>멤버십 레벨 및 혜택</p>
+      <p class="note" id="inheritNote">Upper tiers include all benefits of lower tiers.</p>
 
       <!-- 현재 티어 + 게이지 -->
       <div class="card" style="margin-top:12px">
@@ -27,22 +35,46 @@
         <div class="text-right text-xs text-white/60 mt-1">0%</div>
       </div>
 
-      <!-- 등급 카드 -->
-      <div id="tiersGrid" class="grid grid-cols-2 gap-4 mt-6">
-        <div class="tier-card" data-tier="Bronze">🥉 Bronze</div>
-        <div class="tier-card" data-tier="Silver">🥈 Silver</div>
-        <div class="tier-card" data-tier="Gold">🥇 Gold</div>
-        <div class="tier-card" data-tier="Platinum">💎 Platinum</div>
-        <div class="tier-card" data-tier="Diamond">🔷 Diamond</div>
-        <div class="tier-card" data-tier="Elite">👑 Elite</div>
+      <!-- 등급 카드 + 혜택 -->
+      <div id="tiersGrid" class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px">
+        <div class="tier-card" data-tier="Bronze">
+          <h3>🥉 Bronze</h3>
+          <div class="benefits"></div>
+        </div>
+        <div class="tier-card" data-tier="Silver">
+          <h3>🥈 Silver</h3>
+          <div class="benefits"></div>
+        </div>
+        <div class="tier-card" data-tier="Gold">
+          <h3>🥇 Gold</h3>
+          <div class="benefits"></div>
+        </div>
+        <div class="tier-card" data-tier="Platinum">
+          <h3>💎 Platinum</h3>
+          <div class="benefits"></div>
+        </div>
+        <div class="tier-card" data-tier="Diamond">
+          <h3>🔷 Diamond</h3>
+          <div class="benefits"></div>
+        </div>
+        <div class="tier-card" data-tier="Elite">
+          <h3>👑 Elite</h3>
+          <div class="benefits"></div>
+        </div>
       </div>
+
+      <!-- 하단 안내 -->
+      <p class="note" style="margin-top:18px" id="downgradeNote">
+        If there is no booking for 60 days, your tier will auto-downgrade by 1 level.
+      </p>
     </div>
   </section>
 
-  <!-- 멤버십 로직 불러오기 (파일 분리) -->
+  <!-- 멤버십 로직 -->
   <script src="membership.js"></script>
   <script>
     // (데모) 로그인 후 사용자 데이터가 들어왔다고 가정
+    // 실제 서비스에서는 로그인 후 받은 값으로 setUserContext 호출
     setUserContext({
       totalSpentKRW: 3_250_000,
       lastBookingISO: new Date(Date.now() - 20*86400000).toISOString()
