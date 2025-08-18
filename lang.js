@@ -1,5 +1,6 @@
 // StayWorld i18n — 10 languages (EN/KO/TR/FR/JA/DE/ES/IT/ZH/RU)
 (function(){
+  // ===== 기본 번역 (네가 준 원본 유지) =====
   const LANGS = {
     en:{ 
       nav:{home:"Home", membership:"Membership", login:"Login", signup:"Sign Up"},
@@ -103,10 +104,12 @@
     }
   };
 
+  // ===== DOM 헬퍼 =====
   function setHTML(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
   function setText(id, txt){ const el=document.getElementById(id); if(el) el.textContent=txt; }
   function setPH(id, ph){ const el=document.getElementById(id); if(el && 'placeholder' in el) el.placeholder=ph; }
 
+  // ===== 언어 적용 =====
   function applyLang(code){
     const t = LANGS[code] || LANGS.en;
     setText("t_nav_home", t.nav.home); setText("t_nav_membership", t.nav.membership);
@@ -118,7 +121,7 @@
     setText("t_card2", t.card2); setText("t_card2sub", t.card2sub);
     setText("t_card3", t.card3); setText("t_card3sub", t.card3sub);
 
-    // 멤버십 텍스트도 membership.js에서 LANGS[code].membership을 참조함
+    // 멤버십 텍스트는 membership.js(또는 페이지)에서 LANGS[code].membership을 참조
     window.dispatchEvent(new Event("sw:languageChanged"));
   }
 
@@ -132,14 +135,62 @@
   }
   document.addEventListener("DOMContentLoaded", init);
 
-  // === 멤버십 번역 병합 ===
-  (function addMembershipI18N(){
-    if(!window.LANGS) window.LANGS = LANGS;
-    // 여기서 아까 드린 membership 블록을 각 언어에 병합
-    // (영문 base, ko/fr/ja/de/es/it/zh/ru 번역 포함)
-    // 코드가 길어서 이미 membership.js와 함께 제공된 블록 그대로 붙여넣으면 됩니다.
-    // === membership 블록은 위 답변 "4) lang.js 추가할 번역 키" 그대로 넣으시면 됩니다. ===
-  })();
-
-  window.LANGS = LANGS;
-})();
+  // ===== Membership i18n (10개 언어) =====
+  const MEMBERSHIP_I18N = {
+    en: {
+      title: "Membership Benefits",
+      subtitle: "Earn more as you level up. Elite is automatic based on total spend.",
+      levels: { bronze: "Bronze", silver: "Silver", gold: "Gold", platinum: "Platinum", diamond: "Diamond", elite: "Elite" },
+      perks_title: "Perks by Level",
+      perks: {
+        points_back: "{percent}% points back on each booking",
+        priority_support: "Priority customer support",
+        seasonal_discount: "Seasonal discounts auto-applied",
+        exclusive_coupons: "Exclusive coupons",
+        private_deals: "Access to private deals"
+      },
+      thresholds_title: "Level-up thresholds (total spend)",
+      thresholds: {
+        bronze: "₩0+",
+        silver: "₩500,000+",
+        gold: "₩2,000,000+",
+        platinum: "₩4,000,000+",
+        diamond: "₩7,500,000+",
+        elite: "₩15,000,000+"
+      },
+      retention_title: "Level retention",
+      retention_rule: "If there’s no booking for {days} days, you’ll be auto-downgraded by 1 level.",
+      progress_title: "Your progress",
+      progress_to_next: "Only {amount} left to reach {level}.",
+      warning_demotion: "No booking for {days_no}. {days_left} days left before auto-downgrade.",
+      status_current_level: "Your level: {level}",
+      points_balance: "Points: {points}",
+      earn_on_booking: "You’ll earn ~{percent}% back on this booking.",
+      cta_join: "Join now",
+      cta_view_benefits: "View benefits",
+      cta_learn_more: "Learn more",
+      terms_link: "Membership terms"
+    },
+    ko: {
+      title: "멤버십 혜택",
+      subtitle: "레벨이 오를수록 더 많이 적립됩니다. 엘리트는 누적 금액 기준으로 자동 승급됩니다.",
+      levels: { bronze: "브론즈", silver: "실버", gold: "골드", platinum: "플래티넘", diamond: "다이아몬드", elite: "엘리트" },
+      perks_title: "레벨별 혜택",
+      perks: {
+        points_back: "예약 시 {percent}% 포인트 적립",
+      priority_support: "우선 고객 지원",
+      seasonal_discount: "시즌 할인 자동 적용",
+      exclusive_coupons: "전용 쿠폰",
+      private_deals: "프라이빗 딜 접근"
+      },
+      thresholds_title: "레벨업 기준 (누적 사용금액)",
+      thresholds: {
+        bronze: "₩0+",
+        silver: "₩500,000+",
+        gold: "₩2,000,000+",
+        platinum: "₩4,000,000+",
+        diamond: "₩7,500,000+",
+        elite: "₩15,000,000+"
+      },
+      retention_title: "레벨 유지",
+      retention_rule: "예약이 {days}일 이상 없으면 자동으로 1단계_
