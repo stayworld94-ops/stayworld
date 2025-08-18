@@ -25,18 +25,14 @@
   </style>
 </head>
 <body>
-  <!-- 공통 헤더 -->
   <div id="site-header"></div>
 
   <main class="page-wrap">
-    <!-- 60일 자동강등 고정 안내 -->
     <div id="dwTop" class="sticky-note"></div>
 
-    <!-- 제목/설명 -->
     <h1 id="mb_title"></h1>
     <p id="mb_subtitle" class="note"></p>
 
-    <!-- 현재 등급 카드 -->
     <section class="card" style="position:relative; margin-top:14px">
       <h3 id="levelTitle"></h3>
       <div id="tierBadge" class="badge">5% back</div>
@@ -48,7 +44,6 @@
       <small id="downgradeSticky" class="note" style="display:block;margin-top:10px"></small>
     </section>
 
-    <!-- 등급 카드 + 혜택 (JS가 채움) -->
     <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
       <article class="tier-card" data-tier="Bronze">
         <h3>🥉 <span id="lbl_bronze"></span></h3><div class="benefits"></div>
@@ -71,11 +66,9 @@
     </section>
   </main>
 
-  <!-- 스크립트 로드 순서 반드시 고정 -->
+  <!-- 순서: header -> lang -> membership -->
   <script src="/scripts/header.js" defer></script>
   <script src="/lang.js" defer></script>
-  <!-- 🔹 추가: 각 언어 membership 번역 패치 -->
-  <script src="/scripts/lang.membership.patch.js" defer></script>
   <script src="/membership.js" defer></script>
 </body>
 </html>
