@@ -1,10 +1,11 @@
 /* ============================
    StayWorld Membership — FINAL
-   Works with lang.js (LANGS + sw:languageChanged)
+   (for the provided membership.html)
    - Tier thresholds in KRW
    - Localized currency by language
    - Always-on downgrade note + D-30/15/7/1 toasts
    - Upper tiers inherit benefits of lower tiers
+   - No dependency on data-i18n; uses specific IDs from your HTML
 ============================ */
 
 /* ---- 1) Tier thresholds & earn rates (base: KRW) ---- */
@@ -14,7 +15,7 @@ const LEVELS = [
   { name:'Gold',     minKRW:2_000_000, rate: 5 },
   { name:'Platinum', minKRW:4_000_000, rate: 7 },
   { name:'Diamond',  minKRW:7_500_000, rate:10 },
-  { name:'Elite',    minKRW:15_000_000, rate:15 } // 자동 승격
+  { name:'Elite',    minKRW:15_000_000, rate:15 } // auto promotion
 ];
 
 const DOWNGRADE_DAYS = 60;
@@ -37,14 +38,17 @@ const LANG2CUR = { en:'USD', ko:'KRW', ja:'JPY', zh:'CNY', fr:'EUR', es:'EUR', d
 
 /* ---- 3) Helpers ---- */
 function getLangCode(){
-  const sel=document.getElementById('langSelect');
-  const saved=localStorage.getItem('sw_lang')||(navigator.language||'en').slice(0,2).toLowerCase();
-  const code=(sel && LANGS[sel.value]) ? sel.value : (LANGS[saved]?saved:'en');
-  return code;
+  // lang.js가 관리하는 선택값 우선
+  const sel = document.getElementById('langSelect') || document.getElementById('lang');
+  const selVal = (sel && sel.value) ? sel.value.toLowerCase() : null;
+  const saved = (localStorage.getItem('sw_lang') || (navigator.language||'en')).slice(0,2).toLowerCase();
+  const code = selVal || saved;
+  return (window.LANGS && LANGS[code]) ? code : 'en';
 }
 function getDict(){
   const code=getLangCode();
-  return (window.LANGS && LANGS[code] && LANGS[code].membership) ? LANGS[code].membership : LANGS.en.membership;
+  const fallback = (LANGS?.en?.membership)||{};
+  return (LANGS?.[code]?.membership) || fallback;
 }
 function t(path){ // dot-path getter
   const d=getDict();
@@ -61,26 +65,27 @@ function fmtKRWtoLocal(krw){
 }
 
 /* ---- 4) Benefits per tier (upper inherits lower) ---- */
-const BENEFITS = {
-  member_prices:  (L)=> L?.member_prices || "Member-only prices",
-  basic_support:  (L)=> L?.basic_support || "Standard support",
-  secure_pay:     (L)=> L?.secure_pay || "Secure payments (Cards & Crypto)",
-  points_back:    (L,p)=> tpl(L?.perks?.points_back || "{percent}% back", {percent:p}),
-  free_cancel:    (L)=> L?.free_cancel || "Free-cancel window",
-  prio_email:     (L)=> L?.priority_email || "Priority email support",
-  prio_chat:      (L)=> L?.priority_chat || "Priority live chat",
-  late_checkout:  (L)=> L?.late_checkout || "Late checkout (when available)",
-  upgrade_when_avail:(L)=> L?.upgrade_when_available || "Room upgrade (when available)",
-  b2b_invoice:    (L)=> L?.b2b_invoice || "B2B invoice support",
-  elite_concierge:(L)=> L?.elite_concierge || "Elite concierge access",
+const BENEFITS_TEXT = {
+  // 텍스트는 LANGS[code].membership에 있으면 그걸 우선 사용
+  member_prices:      (L)=> L?.member_prices || "Member-only prices",
+  basic_support:      (L)=> L?.basic_support || "Standard support",
+  secure_pay:         (L)=> L?.secure_pay || "Secure payments (Cards & Crypto)",
+  points_back:        (L,p)=> tpl(L?.perks?.points_back || "{percent}% back on each booking", {percent:p}),
+  free_cancel:        (L)=> L?.free_cancel || "Free-cancel window",
+  priority_email:     (L)=> L?.priority_email || "Priority email support",
+  priority_chat:      (L)=> L?.priority_chat || "Priority live chat",
+  late_checkout:      (L)=> L?.late_checkout || "Late checkout (when available)",
+  upgrade_when_avail: (L)=> L?.upgrade_when_available || "Room upgrade (when available)",
+  b2b_invoice:        (L)=> L?.b2b_invoice || "B2B invoice support",
+  elite_concierge:    (L)=> L?.elite_concierge || "Elite concierge access",
 };
 const BENEFITS_BY_TIER = {
   Bronze:   ['member_prices','basic_support','secure_pay'],
   Silver:   ['member_prices','basic_support','secure_pay',['points_back',3],'free_cancel'],
-  Gold:     ['member_prices','basic_support','secure_pay',['points_back',5],'prio_email','late_checkout'],
-  Platinum: ['member_prices','basic_support','secure_pay',['points_back',7],'prio_email','prio_chat','upgrade_when_avail'],
-  Diamond:  ['member_prices','basic_support','secure_pay',['points_back',7],'prio_email','prio_chat','upgrade_when_avail','b2b_invoice'],
-  Elite:    ['member_prices','basic_support','secure_pay',['points_back',7],'prio_email','prio_chat','upgrade_when_avail','b2b_invoice','elite_concierge']
+  Gold:     ['member_prices','basic_support','secure_pay',['points_back',5],'priority_email','late_checkout'],
+  Platinum: ['member_prices','basic_support','secure_pay',['points_back',7],'priority_email','priority_chat','upgrade_when_avail'],
+  Diamond:  ['member_prices','basic_support','secure_pay',['points_back',7],'priority_email','priority_chat','upgrade_when_avail','b2b_invoice'],
+  Elite:    ['member_prices','basic_support','secure_pay',['points_back',7],'priority_email','priority_chat','upgrade_when_avail','b2b_invoice','elite_concierge']
 };
 
 /* ---- 5) Core logic ---- */
@@ -103,47 +108,58 @@ function remainToNext(totalKRW, idx){
 /* ---- 6) Rendering ---- */
 function renderLabels(){
   const L = getDict();
-  // Title/subtitle + always-on downgrade copy
-  const title = t('title');           if (title) document.getElementById('mb_title').textContent = title;
-  const sub   = t('subtitle') || t('inherit_note'); if (sub) document.getElementById('mb_subtitle').textContent = sub;
-  const rule  = t('retention_rule') ? tpl(t('retention_rule'), {days: (L.defaults?.days ?? DOWNGRADE_DAYS)}) : null;
-  const dwTop = document.getElementById('dwTop');   if (dwTop) dwTop.textContent = rule || `If there’s no booking for ${DOWNGRADE_DAYS} days, you’ll be auto-downgraded by 1 level.`;
+  const set = (id, val)=>{ const el=document.getElementById(id); if(el) el.textContent = val; };
 
-  // Level names
+  // 제목/설명
+  set('mb_title', t('title') || 'Membership Benefits');
+  set('mb_subtitle', t('subtitle') || t('inherit_note') || '');
+
+  // 항상 보이는 강등 안내
+  const days = (L.defaults?.days ?? DOWNGRADE_DAYS);
+  const dwText = t('retention_rule') ? tpl(t('retention_rule'), {days}) :
+                 `If there’s no booking for ${DOWNGRADE_DAYS} days, you’ll be auto-downgraded by 1 level.`;
+  const dwTop = document.getElementById('dwTop'); if (dwTop) dwTop.textContent = dwText;
+
+  // 레벨 라벨
   const lv = t('levels')||{};
-  const map = { bronze:'lbl_bronze', silver:'lbl_silver', gold:'lbl_gold', platinum:'lbl_platinum', diamond:'lbl_diamond', elite:'lbl_elite' };
-  Object.keys(map).forEach(k=>{
-    const el=document.getElementById(map[k]); if(el) el.textContent = lv[k] || k;
-  });
+  set('lbl_bronze',   lv.bronze   || 'Bronze');
+  set('lbl_silver',   lv.silver   || 'Silver');
+  set('lbl_gold',     lv.gold     || 'Gold');
+  set('lbl_platinum', lv.platinum || 'Platinum');
+  set('lbl_diamond',  lv.diamond  || 'Diamond');
+  set('lbl_elite',    lv.elite    || 'Elite');
 }
+
 function renderBenefits(){
   const L = getDict();
   document.querySelectorAll('#tiersGrid .tier-card').forEach(card=>{
     const tier = card.getAttribute('data-tier');
     const list = card.querySelector('.benefits');
+    if (!list) return;
     list.innerHTML='';
     (BENEFITS_BY_TIER[tier]||[]).forEach(item=>{
       let key=item, p=null;
       if (Array.isArray(item)){ key=item[0]; p=item[1]; }
       const div=document.createElement('div');
       div.className='benefit';
-      const text = (BENEFITS[key] ? BENEFITS[key](L, p) : key);
+      const text = (BENEFITS_TEXT[key] ? BENEFITS_TEXT[key](L, p) : key);
       div.innerHTML = `<i>✔</i><span>${text}</span>`;
       list.appendChild(div);
     });
   });
 }
+
 function renderUser(totalSpentKRW, lastBookingISO){
   const L = getDict();
   const idx = computeLevel(totalSpentKRW||0, lastBookingISO||null);
   const lvl = LEVELS[idx];
 
-  // Level title + badge
-  const yourTierTxt = t('status_current_level') ? tpl(t('status_current_level'), {level: lvl.name}) : `Your level: ${lvl.name}`;
-  const lt = document.getElementById('levelTitle'); if (lt) lt.textContent = yourTierTxt;
+  // 상단 현재 등급 & 배지
+  const yourTier = t('status_current_level') ? tpl(t('status_current_level'), {level:lvl.name}) : `Your level: ${lvl.name}`;
+  const lt = document.getElementById('levelTitle'); if (lt) lt.textContent = yourTier;
   const badge = document.getElementById('tierBadge'); if (badge) badge.textContent = `${lvl.rate}% back`;
 
-  // Progress bar + to-next message
+  // 진행률 & 다음 레벨까지
   let pct = 100, remain = remainToNext(totalSpentKRW, idx);
   if (remain!==null){
     const currMin=LEVELS[idx].minKRW, nextMin=LEVELS[idx+1].minKRW;
@@ -158,12 +174,14 @@ function renderUser(totalSpentKRW, lastBookingISO){
       msg.textContent = t('progress_title') || 'Top tier achieved.';
     }else{
       const nextLabel = LEVELS[Math.min(idx+1, LEVELS.length-1)].name;
-      const txt = t('progress_to_next') ? tpl(t('progress_to_next'), { amount: fmtKRWtoLocal(remain), level: nextLabel }) : `${fmtKRWtoLocal(remain)} to reach ${nextLabel}.`;
+      const txt = t('progress_to_next')
+        ? tpl(t('progress_to_next'), { amount: fmtKRWtoLocal(remain), level: nextLabel })
+        : `${fmtKRWtoLocal(remain)} to reach ${nextLabel}.`;
       msg.textContent = txt;
     }
   }
 
-  // Card highlight
+  // 카드 강조
   document.querySelectorAll('#tiersGrid [data-tier]').forEach(card=>{
     const name=card.getAttribute('data-tier');
     const i=LEVELS.findIndex(x=>x.name===name);
@@ -172,33 +190,36 @@ function renderUser(totalSpentKRW, lastBookingISO){
     if (i>idx)   card.classList.add('tier-muted');
   });
 
-  // Always-on downgrade copy at bottom card
+  // 하단 고정 안내
   const sticky=document.getElementById('downgradeSticky');
   if (sticky){
-    const txt = t('retention_rule') ? tpl(t('retention_rule'), {days: (L.defaults?.days ?? DOWNGRADE_DAYS)}) : `If there’s no booking for ${DOWNGRADE_DAYS} days, you’ll be auto-downgraded by 1 level.`;
+    const days = (L.defaults?.days ?? DOWNGRADE_DAYS);
+    const txt = t('retention_rule') ? tpl(t('retention_rule'), {days}) :
+               `If there’s no booking for ${DOWNGRADE_DAYS} days, you’ll be auto-downgraded by 1 level.`;
     sticky.textContent = txt;
   }
 
-  // Downgrade alerts (toast)
+  // 강등 알림 토스트
   if (lastBookingISO){
     const diff = Math.floor((Date.now() - new Date(lastBookingISO).getTime())/86400000);
     const left = DOWNGRADE_DAYS - diff;
-    if ([30,15,7,1].includes(left)) toast(left);
+    if ([30,15,7,1].includes(left)) showToast(left);
   }
 }
 
 /* ---- 7) Toast ---- */
-function toast(daysLeft){
+function showToast(daysLeft){
   const code=getLangCode();
-  const msg =
-    code==='ko' ? (daysLeft===30?'📢 30일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.'
-      : daysLeft===15?'⚠️ 15일 후 자동 강등 예정입니다. 활동을 유지하세요.'
-      : daysLeft===7 ?'⏳ 7일 후 자동 강등 예정입니다. 서둘러 예약하세요!'
-      :'🚨 내일 자동 강등됩니다! 오늘 예약을 완료하세요.')
-    : (daysLeft===30?'📢 Auto downgrade in 30 days. Keep your tier by booking.'
-      : daysLeft===15?'⚠️ Auto downgrade in 15 days. Stay active.'
-      : daysLeft===7 ?'⏳ Auto downgrade in 7 days. Book soon!'
-      :'🚨 Auto downgrade tomorrow! Complete a booking today.');
+  const ko = (daysLeft===30?'📢 30일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.'
+    : daysLeft===15?'⚠️ 15일 후 자동 강등 예정입니다. 활동을 유지하세요.'
+    : daysLeft===7 ?'⏳ 7일 후 자동 강등 예정입니다. 서둘러 예약하세요!'
+    :'🚨 내일 자동 강등됩니다! 오늘 예약을 완료하세요.');
+  const en = (daysLeft===30?'📢 Auto downgrade in 30 days. Keep your tier by booking.'
+    : daysLeft===15?'⚠️ Auto downgrade in 15 days. Stay active.'
+    : daysLeft===7 ?'⏳ Auto downgrade in 7 days. Book soon!'
+    :'🚨 Auto downgrade tomorrow! Complete a booking today.');
+
+  const msg = (code==='ko') ? ko : en;
   const el=document.createElement('div');
   el.style.cssText='position:fixed;right:16px;bottom:16px;z-index:9999;background:#1e2a35;color:#fff;border:1px solid #2f3b47;padding:12px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.35)';
   el.textContent=msg;
