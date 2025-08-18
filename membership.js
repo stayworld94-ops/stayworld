@@ -334,3 +334,14 @@ document.addEventListener('change', (e)=>{
     });
   }
 });
+/* --- INITIAL RENDER (call once on load) --- */
+document.addEventListener('DOMContentLoaded', () => {
+  // 로그인 시 저장해 둔 값 불러오기 (없으면 데모 값)
+  let u = {};
+  try { u = JSON.parse(localStorage.getItem('sw_user') || '{}'); } catch(_) {}
+
+  const totalSpentKRW = Number.isFinite(u.totalSpentKRW) ? u.totalSpentKRW : 3_250_000; // 데모값
+  const lastBookingISO = u.lastBookingISO || new Date(Date.now() - 20*86400000).toISOString();
+
+  setUserContext({ totalSpentKRW, lastBookingISO });
+});
