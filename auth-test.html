@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STAYWORLD — Auth Test</title>
+  <link rel="stylesheet" href="./assets/auth.css"/>
+</head>
+<body>
+  <header class="header">
+    <div class="brand"><i class="logo"></i><span>STAYWORLD</span></div>
+    <nav class="nav">
+      <a href="/">Home</a>
+      <a href="/login.html">Login</a>
+      <a href="/signup.html">Sign up</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <small class="kicker">Auth check</small>
+      <h1>Logged-in status</h1>
+      <p class="sub">현재 로그인한 사용자 정보를 확인합니다.</p>
+
+      <div id="status" class="note">Checking auth status…</div>
+      <div id="profile" style="margin-top:12px"></div>
+
+      <div class="hr"><div class="line"></div><div class="text">actions</div><div class="line"></div></div>
+
+      <button id="btn-logout" class="btn btn-ghost" type="button">Sign out</button>
+    </div>
+    <p class="footer">© StayWorld</p>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { firebaseConfig } from "./assets/firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const $ = (s)=>document.querySelector(s);
+    const status = $("#status");
+    const profile = $("#profile");
+
+    onAuthStateChanged(auth, (user)=>{
+      if(user){
+        status.textContent = "✅ Logged in";
+        const name = user.displayName || "(no name)";
+        const email = user.email || "-";
+        const photo = user.photoURL ? `<img src="${user.photoURL}" alt="" style="width:64px;height:64px;border-radius:12px;display:block;margin-bottom:8px"/>` : "";
+        profile.innerHTML = `
+          ${photo}
+          <div><b>UID:</b> ${user.uid}</div>
+          <div><b>Name:</b> ${name}</div>
+          <div><b>Email:</b> ${email}</div>
+          <div><b>Email verified:</b> ${user.emailVerified}</div>
+          <div><b>Provider:</b> ${user.providerData.map(p=>p.providerId).join(", ")}</div>
+        `;
+      }else{
+        status.textContent = "❌ Not logged in";
+        profile.innerHTML = `<a class="link" href="/login.html?next=/auth-test.html">Go to login</a>`;
+      }
+    });
+
+    document.getElementById("btn-logout").addEventListener("click", async ()=>{
+      await signOut(auth);
+      status.textContent = "Signed out.";
+      profile.innerHTML = `<a class="link" href="/login.html?next=/auth-test.html">Log in again</a>`;
+    });
+  </script>
+</body>
+</html>
