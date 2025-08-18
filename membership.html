@@ -6,7 +6,6 @@
   <title>StayWorld | Membership</title>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    /* 간단한 카드/배지 스타일 보강 */
     .tier-card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
     .tier-active{outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
     .tier-muted{opacity:.6}
@@ -37,33 +36,14 @@
 
       <!-- 등급 카드 + 혜택 -->
       <div id="tiersGrid" class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px">
-        <div class="tier-card" data-tier="Bronze">
-          <h3>🥉 Bronze</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Silver">
-          <h3>🥈 Silver</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Gold">
-          <h3>🥇 Gold</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Platinum">
-          <h3>💎 Platinum</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Diamond">
-          <h3>🔷 Diamond</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Elite">
-          <h3>👑 Elite</h3>
-          <div class="benefits"></div>
-        </div>
+        <div class="tier-card" data-tier="Bronze"><h3>🥉 Bronze</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Silver"><h3>🥈 Silver</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Gold"><h3>🥇 Gold</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Platinum"><h3>💎 Platinum</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Diamond"><h3>🔷 Diamond</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Elite"><h3>👑 Elite</h3><div class="benefits"></div></div>
       </div>
 
-      <!-- 하단 안내 -->
       <p class="note" style="margin-top:18px" id="downgradeNote">
         If there is no booking for 60 days, your tier will auto-downgrade by 1 level.
       </p>
@@ -72,12 +52,16 @@
 
   <!-- 멤버십 로직 -->
   <script src="membership.js"></script>
+
+  <!-- 초기화: 로그인 값이 있으면 자동 반영 -->
   <script>
-    // (데모) 로그인 후 사용자 데이터가 들어왔다고 가정
-    // 실제 서비스에서는 로그인 후 받은 값으로 setUserContext 호출
-    setUserContext({
-      totalSpentKRW: 3_250_000,
-      lastBookingISO: new Date(Date.now() - 20*86400000).toISOString()
+    document.addEventListener('DOMContentLoaded', () => {
+      let u = {};
+      try { u = JSON.parse(localStorage.getItem('sw_user') || '{}'); } catch(_) {}
+      setUserContext({
+        totalSpentKRW: Number.isFinite(u.totalSpentKRW) ? u.totalSpentKRW : 0,
+        lastBookingISO: u.lastBookingISO || null
+      });
     });
   </script>
 </body>
