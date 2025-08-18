@@ -208,3 +208,25 @@ function setUserContext({ totalSpentKRW, lastBookingISO }){
   }
 }
 window.setUserContext = setUserContext;
+// --- 안전망: setUserContext가 호출되지 않은 경우 자동 초기화 ---
+(function(){
+  if (!window._swMembershipAutoInit) {
+    window._swMembershipAutoInit = true;
+    window.addEventListener('DOMContentLoaded', () => {
+      // 이미 어딘가에서 setUserContext가 불렸다면 넘어감
+      if (!window._swMembershipInitialized) {
+        try {
+          let u = {};
+          try { u = JSON.parse(localStorage.getItem('sw_user') || '{}'); } catch(_) {}
+          setUserContext({
+            totalSpentKRW: Number.isFinite(u.totalSpentKRW) ? u.totalSpentKRW : 0,
+            lastBookingISO: u.lastBookingISO || null
+          });
+        } catch (_) {
+          // 최후의 수단
+          setUserContext({ totalSpentKRW: 0, lastBookingISO: null });
+        }
+      }
+    });
+  }
+})();
