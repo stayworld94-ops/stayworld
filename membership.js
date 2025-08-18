@@ -1,308 +1,220 @@
-/* =========================================================
-   STAYWORLD Membership (6 tiers) — robust + i18n + currency
-   - Current-tier badge only (no border highlight)
-   - Language-based currency (by selected lang)
-   - Rich benefits per tier (inherit lower tiers)
-   - {RATE} token -> each tier's % back
-   - Downgrade 1 level if no booking in 60 days (alerts)
-   ========================================================= */
+/* ============================
+   StayWorld Membership — Final
+   - Tiers (upper inherits lower)
+   - Currency shown by selected language
+   - Always-on downgrade note + D-30/15/7/1 toasts
+   - Elite is auto-promotion (NOT manual)
+   ============================ */
 
-/* ---------- Currency map (rough static rates) ---------- */
-const FX = {
-  USD:{symbol:'$',  rate:1,      code:'USD', locale:'en-US'},
-  EUR:{symbol:'€',  rate:0.92,   code:'EUR', locale:'fr-FR'},
-  KRW:{symbol:'₩',  rate:1300,   code:'KRW', locale:'ko-KR'},
-  JPY:{symbol:'¥',  rate:155,    code:'JPY', locale:'ja-JP'},
-  CNY:{symbol:'¥',  rate:7.2,    code:'CNY', locale:'zh-CN'},
-  TRY:{symbol:'₺',  rate:33,     code:'TRY', locale:'tr-TR'},
-  RUB:{symbol:'₽',  rate:90,     code:'RUB', locale:'ru-RU'},
-  GBP:{symbol:'£',  rate:0.78,   code:'GBP', locale:'en-GB'},
-  AED:{symbol:'د.إ',rate:3.67,   code:'AED', locale:'ar-AE'},
-  CAD:{symbol:'$',  rate:1.36,   code:'CAD', locale:'en-CA'},
-};
-const LANG_TO_CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
-
-/* ---------- i18n (EN, KO) — Full benefits with {RATE} ---------- */
-const I18N = {
-  EN:{
-    title:'🌟 StayWorld Membership',
-    inherit:'Upper tiers include all benefits of lower tiers.',
-    your_tier:'Your Tier',
-    current:'Current',
-    toNext:(money)=>`${money} to next tier. Auto-downgrade after 60 days of no bookings.`,
-    top:'Top tier (Elite). Auto-downgrade after 60 days of no bookings.',
-    gauge:(pct)=>`${pct}%`,
-    downgrade:'If there is no booking for 60 days, your tier will auto-downgrade by 1 level.',
-    tiers:['Bronze','Silver','Gold','Platinum','Diamond','Elite'],
-    benefits:{
-      Bronze:[
-        'Basic support',
-        'Secure card/crypto payments',
-        'Verified listings & reviews',
-        'Free cancellation where available',
-        '24h check-in where available'
-      ],
-      Silver:[
-        'Points back {RATE}% per stay',
-        'Priority email support (24h)',
-        'Invoice available · B2B-ready'
-      ],
-      Gold:[
-        'Late checkout when available',
-        'Priority chat support',
-        'Best-rate check on request (free)'
-      ],
-      Platinum:[
-        'Room upgrade when available',
-        'Dedicated support line',
-        'Self check-in assistance'
-      ],
-      Diamond:[
-        'Welcome gift at select properties',
-        'Partner lounge access (where available)',
-        '24/7 VIP phone support'
-      ],
-      Elite:[
-        '24/7 concierge desk',
-        'Invitation-only events',
-        'Complimentary airport transfer (where available)'
-      ]
-    }
-  },
-  KO:{
-    title:'🌟 스테이월드 멤버십',
-    inherit:'상위 등급은 하위 등급의 모든 혜택을 포함합니다.',
-    your_tier:'내 등급',
-    current:'현재 등급',
-    toNext:(money)=>`${money} 남았어요. 60일 예약 없으면 자동 1단계 강등.`,
-    top:'최상위 등급(Elite). 60일 예약 없으면 자동 1단계 강등.',
-    gauge:(pct)=>`${pct}%`,
-    downgrade:'60일 동안 예약이 없으면 등급이 자동으로 1단계 강등됩니다.',
-    tiers:['브론즈','실버','골드','플래티넘','다이아몬드','엘리트'],
-    benefits:{
-      Bronze:[
-        '기본 고객지원',
-        '안전한 카드/암호화폐 결제',
-        '검증된 매물 · 리뷰',
-        '가능 지역 무료 취소',
-        '가능 시 24시간 체크인'
-      ],
-      Silver:[
-        '숙박 결제 {RATE}% 포인트 적립',
-        '우선 이메일 응대(24시간)',
-        '세금계산서 발행 · B2B 지원'
-      ],
-      Gold:[
-        '가능 시 레이트 체크아웃 무료',
-        '우선 채팅 지원',
-        '요청 시 최저가 확인(무료)'
-      ],
-      Platinum:[
-        '가능 시 객실 업그레이드',
-        '전담 지원 라인',
-        '셀프 체크인 지원'
-      ],
-      Diamond:[
-        '일부 호텔 웰컴 기프트',
-        '가능 지역 파트너 라운지 이용',
-        '24/7 VIP 전화 지원'
-      ],
-      Elite:[
-        '24/7 컨시어지',
-        '초대 전용 이벤트',
-        '가능 지역 공항 픽업 무료'
-      ]
-    }
-  }
-};
-
-/* ---------- Config (tiers) ---------- */
-/* Thresholds in USD (base currency). % back per tier in `rate`. */
+/* ---- Levels (thresholds in KRW) ---- */
 const LEVELS = [
-  { name:'Bronze',   minUSD:   0,       rate: 0 },
-  { name:'Silver',   minUSD:  400,      rate: 3 },
-  { name:'Gold',     minUSD: 1500,      rate: 5 },
-  { name:'Platinum', minUSD: 3000,      rate: 7 },
-  { name:'Diamond',  minUSD: 6000,      rate:10 },
-  { name:'Elite',    minUSD:12000,      rate:15, manual:true },
+  { name:'Bronze',   minKRW:       0, rate: 0 },
+  { name:'Silver',   minKRW:  500_000, rate: 3 },
+  { name:'Gold',     minKRW:2_000_000, rate: 5 },
+  { name:'Platinum', minKRW:4_000_000, rate: 7 },
+  { name:'Diamond',  minKRW:7_500_000, rate:10 },
+  { name:'Elite',    minKRW:15_000_000, rate:15 } // 자동 승격
 ];
 const DOWNGRADE_DAYS = 60;
 
-/* ---------- Helpers ---------- */
-const $  = (s,sc)=> (sc||document).querySelector(s);
-const $$ = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
+/* ---- FX: show “KRW amounts” in local currency by language ---- */
+const KRW_PER_USD = 1300; // 단순 환산 기준치(정적)
+const FX = {
+  USD:{code:'USD', symbol:'$',  perUSD:1,    locale:'en-US'},
+  EUR:{code:'EUR', symbol:'€',  perUSD:0.92, locale:'fr-FR'},
+  KRW:{code:'KRW', symbol:'₩',  perUSD:1300, locale:'ko-KR'},
+  JPY:{code:'JPY', symbol:'¥',  perUSD:155,  locale:'ja-JP'},
+  CNY:{code:'CNY', symbol:'¥',  perUSD:7.2,  locale:'zh-CN'},
+  TRY:{code:'TRY', symbol:'₺',  perUSD:33,   locale:'tr-TR'},
+  RUB:{code:'RUB', symbol:'₽',  perUSD:90,   locale:'ru-RU'},
+  GBP:{code:'GBP', symbol:'£',  perUSD:0.78, locale:'en-GB'},
+  AED:{code:'AED', symbol:'د.إ',perUSD:3.67, locale:'ar-AE'},
+  CAD:{code:'CAD', symbol:'$',  perUSD:1.36, locale:'en-CA'}
+};
+const LANG2CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
 
-function currentLangCode(){
+/* lang helper (re-uses lang.js) */
+function currentLang(){
   const sel = document.getElementById('lang') || document.getElementById('langSelect');
-  const saved = localStorage.getItem('sw_lang');
-  return (sel?.value || saved || 'EN').toUpperCase();
+  const v = (sel && sel.value) || localStorage.getItem('sw_lang') || (navigator.language||'en').slice(0,2).toUpperCase();
+  return v.toUpperCase();
 }
-function L(){ return I18N[currentLangCode()] || I18N.EN; }
-
-function currencyForLang(){
-  const code = LANG_TO_CUR[currentLangCode()] || 'USD';
-  return FX[code] || FX.USD;
+/* i18n getter */
+function T(key){
+  const lang = currentLang();
+  const dict = (window.I18N && (I18N[lang]||I18N.EN)) || {};
+  return dict[key];
 }
-function fmtMoneyFromUSD(usd){
-  const cur = currencyForLang();
-  const val = usd * cur.rate;
-  return new Intl.NumberFormat(cur.locale, {
-    style:'currency', currency:cur.code,
-    maximumFractionDigits:(cur.code==='JPY'||cur.code==='KRW')?0:0
-  }).format(val);
-}
-
-function normalizeTotalUSD({totalSpentUSD, totalSpentKRW}){
-  if (Number.isFinite(totalSpentUSD)) return totalSpentUSD;
-  if (Number.isFinite(totalSpentKRW)) return totalSpentKRW / (FX.KRW.rate||1300);
-  return 0;
+/* currency formatter: KRW -> local currency by language */
+function fmtKRWtoLocal(krw){
+  const lang = currentLang();
+  const cur = FX[ LANG2CUR[lang] || 'USD' ] || FX.USD;
+  // KRW -> USD -> Local
+  const usd = krw / KRW_PER_USD;
+  const local = usd * cur.perUSD;
+  const nf = new Intl.NumberFormat(cur.locale,{ style:'currency', currency:cur.code, maximumFractionDigits:(cur.code==='JPY'||cur.code==='KRW')?0:0 });
+  return nf.format(local);
 }
 
-function computeLevelIdx(totalUSD, lastBookingISO){
+/* compute level index */
+function computeLevel(totalKRW, lastBookingISO){
   let base = 0;
   for (let i=0;i<LEVELS.length;i++){
-    if (totalUSD >= LEVELS[i].minUSD) base = i;
+    if (totalKRW >= LEVELS[i].minKRW) base = i;
   }
   if (lastBookingISO){
-    const diffDays = Math.floor((Date.now() - new Date(lastBookingISO).getTime())/86400000);
-    if (diffDays >= DOWNGRADE_DAYS) base = Math.max(0, base-1);
+    const diff = Math.floor((Date.now() - new Date(lastBookingISO).getTime())/86400000);
+    if (diff >= DOWNGRADE_DAYS) base = Math.max(0, base-1);
   }
   return base;
 }
+/* remaining to next (KRW) */
+function remainToNext(totalKRW, idx){
+  if (idx >= LEVELS.length-1) return null;
+  return Math.max(0, LEVELS[idx+1].minKRW - totalKRW);
+}
 
-/* ----- Render benefits with inheritance + {RATE} token ----- */
+/* render benefits per tier (upper inherits lower) */
+const BENEFITS_BY_TIER = {
+  Bronze:   ['b_member_prices','b_basic_support','b_secure_pay'],
+  Silver:   ['b_member_prices','b_basic_support','b_secure_pay','b_points_3','b_free_cancel_window'],
+  Gold:     ['b_member_prices','b_basic_support','b_secure_pay','b_points_5','b_priority_email','b_late_checkout'],
+  Platinum: ['b_member_prices','b_basic_support','b_secure_pay','b_points_7','b_priority_email','b_priority_chat','b_upgrade_when_available'],
+  Diamond:  ['b_member_prices','b_basic_support','b_secure_pay','b_points_7','b_priority_email','b_priority_chat','b_upgrade_when_available','b_b2b_invoice'],
+  Elite:    ['b_member_prices','b_basic_support','b_secure_pay','b_points_7','b_priority_email','b_priority_chat','b_upgrade_when_available','b_b2b_invoice','b_elite_concierge']
+};
 function renderBenefits(){
-  const lang = L();
-  const order = ['Bronze','Silver','Gold','Platinum','Diamond','Elite'];
-
-  // Build inherited arrays once
-  const inherited = order.map((tierName, idx)=>{
-    const arr = [];
-    for (let k=0;k<=idx;k++){
-      const key = order[k];
-      const raw = (lang.benefits[key] || []);
-      raw.forEach(line=> arr.push(line));
-    }
-    return arr;
-  });
-
-  order.forEach((name,idx)=>{
-    const card = document.querySelector(`[data-tier="${name}"]`);
-    if(!card) return;
-
-    // title translation
-    const titleSpan = card.querySelector('h3 .t_tier');
-    if(titleSpan){ titleSpan.textContent = (lang.tiers[idx] || name); }
-
-    // render list (replace {RATE} with that tier's %)
-    const box = card.querySelector('.benefits');
-    box.innerHTML = '';
-    const rate = LEVELS[idx].rate;
-
-    inherited[idx].forEach(line=>{
-      const txt = line.replace(/\{RATE\}/g, String(rate));
-      const row = document.createElement('div');
-      row.className='benefit';
-      row.innerHTML = `<i>✅</i><span>${txt}</span>`;
-      box.appendChild(row);
+  const cards = document.querySelectorAll('#tiersGrid .tier-card');
+  cards.forEach(card=>{
+    const tier = card.getAttribute('data-tier');
+    const list = card.querySelector('.benefits');
+    list.innerHTML = '';
+    (BENEFITS_BY_TIER[tier]||[]).forEach(k=>{
+      const li = document.createElement('div');
+      li.className='benefit';
+      li.innerHTML = `<i>✔</i><span data-i18n="${k}">${T(k)||k}</span>`;
+      list.appendChild(li);
     });
   });
 }
 
-/* ----- UI update ----- */
-function applyLevelUI(levelIdx, totalUSD, lastBookingISO){
-  const lang = L();
+/* apply level UI */
+function applyLevelUI(idx, totalKRW, lastBookingISO){
+  const lvl = LEVELS[idx];
+  // 제목/배지
+  const levelTitle = document.getElementById('levelTitle');
+  if (levelTitle) levelTitle.textContent = `${T('your_tier')||'Your Tier'}: ${lvl.name}`;
 
-  // top texts
-  $('#t_title').textContent      = lang.title;
-  $('#t_inherit').textContent    = lang.inherit;
-  $('#t_your_tier').textContent  = lang.your_tier;
-  $('#t_downgrade').textContent  = lang.downgrade;
+  const badge = document.getElementById('tierBadge');
+  if (badge) badge.textContent = `${lvl.rate}% back`;
 
-  // gauge
-  const gauge = $('#tierGauge');
-  const pctEl = $('#tierGaugePct');
-  let pct = 100;
-  let progressText;
-
-  if (levelIdx < LEVELS.length-1){
-    const currMin = LEVELS[levelIdx].minUSD;
-    const nextMin = LEVELS[levelIdx+1].minUSD;
-    pct = Math.min(100, Math.max(0, Math.round(((totalUSD - currMin) / (nextMin - currMin)) * 100)));
-    const remUSD = Math.max(0, nextMin - totalUSD);
-    progressText = lang.toNext(fmtMoneyFromUSD(remUSD));
-  } else {
-    progressText = lang.top;
+  // 진행도/남은 금액
+  let pct = 100, remKRW = remainToNext(totalKRW, idx);
+  if (remKRW !== null){
+    const currMin = LEVELS[idx].minKRW;
+    const nextMin = LEVELS[idx+1].minKRW;
+    pct = Math.min(100, Math.max(0, Math.round(((totalKRW - currMin) / (nextMin - currMin))*100)));
   }
+  const gf = document.getElementById('gaugeFill'); if (gf) gf.style.width = pct + '%';
+  const pp = document.getElementById('progressPct'); if (pp) pp.textContent = pct + '%';
 
-  if (gauge) gauge.style.width = pct + '%';
-  if (pctEl) pctEl.textContent = lang.gauge(pct);
-  $('#levelProgressText').textContent = progressText;
-
-  // cards: current badge + dim higher tiers
-  $$('#tiersGrid [data-tier]').forEach(card=>{
-    card.classList.remove('tier-muted');
-    card.querySelector('.badge-current')?.remove();
-    const name = card.getAttribute('data-tier');
-    const idx = LEVELS.findIndex(x=>x.name===name);
-    if (idx > levelIdx) card.classList.add('tier-muted');
-    if (idx === levelIdx){
-      const b = document.createElement('span');
-      b.className='badge-current';
-      b.textContent = lang.current;
-      card.appendChild(b);
-    }
-  });
-
-  // downgrade alerts
-  if (lastBookingISO){
-    const diffDays = Math.floor((Date.now() - new Date(lastBookingISO).getTime())/86400000);
-    const left = DOWNGRADE_DAYS - diffDays;
-    if ([30,15,7,1].includes(left)){
-      const wrap = document.createElement('div');
-      wrap.className='fixed bottom-5 right-5 bg-red-600 text-white px-4 py-3 rounded-xl shadow-lg';
-      wrap.style.zIndex = 9999;
-      wrap.textContent = (currentLangCode()==='KO')
-        ? `${left}일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.`
-        : `Auto-downgrade in ${left} day(s). Keep your tier by booking.`;
-      document.body.appendChild(wrap);
-      setTimeout(()=>wrap.remove(),8000);
-    }
-  }
-}
-
-/* ----- react to language change ----- */
-function bindLangWatcher(){
-  const sel = document.getElementById('lang') || document.getElementById('langSelect');
-  if(!sel) return;
-  sel.addEventListener('change', ()=>{
-    if(window.__SW_LAST_CTX){
-      const ctx = window.__SW_LAST_CTX;
-      const totalUSD = normalizeTotalUSD(ctx);
-      const idx = computeLevelIdx(totalUSD, ctx.lastBookingISO);
-      renderBenefits();
-      applyLevelUI(idx, totalUSD, ctx.lastBookingISO);
+  const msgEl = document.getElementById('levelProgressText');
+  if (msgEl){
+    if (remKRW===null){
+      msgEl.textContent = (T('to_next_msg') && T('to_next_msg')('')) || `Top tier. Auto-downgrade after ${DOWNGRADE_DAYS} days of no bookings.`;
     }else{
-      renderBenefits();
-      applyLevelUI(0,0,null);
+      const amt = fmtKRWtoLocal(remKRW);
+      // to_next_msg는 함수(string builder)
+      const k = T('to_next_msg');
+      msgEl.textContent = (typeof k==='function') ? k(amt) : `${amt} to next tier.`;
     }
+  }
+
+  // 카드 강조(현재만 강조, 상위는 흐리게)
+  document.querySelectorAll('#tiersGrid [data-tier]').forEach(card=>{
+    const name = card.getAttribute('data-tier');
+    const i = LEVELS.findIndex(x=>x.name===name);
+    card.classList.remove('tier-active','tier-muted');
+    if (i === idx) card.classList.add('tier-active');
+    if (i > idx) card.classList.add('tier-muted');
+  });
+
+  // 항상 노출되는 고정 문구(번역)
+  const topNote = document.getElementById('dwTop');
+  if (topNote){ topNote.textContent = T('dw_always') || `If there is no booking for ${DOWNGRADE_DAYS} days, your tier will auto-downgrade by 1 level.`; }
+
+  // D-30/15/7/1 경고 토스트
+  if (lastBookingISO){
+    const diff = Math.floor((Date.now() - new Date(lastBookingISO).getTime())/86400000);
+    const left = DOWNGRADE_DAYS - diff;
+    if ([30,15,7,1].includes(left)) showToast(left);
+  }
+}
+
+/* toast */
+function showToast(daysLeft){
+  const map = {
+    30: '📢 30일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.',
+    15: '⚠️ 15일 후 자동 강등 예정입니다. 활동을 유지하세요.',
+    7:  '⏳ 7일 후 자동 강등 예정입니다. 서둘러 예약하세요!',
+    1:  '🚨 내일 자동 강등됩니다! 오늘 예약을 완료하세요.'
+  };
+  const msg = (currentLang()==='KO') ? map[daysLeft]
+    : (daysLeft===30?'📢 Auto downgrade in 30 days. Keep your tier by booking.'
+    : daysLeft===15?'⚠️ Auto downgrade in 15 days. Stay active.'
+    : daysLeft===7?'⏳ Auto downgrade in 7 days. Book soon!'
+    : '🚨 Auto downgrade tomorrow! Complete a booking today.');
+  const el = document.createElement('div');
+  el.style.cssText='position:fixed;right:16px;bottom:16px;z-index:9999;background:#1e2a35;color:#fff;border:1px solid #2f3b47;padding:12px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.35)';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=> el.remove(), 8000);
+}
+
+/* re-apply i18n text placeholders in DOM when language changes */
+function applyStaticI18N(){
+  const lang = currentLang();
+  const dict = (I18N && (I18N[lang]||I18N.EN)) || {};
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    const v = dict[k];
+    if (typeof v === 'function'){ /* 동적 함수는 여기서 건너뜀 */ }
+    else if (typeof v === 'string'){ el.textContent = v; }
   });
 }
 
-/* ----- public ----- */
-function setUserContext(ctx){
-  window.__SW_LAST_CTX = ctx;
-  const totalUSD = normalizeTotalUSD(ctx);
-  const idx = computeLevelIdx(totalUSD, ctx.lastBookingISO);
+/* public API; call after login/user fetch */
+function setUserContext({ totalSpentKRW, lastBookingISO }){
+  applyStaticI18N();
   renderBenefits();
-  applyLevelUI(idx, totalUSD, ctx.lastBookingISO);
+  const idx = computeLevel(totalSpentKRW||0, lastBookingISO||null);
+  applyLevelUI(idx, totalSpentKRW||0, lastBookingISO||null);
 }
 
-/* init */
+/* init with localStorage sw_user if exists */
 document.addEventListener('DOMContentLoaded', ()=>{
+  applyStaticI18N();
   renderBenefits();
-  applyLevelUI(0,0,null);
-  bindLangWatcher();
+
+  let u={};
+  try{ u = JSON.parse(localStorage.getItem('sw_user')||'{}'); }catch(_){}
+  setUserContext({
+    totalSpentKRW: Number.isFinite(u.totalSpentKRW)?u.totalSpentKRW:0,
+    lastBookingISO: u.lastBookingISO || null
+  });
+
+  // 언어 변경 시 즉시 갱신
+  const sel = document.getElementById('lang') || document.getElementById('langSelect');
+  if (sel){
+    sel.addEventListener('change', ()=>{
+      const curr = JSON.parse(localStorage.getItem('sw_user')||'{}');
+      setUserContext({
+        totalSpentKRW: Number.isFinite(curr.totalSpentKRW)?curr.totalSpentKRW:0,
+        lastBookingISO: curr.lastBookingISO || null
+      });
+    });
+  }
 });
 
+/* expose (optional) */
 window.setUserContext = setUserContext;
