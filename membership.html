@@ -20,7 +20,6 @@
     .tier-active{outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
     .tier-muted{opacity:.65}
     .badge{position:absolute;right:16px;top:-10px;background:#f4d78c;color:#1a1205;border-radius:999px;padding:6px 12px;font-weight:700}
-    /* 알림 바 – 중립 톤 */
     .sticky-note{position:sticky;top:0;z-index:30;background:#0f1420;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:16px}
     @media (max-width: 840px){ .tier-grid{grid-template-columns:1fr} }
   </style>
@@ -30,44 +29,44 @@
   <div id="site-header"></div>
 
   <main class="page-wrap">
-    <!-- 60일 자동강등 고정 안내 (항상 보임) -->
-    <div id="dwTop" class="sticky-note" data-i18n="dw_always"></div>
+    <!-- 60일 자동강등 고정 안내 -->
+    <div id="dwTop" class="sticky-note"></div>
 
     <!-- 제목/설명 -->
-    <h1 data-i18n="title"></h1>
-    <p class="note" data-i18n="inherit_note"></p>
+    <h1 id="mb_title"></h1>
+    <p id="mb_subtitle" class="note"></p>
 
     <!-- 현재 등급 카드 -->
     <section class="card" style="position:relative; margin-top:14px">
-      <h3 id="levelTitle" data-i18n="your_tier"></h3>
+      <h3 id="levelTitle"></h3>
       <div id="tierBadge" class="badge">5% back</div>
 
       <p id="levelProgressText"></p>
       <div class="gauge"><div id="gaugeFill" style="width:0%"></div></div>
       <div id="progressPct" class="note" style="text-align:right;margin-top:6px">0%</div>
 
-      <small id="downgradeSticky" class="note" style="display:block;margin-top:10px" data-i18n="dw_always"></small>
+      <small id="downgradeSticky" class="note" style="display:block;margin-top:10px"></small>
     </section>
 
-    <!-- 등급 카드 + 혜택 (JS가 채움; 상위 = 하위 포함) -->
+    <!-- 등급 카드 + 혜택 (JS가 채움) -->
     <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
       <article class="tier-card" data-tier="Bronze">
-        <h3>🥉 <span data-i18n="bronze"></span></h3><div class="benefits"></div>
+        <h3>🥉 <span id="lbl_bronze"></span></h3><div class="benefits"></div>
       </article>
       <article class="tier-card" data-tier="Silver">
-        <h3>🥈 <span data-i18n="silver"></span></h3><div class="benefits"></div>
+        <h3>🥈 <span id="lbl_silver"></span></h3><div class="benefits"></div>
       </article>
       <article class="tier-card" data-tier="Gold">
-        <h3>🥇 <span data-i18n="gold"></span></h3><div class="benefits"></div>
+        <h3>🥇 <span id="lbl_gold"></span></h3><div class="benefits"></div>
       </article>
       <article class="tier-card" data-tier="Platinum">
-        <h3>💎 <span data-i18n="platinum"></span></h3><div class="benefits"></div>
+        <h3>💎 <span id="lbl_platinum"></span></h3><div class="benefits"></div>
       </article>
       <article class="tier-card" data-tier="Diamond">
-        <h3>🔷 <span data-i18n="diamond"></span></h3><div class="benefits"></div>
+        <h3>🔷 <span id="lbl_diamond"></span></h3><div class="benefits"></div>
       </article>
       <article class="tier-card" data-tier="Elite">
-        <h3>👑 <span data-i18n="elite"></span></h3><div class="benefits"></div>
+        <h3>👑 <span id="lbl_elite"></span></h3><div class="benefits"></div>
       </article>
     </section>
   </main>
@@ -78,3 +77,4 @@
   <script src="/membership.js" defer></script>
 </body>
 </html>
+
