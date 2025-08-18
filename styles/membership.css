@@ -1,0 +1,53 @@
+/* STAYWORLD — membership.css */
+
+/* 배너(60일 미이용 강등 안내) */
+.sw-banner{
+  position:sticky; top:8px; z-index:25;
+  display:flex; gap:10px; align-items:center; justify-content:space-between;
+  background:#221617; border:1px solid #5a2f31; color:#ffdede;
+  padding:10px 12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.35)
+}
+.sw-banner strong{color:#ffe2e2}
+
+/* 카드 */
+.card{
+  background:#0f1420;border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.25)
+}
+
+/* 현재 등급 카드 */
+.sw-current-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sw-badge{
+  background:linear-gradient(180deg,#f4d78c,#c9a35b);
+  color:#1a1205;padding:6px 10px;border-radius:999px;font-weight:800;border:0
+}
+.sw-gauge{margin-top:8px;background:rgba(255,255,255,.1);height:10px;border-radius:999px;overflow:hidden}
+.sw-gauge-fill{height:10px;background:linear-gradient(180deg,#f4d78c,#c9a35b)}
+
+.sw-gauge-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:12px;opacity:.9}
+
+/* 등급 그리드 */
+.tiers-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px
+}
+.tier-card{
+  background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px; transition:.2s
+}
+.tier-card .tier-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tier-card .ti{font-size:20px}
+.tier-card h3{margin:0;font-size:16px}
+
+.tier-card.tier-active{
+  outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset
+}
+.tier-card .benefits{list-style:none;margin:8px 0 0;padding:0}
+.tier-card .benefits li{
+  display:flex;gap:8px;align-items:flex-start;margin:6px 0; font-size:14px
+}
+.tier-card .benefits i{font-style:normal; opacity:.9}
+.tier-card .benefits .dot{opacity:.7}
+
+/* 반응형 */
+@media (max-width:800px){
+  .tiers-grid{grid-template-columns:1fr}
+}
