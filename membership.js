@@ -1,11 +1,11 @@
 /* ============================
    StayWorld Membership — SELF-CONTAINED FINAL
-   - LANGS가 없어도 기본 번역으로 렌더됨 (DEFAULT_I18N 사용)
-   - LANGS가 있으면 LANGS[code].membership을 우선 사용
-   - tiers/혜택/진행률/통화/강등알람 전부 포함
+   - LANGS 없어도 DEFAULT_I18N 사용
+   - LANGS[code].membership 있으면 우선 사용
+   - 등급/혜택/진행률/통화/강등알람 포함
 ============================ */
 
-/* ---- 0) 기본 i18n (LANGS가 비정상일 때 fallback) ---- */
+/* ---- 0) 기본 i18n (fallback) ---- */
 const DEFAULT_I18N = {
   en: {
     title: "Membership Benefits",
@@ -16,7 +16,7 @@ const DEFAULT_I18N = {
     progress_title: "Top tier achieved.",
     progress_to_next: "Only {amount} left to reach {level}.",
     status_current_level: "Your level: {level}",
-    // standalone benefit labels (페이지 카드용)
+    // 카드용 단일 라벨
     member_prices: "Member-only prices",
     basic_support: "Standard support",
     secure_pay: "Secure payments (Cards & Crypto)",
@@ -86,7 +86,6 @@ function getLangCode(){
 }
 function getDict(){
   const code = getLangCode();
-  // LANGS[code].membership 우선, 없으면 DEFAULT
   const fromLangs = (window.LANGS && LANGS[code] && LANGS[code].membership) ? LANGS[code].membership : null;
   const fallback  = DEFAULT_I18N[code] || DEFAULT_I18N.en;
   return fromLangs || fallback;
@@ -103,6 +102,12 @@ function fmtKRWtoLocal(krw){
   const usd = krw / KRW_PER_USD;
   const local = usd * cur.perUSD;
   return new Intl.NumberFormat(cur.locale, { style:'currency', currency:cur.code, maximumFractionDigits:cur.frac }).format(local);
+}
+/* 레벨명을 현지화 */
+function localizeLevelName(name){
+  const lv = t('levels') || DEFAULT_I18N.en.levels;
+  const key = String(name).toLowerCase();
+  return lv?.[key] || name;
 }
 
 /* ---- 4) Benefits ---- */
@@ -158,12 +163,13 @@ function renderLabels(){
   const dwTop = document.getElementById('dwTop'); if (dwTop) dwTop.textContent = dwText;
 
   const lv = t('levels')||DEFAULT_I18N.en.levels;
-  set('lbl_bronze',   lv.bronze);
-  set('lbl_silver',   lv.silver);
-  set('lbl_gold',     lv.gold);
-  set('lbl_platinum', lv.platinum);
-  set('lbl_diamond',  lv.diamond);
-  set('lbl_elite',    lv.elite);
+  const setSafe = (id, v)=>{ const el=document.getElementById(id); if(el && v) el.textContent = v; };
+  setSafe('lbl_bronze',   lv.bronze);
+  setSafe('lbl_silver',   lv.silver);
+  setSafe('lbl_gold',     lv.gold);
+  setSafe('lbl_platinum', lv.platinum);
+  setSafe('lbl_diamond',  lv.diamond);
+  setSafe('lbl_elite',    lv.elite);
 }
 
 function renderBenefits(){
@@ -190,9 +196,11 @@ function renderUser(totalSpentKRW, lastBookingISO){
   const idx = computeLevel(totalSpentKRW||0, lastBookingISO||null);
   const lvl = LEVELS[idx];
 
+  // ✅ 레벨명 현지화
+  const levelLocal = localizeLevelName(lvl.name);
   const yourTier = t('status_current_level')
-    ? tpl(t('status_current_level'), {level:lvl.name})
-    : tpl(DEFAULT_I18N.en.status_current_level, {level:lvl.name});
+    ? tpl(t('status_current_level'), {level:levelLocal})
+    : tpl(DEFAULT_I18N.en.status_current_level, {level:levelLocal});
   const lt = document.getElementById('levelTitle'); if (lt) lt.textContent = yourTier;
 
   const badge = document.getElementById('tierBadge'); if (badge) badge.textContent = `${lvl.rate}% back`;
@@ -210,10 +218,10 @@ function renderUser(totalSpentKRW, lastBookingISO){
     if (remain===null){
       msg.textContent = t('progress_title') || DEFAULT_I18N.en.progress_title;
     }else{
-      const nextLabel = LEVELS[Math.min(idx+1, LEVELS.length-1)].name;
+      const nextLabelLocal = localizeLevelName(LEVELS[Math.min(idx+1, LEVELS.length-1)].name);
       const txt = t('progress_to_next')
-        ? tpl(t('progress_to_next'), { amount: fmtKRWtoLocal(remain), level: nextLabel })
-        : tpl(DEFAULT_I18N.en.progress_to_next, { amount: fmtKRWtoLocal(remain), level: nextLabel });
+        ? tpl(t('progress_to_next'), { amount: fmtKRWtoLocal(remain), level: nextLabelLocal })
+        : tpl(DEFAULT_I18N.en.progress_to_next, { amount: fmtKRWtoLocal(remain), level: nextLabelLocal });
       msg.textContent = txt;
     }
   }
@@ -271,7 +279,13 @@ function setUserContext({ totalSpentKRW, lastBookingISO }){
 
 /* ---- 9) Init ---- */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // 기본 유저(없으면 0원)
+  // ✅ 0) 저장된 언어 즉시 적용 (페이지 진입 시 영어로 돌아가는 문제 해결)
+  const savedLang = localStorage.getItem('sw_lang') || (navigator.language||'en').slice(0,2).toLowerCase();
+  if (window.StayWorldI18n && typeof window.StayWorldI18n.applyLang === 'function') {
+    window.StayWorldI18n.applyLang(savedLang);
+  }
+
+  // 1) 기본 유저(없으면 0원)
   let u={};
   try{ u = JSON.parse(localStorage.getItem('sw_user')||'{}'); }catch(_){}
   setUserContext({
@@ -279,7 +293,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     lastBookingISO: u.lastBookingISO || null
   });
 
-  // 언어 변경 이벤트 연동 (lang.js에서 dispatch)
+  // 2) 언어 변경 이벤트 연동 (lang.js에서 dispatch)
   window.addEventListener('sw:languageChanged', ()=>{
     let cur={};
     try{ cur = JSON.parse(localStorage.getItem('sw_user')||'{}'); }catch(_){}
@@ -292,6 +306,3 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 // export
 window.setUserContext = setUserContext;
-
-// 디버그 힌트(필요 시 주석 해제)
-// console.log('[Membership] LANGS exists?', !!window.LANGS);
