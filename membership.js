@@ -1,11 +1,11 @@
 /* ============================
-   STAYWORLD Membership Logic (6 tiers)
+   STAYWORLD Membership Logic (6 tiers) — hardened
    - Higher tier inherits lower-tier benefits
    - Level by total spent (KRW)
    - Auto downgrade 1 level if no booking >= 60 days
    - Auto highlight current tier + progress gauge update
    - Downgrade alerts at D-30, D-15, D-7, D-1
-   ============================ */
+============================ */
 
 const LEVELS = [
   { name:'Bronze',   min:       0, rate: 0  },
@@ -15,7 +15,34 @@ const LEVELS = [
   { name:'Diamond',  min:7_500_000, rate:10  },
   { name:'Elite',    min:15_000_000, rate:15, manual:true }
 ];
+
 const DOWNGRADE_DAYS = 60;
+
+/* i18n (en/ko) */
+const MSG = {
+  en:{
+    toNext:(rem)=>`₩${rem.toLocaleString('ko-KR')} to next tier. Auto-downgrade by 1 level after 60 days of no bookings.`,
+    top:`Top tier (Elite). Auto-downgrade by 1 level after 60 days.`,
+    d30:`📢 Auto downgrade in 30 days. Keep your tier by booking.`,
+    d15:`⚠️ Auto downgrade in 15 days. Stay active.`,
+    d7:`⏳ Auto downgrade in 7 days. Book soon!`,
+    d1:`🚨 Auto downgrade tomorrow! Complete a booking today.`
+  },
+  ko:{
+    toNext:(rem)=>`다음 등급까지 ₩${rem.toLocaleString('ko-KR')} 남았어요. 60일 예약 없으면 자동 1단계 강등.`,
+    top:`최상위 등급(Elite). 60일 예약 없으면 자동 1단계 강등.`,
+    d30:`📢 30일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.`,
+    d15:`⚠️ 15일 후 자동 강등 예정입니다. 활동을 유지하세요.`,
+    d7:`⏳ 7일 후 자동 강등 예정입니다. 서둘러 예약하세요!`,
+    d1:`🚨 내일 자동 강등됩니다! 오늘 예약을 완료하세요.`
+  }
+};
+
+function currentLang(){
+  const sel = document.getElementById('lang') || document.getElementById('langSelect');
+  const v = (sel && sel.value) || localStorage.getItem('sw_lang') || (navigator.language || 'en').slice(0,2);
+  return /^ko/i.test(v) ? 'ko' : 'en';
+}
 
 /** Compute level index from totalSpent and lastBooking date (ISO) */
 function computeLevel(totalSpentKRW, lastBookingISO){
@@ -42,40 +69,38 @@ function remainingToNext(totalSpentKRW, levelIdx){
 function $(sel, scope){ return (scope||document).querySelector(sel); }
 function $all(sel, scope){ return (scope||document).querySelectorAll(sel); }
 
-/** Update top card + gauge + membership grid highlight */
+/** Update UI: top card + gauge + membership grid highlight */
 function applyLevelUI(levelIdx, totalSpentKRW){
-  const lvl = LEVELS[levelIdx];
+  const lang = currentLang();
+  const t = MSG[lang];
 
-  // Top "Your tier" area
+  const lvl = LEVELS[levelIdx];
   const tierText = $('#levelProgressText');
 
-  // Gauge bar (try strict first, then fallback)
-  let gauge = document.querySelector('.card .bg-[var(--gold)].h-2');
-  if (!gauge){
-    const gaugeContainer = $all('.w-full.bg-white\\/10.rounded-full.h-2')[0];
-    if (gaugeContainer) gauge = gaugeContainer.querySelector('.h-2');
-  }
+  // Gauge nodes (두 가지 마크업 모두 대응)
+  let gauge = document.querySelector('.card .bg-[var(--gold)].h-2')
+          || ($('.w-full.bg-white\\/10.rounded-full.h-2')?.querySelector('.h-2'));
   const gaugePctEl = $('.text-right.text-xs.text-white\\/60.mt-1');
 
-  // Progress calc
   let pct = 100;
   const rem = remainingToNext(totalSpentKRW, levelIdx);
+
   if (rem !== null){
     const currMin = LEVELS[levelIdx].min;
     const nextMin = LEVELS[levelIdx+1].min;
     pct = Math.min(100, Math.max(0, Math.round(((totalSpentKRW - currMin) / (nextMin - currMin)) * 100)));
-    if (tierText) tierText.textContent = `다음 등급까지 ₩${rem.toLocaleString()} 남았어요. 60일 예약 없으면 자동 1단계 강등.`;
+    if (tierText) tierText.textContent = t.toNext(rem);
   } else {
-    if (tierText) tierText.textContent = `최상위 등급(Elite). 60일 예약 없으면 자동 1단계 강등.`;
+    if (tierText) tierText.textContent = t.top;
   }
+
   if (gauge) gauge.style.width = pct + '%';
   if (gaugePctEl) gaugePctEl.textContent = pct + '%';
 
-  // Replace "Your tier" headline (the small right card title)
-  const heroTitle = $all('h3.text-xl.font-bold')[0];
+  const heroTitle = $('#levelTitle') || $all('h3.text-xl.font-bold')[0];
   if (heroTitle){ heroTitle.innerHTML = `${lvl.name.toUpperCase()} <span class="text-brand.gold">${lvl.rate}% back</span>`; }
 
-  // Membership card highlight (data-tier)
+  // 그리드 강조
   $all('#tiersGrid [data-tier]').forEach(card=>{
     card.classList.remove('tier-active','tier-muted');
     const name = card.getAttribute('data-tier');
@@ -87,12 +112,9 @@ function applyLevelUI(levelIdx, totalSpentKRW){
 
 /** Downgrade alerts (30, 15, 7, 1 days left) */
 function showDowngradeAlert(daysLeft){
-  const map = {
-    30: '📢 30일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.',
-    15: '⚠️ 15일 후 자동 강등 예정입니다. 활동을 유지하세요.',
-    7:  '⏳ 7일 후 자동 강등 예정입니다. 서둘러 예약하세요!',
-    1:  '🚨 내일 자동 강등됩니다! 오늘 예약을 완료하세요.'
-  };
+  const lang = currentLang();
+  const t = MSG[lang];
+  const map = {30:t.d30, 15:t.d15, 7:t.d7, 1:t.d1};
   const msg = map[daysLeft];
   if (!msg) return;
 
@@ -115,12 +137,4 @@ function setUserContext({ totalSpentKRW, lastBookingISO }){
   }
 }
 
-/* ===== Demo hook: remove in production if you inject real user data ===== */
-(function(){
-  if (window.ENV?.DEMO_MODE){
-    setUserContext({
-      totalSpentKRW: 3_250_000,                                   // 누적 결제액
-      lastBookingISO: new Date(Date.now()-20*86400000).toISOString() // 마지막 예약: 20일 전
-    });
-  }
-})();
+window.setUserContext = setUserContext;
