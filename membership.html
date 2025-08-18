@@ -17,7 +17,7 @@
 <body>
   <!-- 공통 헤더 (로고/언어 선택 유지) -->
   <div id="site-header"></div>
-  <script src="scripts/header.js"></script>
+  <script src="scripts/header.js" defer></script>
 
   <section class="section">
     <div class="container">
@@ -34,7 +34,7 @@
         <div class="text-right text-xs text-white/60 mt-1">0%</div>
       </div>
 
-      <!-- 등급 카드 + 혜택(상속 표시) -->
+      <!-- 등급 카드 + 혜택 -->
       <div id="tiersGrid" class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px">
         <div class="tier-card" data-tier="Bronze"><h3>🥉 Bronze</h3><div class="benefits"></div></div>
         <div class="tier-card" data-tier="Silver"><h3>🥈 Silver</h3><div class="benefits"></div></div>
@@ -50,17 +50,17 @@
     </div>
   </section>
 
-  <!-- 멤버십 로직 (다국어/상속/게이지/알림) -->
-  <script src="membership.js"></script>
+  <!-- 멤버십 로직 -->
+  <script src="membership.js" defer></script>
 
   <!-- 초기화: 로그인 값이 있으면 자동 반영 -->
-  <script>
+  <script defer>
     document.addEventListener('DOMContentLoaded', () => {
       let u = {};
       try { u = JSON.parse(localStorage.getItem('sw_user') || '{}'); } catch(_) {}
       setUserContext({
-        totalSpentKRW: Number.isFinite(u.totalSpentKRW) ? u.totalSpentKRW : 0,
-        lastBookingISO: u.lastBookingISO || null
+        totalSpentKRW: Number.isFinite(u.totalSpentKRW) ? u.totalSpentKRW : 3_250_000, // demo fallback
+        lastBookingISO: u.lastBookingISO || new Date(Date.now()-20*86400000).toISOString()
       });
     });
   </script>
