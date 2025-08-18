@@ -1,7 +1,8 @@
 /* ============================
-   StayWorld Membership — ULTRA SELF-CONTAINED (10 langs)
-   - URL ?lang=xx / 헤더 select / localStorage / 브라우저 언어 모두 지원
-   - LANGS[code].membership이 있으면 deep-merge
+   StayWorld Membership — ULTRA SELF-CONTAINED (Final)
+   - 10 languages built-in (EN/KO/FR/JA/DE/ES/IT/TR/ZH/RU)
+   - Deep-merge with window.LANGS[code].membership when available
+   - Renders AFTER LANGS is ready (race-condition fix)
 ============================ */
 
 /* ---- 0) Built-in i18n for 10 languages ---- */
@@ -208,7 +209,7 @@ const I18N_BASE = {
   }
 };
 
-/* ---- 1) Levels & downgrade ---- */
+/* ---- 1) Levels ---- */
 const LEVELS = [
   { name:'Bronze',   minKRW:       0, rate: 0 },
   { name:'Silver',   minKRW:  500_000, rate: 3 },
@@ -218,8 +219,7 @@ const LEVELS = [
   { name:'Elite',    minKRW:15_000_000, rate:15 }
 ];
 
-/* ---- 2) Currency map ---- */
-const DOWNGRADE_DAYS = 60;
+/* ---- 2) Currency ---- */
 const KRW_PER_USD = 1300;
 const FX = {
   USD:{code:'USD', symbol:'$',  perUSD:1,    locale:'en-US', frac:0},
@@ -236,25 +236,30 @@ const LANG2CUR = { en:'USD', ko:'KRW', ja:'JPY', zh:'CNY', fr:'EUR', es:'EUR', d
 function deepMerge(base, ext){
   const out = Array.isArray(base) ? base.slice() : {...base};
   if (!ext) return out;
-  Object.keys(ext).forEach(k=>{
+  for (const k of Object.keys(ext)){
     if (ext[k] && typeof ext[k]==='object' && !Array.isArray(ext[k])) out[k] = deepMerge(base?.[k]||{}, ext[k]);
     else out[k] = ext[k];
-  });
+  }
   return out;
 }
 
-// 🔧 언어 결정: URL ?lang=xx -> 헤더 셀렉트 -> localStorage -> 브라우저
+// LANGS 로드 대기 (race-condition 방지)
+function waitForLangs(cb, tries=0){
+  if (window.LANGS && Object.keys(window.LANGS).length) return cb();
+  if (tries > 100) return cb(); // ~5s 타임아웃
+  setTimeout(()=>waitForLangs(cb, tries+1), 50);
+}
+
 function getLangCode() {
   const url = new URL(window.location.href);
   let code = (url.searchParams.get('lang') || '').trim().toLowerCase();
 
   if (!code) {
-    const sel = document.getElementById('langSelect') || document.getElementById('lang');
-    if (sel && sel.value) code = String(sel.value).trim().toLowerCase();
+    try { code = (localStorage.getItem('sw_lang') || '').trim().toLowerCase(); } catch(_) {}
   }
   if (!code) {
-    const saved = (localStorage.getItem('sw_lang') || '').trim().toLowerCase();
-    if (saved) code = saved;
+    const sel = document.getElementById('langSelect') || document.getElementById('lang');
+    if (sel && sel.value) code = String(sel.value).trim().toLowerCase();
   }
   if (!code) {
     const nav = (navigator.language || 'en').toLowerCase();
@@ -263,6 +268,7 @@ function getLangCode() {
   code = code.slice(0,2);
   if (!I18N_BASE[code]) code = 'en';
 
+  // URL 강제시 저장
   if (url.searchParams.get('lang')) {
     try { localStorage.setItem('sw_lang', code); } catch(_) {}
   }
@@ -273,9 +279,8 @@ function getDict(){
   const code = getLangCode();
   const base = I18N_BASE[code] || I18N_BASE.en;
   const fromLangs = (window.LANGS && LANGS[code] && LANGS[code].membership) ? LANGS[code].membership : null;
-  return deepMerge(base, fromLangs||{});
+  return deepMerge(base, fromLangs || {});
 }
-
 function t(path){
   const d=getDict();
   return path.split('.').reduce((o,k)=> (o&&o[k]!=null)?o[k]:undefined, d);
@@ -318,13 +323,14 @@ const BENEFITS_BY_TIER = {
   Elite:    ['member_prices','basic_support','secure_pay',['points_back',15],'priority_email','priority_chat','upgrade_when_available','b2b_invoice','elite_concierge']
 };
 
-/* ---- 5) Level helpers ---- */
+/* ---- 5) Level logic ---- */
 function computeLevel(totalKRW, lastBookingISO){
   let idx = 0;
   for (let i=0;i<LEVELS.length;i++){ if (totalKRW >= LEVELS[i].minKRW) idx = i; }
+  const days = t('defaults.days') ?? 60;
   if (lastBookingISO){
     const diff = Math.floor((Date.now()-new Date(lastBookingISO).getTime())/86400000);
-    if (diff >= (t('defaults.days') ?? 60)) idx = Math.max(0, idx-1);
+    if (diff >= days) idx = Math.max(0, idx-1);
   }
   return idx;
 }
@@ -342,9 +348,10 @@ function renderLabels(){
   set('mb_subtitle', L.subtitle);
 
   const days = L.defaults?.days ?? 60;
-  set('dwTop', tpl(L.retention_rule, {days}));
+  const dw = tpl(L.retention_rule, {days});
+  const dwTop = document.getElementById('dwTop'); if (dwTop) dwTop.textContent = dw;
 
-  const lv = L.levels;
+  const lv = L.levels || {};
   set('lbl_bronze',   lv.bronze);
   set('lbl_silver',   lv.silver);
   set('lbl_gold',     lv.gold);
@@ -388,13 +395,10 @@ function renderUser(totalSpentKRW, lastBookingISO){
   const pv=document.getElementById('progressPct'); if (pv) pv.textContent = pct + '%';
 
   const msg=document.getElementById('levelProgressText');
-  if (msg){
-    if (remain===null){
-      msg.textContent = L.progress_title;
-    }else{
-      const nextLabel = localizeLevelName(LEVELS[Math.min(idx+1, LEVELS.length-1)].name);
-      msg.textContent = tpl(L.progress_to_next, { amount: fmtKRWtoLocal(remain), level: nextLabel });
-    }
+  if (remain===null) msg && (msg.textContent = L.progress_title);
+  else {
+    const nextLabel = localizeLevelName(LEVELS[Math.min(idx+1, LEVELS.length-1)].name);
+    msg && (msg.textContent = tpl(L.progress_to_next, { amount: fmtKRWtoLocal(remain), level: nextLabel }));
   }
 
   document.querySelectorAll('#tiersGrid [data-tier]').forEach(card=>{
@@ -412,15 +416,14 @@ function renderUser(totalSpentKRW, lastBookingISO){
   }
 
   if (lastBookingISO){
-    const diff = Math.floor((Date.now() - new Date(lastBookingISO).getTime())/86400000);
-    const left = (L.defaults?.days ?? 60) - diff;
+    const left = (L.defaults?.days ?? 60) - Math.floor((Date.now() - new Date(lastBookingISO).getTime())/86400000);
     if ([30,15,7,1].includes(left)) showToast(left);
   }
 }
 
 /* ---- 7) Toast ---- */
 function showToast(daysLeft){
-  const code=getLangCode();
+  const code = getLangCode();
   const ko = (daysLeft===30?'📢 30일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.'
     : daysLeft===15?'⚠️ 15일 후 자동 강등 예정입니다. 활동을 유지하세요.'
     : daysLeft===7 ?'⏳ 7일 후 자동 강등 예정입니다. 서둘러 예약하세요!'
@@ -429,8 +432,8 @@ function showToast(daysLeft){
     : daysLeft===15?'⚠️ Auto downgrade in 15 days. Stay active.'
     : daysLeft===7 ?'⏳ Auto downgrade in 7 days. Book soon!'
     :'🚨 Auto downgrade tomorrow! Complete a booking today.');
-
   const msg = (code==='ko') ? ko : en;
+
   const el=document.createElement('div');
   el.style.cssText='position:fixed;right:16px;bottom:16px;z-index:9999;background:#1e2a35;color:#fff;border:1px solid #2f3b47;padding:12px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.35)';
   el.textContent=msg;
@@ -446,20 +449,28 @@ function setUserContext({ totalSpentKRW, lastBookingISO }){
 }
 window.setUserContext = setUserContext;
 
-/* ---- 9) Init ---- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  const savedLang = (localStorage.getItem('sw_lang') || (navigator.language||'en')).slice(0,2).toLowerCase();
-  if (window.StayWorldI18n && typeof window.StayWorldI18n.applyLang === 'function') {
-    window.StayWorldI18n.applyLang(savedLang);
-  }
+/* ---- 9) Init (LANGS 로드 대기 후 렌더) ---- */
+document.addEventListener('DOMContentLoaded', () => {
+  waitForLangs(() => {
+    const code = getLangCode();
+    if (window.StayWorldI18n && typeof window.StayWorldI18n.applyLang === 'function') {
+      window.StayWorldI18n.applyLang(code);
+    } else {
+      try { localStorage.setItem('sw_lang', code); } catch(_) {}
+    }
 
-  let u={}; try{ u=JSON.parse(localStorage.getItem('sw_user')||'{}'); }catch(_){}
-  setUserContext({ totalSpentKRW: Number.isFinite(u.totalSpentKRW)?u.totalSpentKRW:0, lastBookingISO: u.lastBookingISO || null });
+    let u={}; try{ u = JSON.parse(localStorage.getItem('sw_user')||'{}'); }catch(_){}
+    setUserContext({
+      totalSpentKRW: Number.isFinite(u.totalSpentKRW) ? u.totalSpentKRW : 0,
+      lastBookingISO: u.lastBookingISO || null
+    });
 
-  window.addEventListener('sw:languageChanged', ()=>{
-    let cur={}; try{ cur=JSON.parse(localStorage.getItem('sw_user')||'{}'); }catch(_){}
-    setUserContext({ totalSpentKRW: Number.isFinite(cur.totalSpentKRW)?cur.totalSpentKRW:0, lastBookingISO: cur.lastBookingISO || null });
+    window.addEventListener('sw:languageChanged', () => {
+      let cur={}; try{ cur = JSON.parse(localStorage.getItem('sw_user')||'{}'); }catch(_){}
+      setUserContext({
+        totalSpentKRW: Number.isFinite(cur.totalSpentKRW) ? cur.totalSpentKRW : 0,
+        lastBookingISO: cur.lastBookingISO || null
+      });
+    });
   });
-
-  setTimeout(()=> window.dispatchEvent(new Event('sw:languageChanged')), 200);
 });
