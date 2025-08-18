@@ -1,79 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld | Membership</title>
-  <link rel="stylesheet" href="/style.css"/>
+/* ============================
+   StayWorld Membership — FINAL
+   Works with lang.js (LANGS + sw:languageChanged)
+   - Tier thresholds in KRW
+   - Localized currency by language
+   - Always-on downgrade note + D-30/15/7/1 toasts
+   - Upper tiers inherit benefits of lower tiers
+============================ */
 
-  <style>
-    .page-wrap{max-width:1040px;margin:0 auto;padding:24px}
-    .note{opacity:.85}
-    .card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
-    .gauge{width:100%;height:8px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
-    .gauge > div{height:100%;background:#f4d78c}
-    .tier-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-    .tier-card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
-    .tier-card h3{display:flex;gap:8px;align-items:center;margin:0 0 8px}
-    .benefit{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
-    .benefit i{font-style:normal}
-    .tier-active{outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
-    .tier-muted{opacity:.65}
-    .badge{position:absolute;right:16px;top:-10px;background:#f4d78c;color:#1a1205;border-radius:999px;padding:6px 12px;font-weight:700}
-    .sticky-note{position:sticky;top:0;z-index:30;background:#0f1420;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:16px}
-    @media (max-width: 840px){ .tier-grid{grid-template-columns:1fr} }
-  </style>
-</head>
-<body>
-  <!-- 공통 헤더 -->
-  <div id="site-header"></div>
+/* ---- 1) Tier thresholds & earn rates (base: KRW) ---- */
+const LEVELS = [
+  { name:'Bronze',   minKRW:       0, rate: 0 },
+  { name:'Silver',   minKRW:  500_000, rate: 3 },
+  { name:'Gold',     minKRW:2_000_000, rate: 5 },
+  { name:'Platinum', minKRW:4_000_000, rate: 7 },
+  { name:'Diamond',  minKRW:7_500_000, rate:10 },
+  { name:'Elite',    minKRW:15_000_000, rate:15 } // 자동 승격
+];
 
-  <main class="page-wrap">
-    <!-- 60일 자동강등 고정 안내 -->
-    <div id="dwTop" class="sticky-note"></div>
+const DOWNGRADE_DAYS = 60;
 
-    <!-- 제목/설명 -->
-    <h1 id="mb_title"></h1>
-    <p id="mb_subtitle" class="note"></p>
+/* ---- 2) Currency map per language (coarse FX for display only) ---- */
+const KRW_PER_USD = 1300;
+const FX = {
+  USD:{code:'USD', symbol:'$',  perUSD:1,    locale:'en-US', frac:0},
+  EUR:{code:'EUR', symbol:'€',  perUSD:0.92, locale:'fr-FR', frac:0},
+  KRW:{code:'KRW', symbol:'₩',  perUSD:1300, locale:'ko-KR', frac:0},
+  JPY:{code:'JPY', symbol:'¥',  perUSD:155,  locale:'ja-JP', frac:0},
+  CNY:{code:'CNY', symbol:'¥',  perUSD:7.2,  locale:'zh-CN', frac:0},
+  TRY:{code:'TRY', symbol:'₺',  perUSD:33,   locale:'tr-TR', frac:0},
+  RUB:{code:'RUB', symbol:'₽',  perUSD:90,   locale:'ru-RU', frac:0},
+  GBP:{code:'GBP', symbol:'£',  perUSD:0.78, locale:'en-GB', frac:0},
+  AED:{code:'AED', symbol:'د.إ',perUSD:3.67, locale:'ar-AE', frac:0},
+  CAD:{code:'CAD', symbol:'$',  perUSD:1.36, locale:'en-CA', frac:0}
+};
+const LANG2CUR = { en:'USD', ko:'KRW', ja:'JPY', zh:'CNY', fr:'EUR', es:'EUR', de:'EUR', it:'EUR', tr:'TRY', ru:'RUB' };
 
-    <!-- 현재 등급 카드 -->
-    <section class="card" style="position:relative; margin-top:14px">
-      <h3 id="levelTitle"></h3>
-      <div id="tierBadge" class="badge">5% back</div>
+/* ---- 3) Helpers ---- */
+function getLangCode(){
+  const sel=document.getElementById('langSelect');
+  const saved=localStorage.getItem('sw_lang')||(navigator.language||'en').slice(0,2).toLowerCase();
+  const code=(sel && LANGS[sel.value]) ? sel.value : (LANGS[saved]?saved:'en');
+  return code;
+}
+function getDict(){
+  const code=getLangCode();
+  return (window.LANGS && LANGS[code] && LANGS[code].membership) ? LANGS[code].membership : LANGS.en.membership;
+}
+function t(path){ // dot-path getter
+  const d=getDict();
+  return path.split('.').reduce((o,k)=> (o&&o[k]!=null)?o[k]:undefined, d);
+}
+function tpl(str, map){
+  return String(str).replace(/\{(\w+)\}/g, (_,k)=> (map && (k in map)) ? map[k] : `{${k}}`);
+}
+function fmtKRWtoLocal(krw){
+  const cur = FX[ LANG2CUR[getLangCode()] || 'USD' ] || FX.USD;
+  const usd = krw / KRW_PER_USD;
+  const local = usd * cur.perUSD;
+  return new Intl.NumberFormat(cur.locale, { style:'currency', currency:cur.code, maximumFractionDigits:cur.frac }).format(local);
+}
 
-      <p id="levelProgressText"></p>
-      <div class="gauge"><div id="gaugeFill" style="width:0%"></div></div>
-      <div id="progressPct" class="note" style="text-align:right;margin-top:6px">0%</div>
-
-      <small id="downgradeSticky" class="note" style="display:block;margin-top:10px"></small>
-    </section>
-
-    <!-- 등급 카드 + 혜택 (JS가 채움) -->
-    <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
-      <article class="tier-card" data-tier="Bronze">
-        <h3>🥉 <span id="lbl_bronze"></span></h3><div class="benefits"></div>
-      </article>
-      <article class="tier-card" data-tier="Silver">
-        <h3>🥈 <span id="lbl_silver"></span></h3><div class="benefits"></div>
-      </article>
-      <article class="tier-card" data-tier="Gold">
-        <h3>🥇 <span id="lbl_gold"></span></h3><div class="benefits"></div>
-      </article>
-      <article class="tier-card" data-tier="Platinum">
-        <h3>💎 <span id="lbl_platinum"></span></h3><div class="benefits"></div>
-      </article>
-      <article class="tier-card" data-tier="Diamond">
-        <h3>🔷 <span id="lbl_diamond"></span></h3><div class="benefits"></div>
-      </article>
-      <article class="tier-card" data-tier="Elite">
-        <h3>👑 <span id="lbl_elite"></span></h3><div class="benefits"></div>
-      </article>
-    </section>
-  </main>
-
-  <!-- 로드 순서 고정: header -> lang -> membership -->
-  <script src="/scripts/header.js" defer></script>
-  <script src="/lang.js" defer></script>
-  <script src="/membership.js" defer></script>
-</body>
-</html>
+/* ---- 4) Benefits per tier (upper inherits lower) ---- */
+const BENEFITS = {
+  member_prices:  (L)=> L?.member_prices || "Member-only prices",
+  basic_support:  (L)=> L?.basic_support || "Standard support",
+  secure_pay:     (L)=> L?.secure_pay || "Secure payments (Cards & Crypto)",
+  points_back:    (L,p)=> tpl(L?.perks?.points_back || "{percent}% back", {percent:p}),
+  free_cancel:    (L)=> L?.free_cancel || "Free-cancel window",
+  prio_email:     (L)=> L?.priority_email || "Priority email support",
+  prio_chat:      (L)=> L?.priority_chat || "Priority live chat",
+  late_checkout:  (_
