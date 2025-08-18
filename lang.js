@@ -194,3 +194,37 @@
       },
       retention_title: "레벨 유지",
       retention_rule: "예약이 {days}일 이상 없으면 자동으로 1단계_
+<h1 id="mb_title"></h1>
+<p id="mb_subtitle"></p>
+
+<!-- 진행률 -->
+<div class="progress-wrap">
+  <div class="progress-track">
+    <div id="mb_progress_bar" class="progress-fill"></div>
+  </div>
+  <span id="mb_badge_percent" class="badge"></span>
+  <span id="mb_progress_value">0%</span>
+</div>
+<p id="mb_progress_note"></p>
+
+<!-- 레벨 카드 타이틀들 -->
+<div class="grid">
+  <div class="card"><span>🥉</span><span id="mb_level_bronze"></span></div>
+  <div class="card"><span>🥈</span><span id="mb_level_silver"></span></div>
+  <div class="card"><span>🥇</span><span id="mb_level_gold"></span></div>
+  <div class="card"><span>💎</span><span id="mb_level_diamond"></span></div>
+  <div class="card"><span>🔷</span><span id="mb_level_platinum"></span></div>
+  <div class="card"><span>👑</span><span id="mb_level_elite"></span></div>
+</div>
+
+<h2 id="mb_perks_title"></h2>
+<h2 id="mb_thresholds_title"></h2>
+<h2 id="mb_retention_title"></h2>
+<p id="mb_retention_rule"></p>
+
+<div class="actions">
+  <button id="mb_cta_join"></button>
+  <button id="mb_cta_view"></button>
+  <a href="/terms" id="mb_cta_learn"></a>
+  <a href="/terms" id="mb_terms"></a>
+</div>
