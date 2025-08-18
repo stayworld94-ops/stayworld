@@ -1,145 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StayWorld — Membership & Rewards</title>
-  <link rel="stylesheet" href="/style.css" />
-  <meta name="color-scheme" content="dark light" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StayWorld | Membership</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <!-- 공통 헤더 주입 (로고/네비 고정) -->
+  <!-- 공통 헤더 주입 -->
   <div id="site-header"></div>
-  <script src="/scripts/header.js"></script>
+  <!-- ❗️GitHub Pages면 절대경로(/scripts/...)가 404 날 수 있으니 상대경로 사용 -->
+  <script src="scripts/header.js"></script>
 
-  <!-- Hero / Summary -->
-  <section class="hero">
-    <div class="container">
-      <h1 class="hero-title">StayWorld<span class="accent"> Membership</span></h1>
-      <p class="hero-sub">Earn points on every booking. Higher tiers inherit benefits from lower tiers.</p>
-
-      <!-- 현재 등급 요약 카드 -->
-      <div class="card" style="margin-top:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
-          <div>
-            <h3 id="yourTierTitle" class="text-xl font-bold">BRONZE <span class="text-brand gold">0% back</span></h3>
-            <div id="levelProgressText" class="text-sm" style="opacity:.85">Welcome to StayWorld Membership.</div>
-          </div>
-          <div style="min-width:260px;flex:1">
-            <div class="w-full bg-white/10 rounded-full h-2" id="levelGauge" aria-label="Progress to next tier">
-              <div id="levelGaugeBar" class="h-2" style="width:0%;background:linear-gradient(180deg,#f4d78c,#c9a35b);border-radius:999px;"></div>
-            </div>
-            <div id="levelGaugePct" class="text-right text-xs text-white/60 mt-1">0%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Tiers Grid -->
   <section class="section">
     <div class="container">
-      <h2 style="margin:0 0 12px">Tiers & Benefits</h2>
+      <h1>🌟 StayWorld Membership</h1>
+      <p>멤버십 레벨 및 혜택</p>
 
-      <div id="tiersGrid" class="features" style="grid-template-columns:repeat(3,1fr)">
-        <!-- Bronze -->
-        <article class="card" data-tier="Bronze" tabindex="0" aria-label="Bronze tier">
-          <h3>Bronze</h3>
-          <p>₩0+ total · 0% back</p>
-          <ul style="margin-top:8px;opacity:.9">
-            <li>• Basic support</li>
-            <li>• Access to member-only deals</li>
-          </ul>
-        </article>
-
-        <!-- Silver -->
-        <article class="card" data-tier="Silver" tabindex="0" aria-label="Silver tier">
-          <h3>Silver</h3>
-          <p>₩500,000+ total · 3% back</p>
-          <ul style="margin-top:8px;opacity:.9">
-            <li>• Bronze benefits</li>
-            <li>• Priority customer support</li>
-          </ul>
-        </article>
-
-        <!-- Gold -->
-        <article class="card" data-tier="Gold" tabindex="0" aria-label="Gold tier">
-          <h3>Gold</h3>
-          <p>₩2,000,000+ total · 5% back</p>
-          <ul style="margin-top:8px;opacity:.9">
-            <li>• Silver benefits</li>
-            <li>• Free late checkout (when available)</li>
-          </ul>
-        </article>
-
-        <!-- Platinum -->
-        <article class="card" data-tier="Platinum" tabindex="0" aria-label="Platinum tier">
-          <h3>Platinum</h3>
-          <p>₩4,000,000+ total · 7% back</p>
-          <ul style="margin-top:8px;opacity:.9">
-            <li>• Gold benefits</li>
-            <li>• Dedicated concierge line</li>
-          </ul>
-        </article>
-
-        <!-- Diamond -->
-        <article class="card" data-tier="Diamond" tabindex="0" aria-label="Diamond tier">
-          <h3>Diamond</h3>
-          <p>₩7,500,000+ total · 10% back</p>
-          <ul style="margin-top:8px;opacity:.9">
-            <li>• Platinum benefits</li>
-            <li>• Complimentary room upgrade (subject to availability)</li>
-          </ul>
-        </article>
-
-        <!-- Elite (manual by default) -->
-        <article class="card" data-tier="Elite" tabindex="0" aria-label="Elite tier">
-          <h3>Elite</h3>
-          <p>₩15,000,000+ total · 15% back (manual)</p>
-          <ul style="margin-top:8px;opacity:.9">
-            <li>• Diamond benefits</li>
-            <li>• VIP welcome & guaranteed late checkout</li>
-          </ul>
-        </article>
+      <!-- 현재 티어 + 게이지 -->
+      <div class="card" style="margin-top:12px">
+        <h3 id="levelTitle">Your Tier</h3>
+        <p id="levelProgressText"></p>
+        <div class="w-full bg-white/10 rounded-full h-2">
+          <div class="bg-[var(--gold)] h-2" style="width:0%"></div>
+        </div>
+        <div class="text-right text-xs text-white/60 mt-1">0%</div>
       </div>
 
-      <p class="text-sm" style="margin-top:12px;opacity:.7">
-        * If there are no bookings for 60 consecutive days, you are automatically downgraded by one level.
-      </p>
+      <!-- 등급 카드 -->
+      <div id="tiersGrid" class="grid grid-cols-2 gap-4 mt-6">
+        <div class="tier-card" data-tier="Bronze">🥉 Bronze</div>
+        <div class="tier-card" data-tier="Silver">🥈 Silver</div>
+        <div class="tier-card" data-tier="Gold">🥇 Gold</div>
+        <div class="tier-card" data-tier="Platinum">💎 Platinum</div>
+        <div class="tier-card" data-tier="Diamond">🔷 Diamond</div>
+        <div class="tier-card" data-tier="Elite">👑 Elite</div>
+      </div>
     </div>
   </section>
 
-  <!-- Scripts -->
-  <script src="/scripts/membership.js"></script>
+  <!-- 멤버십 로직 불러오기 (파일 분리) -->
+  <script src="membership.js"></script>
   <script>
-    // 실제 서비스에서는 로그인 후 서버에서 받아온 유저 데이터로 대체
-    // localStorage에 sw_user가 있으면 사용, 없으면 데모
-    (function(){
-      try{
-        const raw = localStorage.getItem('sw_user');
-        if(raw){
-          const u = JSON.parse(raw);
-          window.StayWorldMembership.setUserContext({
-            totalSpentKRW: Number(u.totalSpentKRW)||0,
-            lastBookingISO: u.lastBookingISO||null,
-            eliteGranted: !!u.eliteGranted
-          });
-        }else{
-          // DEMO 보기 좋게
-          window.StayWorldMembership.setUserContext({
-            totalSpentKRW: 3_250_000,
-            lastBookingISO: new Date(Date.now()-20*86400000).toISOString(),
-            eliteGranted: false
-          });
-        }
-      }catch(e){
-        console.warn('membership demo init failed', e);
-      }
-    })();
+    // (데모) 로그인 후 사용자 데이터가 들어왔다고 가정
+    setUserContext({
+      totalSpentKRW: 3_250_000,
+      lastBookingISO: new Date(Date.now() - 20*86400000).toISOString()
+    });
   </script>
-
-  <footer class="site-footer">
-    <div class="container"><small>© StayWorld — stayworldbooking.com</small></div>
-  </footer>
 </body>
 </html>
