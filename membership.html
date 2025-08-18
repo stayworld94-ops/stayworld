@@ -4,80 +4,91 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StayWorld | Membership</title>
+  <link rel="stylesheet" href="/style.css"/>
 
-  <!-- 전역 스타일 + 본 페이지 전용 스타일 -->
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="styles/membership.css"/>
-
-  <!-- 공통 헤더 (로고/언어 선택 유지) -->
-  <script src="scripts/header.js" defer></script>
-  <!-- 다국어 사전 (기존 lang.js 유지 + 하단의 추가키를 lang.js에 넣어주세요) -->
-  <script src="lang.js" defer></script>
-  <!-- 멤버십 로직 -->
-  <script src="scripts/membership.js" defer></script>
+  <style>
+    /* 간결한 보강 스타일 */
+    .page-wrap{max-width:1040px;margin:0 auto;padding:24px}
+    .note{opacity:.85}
+    .card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
+    .gauge{width:100%;height:8px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+    .gauge > div{height:100%;background:#f4d78c}
+    .tier-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .tier-card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
+    .tier-card h3{display:flex;gap:8px;align-items:center;margin:0 0 8px}
+    .benefit{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+    .benefit i{font-style:normal}
+    .tier-active{outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
+    .tier-muted{opacity:.65}
+    .badge{position:absolute;right:16px;top:-10px;background:#f4d78c;color:#1a1205;border-radius:999px;padding:6px 12px;font-weight:700}
+    .sticky-note{position:sticky;top:0;z-index:30;background:#1b1310;border:1px solid #4b2f13;color:#fce7c2;border-radius:12px;padding:10px 14px;margin-bottom:16px}
+    @media (max-width: 840px){ .tier-grid{grid-template-columns:1fr} }
+  </style>
 </head>
 <body>
-  <!-- 공통 헤더 주입 위치 -->
+  <!-- 공통 헤더 -->
   <div id="site-header"></div>
 
-  <section class="section">
-    <div class="container">
-      <!-- 항상 보이는 60일 강등 경고/카운트 -->
-      <div id="downgradeBanner" class="sw-banner" role="status" aria-live="polite">
-        <strong id="dwLabel"></strong>
-        <span id="dwCountdown"></span>
+  <main class="page-wrap">
+    <!-- 60일 자동강등 고정 안내 -->
+    <div id="dwTop" class="sticky-note" data-i18n="dw_always"></div>
+
+    <!-- 제목/설명 -->
+    <h1 data-i18n="title"></h1>
+    <p class="note" data-i18n="inherit_note"></p>
+
+    <!-- 현재 등급 카드 -->
+    <section class="card" style="position:relative; margin-top:14px">
+      <h3 id="levelTitle" data-i18n="your_tier"></h3>
+      <div id="tierBadge" class="badge">5% back</div>
+
+      <p id="levelProgressText"><!-- to next message --></p>
+      <div class="gauge">
+        <div id="gaugeFill" style="width:0%"></div>
       </div>
+      <div id="progressPct" class="note" style="text-align:right;margin-top:6px">0%</div>
 
-      <h1 id="mbTitle">🌟 StayWorld Membership</h1>
-      <p class="note" id="inheritNote"></p>
+      <!-- 하단에도 항상 한 번 더 고정 안내 문구 노출 -->
+      <small id="downgradeSticky" class="note" style="display:block;margin-top:10px" data-i18n="dw_always"></small>
+    </section>
 
-      <!-- 현재 등급 / 게이지 / 남은 금액 -->
-      <div class="card sw-current">
-        <div class="sw-current-top">
-          <h3 id="currentTierName">Your Tier</h3>
-          <span id="currentTierRate" class="sw-badge">0% back</span>
-        </div>
-        <p id="levelProgressText"></p>
+    <!-- 등급 카드 + 혜택 (상위는 하위 혜택 포함; JS가 내용 채움) -->
+    <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
+      <article class="tier-card" data-tier="Bronze">
+        <h3>🥉 <span data-i18n="bronze"></span></h3>
+        <div class="benefits"></div>
+      </article>
 
-        <div class="sw-gauge">
-          <div class="sw-gauge-fill" id="gaugeFill" style="width:0%"></div>
-        </div>
-        <div class="sw-gauge-meta">
-          <span id="progressPct">0%</span>
-          <span id="toNextLabel"></span>
-        </div>
-      </div>
+      <article class="tier-card" data-tier="Silver">
+        <h3>🥈 <span data-i18n="silver"></span></h3>
+        <div class="benefits"></div>
+      </article>
 
-      <!-- 등급 카드: 상위가 하위 혜택 포함 -->
-      <div id="tiersGrid" class="tiers-grid">
-        <div class="tier-card" data-tier="Bronze">
-          <div class="tier-head"><span class="ti">🥉</span><h3>Bronze</h3></div>
-          <ul class="benefits"></ul>
-        </div>
-        <div class="tier-card" data-tier="Silver">
-          <div class="tier-head"><span class="ti">🥈</span><h3>Silver</h3></div>
-          <ul class="benefits"></ul>
-        </div>
-        <div class="tier-card" data-tier="Gold">
-          <div class="tier-head"><span class="ti">🥇</span><h3>Gold</h3></div>
-          <ul class="benefits"></ul>
-        </div>
-        <div class="tier-card" data-tier="Platinum">
-          <div class="tier-head"><span class="ti">💎</span><h3>Platinum</h3></div>
-          <ul class="benefits"></ul>
-        </div>
-        <div class="tier-card" data-tier="Diamond">
-          <div class="tier-head"><span class="ti">🔷</span><h3>Diamond</h3></div>
-          <ul class="benefits"></ul>
-        </div>
-        <div class="tier-card" data-tier="Elite">
-          <div class="tier-head"><span class="ti">👑</span><h3>Elite</h3></div>
-          <ul class="benefits"></ul>
-        </div>
-      </div>
+      <article class="tier-card" data-tier="Gold">
+        <h3>🥇 <span data-i18n="gold"></span></h3>
+        <div class="benefits"></div>
+      </article>
 
-      <p class="note" id="dwNote"></p>
-    </div>
-  </section>
+      <article class="tier-card" data-tier="Platinum">
+        <h3>💎 <span data-i18n="platinum"></span></h3>
+        <div class="benefits"></div>
+      </article>
+
+      <article class="tier-card" data-tier="Diamond">
+        <h3>🔷 <span data-i18n="diamond"></span></h3>
+        <div class="benefits"></div>
+      </article>
+
+      <article class="tier-card" data-tier="Elite">
+        <h3>👑 <span data-i18n="elite"></span></h3>
+        <div class="benefits"></div>
+      </article>
+    </section>
+  </main>
+
+  <!-- 스크립트: 로드 순서 고정 (모두 defer) -->
+  <script src="/scripts/header.js" defer></script>
+  <script src="/lang.js" defer></script>         <!-- 너가 쓰는 i18n 파일명 정확히! (lanq.js 아님) -->
+  <script src="/membership.js" defer></script>    <!-- 제가 준 membership.js 최종본 -->
 </body>
 </html>
