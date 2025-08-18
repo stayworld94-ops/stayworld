@@ -1,6 +1,6 @@
 // StayWorld i18n — 10 languages (EN/KO/TR/FR/JA/DE/ES/IT/ZH/RU)
 (function(){
-  // ===== 기본 번역 (네가 준 원본 유지) =====
+  // ===== 기본 번역 (메인 페이지) =====
   const LANGS = {
     en:{ 
       nav:{home:"Home", membership:"Membership", login:"Login", signup:"Sign Up"},
@@ -10,7 +10,7 @@
       card1:"Verified stays", card1sub:"Top picks near you.",
       card2:"StayWorld+ Rewards", card2sub:"Earn points on every booking.",
       card3:"Secure payments", card3sub:"Visa, Mastercard, Amex & Crypto.",
-      membership:{} // 밑에서 병합됨
+      membership:{} // 밑에서 병합
     },
     ko:{ 
       nav:{home:"홈", membership:"멤버십", login:"로그인", signup:"가입"},
@@ -121,7 +121,7 @@
     setText("t_card2", t.card2); setText("t_card2sub", t.card2sub);
     setText("t_card3", t.card3); setText("t_card3sub", t.card3sub);
 
-    // 멤버십 텍스트는 membership.js(또는 페이지)에서 LANGS[code].membership을 참조
+    // 멤버십 텍스트는 membership.js에서 LANGS[code].membership을 참조
     window.dispatchEvent(new Event("sw:languageChanged"));
   }
 
@@ -135,96 +135,25 @@
   }
   document.addEventListener("DOMContentLoaded", init);
 
-  // ===== Membership i18n (10개 언어) =====
+  // ===== Membership i18n 추가 (10개 언어) =====
   const MEMBERSHIP_I18N = {
-    en: {
-      title: "Membership Benefits",
-      subtitle: "Earn more as you level up. Elite is automatic based on total spend.",
-      levels: { bronze: "Bronze", silver: "Silver", gold: "Gold", platinum: "Platinum", diamond: "Diamond", elite: "Elite" },
-      perks_title: "Perks by Level",
-      perks: {
-        points_back: "{percent}% points back on each booking",
-        priority_support: "Priority customer support",
-        seasonal_discount: "Seasonal discounts auto-applied",
-        exclusive_coupons: "Exclusive coupons",
-        private_deals: "Access to private deals"
-      },
-      thresholds_title: "Level-up thresholds (total spend)",
-      thresholds: {
-        bronze: "₩0+",
-        silver: "₩500,000+",
-        gold: "₩2,000,000+",
-        platinum: "₩4,000,000+",
-        diamond: "₩7,500,000+",
-        elite: "₩15,000,000+"
-      },
-      retention_title: "Level retention",
-      retention_rule: "If there’s no booking for {days} days, you’ll be auto-downgraded by 1 level.",
-      progress_title: "Your progress",
-      progress_to_next: "Only {amount} left to reach {level}.",
-      warning_demotion: "No booking for {days_no}. {days_left} days left before auto-downgrade.",
-      status_current_level: "Your level: {level}",
-      points_balance: "Points: {points}",
-      earn_on_booking: "You’ll earn ~{percent}% back on this booking.",
-      cta_join: "Join now",
-      cta_view_benefits: "View benefits",
-      cta_learn_more: "Learn more",
-      terms_link: "Membership terms"
-    },
-    ko: {
-      title: "멤버십 혜택",
-      subtitle: "레벨이 오를수록 더 많이 적립됩니다. 엘리트는 누적 금액 기준으로 자동 승급됩니다.",
-      levels: { bronze: "브론즈", silver: "실버", gold: "골드", platinum: "플래티넘", diamond: "다이아몬드", elite: "엘리트" },
-      perks_title: "레벨별 혜택",
-      perks: {
-        points_back: "예약 시 {percent}% 포인트 적립",
-      priority_support: "우선 고객 지원",
-      seasonal_discount: "시즌 할인 자동 적용",
-      exclusive_coupons: "전용 쿠폰",
-      private_deals: "프라이빗 딜 접근"
-      },
-      thresholds_title: "레벨업 기준 (누적 사용금액)",
-      thresholds: {
-        bronze: "₩0+",
-        silver: "₩500,000+",
-        gold: "₩2,000,000+",
-        platinum: "₩4,000,000+",
-        diamond: "₩7,500,000+",
-        elite: "₩15,000,000+"
-      },
-      retention_title: "레벨 유지",
-      retention_rule: "예약이 {days}일 이상 없으면 자동으로 1단계_
-<h1 id="mb_title"></h1>
-<p id="mb_subtitle"></p>
+    en:{ title:"Membership Benefits", subtitle:"Higher tiers include all perks from lower tiers.", levels:{bronze:"Bronze",silver:"Silver",gold:"Gold",platinum:"Platinum",diamond:"Diamond",elite:"Elite"}, perks:{points_back:"{percent}% points back on each booking", priority_support:"Priority support", seasonal_discount:"Seasonal discounts", exclusive_coupons:"Exclusive coupons", private_deals:"Private deals"}, retention_rule:"If there’s no booking for {days} days, you’ll be auto-downgraded by 1 level.", progress_title:"Top tier achieved.", progress_to_next:"Only {amount} left to reach {level}.", status_current_level:"Your level: {level}", defaults:{days:60}},
+    ko:{ title:"멤버십 혜택", subtitle:"상위 등급은 하위 등급 혜택을 모두 포함합니다.", levels:{bronze:"브론즈",silver:"실버",gold:"골드",platinum:"플래티넘",diamond:"다이아몬드",elite:"엘리트"}, perks:{points_back:"예약 시 {percent}% 포인트 적립", priority_support:"우선 지원", seasonal_discount:"시즌 할인", exclusive_coupons:"전용 쿠폰", private_deals:"프라이빗 딜"}, retention_rule:"예약이 {days}일 이상 없으면 자동으로 1단계 강등됩니다.", progress_title:"최상위 등급에 도달했습니다.", progress_to_next:"{level}까지 {amount} 남았습니다.", status_current_level:"현재 레벨: {level}", defaults:{days:60}},
+    fr:{ title:"Avantages du programme", subtitle:"Les niveaux supérieurs incluent tous les avantages des niveaux inférieurs.", levels:{bronze:"Bronze",silver:"Argent",gold:"Or",platinum:"Platine",diamond:"Diamant",elite:"Élite"}, perks:{points_back:"{percent}% de points à chaque réservation", priority_support:"Support prioritaire", seasonal_discount:"Réductions saisonnières", exclusive_coupons:"Coupons exclusifs", private_deals:"Offres privées"}, retention_rule:"Sans réservation pendant {days} jours, rétrogradation automatique d’un niveau.", progress_title:"Niveau maximal atteint.", progress_to_next:"Plus que {amount} pour atteindre {level}.", status_current_level:"Votre niveau : {level}", defaults:{days:60}},
+    ja:{ title:"メンバーシップ特典", subtitle:"上位ランクは下位ランクの特典をすべて含みます。", levels:{bronze:"ブロンズ",silver:"シルバー",gold:"ゴールド",platinum:"プラチナ",diamond:"ダイヤモンド",elite:"エリート"}, perks:{points_back:"予約ごとに{percent}%ポイント還元", priority_support:"優先サポート", seasonal_discount:"シーズン割引", exclusive_coupons:"限定クーポン", private_deals:"非公開ディール"}, retention_rule:"{days}日間予約がない場合、自動的に1ランク降格します。", progress_title:"最上位ランクに到達しました。", progress_to_next:"{level}まであと {amount}。", status_current_level:"現在のランク：{level}", defaults:{days:60}},
+    de:{ title:"Mitgliedschaftsvorteile", subtitle:"Höhere Stufen enthalten alle Vorteile der unteren Stufen.", levels:{bronze:"Bronze",silver:"Silber",gold:"Gold",platinum:"Platin",diamond:"Diamant",elite:"Elite"}, perks:{points_back:"{percent}% Punkte pro Buchung", priority_support:"Priorisierter Support", seasonal_discount:"Saisonale Rabatte", exclusive_coupons:"Exklusive Gutscheine", private_deals:"Private Angebote"}, retention_rule:"Ohne Buchung innerhalb von {days} Tagen erfolgt eine automatische Herabstufung.", progress_title:"Höchste Stufe erreicht.", progress_to_next:"Nur noch {amount} bis {level}.", status_current_level:"Dein Level: {level}", defaults:{days:60}},
+    es:{ title:"Beneficios de membresía", subtitle:"Los niveles superiores incluyen todas las ventajas de los niveles inferiores.", levels:{bronze:"Bronce",silver:"Plata",gold:"Oro",platinum:"Platino",diamond:"Diamante",elite:"Élite"}, perks:{points_back:"{percent}% de puntos por cada reserva", priority_support:"Soporte prioritario", seasonal_discount:"Descuentos de temporada", exclusive_coupons:"Cupones exclusivos", private_deals:"Ofertas privadas"}, retention_rule:"Si no hay reservas durante {days} días, se te degradará automáticamente un nivel.", progress_title:"Nivel máximo alcanzado.", progress_to_next:"Faltan {amount} para llegar a {level}.", status_current_level:"Tu nivel: {level}", defaults:{days:60}},
+    it:{ title:"Vantaggi dell’abbonamento", subtitle:"I livelli superiori includono tutti i vantaggi di quelli inferiori.", levels:{bronze:"Bronzo",silver:"Argento",gold:"Oro",platinum:"Platino",diamond:"Diamante",elite:"Élite"}, perks:{points_back:"{percent}% di punti per ogni prenotazione", priority_support:"Supporto prioritario", seasonal_discount:"Sconti stagionali", exclusive_coupons:"Coupon esclusivi", private_deals:"Offerte private"}, retention_rule:"Se non effettui prenotazioni per {days} giorni, verrai retrocesso automaticamente di 1 livello.", progress_title:"Raggiunto il livello massimo.", progress_to_next:"Mancano {amount} per raggiungere {level}.", status_current_level:"Il tuo livello: {level}", defaults:{days:60}},
+    zh:{ title:"会员权益", subtitle:"更高级别包含所有低级别的权益。", levels:{bronze:"青铜",silver:"白银",gold:"黄金",platinum:"铂金",diamond:"钻石",elite:"精英"}, perks:{points_back:"每次预订返还 {percent}% 积分", priority_support:"优先支持", seasonal_discount:"季节性折扣", exclusive_coupons:"专属优惠券", private_deals:"私人优惠"}, retention_rule:"若 {days} 天内无预订，将自动降级一级。", progress_title:"已达到最高等级。", progress_to_next:"距离 {level} 只差 {amount}。", status_current_level:"你的等级：{level}", defaults:{days:60}},
+    ru:{ title:"Преимущества членства", subtitle:"Более высокий уровень включает все преимущества нижних уровней.", levels:{bronze:"Бронза",silver:"Серебро",gold:"Золото",platinum:"Платина",diamond:"Бриллиант",elite:"Элита"}, perks:{points_back:"{percent}% бонусов за каждое бронирование", priority_support:"Приоритетная поддержка", seasonal_discount:"Сезонные скидки", exclusive_coupons:"Эксклюзивные купоны", private_deals:"Приватные предложения"}, retention_rule:"Если нет бронирований в течение {days} дней, произойдет автоматическое понижение на 1 уровень.", progress_title:"Достигнут максимальный уровень.", progress_to_next:"Осталось {amount} до уровня {level}.", status_current_level:"Ваш уровень: {level}", defaults:{days:60}}
+  };
 
-<!-- 진행률 -->
-<div class="progress-wrap">
-  <div class="progress-track">
-    <div id="mb_progress_bar" class="progress-fill"></div>
-  </div>
-  <span id="mb_badge_percent" class="badge"></span>
-  <span id="mb_progress_value">0%</span>
-</div>
-<p id="mb_progress_note"></p>
+  // 병합
+  Object.keys(MEMBERSHIP_I18N).forEach(code=>{
+    LANGS[code] = LANGS[code] || {};
+    LANGS[code].membership = {...(LANGS[code].membership||{}), ...MEMBERSHIP_I18N[code]};
+  });
 
-<!-- 레벨 카드 타이틀들 -->
-<div class="grid">
-  <div class="card"><span>🥉</span><span id="mb_level_bronze"></span></div>
-  <div class="card"><span>🥈</span><span id="mb_level_silver"></span></div>
-  <div class="card"><span>🥇</span><span id="mb_level_gold"></span></div>
-  <div class="card"><span>💎</span><span id="mb_level_diamond"></span></div>
-  <div class="card"><span>🔷</span><span id="mb_level_platinum"></span></div>
-  <div class="card"><span>👑</span><span id="mb_level_elite"></span></div>
-</div>
-
-<h2 id="mb_perks_title"></h2>
-<h2 id="mb_thresholds_title"></h2>
-<h2 id="mb_retention_title"></h2>
-<p id="mb_retention_rule"></p>
-
-<div class="actions">
-  <button id="mb_cta_join"></button>
-  <button id="mb_cta_view"></button>
-  <a href="/terms" id="mb_cta_learn"></a>
-  <a href="/terms" id="mb_terms"></a>
-</div>
+  // 전역 등록
+  window.LANGS = LANGS;
+})();
