@@ -4,65 +4,80 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StayWorld | Membership</title>
+
+  <!-- 전역 스타일 + 본 페이지 전용 스타일 -->
   <link rel="stylesheet" href="style.css"/>
-  <style>
-    .tier-card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
-    .tier-active{outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
-    .tier-muted{opacity:.6}
-    .benefit{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
-    .benefit i{font-style:normal}
-    .note{opacity:.85}
-  </style>
+  <link rel="stylesheet" href="styles/membership.css"/>
+
+  <!-- 공통 헤더 (로고/언어 선택 유지) -->
+  <script src="scripts/header.js" defer></script>
+  <!-- 다국어 사전 (기존 lang.js 유지 + 하단의 추가키를 lang.js에 넣어주세요) -->
+  <script src="lang.js" defer></script>
+  <!-- 멤버십 로직 -->
+  <script src="scripts/membership.js" defer></script>
 </head>
 <body>
-  <!-- 공통 헤더 (로고/언어 선택 유지) -->
+  <!-- 공통 헤더 주입 위치 -->
   <div id="site-header"></div>
-  <script src="scripts/header.js" defer></script>
 
   <section class="section">
     <div class="container">
-      <h1>🌟 StayWorld Membership</h1>
-      <p class="note" id="inheritNote">Upper tiers include all benefits of lower tiers.</p>
+      <!-- 항상 보이는 60일 강등 경고/카운트 -->
+      <div id="downgradeBanner" class="sw-banner" role="status" aria-live="polite">
+        <strong id="dwLabel"></strong>
+        <span id="dwCountdown"></span>
+      </div>
 
-      <!-- 현재 티어 + 게이지 -->
-      <div class="card" style="margin-top:12px">
-        <h3 id="levelTitle">Your Tier</h3>
-        <p id="levelProgressText"></p>
-        <div class="w-full bg-white/10 rounded-full h-2">
-          <div class="bg-[var(--gold)] h-2" style="width:0%"></div>
+      <h1 id="mbTitle">🌟 StayWorld Membership</h1>
+      <p class="note" id="inheritNote"></p>
+
+      <!-- 현재 등급 / 게이지 / 남은 금액 -->
+      <div class="card sw-current">
+        <div class="sw-current-top">
+          <h3 id="currentTierName">Your Tier</h3>
+          <span id="currentTierRate" class="sw-badge">0% back</span>
         </div>
-        <div class="text-right text-xs text-white/60 mt-1">0%</div>
+        <p id="levelProgressText"></p>
+
+        <div class="sw-gauge">
+          <div class="sw-gauge-fill" id="gaugeFill" style="width:0%"></div>
+        </div>
+        <div class="sw-gauge-meta">
+          <span id="progressPct">0%</span>
+          <span id="toNextLabel"></span>
+        </div>
       </div>
 
-      <!-- 등급 카드 + 혜택 -->
-      <div id="tiersGrid" class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px">
-        <div class="tier-card" data-tier="Bronze"><h3>🥉 Bronze</h3><div class="benefits"></div></div>
-        <div class="tier-card" data-tier="Silver"><h3>🥈 Silver</h3><div class="benefits"></div></div>
-        <div class="tier-card" data-tier="Gold"><h3>🥇 Gold</h3><div class="benefits"></div></div>
-        <div class="tier-card" data-tier="Platinum"><h3>💎 Platinum</h3><div class="benefits"></div></div>
-        <div class="tier-card" data-tier="Diamond"><h3>🔷 Diamond</h3><div class="benefits"></div></div>
-        <div class="tier-card" data-tier="Elite"><h3>👑 Elite</h3><div class="benefits"></div></div>
+      <!-- 등급 카드: 상위가 하위 혜택 포함 -->
+      <div id="tiersGrid" class="tiers-grid">
+        <div class="tier-card" data-tier="Bronze">
+          <div class="tier-head"><span class="ti">🥉</span><h3>Bronze</h3></div>
+          <ul class="benefits"></ul>
+        </div>
+        <div class="tier-card" data-tier="Silver">
+          <div class="tier-head"><span class="ti">🥈</span><h3>Silver</h3></div>
+          <ul class="benefits"></ul>
+        </div>
+        <div class="tier-card" data-tier="Gold">
+          <div class="tier-head"><span class="ti">🥇</span><h3>Gold</h3></div>
+          <ul class="benefits"></ul>
+        </div>
+        <div class="tier-card" data-tier="Platinum">
+          <div class="tier-head"><span class="ti">💎</span><h3>Platinum</h3></div>
+          <ul class="benefits"></ul>
+        </div>
+        <div class="tier-card" data-tier="Diamond">
+          <div class="tier-head"><span class="ti">🔷</span><h3>Diamond</h3></div>
+          <ul class="benefits"></ul>
+        </div>
+        <div class="tier-card" data-tier="Elite">
+          <div class="tier-head"><span class="ti">👑</span><h3>Elite</h3></div>
+          <ul class="benefits"></ul>
+        </div>
       </div>
 
-      <p class="note" style="margin-top:18px" id="downgradeNote">
-        If there is no booking for 60 days, your tier will auto-downgrade by 1 level.
-      </p>
+      <p class="note" id="dwNote"></p>
     </div>
   </section>
-
-  <!-- 멤버십 로직 -->
-  <script src="membership.js" defer></script>
-
-  <!-- 초기화: 로그인 값이 있으면 자동 반영 -->
-  <script defer>
-    document.addEventListener('DOMContentLoaded', () => {
-      let u = {};
-      try { u = JSON.parse(localStorage.getItem('sw_user') || '{}'); } catch(_) {}
-      setUserContext({
-        totalSpentKRW: Number.isFinite(u.totalSpentKRW) ? u.totalSpentKRW : 3_250_000, // demo fallback
-        lastBookingISO: u.lastBookingISO || new Date(Date.now()-20*86400000).toISOString()
-      });
-    });
-  </script>
 </body>
 </html>
