@@ -1,222 +1,145 @@
-/* ============================
-   STAYWORLD Membership Logic (6 tiers) — hardened
-   - Higher tier inherits lower-tier benefits
-   - Level by total spent (KRW)
-   - Auto downgrade 1 level if no booking >= 60 days
-   - Auto highlight current tier + progress gauge update
-   - Downgrade alerts at D-30, D-15, D-7, D-1
-   - i18n messages (EN/KR 기본) + fallback
-   - Elite tier can be manual-only (config)
-   ============================ */
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld — Membership & Rewards</title>
+  <link rel="stylesheet" href="/style.css" />
+  <meta name="color-scheme" content="dark light" />
+</head>
+<body>
+  <!-- 공통 헤더 주입 (로고/네비 고정) -->
+  <div id="site-header"></div>
+  <script src="/scripts/header.js"></script>
 
-(function(){
-  /* ---------- CONFIG ---------- */
-  const LEVELS = [
-    { name:'Bronze',   min:       0, rate: 0  },
-    { name:'Silver',   min:  500_000, rate: 3  },
-    { name:'Gold',     min:2_000_000, rate: 5  },
-    { name:'Platinum', min:4_000_000, rate: 7  },
-    { name:'Diamond',  min:7_500_000, rate:10  },
-    { name:'Elite',    min:15_000_000, rate:15, manual:true } // manual 승급(기본)
-  ];
-  const DOWNGRADE_DAYS = 60;
+  <!-- Hero / Summary -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">StayWorld<span class="accent"> Membership</span></h1>
+      <p class="hero-sub">Earn points on every booking. Higher tiers inherit benefits from lower tiers.</p>
 
-  // 메시지 i18n (필요 시 확장)
-  const MSG = {
-    en:{
-      toNext:(rem)=>`₩${rem.toLocaleString('ko-KR')} to next tier. Auto-downgrade by 1 level after 60 days of no bookings.`,
-      top: `Top tier (Elite). Auto-downgrade by 1 level after 60 days of no bookings.`,
-      d30:'📢 Auto downgrade in 30 days. Keep your tier by booking.',
-      d15:'⚠️ Auto downgrade in 15 days. Stay active.',
-      d7 :'⏳ Auto downgrade in 7 days. Book soon!',
-      d1 :'🚨 Auto downgrade tomorrow! Complete a booking today.'
-    },
-    ko:{
-      toNext:(rem)=>`다음 등급까지 ₩${rem.toLocaleString('ko-KR')} 남았어요. 60일 예약 없으면 자동 1단계 강등.`,
-      top: `최상위 등급(Elite). 60일 예약 없으면 자동 1단계 강등.`,
-      d30:'📢 30일 후 자동 강등 예정입니다. 지금 예약하면 유지됩니다.',
-      d15:'⚠️ 15일 후 자동 강등 예정입니다. 활동을 유지하세요.',
-      d7 :'⏳ 7일 후 자동 강등 예정입니다. 서둘러 예약하세요!',
-      d1 :'🚨 내일 자동 강등됩니다! 오늘 예약을 완료하세요.'
-    }
-  };
+      <!-- 현재 등급 요약 카드 -->
+      <div class="card" style="margin-top:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+          <div>
+            <h3 id="yourTierTitle" class="text-xl font-bold">BRONZE <span class="text-brand gold">0% back</span></h3>
+            <div id="levelProgressText" class="text-sm" style="opacity:.85">Welcome to StayWorld Membership.</div>
+          </div>
+          <div style="min-width:260px;flex:1">
+            <div class="w-full bg-white/10 rounded-full h-2" id="levelGauge" aria-label="Progress to next tier">
+              <div id="levelGaugeBar" class="h-2" style="width:0%;background:linear-gradient(180deg,#f4d78c,#c9a35b);border-radius:999px;"></div>
+            </div>
+            <div id="levelGaugePct" class="text-right text-xs text-white/60 mt-1">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  function currentLang(){
-    // header의 <select id="lang"> 또는 localStorage(sw_lang) 확인
-    const sel = document.getElementById('lang');
-    const code = (sel?.value || localStorage.getItem('sw_lang') || 'EN').toLowerCase();
-    return code.startsWith('ko') ? 'ko' : 'en';
-  }
+  <!-- Tiers Grid -->
+  <section class="section">
+    <div class="container">
+      <h2 style="margin:0 0 12px">Tiers & Benefits</h2>
 
-  /* ---------- HELPERS ---------- */
-  function $(sel, scope){ return (scope||document).querySelector(sel); }
-  function $all(sel, scope){ return Array.from((scope||document).querySelectorAll(sel)); }
+      <div id="tiersGrid" class="features" style="grid-template-columns:repeat(3,1fr)">
+        <!-- Bronze -->
+        <article class="card" data-tier="Bronze" tabindex="0" aria-label="Bronze tier">
+          <h3>Bronze</h3>
+          <p>₩0+ total · 0% back</p>
+          <ul style="margin-top:8px;opacity:.9">
+            <li>• Basic support</li>
+            <li>• Access to member-only deals</li>
+          </ul>
+        </article>
 
-  // 게이지/텍스트용 다중 셀렉터(디자인 바뀌어도 최대한 찾아줌)
-  function findGaugeElements(){
-    // 우선순위: 명시적 ID → 널리 쓰는 구조 → Tailwind 유사 구조
-    const gaugeBar = $('#levelGaugeBar')
-      || $('.card .bg-[var(--gold)].h-2')
-      || ($('.w-full.bg-white\\/10.rounded-full.h-2')?.querySelector('.h-2'))
-      || $('#levelGauge .bar')
-      || $('.level-gauge .bar');
+        <!-- Silver -->
+        <article class="card" data-tier="Silver" tabindex="0" aria-label="Silver tier">
+          <h3>Silver</h3>
+          <p>₩500,000+ total · 3% back</p>
+          <ul style="margin-top:8px;opacity:.9">
+            <li>• Bronze benefits</li>
+            <li>• Priority customer support</li>
+          </ul>
+        </article>
 
-    const gaugePctEl = $('#levelGaugePct')
-      || $('.text-right.text-xs.text-white\\/60.mt-1')
-      || $('.level-gauge .pct');
+        <!-- Gold -->
+        <article class="card" data-tier="Gold" tabindex="0" aria-label="Gold tier">
+          <h3>Gold</h3>
+          <p>₩2,000,000+ total · 5% back</p>
+          <ul style="margin-top:8px;opacity:.9">
+            <li>• Silver benefits</li>
+            <li>• Free late checkout (when available)</li>
+          </ul>
+        </article>
 
-    const tierText = $('#levelProgressText')
-      || $('#levelProgress .text')
-      || $('.level-progress-text');
+        <!-- Platinum -->
+        <article class="card" data-tier="Platinum" tabindex="0" aria-label="Platinum tier">
+          <h3>Platinum</h3>
+          <p>₩4,000,000+ total · 7% back</p>
+          <ul style="margin-top:8px;opacity:.9">
+            <li>• Gold benefits</li>
+            <li>• Dedicated concierge line</li>
+          </ul>
+        </article>
 
-    return { gaugeBar, gaugePctEl, tierText };
-  }
+        <!-- Diamond -->
+        <article class="card" data-tier="Diamond" tabindex="0" aria-label="Diamond tier">
+          <h3>Diamond</h3>
+          <p>₩7,500,000+ total · 10% back</p>
+          <ul style="margin-top:8px;opacity:.9">
+            <li>• Platinum benefits</li>
+            <li>• Complimentary room upgrade (subject to availability)</li>
+          </ul>
+        </article>
 
-  function findTierCards(){
-    // data-tier 속성 카드 (권장). 없으면 타이틀 텍스트로 추정
-    const grid = $('#tiersGrid') || document;
-    const cards = $all('[data-tier]', grid);
-    if (cards.length) return cards;
-    // Fallback: 카드 안 h3/h4 텍스트에 등급명 포함된 요소들 추정
-    return $all('.card, [class*=tier], .membership-card', grid)
-      .filter(card=>{
-        const t = (card.textContent||'').toLowerCase();
-        return LEVELS.some(l=> t.includes(l.name.toLowerCase()));
-      });
-  }
+        <!-- Elite (manual by default) -->
+        <article class="card" data-tier="Elite" tabindex="0" aria-label="Elite tier">
+          <h3>Elite</h3>
+          <p>₩15,000,000+ total · 15% back (manual)</p>
+          <ul style="margin-top:8px;opacity:.9">
+            <li>• Diamond benefits</li>
+            <li>• VIP welcome & guaranteed late checkout</li>
+          </ul>
+        </article>
+      </div>
 
-  function krw(n){ return new Intl.NumberFormat('ko-KR', { style:'currency', currency:'KRW', maximumFractionDigits:0 }).format(n); }
+      <p class="text-sm" style="margin-top:12px;opacity:.7">
+        * If there are no bookings for 60 consecutive days, you are automatically downgraded by one level.
+      </p>
+    </div>
+  </section>
 
-  /* ---------- CORE CALCS ---------- */
-  /** Compute level index (considers manual-only Elite) */
-  function computeLevel(totalSpentKRW, lastBookingISO, opts={}){
-    const { eliteGranted=false } = opts;
-    let base = 0;
-    for (let i=0;i<LEVELS.length;i++){
-      // Elite가 manual이면 점수만으로는 들어가지 않도록
-      if (LEVELS[i].manual && !eliteGranted) continue;
-      if (totalSpentKRW >= LEVELS[i].min) base = i;
-    }
-    if (lastBookingISO){
-      const last = new Date(lastBookingISO);
-      if (!Number.isNaN(+last)){
-        const diffDays = Math.floor((Date.now() - last.getTime())/86400000);
-        if (diffDays >= DOWNGRADE_DAYS) base = Math.max(0, base - 1);
+  <!-- Scripts -->
+  <script src="/scripts/membership.js"></script>
+  <script>
+    // 실제 서비스에서는 로그인 후 서버에서 받아온 유저 데이터로 대체
+    // localStorage에 sw_user가 있으면 사용, 없으면 데모
+    (function(){
+      try{
+        const raw = localStorage.getItem('sw_user');
+        if(raw){
+          const u = JSON.parse(raw);
+          window.StayWorldMembership.setUserContext({
+            totalSpentKRW: Number(u.totalSpentKRW)||0,
+            lastBookingISO: u.lastBookingISO||null,
+            eliteGranted: !!u.eliteGranted
+          });
+        }else{
+          // DEMO 보기 좋게
+          window.StayWorldMembership.setUserContext({
+            totalSpentKRW: 3_250_000,
+            lastBookingISO: new Date(Date.now()-20*86400000).toISOString(),
+            eliteGranted: false
+          });
+        }
+      }catch(e){
+        console.warn('membership demo init failed', e);
       }
-    }
-    return base;
-  }
+    })();
+  </script>
 
-  /** KRW remaining to next level; null if at top (reachable) */
-  function remainingToNext(totalSpentKRW, levelIdx, eliteReachable){
-    const topReachableIdx = (eliteReachable ? LEVELS.length-1 : LEVELS.length-2);
-    if (levelIdx >= topReachableIdx) return null;
-    const nextMin = LEVELS[levelIdx+1].min;
-    return Math.max(0, nextMin - totalSpentKRW);
-  }
-
-  /* ---------- UI UPDATE ---------- */
-  function applyLevelUI(levelIdx, totalSpentKRW, opts={}){
-    const { eliteGranted=false } = opts;
-    const lang = currentLang();
-    const T = MSG[lang]||MSG.en;
-    const lvl = LEVELS[levelIdx];
-
-    // 게이지/텍스트
-    const { gaugeBar, gaugePctEl, tierText } = findGaugeElements();
-
-    // 진행률 계산
-    let pct = 100;
-    const rem = remainingToNext(totalSpentKRW, levelIdx, eliteGranted || !LEVELS[levelIdx+1]?.manual);
-    if (rem !== null){
-      const currMin = LEVELS[levelIdx].min;
-      const nextMin = LEVELS[levelIdx+1].min;
-      pct = Math.round(((totalSpentKRW - currMin) / Math.max(1,(nextMin - currMin))) * 100);
-      pct = Math.max(0, Math.min(100, pct));
-      if (tierText) tierText.textContent = T.toNext(rem);
-    } else {
-      if (tierText) tierText.textContent = T.top;
-    }
-    if (gaugeBar) gaugeBar.style.width = pct + '%';
-    if (gaugePctEl) gaugePctEl.textContent = pct + '%';
-
-    // 히어로/요약 타이틀 (가능하면 갱신)
-    const heroTitle = $all('h3.text-xl.font-bold, .your-tier-title, #yourTierTitle')[0];
-    if (heroTitle){
-      heroTitle.innerHTML = `${lvl.name.toUpperCase()} <span class="text-brand gold">${lvl.rate}% back</span>`;
-    }
-
-    // 멤버십 카드 하이라이트
-    const cards = findTierCards();
-    cards.forEach(card=>{
-      // 스타일 클래스 통일
-      card.classList.remove('tier-active','tier-muted');
-      const name = card.getAttribute('data-tier') || (card.querySelector('h3,h4')?.textContent||'').trim();
-      const idx = LEVELS.findIndex(x=> name.toLowerCase().includes(x.name.toLowerCase()));
-      if (idx === -1) return;
-      if (idx === levelIdx) card.classList.add('tier-active');
-      if (idx > levelIdx)  card.classList.add('tier-muted');
-      // 접근성: 현재 등급 aria 표시
-      if (idx === levelIdx) card.setAttribute('aria-current','true'); else card.removeAttribute('aria-current');
-    });
-
-    // 진행 상태 이벤트(필요시 다른 모듈에서 듣게)
-    document.dispatchEvent(new CustomEvent('membership:updated', {
-      detail:{ levelIndex:levelIdx, level:lvl, totalSpentKRW, pct, remaining:rem }
-    }));
-  }
-
-  /* ---------- Alerts ---------- */
-  function showDowngradeAlert(daysLeft){
-    const lang = currentLang();
-    const T = MSG[lang]||MSG.en;
-    const map = {30:T.d30, 15:T.d15, 7:T.d7, 1:T.d1};
-    const msg = map[daysLeft];
-    if (!msg) return;
-
-    const alertEl = document.createElement('div');
-    alertEl.className = "fixed bottom-5 right-5 bg-red-600 text-white px-4 py-3 rounded-xl shadow-lg z-50";
-    alertEl.textContent = msg;
-    document.body.appendChild(alertEl);
-    setTimeout(()=> alertEl.remove(), 8000);
-  }
-
-  /* ---------- Public API ---------- */
-  /**
-   * setUserContext
-   * @param {Object} ctx
-   * @param {number} ctx.totalSpentKRW - 누적 결제액(원)
-   * @param {string} [ctx.lastBookingISO] - 마지막 예약 ISO 날짜 문자열
-   * @param {boolean} [ctx.eliteGranted] - 엘리트 수동 승급 권한 (운영자 수동 설정)
-   */
-  function setUserContext({ totalSpentKRW, lastBookingISO, eliteGranted=false }){
-    const idx = computeLevel(totalSpentKRW||0, lastBookingISO, { eliteGranted });
-    applyLevelUI(idx, totalSpentKRW||0, { eliteGranted });
-
-    if (lastBookingISO){
-      const d = new Date(lastBookingISO);
-      if (!Number.isNaN(+d)){
-        const diffDays = Math.floor((Date.now() - d.getTime())/86400000);
-        const daysLeft = DOWNGRADE_DAYS - diffDays;
-        if ([30,15,7,1].includes(daysLeft)) showDowngradeAlert(daysLeft);
-      }
-    }
-  }
-
-  // 전역 노출 (다른 페이지/모듈에서 호출)
-  window.StayWorldMembership = {
-    LEVELS, DOWNGRADE_DAYS,
-    computeLevel, setUserContext, applyLevelUI
-  };
-
-  /* ===== Demo hook: remove/disable in production ===== */
-  (function demo(){
-    if (window.ENV?.DEMO_MODE){
-      setUserContext({
-        totalSpentKRW: 3_250_000,                                     // 누적 결제액
-        lastBookingISO: new Date(Date.now()-20*86400000).toISOString(), // 마지막 예약: 20일 전
-        eliteGranted:false
-      });
-    }
-  })();
-})();
+  <footer class="site-footer">
+    <div class="container"><small>© StayWorld — stayworldbooking.com</small></div>
+  </footer>
+</body>
+</html>
