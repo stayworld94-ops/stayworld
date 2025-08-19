@@ -1,7 +1,5 @@
 [build]
-  # 빌드 실패 방지: 굳이 빌드 안 해도 되는 프로젝트면 설치만 하고 끝
-  command = "npm ci --omit=dev"
-  # 정적 파일이 루트에 있다면 점(.) 사용, 폴더가 있으면 그 폴더로 변경
+  command = "npm install"   # ← 여기만 npm install 로 변경
   publish = "."
   functions = "netlify/functions"
 
