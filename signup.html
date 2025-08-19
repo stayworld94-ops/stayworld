@@ -14,7 +14,7 @@
       <a href="/membership.html">Membership</a>
       <a href="/host.html">Host</a>
       <a href="/support.html">Support</a>
-      <!-- 여기: JS가 로그인/로그아웃으로 전환 -->
+      <!-- 로그인/로그아웃 토글 제거: 이 페이지는 항상 Login만 표시 -->
       <a href="/login.html" id="navAuthLink">Login</a>
     </nav>
   </header>
@@ -64,33 +64,13 @@
   <!-- 원래 있던 가입 로직 -->
   <script type="module" src="./assets/signup.js"></script>
 
-  <!-- 로그인/로그아웃 전환 스크립트 -->
+  <!-- (선택) 로그인 사용자가 이 페이지 접근 시 홈으로 보내고 싶으면 아래 주석 해제 -->
+  <!--
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const navAuthLink = document.getElementById("navAuthLink");
-
-      // 로컬 저장소 기반 로그인 상태 확인 (테스트용)
-      const isLoggedIn = localStorage.getItem("sw_logged_in") === "true";
-
-      function updateAuthLink() {
-        if (localStorage.getItem("sw_logged_in") === "true") {
-          navAuthLink.textContent = "Logout";
-          navAuthLink.href = "#";
-          navAuthLink.onclick = (e) => {
-            e.preventDefault();
-            localStorage.removeItem("sw_logged_in");
-            alert("로그아웃 되었습니다.");
-            location.href = "/";
-          };
-        } else {
-          navAuthLink.textContent = "Login";
-          navAuthLink.href = "/login.html";
-          navAuthLink.onclick = null;
-        }
-      }
-
-      updateAuthLink();
-    });
+    if (localStorage.getItem('sw_logged_in') === 'true') {
+      location.replace('/');
+    }
   </script>
+  -->
 </body>
 </html>
