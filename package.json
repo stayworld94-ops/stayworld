@@ -1,18 +1,17 @@
 {
-  "name": "stayworld-server",
+  "name": "stayworld",
+  "private": true,
   "version": "1.0.0",
-  "main": "server/index.js",
-  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js"
+    "build": "echo \"(정적 사이트면 생략 가능)\"",
+    "dev": "netlify dev",
+    "start": "netlify dev"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "pg": "^8.11.5"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "firebase-admin": "11.11.0",
+    "node-fetch": "2.6.9"
   }
 }
