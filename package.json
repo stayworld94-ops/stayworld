@@ -2,11 +2,9 @@
   "name": "stayworld",
   "private": true,
   "version": "1.0.0",
-  "engines": {
-    "node": ">=18"
-  },
+  "engines": { "node": ">=18" },
   "scripts": {
-    "build": "echo \"(정적 사이트면 생략 가능)\"",
+    "build": "echo \"no build step (static site + netlify functions)\"",
     "dev": "netlify dev",
     "start": "netlify dev"
   },
