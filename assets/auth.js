@@ -7,16 +7,14 @@ import {
 
 // ↓↓↓ 여기를 콘솔의 'Config'에서 나온 진짜 값으로 통째로 바꾸세요 ↓↓↓
 const firebaseConfig = {
-const firebaseConfig = { 
-  apiKey : "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk" , 
-  authDomain : "stayworld-2570c.firebaseapp.com" , 
-  projectId : "stayworld-2570c" , 
-  storageBucket : "stayworld-2570c.firebasestorage.app" , 
-  messagingSenderId : "272599681686" , 
-  appId : "1:272599681686:web:33f89b66f7ee6f6f0b50b7" , 
-  measurementId : "G-F8MXM3D7FJ" 
+  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
+  authDomain: "stayworld-2570c.firebaseapp.com",
+  projectId: "stayworld-2570c",
+  storageBucket: "stayworld-2570c.firebasestorage.app",
+  messagingSenderId: "272599681686",
+  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
+  measurementId: "G-F8MXM3D7FJ"
 };
-
 // ↑↑↑ 여기까지 교체 ↑↑↑
 
 // (선택) 설정 검증
