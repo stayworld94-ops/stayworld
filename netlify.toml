@@ -1,13 +1,13 @@
 [build]
-  command = "npm install && npm run build"
-  publish = "dist"            # 정적 빌드 산출물이 없으면 이 줄은 지워도 됩니다
+  # 빌드 실패 방지: 굳이 빌드 안 해도 되는 프로젝트면 설치만 하고 끝
+  command = "npm ci --omit=dev"
+  # 정적 파일이 루트에 있다면 점(.) 사용, 폴더가 있으면 그 폴더로 변경
+  publish = "."
   functions = "netlify/functions"
 
-# (선택) 함수 폴더 package.json 자동 설치 플러그인 — 지금 구조에서는 필요 없음
-# [[plugins]]
-#   package = "@netlify/plugin-functions-install-core"
-
 [functions]
-  node_bundler = "esbuild"     # 의존성 번들 최적화
-  external_node_modules = ["firebase-admin", "node-fetch"]  # 외부 모듈로 유지 원하면
-  included_files = []          # 서비스 계정 파일을 파일로 넣을 때만 지정
+  node_bundler = "esbuild"
+  external_node_modules = ["firebase-admin", "node-fetch"]
+
+[build.environment]
+  NODE_VERSION = "18"
