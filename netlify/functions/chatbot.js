@@ -1,57 +1,20 @@
-// 파일 위치: netlify/functions/chatbot.js
+const { admin, getApp } = require('./_firebase');
 
-import fetch from "node-fetch";
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'POST')
+    return { statusCode: 405, body: 'Method Not Allowed' };
 
-export async function handler(event, context) {
   try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ error: "Method Not Allowed" })
-      };
-    }
+    getApp();
+    const db = admin.firestore();
 
-    const { message, lang } = JSON.parse(event.body);
+    const payload = JSON.parse(event.body || '{}');
+    // TODO: 서명 검증 & 저장
+    // await db.collection('payments').add(payload);
 
-    if (!message) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "No message provided" })
-      };
-    }
-
-    // OpenAI API 호출
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}` // Netlify 환경변수에 설정 필요
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini", // 비용 효율적인 모델
-        messages: [
-          {
-            role: "system",
-            content: `You are an AI assistant for StayWorld. Always answer in ${lang || "English"}.`
-          },
-          { role: "user", content: message }
-        ],
-        max_tokens: 300
-      })
-    });
-
-    const data = await response.json();
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        reply: data.choices?.[0]?.message?.content || "Sorry, I could not generate a response."
-      })
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
+    return { statusCode: 200, body: 'OK' };
+  } catch (e) {
+    console.error(e);
+    return { statusCode: 500, body: e.message };
   }
-}
+};
