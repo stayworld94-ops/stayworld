@@ -43,6 +43,26 @@ exports.handler = async (event) => {
       "";
     const body = event.body || "";
 
+    // ✅ DEBUG BLOCK (서명 비교 직전)
+    if (event.queryStringParameters?.debug === "1") {
+      const expected = crypto
+        .createHmac("sha512", ipnSecret)
+        .update(body)
+        .digest("hex");
+
+      return {
+        statusCode: 200,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          mode: "debug",
+          receivedSignature: signature,
+          expectedSignature: expected,
+          rawBody: body,
+          note: "임시 디버그용. 문제 해결 후 제거하세요.",
+        }),
+      };
+    }
+
     const h = crypto.createHmac("sha512", ipnSecret).update(body).digest("hex");
     if (h !== signature) {
       console.warn("Invalid signature");
@@ -51,7 +71,6 @@ exports.handler = async (event) => {
 
     // 2) Payload 파싱
     const p = JSON.parse(body || "{}");
-    // 대표 필드들 (문서화 기준 – 없는 것도 있을 수 있음)
     const {
       payment_id,
       order_id,
@@ -65,12 +84,10 @@ exports.handler = async (event) => {
       actually_amount,
       update_time,
       created_at,
-      // …필요한 것 더 추가 가능
     } = p;
 
     // 3) Firestore 저장
     const db = initFirebase();
-
     const payDocId =
       String(payment_id ?? invoice_id ?? order_id ?? `np_${Date.now()}`);
 
