@@ -14,7 +14,8 @@
       <a href="/membership.html">Membership</a>
       <a href="/host.html">Host</a>
       <a href="/support.html">Support</a>
-      <a href="/login.html">Login</a>
+      <!-- 여기: JS가 로그인/로그아웃으로 전환 -->
+      <a href="/login.html" id="navAuthLink">Login</a>
     </nav>
   </header>
 
@@ -24,24 +25,22 @@
       <h1>Sign up</h1>
       <p class="sub">Join StayWorld for verified stays, rewards, and global deals.</p>
 
-      <!-- 이메일/비밀번호 가입 -->
       <form id="form-signup" autocomplete="on">
         <div class="form-row">
           <label for="name">Full name</label>
-          <input id="name" type="text" placeholder="Your name" autocomplete="name"/>
+          <input id="name" type="text" placeholder="Your name"/>
         </div>
         <div class="form-row">
           <label for="email">Email</label>
-          <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required/>
+          <input id="email" type="email" placeholder="you@example.com" required/>
         </div>
         <div class="form-row">
           <label for="password">Password</label>
-          <input id="password" type="password" placeholder="Create a password" minlength="6" autocomplete="new-password" required/>
+          <input id="password" type="password" placeholder="Create a password" minlength="6" required/>
         </div>
         <button class="btn btn-primary" type="submit">Sign up</button>
       </form>
 
-      <!-- 또는 구글로 가입/로그인 -->
       <div class="hr"><div class="line"></div><div class="text">or</div><div class="line"></div></div>
 
       <button id="btn-google" class="btn btn-google" type="button" aria-label="Continue with Google">
@@ -62,8 +61,36 @@
     <p class="footer">© StayWorld</p>
   </main>
 
-  <!-- JS -->
+  <!-- 원래 있던 가입 로직 -->
   <script type="module" src="./assets/signup.js"></script>
+
+  <!-- 로그인/로그아웃 전환 스크립트 -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const navAuthLink = document.getElementById("navAuthLink");
+
+      // 로컬 저장소 기반 로그인 상태 확인 (테스트용)
+      const isLoggedIn = localStorage.getItem("sw_logged_in") === "true";
+
+      function updateAuthLink() {
+        if (localStorage.getItem("sw_logged_in") === "true") {
+          navAuthLink.textContent = "Logout";
+          navAuthLink.href = "#";
+          navAuthLink.onclick = (e) => {
+            e.preventDefault();
+            localStorage.removeItem("sw_logged_in");
+            alert("로그아웃 되었습니다.");
+            location.href = "/";
+          };
+        } else {
+          navAuthLink.textContent = "Login";
+          navAuthLink.href = "/login.html";
+          navAuthLink.onclick = null;
+        }
+      }
+
+      updateAuthLink();
+    });
+  </script>
 </body>
 </html>
-
