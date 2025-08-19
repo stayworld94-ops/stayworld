@@ -3,13 +3,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/fireba
 import {
   getAuth, setPersistence, browserLocalPersistence,
   signInWithEmailAndPassword,
-  GoogleAuthProvider, signInWithPopup,
-  getAdditionalUserInfo, deleteUser, signOut
+  GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-/* 🔴 콘솔의 Config 값으로 교체 */
+// 🔴 콘솔의 Config 값으로 교체
 const firebaseConfig = {
-  const firebaseConfig = {
   apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
   authDomain: "stayworld-2570c.firebaseapp.com",
   projectId: "stayworld-2570c",
@@ -21,9 +19,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-await setPersistence(auth, browserLocalPersistence);
 
-// DOM
 const form = document.getElementById("form-login");
 const emailEl = document.getElementById("email");
 const pwEl = document.getElementById("password");
@@ -31,6 +27,7 @@ const googleBtn = document.getElementById("btn-google");
 const errEl = document.getElementById("error");
 const okEl = document.getElementById("ok");
 
+const show = (el,msg)=>{ if(!el) return; el.textContent=msg||""; el.style.display=msg?"block":"none"; };
 const errMap = (e)=>({
   "auth/invalid-email":"이메일 형식이 올바르지 않습니다.",
   "auth/user-disabled":"해당 계정은 비활성화되었습니다.",
@@ -41,33 +38,32 @@ const errMap = (e)=>({
   "auth/unauthorized-domain":"허용되지 않은 도메인입니다. Authorized domains를 확인하세요."
 }[e?.code] || `오류: ${e?.message || "알 수 없는 오류"}`);
 
-const show = (el,msg)=>{ if(!el) return; el.textContent=msg||""; el.style.display=msg?"block":"none"; };
-const redirect = (to="/")=>location.href=to;
+async function init(){
+  try{ await setPersistence(auth, browserLocalPersistence); }catch(e){ console.error(e); }
 
-// 이메일/비밀번호 로그인
-form?.addEventListener("submit", async (e)=>{
-  e.preventDefault(); show(errEl,""); show(okEl,"");
-  try{
-    await signInWithEmailAndPassword(auth, emailEl.value.trim(), pwEl.value);
-    show(okEl,"로그인 완료!"); redirect("/");
-  }catch(err){ show(errEl, errMap(err)); }
-});
+  // 이메일/비번 로그인
+  form?.addEventListener("submit", async (e)=>{
+    e.preventDefault(); show(errEl,""); show(okEl,"");
+    try{
+      await signInWithEmailAndPassword(auth, emailEl.value.trim(), pwEl.value);
+      show(okEl,"로그인 완료!"); location.href="/";
+    }catch(err){ show(errEl, errMap(err)); }
+  });
 
-// Google 로그인(로그인 페이지에서는 신규 유저 차단 → 가입 페이지로)
-googleBtn?.addEventListener("click", async ()=>{
-  show(errEl,""); show(okEl,"");
-  try{
-    const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(auth, provider);
-    const isNew = getAdditionalUserInfo(cred)?.isNewUser;
-
-    if (isNew) {
-      // 로그인 화면에서 첫 사용자는 ‘가입 페이지’로만 진행하게 만들기
-      try { await deleteUser(cred.user); } catch {}
-      await signOut(auth);
-      show(errEl,"회원가입이 필요합니다. Google로 가입을 진행해 주세요.");
-      return redirect("/signup");
-    }
-    show(okEl,"로그인 완료!"); redirect("/");
-  }catch(err){ show(errEl, errMap(err)); }
-});
+  // Google 로그인: 신규 유저면 가입 페이지로 보냄
+  googleBtn?.addEventListener("click", async ()=>{
+    show(errEl,""); show(okEl,"");
+    try{
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      const isNew = getAdditionalUserInfo(cred)?.isNewUser;
+      if (isNew) {
+        await signOut(auth); // 로그인 상태 해제
+        show(errEl,"회원가입이 필요합니다. Google로 가입을 진행해 주세요.");
+        return location.assign("/signup");
+      }
+      show(okEl,"로그인 완료!"); location.assign("/");
+    }catch(err){ show(errEl, errMap(err)); }
+  });
+}
+init();
