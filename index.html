@@ -210,7 +210,7 @@
       f_staytype:"宿タイプ", f_review:"レビュー評価", f_beds:"ベッド&バス", f_pets:"ペット", f_checkin:"チェックイン",
       f_amen:"アメニティ", f_booking:"予約方法", f_verify:"認証", f_long:"長期滞在", f_biz:"ビジネス",
       f_loc:"場所", f_access:"アクセシビリティ", f_ex:"体験", f_view:"眺望", f_safe:"安全",
-      f_family:"家族向け", f_ent:"エンタメ", f_out:"屋外", f_park:"駐車",
+      f_family:"家族向け", f_ent:"エンタ메", f_out:"屋外", f_park:"駐車",
       footer_copy:"© StayWorld — stayworldbooking.com"
     },
     ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_signup:"注册",language:"语言",
@@ -267,8 +267,8 @@
     TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_signup:"Kaydol",language:"Dil",
       hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara",
-      feat_verified:"Doğrulanmış konaklamalar",feat_verified_sub:"Yakınınızdaki en iyi seçenekler.",
-      feat_rewards:"StayWorld+ Ödülleri",feat_rewards_sub:"Her rezervasyonda puan kazanın.",
+      feat_verified:"Doğrulanmış konaklamalar",feat_rewards_sub:"Her rezervasyonda puan kazanın.",
+      feat_rewards:"StayWorld+ Ödülleri",
       feat_payments:"Güvenli ödemeler",feat_payments_sub:"Visa, Mastercard, Amex & Kripto.",
       f_title:"Filtreler", f_reset:"Sıfırla", f_apply:"Uygula", f_currency:"Para birimi", f_price:"Gecelik fiyat",
       f_staytype:"Konaklama türü", f_review:"Puan", f_beds:"Yatak & Banyo", f_pets:"Evcil", f_checkin:"Giriş",
@@ -598,6 +598,34 @@
   }
   document.getElementById('btnSearch').addEventListener('click',runSearch,{capture:true});
   ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
+  </script>
+
+  <!-- 로그인/로그아웃 전환 스크립트 (홈 전용) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const navLogin = document.querySelector('.main-nav a[data-i18n="nav_login"]');
+      if (!navLogin) return;
+
+      function setLogin() {
+        navLogin.textContent = "Login";
+        navLogin.href = "login.html";
+        navLogin.onclick = null;
+      }
+
+      function setLogout() {
+        navLogin.textContent = "Logout";
+        navLogin.href = "#";
+        navLogin.onclick = (e) => {
+          e.preventDefault();
+          localStorage.removeItem("sw_logged_in");
+          alert("로그아웃 되었습니다.");
+          location.reload(); // 홈에서만 새로고침
+        };
+      }
+
+      const isLoggedIn = localStorage.getItem("sw_logged_in") === "true";
+      if (isLoggedIn) setLogout(); else setLogin();
+    });
   </script>
 
   <!-- FOOTER -->
