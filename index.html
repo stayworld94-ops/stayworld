@@ -33,8 +33,37 @@
     /* ---- Host dropdown (추가) ---- */
     .nav-item.dropdown{position:relative}
     .nav-link.dropdown-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;font-weight:600;opacity:.95}
-    .dropdown-panel{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);min-width:220px;background:#0f1520;border:1px solid var(--line);border-radius:12px;padding:8px;display:none;z-index:30;box-shadow:0 16px 40px rgba(0,0,0,.45)}
-    .nav-item.dropdown:hover .dropdown-panel{display:block}
+    /* 수정본 */
+.dropdown-panel{
+  position:absolute;
+  top:100%;                 /* 버튼에 딱 붙여서 간격 제거 */
+  left:50%;
+  transform:translate(-50%, 8px);  /* 자연스럽게 아래로 8px 내려 보이게 */
+  min-width:220px;
+  background:#0f1520;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:8px;
+  z-index:30;
+  box-shadow:0 16px 40px rgba(0,0,0,.45);
+
+  /* 보였다/사라졌다 부드럽게 (display 대신 visibility/opacity 사용) */
+  visibility:hidden;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .12s ease, transform .12s ease, visibility .12s;
+}
+
+/* 호버/포커스/열림 상태에서 보여주기 */
+.nav-item.dropdown:hover .dropdown-panel,
+.nav-item.dropdown:focus-within .dropdown-panel,
+.nav-item.dropdown.open .dropdown-panel{
+  visibility:visible;
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%, 0);
+}
+
     .dropdown-item{display:block;padding:10px 12px;border-radius:8px;color:#e7e9ee;text-decoration:none;white-space:nowrap}
     .dropdown-item:hover{background:#121a26}
     .dropdown-divider{height:1px;background:var(--line);margin:6px 0}
