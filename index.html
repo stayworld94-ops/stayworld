@@ -767,6 +767,10 @@
     hostMenu.addEventListener('mouseenter', ()=> clearTimeout(hideTimer));
   }
 </script>
+<!-- ... (본문 및 다른 스크립트 동일 유지) ... -->
+
+<!-- 사이트 공통 인증 브리지 (반드시 마지막에, defer 없이 일반 include 권장) -->
+<script src="/assets/auth-bridge.js"></script>
 
 </body>
 </html>
