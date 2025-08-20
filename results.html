@@ -1,30 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StayWorld | Search Results</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Results - StayWorld</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- 공통 헤더 주입 -->
-  <div id="site-header"></div>
-  <script src="/scripts/header.js"></script>
-
-  <section class="section">
-    <div class="container">
-      <h1>🔍 Search Results</h1>
-      <a href="index.html">➜ Back to Home</a>
+  <!-- HEADER (공통) -->
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="index.html" class="brand">
+        <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
+        <span class="brand-text">STAYWORLD</span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="membership.html" data-i18n="nav_membership">Membership</a>
+        <a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
+      </nav>
+      <div class="header-cta">
+        <label for="lang" data-i18n="language">Language</label>
+        <select id="lang" class="lang-select"></select>
+        <a href="signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign Up</a>
+      </div>
     </div>
-  </section>
+  </header>
 
-  <section class="section">
-    <div class="container">
-      <h2 id="results-title">Results for:</h2>
-      <ul id="results-list" class="results-list">
-        <!-- 숙소 검색 결과 아이템이 JS(app.js)에서 자동 주입 -->
-      </ul>
-    </div>
-  </section>
+  <!-- MAIN -->
+  <main class="container" style="padding:40px 16px;">
+    <h1 data-i18n="results_title">Search Results</h1>
+    <p data-i18n="results_desc">Browse available properties.</p>
+    <!-- 결과 리스트 -->
+  </main>
+
+  <footer class="site-footer">© StayWorld</footer>
+  <script src="i18n.js"></script>
+  <script src="/assets/login-modal.js"></script>
 </body>
 </html>
