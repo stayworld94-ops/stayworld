@@ -635,6 +635,40 @@
   </footer>
 
   <!-- 챗봇 FAB (처음엔 DOM에 없을 수도 있으므로 JS가 만들어줌) -->
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const navAuthLink = document.getElementById("navAuthLink");
+
+    function setLogin() {
+      navAuthLink.textContent = "Login";
+      navAuthLink.href = "/login.html";
+      navAuthLink.onclick = null;
+    }
+
+    function setLogout() {
+      navAuthLink.textContent = "Logout";
+      navAuthLink.href = "#";
+      navAuthLink.onclick = (e) => {
+        e.preventDefault();
+        localStorage.removeItem("sw_logged_in");
+        alert("로그아웃 되었습니다.");
+        location.href = "/";
+      };
+    }
+
+    // ✅ 로그인 성공 시 실행할 함수 (signup.js나 login.js에서 호출 가능)
+    window.markLoggedIn = function() {
+      localStorage.setItem("sw_logged_in", "true");
+      setLogout();
+    };
+
+    // 페이지 로드할 때 상태 확인
+    const isLoggedIn = localStorage.getItem("sw_logged_in") === "true";
+    if (isLoggedIn) setLogout();
+    else setLogin();
+  });
+</script>
+
 </body>
 </html>
 <script src="/assets/login-modal.js"></script>
