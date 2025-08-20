@@ -13,7 +13,37 @@
       <textarea class="input" placeholder="Description" rows="4"></textarea>
       <input class="input" type="text" placeholder="Address" required>
       <input class="input" type="number" placeholder="Nightly price (USD)" required>
+      <input class="input" type="file" multiple acce<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Register Property — StayWorld</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" style="max-width:640px;margin:40px auto">
+    <h1 data-i18n="host_register_property">Register New Property</h1>
+    <form id="propForm" style="display:grid;gap:14px;margin-top:20px">
+      <input class="input" type="text" placeholder="Property name" required>
+      <textarea class="input" placeholder="Description" rows="4"></textarea>
+      <input class="input" type="text" placeholder="Address" required>
+      <input class="input" type="number" placeholder="Nightly price (USD)" required>
       <input class="input" type="file" multiple accept="image/*">
+      <button class="btn btn-gold" type="submit">Save</button>
+    </form>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script>
+    document.getElementById('propForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      alert('Property registered!');
+      location.href='host-dashboard.html';
+    });
+  </script>
+</body>
+</html>
+pt="image/*">
       <button class="btn btn-gold" type="submit">Save</button>
     </form>
   </div>
