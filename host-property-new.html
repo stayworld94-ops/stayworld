@@ -3,59 +3,62 @@
 <head>
   <meta charset="utf-8">
   <title>Register Property — StayWorld</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{margin:0;background:#0b0f16;color:#e7e9ee;font-family:Inter,system-ui,sans-serif}
+    .container{max-width:860px;margin:40px auto;padding:0 16px}
+    .input, textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0f1621;color:#e7e9ee}
+    .btn{border:0;border-radius:14px;padding:12px 18px;cursor:pointer}
+    .btn-gold{background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#1a1205;font-weight:700}
+    a{color:#f4d78c}
+  </style>
 </head>
 <body>
-  <div class="container" style="max-width:640px;margin:40px auto">
-    <h1 data-i18n="host_register_property">Register New Property</h1>
+  <div class="container">
+    <h1 data-i18n="host_register_property">Register Property</h1>
+
     <form id="propForm" style="display:grid;gap:14px;margin-top:20px">
-      <input class="input" type="text" placeholder="Property name" required>
-      <textarea class="input" placeholder="Description" rows="4"></textarea>
-      <input class="input" type="text" placeholder="Address" required>
-      <input class="input" type="number" placeholder="Nightly price (USD)" required>
-      <input class="input" type="file" multiple acce<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Register Property — StayWorld</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container" style="max-width:640px;margin:40px auto">
-    <h1 data-i18n="host_register_property">Register New Property</h1>
-    <form id="propForm" style="display:grid;gap:14px;margin-top:20px">
-      <input class="input" type="text" placeholder="Property name" required>
-      <textarea class="input" placeholder="Description" rows="4"></textarea>
-      <input class="input" type="text" placeholder="Address" required>
-      <input class="input" type="number" placeholder="Nightly price (USD)" required>
-      <input class="input" type="file" multiple accept="image/*">
-      <button class="btn btn-gold" type="submit">Save</button>
+      <label data-i18n="property_name">Property name</label>
+      <input class="input" id="pname" type="text" data-i18n-placeholder="property_name" placeholder="Property name" required>
+
+      <label data-i18n="description">Description</label>
+      <textarea class="input" id="pdesc" rows="4" data-i18n-placeholder="description" placeholder="Description"></textarea>
+
+      <label data-i18n="address">Address</label>
+      <input class="input" id="paddr" type="text" data-i18n-placeholder="address" placeholder="Address" required>
+
+      <label data-i18n="nightly_price">Nightly price (USD)</label>
+      <input class="input" id="pprice" type="number" placeholder="100" min="0" step="1" required>
+
+      <label>Photos</label>
+      <input class="input" id="pphotos" type="file" multiple accept="image/*">
+
+      <button class="btn btn-gold" type="submit" data-i18n="host_register_property">Register Property</button>
+      <p><a href="host-dashboard.html" data-i18n="go_dashboard">Go to Dashboard</a></p>
     </form>
   </div>
 
   <script src="i18n.js"></script>
   <script>
+    // 로그인 요구
+    if(localStorage.getItem('sw_logged_in')!=='true'){
+      alert('Please login as host.');
+      location.href='host-login.html';
+    }
     document.getElementById('propForm').addEventListener('submit', e=>{
       e.preventDefault();
+      const props = JSON.parse(localStorage.getItem('sw_props')||'[]');
+      props.push({
+        id: Date.now(),
+        name: document.getElementById('pname').value.trim(),
+        desc: document.getElementById('pdesc').value.trim(),
+        addr: document.getElementById('paddr').value.trim(),
+        price: Number(document.getElementById('pprice').value||0)
+      });
+      localStorage.setItem('sw_props', JSON.stringify(props));
       alert('Property registered!');
       location.href='host-dashboard.html';
     });
   </script>
-</body>
-</html>
-pt="image/*">
-      <button class="btn btn-gold" type="submit">Save</button>
-    </form>
-  </div>
-
-  <script src="i18n.js"></script>
-  <script>
-    document.getElementById('propForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      alert('Property registered!');
-      location.href='host-dashboard.html';
-    });
-  </script>
-  <script src="i18n.js"></script>
 </body>
 </html>
