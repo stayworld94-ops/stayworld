@@ -1,4 +1,4 @@
-/* ===== i18n.js (교체본) ===== */
+/* ===== i18n.js ===== */
 const I18N = {
   EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"Logout",nav_signup:"Sign Up",language:"Language",
     hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
@@ -12,14 +12,15 @@ const I18N = {
     f_loc:"Location", f_access:"Accessibility", f_ex:"Experiences", f_view:"View", f_safe:"Safety",
     f_family:"Family", f_ent:"Entertainment", f_out:"Outdoor", f_park:"Parking",
     footer_copy:"© StayWorld — stayworldbooking.com",
-    /* Host keys */
+    /* Host */
     nav_host:"Host", host_login:"Host Login", host_signup:"Host Sign Up", host_register_property:"Register Property",
     host_my_listings:"My Listings", host_logout:"Logout",
     email:"Email", password:"Password", login:"Login", signup:"Sign Up",
     dont_have_account:"Don’t have an account?", already_have_account:"Already have an account?",
     passport_upload:"Upload Passport / ID", full_name:"Full name", property_name:"Property name",
     description:"Description", address:"Address", nightly_price:"Nightly price (USD)",
-    sign_in_with_google:"Sign in with Google"
+    sign_in_with_google:"Sign in with Google",
+    go_dashboard:"Go to Dashboard", logout:"Logout"
   },
   KO:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",nav_logout:"로그아웃",nav_signup:"가입하기",language:"언어",
     hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
@@ -38,45 +39,8 @@ const I18N = {
     dont_have_account:"계정이 없나요?", already_have_account:"이미 계정이 있나요?",
     passport_upload:"여권/신분증 업로드", full_name:"이름", property_name:"숙소명",
     description:"설명", address:"주소", nightly_price:"1박 요금 (USD)",
-    sign_in_with_google:"Google로 로그인"
-  },
-  JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"ログアウト",nav_signup:"Sign Up",language:"Language",
-    hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
-    placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
-    feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
-    feat_payments:"安全な支払い",feat_payments_sub:"VISA, Master, Amex & Crypto。",
-    f_title:"フィルター", f_reset:"リセット", f_apply:"適用", f_currency:"通貨", f_price:"1泊の価格",
-    f_staytype:"宿タイプ", f_review:"レビュー評価", f_beds:"ベッド&バス", f_pets:"ペット", f_checkin:"チェックイン",
-    f_amen:"アメニティ", f_booking:"予約方法", f_verify:"認証", f_long:"長期滞在", f_biz:"ビジネス",
-    f_loc:"場所", f_access:"アクセシビリティ", f_ex:"体験", f_view:"眺望", f_safe:"安全",
-    f_family:"家族向け", f_ent:"エンタメ", f_out:"屋外", f_park:"駐車",
-    nav_host:"ホスト", host_login:"ホストログイン", host_signup:"ホスト登録", host_register_property:"物件を登録",
-    host_my_listings:"マイリスティング", host_logout:"ログアウト",
-    email:"メール", password:"パスワード", login:"ログイン", signup:"登録",
-    dont_have_account:"アカウントがありませんか？", already_have_account:"すでにアカウントをお持ちですか？",
-    passport_upload:"パスポート/ID をアップロード", full_name:"氏名", property_name:"物件名",
-    description:"説明", address:"住所", nightly_price:"1泊料金 (USD)",
-    sign_in_with_google:"Googleでログイン",
-    footer_copy:"© StayWorld — stayworldbooking.com"
-  },
-  ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_logout:"退出登录",nav_signup:"注册",language:"语言",
-    hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
-    placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
-    feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
-    feat_payments:"安全支付",feat_payments_sub:"Visa、Mastercard、Amex 与加密货币。",
-    f_title:"筛选", f_reset:"重置", f_apply:"应用", f_currency:"货币", f_price:"每晚价格",
-    f_staytype:"房源类型", f_review:"评分", f_beds:"床&浴室", f_pets:"宠物", f_checkin:"入住",
-    f_amen:"设施", f_booking:"预订方式", f_verify:"认证", f_long:"长住", f_biz:"商务",
-    f_loc:"位置", f_access:"无障碍", f_ex:"体验", f_view:"景观", f_safe:"安全",
-    f_family:"亲子", f_ent:"娱乐", f_out:"户外", f_park:"停车",
-    nav_host:"房东", host_login:"房东登录", host_signup:"房东注册", host_register_property:"登记房源",
-    host_my_listings:"我的房源", host_logout:"退出登录",
-    email:"邮箱", password:"密码", login:"登录", signup:"注册",
-    dont_have_account:"还没有账号？", already_have_account:"已有账号？",
-    passport_upload:"上传护照/证件", full_name:"姓名", property_name:"房源名称",
-    description:"简介", address:"地址", nightly_price:"每晚价格 (USD)",
-    sign_in_with_google:"用 Google 登录",
-    footer_copy:"© StayWorld — stayworldbooking.com"
+    sign_in_with_google:"Google로 로그인",
+    go_dashboard:"대시보드로 가기", logout:"로그아웃"
   },
   FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_logout:"Déconnexion",nav_signup:"S’inscrire",language:"Langue",
     hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",
@@ -96,35 +60,65 @@ const I18N = {
     passport_upload:"Téléverser passeport / pièce d’identité", full_name:"Nom complet", property_name:"Nom du logement",
     description:"Description", address:"Adresse", nightly_price:"Prix par nuit (USD)",
     sign_in_with_google:"Se connecter avec Google",
+    go_dashboard:"Aller au tableau de bord", logout:"Déconnexion",
     footer_copy:"© StayWorld — stayworldbooking.com"
   },
-  ES:{/* 생략… 필요 시 추가 */},
-  DE:{/* 생략… 필요 시 추가 */},
-  TR:{/* 생략… 필요 시 추가 */},
-  AR:{/* 생략… 필요 시 추가 */},
-  RU:{/* 생략… 필요 시 추가 */}
+  JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"ログアウト",nav_signup:"Sign Up",language:"Language",
+    hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
+    placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
+    feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
+    feat_payments:"安全な支払い",feat_payments_sub:"VISA, Master, Amex & Crypto。",
+    f_title:"フィルター", f_reset:"リセット", f_apply:"適用", f_currency:"通貨", f_price:"1泊の価格",
+    f_staytype:"宿タイプ", f_review:"レビュー評価", f_beds:"ベッド&バス", f_pets:"ペット", f_checkin:"チェックイン",
+    f_amen:"アメニティ", f_booking:"予約方法", f_verify:"認証", f_long:"長期滞在", f_biz:"ビジネス",
+    f_loc:"場所", f_access:"アクセシビリティ", f_ex:"体験", f_view:"眺望", f_safe:"安全",
+    f_family:"家族向け", f_ent:"エンタメ", f_out:"屋外", f_park:"駐車",
+    nav_host:"ホスト", host_login:"ホストログイン", host_signup:"ホスト登録", host_register_property:"物件を登録",
+    host_my_listings:"マイリスティング", host_logout:"ログアウト",
+    email:"メール", password:"パスワード", login:"ログイン", signup:"登録",
+    dont_have_account:"アカウントがありませんか？", already_have_account:"すでにアカウント？",
+    passport_upload:"パスポート/ID をアップロード", full_name:"氏名", property_name:"物件名",
+    description:"説明", address:"住所", nightly_price:"1泊料金 (USD)",
+    sign_in_with_google:"Googleでログイン",
+    go_dashboard:"ダッシュボードへ", logout:"ログアウト",
+    footer_copy:"© StayWorld — stayworldbooking.com"
+  },
+  ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_logout:"退出登录",nav_signup:"注册",language:"语言",
+    hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
+    placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
+    feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
+    feat_payments:"安全支付",feat_payments_sub:"Visa、Mastercard、Amex 与加密货币。",
+    f_title:"筛选", f_reset:"重置", f_apply:"应用", f_currency:"货币", f_price:"每晚价格",
+    f_staytype:"房源类型", f_review:"评分", f_beds:"床&浴室", f_pets:"宠物", f_checkin:"入住",
+    f_amen:"设施", f_booking:"预订方式", f_verify:"认证", f_long:"长住", f_biz:"商务",
+    f_loc:"位置", f_access:"无障碍", f_ex:"体验", f_view:"景观", f_safe:"安全",
+    f_family:"亲子", f_ent:"娱乐", f_out:"户外", f_park:"停车",
+    nav_host:"房东", host_login:"房东登录", host_signup:"房东注册", host_register_property:"登记房源",
+    host_my_listings:"我的房源", host_logout:"退出登录",
+    email:"邮箱", password:"密码", login:"登录", signup:"注册",
+    dont_have_account:"还没有账号？", already_have_account:"已有账号？",
+    passport_upload:"上传护照/证件", full_name:"姓名", property_name:"房源名称",
+    description:"简介", address:"地址", nightly_price:"每晚价格 (USD)",
+    sign_in_with_google:"用 Google 登录",
+    go_dashboard:"前往控制台", logout:"退出登录",
+    footer_copy:"© StayWorld — stayworldbooking.com"
+  }
 };
 
 function applyI18NPage(){
   const lang = localStorage.getItem('sw_lang') || 'EN';
   const dict = I18N[lang] || I18N.EN;
   document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k = el.getAttribute('data-i18n');
-    if(dict[k]) el.textContent = dict[k];
+    const k = el.getAttribute('data-i18n'); if(dict[k]) el.textContent = dict[k];
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-    const k = el.getAttribute('data-i18n-placeholder');
-    if(dict[k]) el.setAttribute('placeholder', dict[k]);
+    const k = el.getAttribute('data-i18n-placeholder'); if(dict[k]) el.setAttribute('placeholder', dict[k]);
   });
-  // 헤더의 언어 select 동기화(있을 때만)
-  const sel = document.getElementById('lang');
-  if(sel){ sel.value = lang; }
+  const sel = document.getElementById('lang'); if(sel) sel.value = lang;
 }
-// 별칭 (혹시 다른 페이지에서 applyI18n를 호출해도 동작)
 const applyI18n = applyI18NPage;
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  // 저장된 언어 없으면 기본 EN
   if(!localStorage.getItem('sw_lang')) localStorage.setItem('sw_lang','EN');
   applyI18NPage();
   const sel = document.getElementById('lang');
