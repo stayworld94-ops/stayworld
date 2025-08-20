@@ -1,52 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Host Login — StayWorld</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{margin:0;background:#0b0f16;color:#e7e9ee;font-family:Inter,system-ui,sans-serif}
-    .container{max-width:760px;margin:60px auto;padding:0 16px}
-    .input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0f1621;color:#e7e9ee}
-    .btn{border:0;border-radius:14px;padding:12px 18px;cursor:pointer}
-    .btn-gold{background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#1a1205;font-weight:700}
-    .btn-chip{background:#121a26;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:10px 14px}
-    a{color:#f4d78c}
-    .row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-    @media(max-width:640px){.row{grid-template-columns:1fr}}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Host Login - StayWorld</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1 data-i18n="host_login">Host Login</h1>
+  <header>
+    <a href="/" class="brand">STAYWORLD</a>
+    <nav>
+      <a href="host-register.html">Host Sign Up</a>
+      <a href="host-login.html" class="active">Host Login</a>
+    </nav>
+  </header>
 
-    <form id="hostLoginForm" style="display:grid;gap:14px;margin-top:20px">
-      <label data-i18n="email">Email</label>
-      <input class="input" type="email" data-i18n-placeholder="email" placeholder="Email" required>
+  <main class="container" style="max-width:480px; padding:40px 0;">
+    <h1>Host Login</h1>
+    <label>Email</label>
+    <input type="email" id="email" />
+    <label>Password</label>
+    <input type="password" id="password" />
+    <button id="hostLoginBtn">Login</button>
+    <button id="hostGoogleBtn" class="btn-google">Continue with Google</button>
 
-      <label data-i18n="password">Password</label>
-      <input class="input" type="password" data-i18n-placeholder="password" placeholder="Password" required>
+    <p>No account? <a href="host-register.html">Sign up here</a></p>
+  </main>
 
-      <div class="row" style="align-items:center">
-        <button class="btn btn-gold" type="submit" data-i18n="login">Login</button>
-        <button class="btn-chip" type="button" data-i18n="sign_in_with_google">Sign in with Google</button>
-      </div>
-
-      <p><span data-i18n="dont_have_account">Don’t have an account?</span>
-        <a href="host-register.html" data-i18n="host_signup">Host Sign Up</a></p>
-      <p><a class="btn-chip" href="host-dashboard.html" data-i18n="go_dashboard">Go to Dashboard</a></p>
-    </form>
-  </div>
-
-  <script src="i18n.js"></script>
-  <script>
-    document.getElementById('hostLoginForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      localStorage.setItem('sw_logged_in','true');
-      if(typeof window.markLoggedIn==='function') window.markLoggedIn();
-      location.href='host-dashboard.html';
-    });
-  </script>
-  <script src="/assets/login-modal.js"></script>
+  <script type="module" src="/assets/login-modal.js"></script>
 </body>
 </html>
