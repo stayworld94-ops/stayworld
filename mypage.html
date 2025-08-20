@@ -1,348 +1,234 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StayWorld — My Page</title>
-  <link rel="icon" href="/stayworld-logo.png" />
-  <style>
-    :root{--bg:#0b0b0c;--card:#131417;--muted:#9aa0a6;--text:#e8eaed;--accent:#ffd166;--ok:#4caf50;--warn:#ff9800;--danger:#ef5350;--border:#23252a}
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:linear-gradient(180deg,#0a0a0b,#0d0f12);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    a{color:var(--accent);text-decoration:none}
-    .container{max-width:1100px;margin:0 auto;padding:24px}
-    .site-header{position:sticky;top:0;z-index:30;background:rgba(10,10,12,0.8);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--border)}
-    .header-row{display:flex;align-items:center;justify-content:space-between}
-    .brand{display:flex;gap:10px;align-items:center}
-    .brand-logo{height:34px;width:34px;border-radius:10px;box-shadow:0 0 0 2px #222}
-    .brand-text{font-weight:800;letter-spacing:1.5px}
-    nav.main-nav{display:flex;gap:16px;align-items:center}
-    nav.main-nav a{padding:8px 10px;border-radius:10px}
-    nav.main-nav a:hover{background:#181a1f}
+/* ============================================
+   STAYWORLD Login Panel (modal-style) — /assets/login-modal.js
+   - Autocreates dialog & template if missing
+   - Intercepts login links to open panel instead of navigating
+   - ESC, backdrop click, ✕ close
+   - Demo-friendly; optional Firebase hook
+   - Calls markLoggedIn()/updateHostMenu()/applyI18NPage() after success
+   ============================================ */
+(function () {
+  const $$ = (sel, scope) => (scope || document).querySelector(sel);
 
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:#0f1115}
-    .select{appearance:none;background:#0f1115;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:12px}
+  // ------------ Style injection (Google-btn visible, dialog backdrop)
+  function ensureStyles() {
+    if ($$('#sw-login-modal-styles')) return;
+    const s = document.createElement('style');
+    s.id = 'sw-login-modal-styles';
+    s.textContent = `
+      dialog.sw-login { 
+        width:min(420px, 92vw); border:1px solid rgba(255,255,255,.12);
+        border-radius:16px; padding:0; background:#101018; color:#e7e9ee;
+        box-shadow:0 30px 80px rgba(0,0,0,.55); 
+      }
+      dialog.sw-login::backdrop{ background:rgba(0,0,0,.55); }
+      .sw-login-head{ display:flex; align-items:center; justify-content:space-between;
+        padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.08); }
+      .sw-login-title{ font-size:18px; font-weight:800; }
+      .sw-login-close{ border:0; background:transparent; color:#cfd6e6; font-size:18px; cursor:pointer; }
+      .sw-login-body{ padding:16px; display:grid; gap:10px; }
+      .sw-login-body label{ font-size:13px; opacity:.85; }
+      .sw-login-input{ background:#0f1621; border:1px solid rgba(255,255,255,.1); color:#e7e9ee; 
+        padding:12px 14px; border-radius:12px; width:100%; }
+      .sw-login-actions{ display:grid; gap:10px; margin-top:6px; }
+      .sw-btn{ border:0; cursor:pointer; padding:12px 14px; border-radius:12px; }
+      .sw-btn-gold{ background:linear-gradient(180deg, #f4d78c, #c9a35b); color:#170f04; font-weight:800; }
+      .sw-btn-ghost{ background:transparent; color:#cfcfcf; }
+      .sw-btn-google{ background:#fff; color:#111; border:1px solid rgba(0,0,0,.12); 
+        display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; }
+      .sw-btn-google:hover{ background:#f5f5f5; }
+      .sw-g-logo{ width:18px; height:18px; border-radius:2px; display:inline-block; 
+        background:
+          conic-gradient(from 0deg,#4285F4 0 90deg,#34A853 0 180deg,#FBBC05 0 270deg,#EA4335 0 360deg);
+        mask: radial-gradient(circle at 65% 35%,transparent 6px,#000 7px) 
+              subtract, linear-gradient(#000,#000) content-box;
+        -webkit-mask-composite: xor; mask-composite: exclude;
+        padding:2px;
+      }
+      .sw-login-foot{ padding:12px 16px; border-top:1px solid rgba(255,255,255,.08); font-size:13px; opacity:.9; }
+      .sw-login-foot a{ color:#f4d78c; text-decoration:none; }
+    `;
+    document.head.appendChild(s);
+  }
 
-    .grid{display:grid;gap:16px}
-    @media(min-width:920px){.grid-2{grid-template-columns:1.1fr .9fr}}
+  // ------------ Create dialog & template if absent
+  function ensureDialog() {
+    let dlg = $$('#loginModal');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'loginModal';
+      dlg.className = 'sw-login';
+      document.body.appendChild(dlg);
+    }
+    return dlg;
+  }
 
-    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
-    .card-h{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
-    .card-c{padding:18px 20px}
-    .muted{color:var(--muted)}
-    .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#111319}
-    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .btn{cursor:pointer;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#16181f;color:var(--text)}
-    .btn:hover{background:#1a1d25}
-    .btn.primary{background:linear-gradient(180deg,#1d2028,#181b22);border-color:#2a2f3a}
-    .btn.danger{border-color:#40222a;background:#2a1418}
-    .btn.ok{border-color:#1f3b23;background:#122015}
-
-    #map{height:380px;border-radius:16px;border:1px solid var(--border)}
-
-    .booking{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px dashed #23262d}
-    .booking:last-child{border-bottom:none}
-    .thumb{height:64px;width:64px;border-radius:12px;background:#0f1115;border:1px solid var(--border);object-fit:cover}
-
-    .empty{display:flex;align-items:center;justify-content:center;gap:10px;padding:22px;border:1px dashed #2a2e35;border-radius:14px;color:var(--muted)}
-
-    .footer{padding:30px 0;color:#8b9098;text-align:center}
-  </style>
-</head>
-<body>
-  <header class="site-header">
-    <div class="container header-row">
-      <a href="/" class="brand">
-        <img src="/stayworld-logo.png" class="brand-logo" alt="StayWorld"/>
-        <span class="brand-text">STAYWORLD</span>
-      </a>
-      <nav class="main-nav">
-        <a href="index.html" data-i18n="nav_home">Home</a>
-        <a href="membership.html" data-i18n="nav_membership">Membership</a>
-        <a href="/login.html" id="loginLink" data-i18n="nav_login">Login</a>
-        <button id="logoutBtn" class="btn" style="display:none" data-i18n="logout">Logout</button>
-        <select id="langSelect" class="select" aria-label="Language">
-          <option value="en">English</option>
-          <option value="ko">한국어</option>
-          <option value="fr">Français</option>
-          <option value="tr">Türkçe</option>
-          <option value="ja">日本語</option>
-          <option value="de">Deutsch</option>
-          <option value="es">Español</option>
-          <option value="ru">Русский</option>
-          <option value="it">Italiano</option>
-          <option value="zh">简体中文</option>
-        </select>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container grid grid-2">
-    <!-- Profile / Summary -->
-    <section class="card">
-      <div class="card-h">
-        <h2 data-i18n="my_page">My Page</h2>
-        <span class="chip" id="userLevel">Bronze</span>
-      </div>
-      <div class="card-c">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="muted" data-i18n="signed_in_as">Signed in as</div>
-            <div id="userName" style="font-weight:700;font-size:18px">—</div>
-            <div id="userEmail" class="muted">—</div>
-          </div>
-          <div>
-            <div class="muted" data-i18n="points">Points</div>
-            <div id="userPoints" style="font-size:20px;font-weight:700">0</div>
-          </div>
+  function ensureTemplate() {
+    let tpl = $$('#loginTpl');
+    if (!tpl) {
+      tpl = document.createElement('template');
+      tpl.id = 'loginTpl';
+      tpl.innerHTML = `
+        <div class="sw-login-head">
+          <div class="sw-login-title" data-i18n="login_title">Log in</div>
+          <button class="sw-login-close" type="button" aria-label="Close">✕</button>
         </div>
-        <div class="row" style="margin-top:14px">
-          <a class="btn primary" href="/results.html" data-i18n="find_stays">Find stays</a>
-          <a class="btn" href="/settings.html" data-i18n="settings">Settings</a>
+        <form class="sw-login-body" id="swLoginForm">
+          <label for="swLoginEmail" data-i18n="login_email">Email</label>
+          <input class="sw-login-input" id="swLoginEmail" type="email" placeholder="you@example.com" autocomplete="username" />
+
+          <label for="swLoginPwd" data-i18n="login_password">Password</label>
+          <input class="sw-login-input" id="swLoginPwd" type="password" placeholder="********" autocomplete="current-password" />
+
+          <div class="sw-login-actions">
+            <button class="sw-btn sw-btn-gold" type="submit" data-i18n="login_btn">Login</button>
+            <button class="sw-btn sw-btn-google" type="button" id="swGoogleBtn">
+              <span class="sw-g-logo" aria-hidden="true"></span>
+              <span data-i18n="login_google">Continue with Google</span>
+            </button>
+          </div>
+        </form>
+        <div class="sw-login-foot">
+          <span data-i18n="login_no_account">Don’t have an account?</span>
+          <a href="signup.html" data-i18n="nav_signup">Sign Up</a>
         </div>
-      </div>
-    </section>
+      `;
+      document.body.appendChild(tpl);
+    }
+    return tpl;
+  }
 
-    <!-- My Locations (Map) -->
-    <section class="card">
-      <div class="card-h">
-        <h2 data-i18n="my_locations">My Locations</h2>
-        <span class="muted" id="locationsCount">0</span>
-      </div>
-      <div class="card-c">
-        <div id="map"></div>
-      </div>
-    </section>
+  // ------------ Mount / Open / Close
+  function openLoginPanel() {
+    ensureStyles();
+    const dlg = ensureDialog();
+    const tpl = ensureTemplate();
 
-    <!-- My Bookings -->
-    <section class="card" style="grid-column:1 / -1">
-      <div class="card-h">
-        <h2 data-i18n="my_bookings">My Bookings</h2>
-        <span class="muted" id="bookingsCount">0</span>
-      </div>
-      <div class="card-c" id="bookingsList">
-        <div class="empty"><span>🗂️</span> <span data-i18n="no_bookings">No bookings yet.</span></div>
-      </div>
-    </section>
-  </main>
+    // mount fresh content each open (i18n-safe)
+    dlg.innerHTML = tpl.innerHTML;
 
-  <footer class="footer container">
-    <div>© <span id="year"></span> STAYWORLD • <span class="muted" data-i18n="all_rights">All rights reserved.</span></div>
-  </footer>
+    // wire events
+    const closeBtn = $$('.sw-login-close', dlg);
+    closeBtn?.addEventListener('click', (e) => { e.preventDefault(); closeLoginPanel(); });
 
-  <!-- i18n dictionary: 10 languages -->
-  <script>
-    const I18N = {
-      en:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",logout:"Logout",my_page:"My Page",signed_in_as:"Signed in as",points:"Points",find_stays:"Find stays",settings:"Settings",my_locations:"My Locations",my_bookings:"My Bookings",no_bookings:"No bookings yet.",check_in:"Check‑in",check_out:"Check‑out",status:"Status",price:"Price",payment_status:"Payment",cancel:"Cancel",cancel_requested:"Cancel requested",sign_in_prompt:"Please sign in to view your page.",all_rights:"All rights reserved."},
-      ko:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",logout:"로그아웃",my_page:"마이페이지",signed_in_as:"로그인 계정",points:"포인트",find_stays:"숙소 찾기",settings:"설정",my_locations:"내 위치 리스트",my_bookings:"내 예약",no_bookings:"아직 예약이 없습니다.",check_in:"체크인",check_out:"체크아웃",status:"상태",price:"결제금액",payment_status:"결제",cancel:"예약 취소",cancel_requested:"취소 요청됨",sign_in_prompt:"마이페이지 보기를 위해 로그인해주세요.",all_rights:"모든 권리 보유."},
-      fr:{nav_home:"Accueil",nav_membership:"Abonnement",nav_login:"Connexion",logout:"Déconnexion",my_page:"Mon espace",signed_in_as:"Connecté en tant que",points:"Points",find_stays:"Trouver des séjours",settings:"Paramètres",my_locations:"Mes lieux",my_bookings:"Mes réservations",no_bookings:"Aucune réservation.",check_in:"Arrivée",check_out:"Départ",status:"Statut",price:"Montant",payment_status:"Paiement",cancel:"Annuler",cancel_requested:"Annulation demandée",sign_in_prompt:"Veuillez vous connecter pour voir votre espace.",all_rights:"Tous droits réservés."},
-      tr:{nav_home:"Ana sayfa",nav_membership:"Üyelik",nav_login:"Giriş",logout:"Çıkış",my_page:"Hesabım",signed_in_as:"Olarak giriş yapıldı",points:"Puan",find_stays:"Konaklama bul",settings:"Ayarlar",my_locations:"Konumlarım",my_bookings:"Rezervasyonlarım",no_bookings:"Rezervasyon yok.",check_in:"Giriş",check_out:"Çıkış",status:"Durum",price:"Tutar",payment_status:"Ödeme",cancel:"İptal",cancel_requested:"İptal talep edildi",sign_in_prompt:"Sayfanızı görmek için giriş yapın.",all_rights:"Tüm hakları saklıdır."},
-      ja:{nav_home:"ホーム",nav_membership:"メンバーシップ",nav_login:"ログイン",logout:"ログアウト",my_page:"マイページ",signed_in_as:"ログイン中",points:"ポイント",find_stays:"宿泊先を探す",settings:"設定",my_locations:"マイロケーション",my_bookings:"予約一覧",no_bookings:"予約がありません。",check_in:"チェックイン",check_out:"チェックアウト",status:"ステータス",price:"金額",payment_status:"支払い",cancel:"キャンセル",cancel_requested:"キャンセル申請済み",sign_in_prompt:"表示するにはログインしてください。",all_rights:"無断転載禁止。"},
-      de:{nav_home:"Startseite",nav_membership:"Mitgliedschaft",nav_login:"Anmelden",logout:"Abmelden",my_page:"Mein Bereich",signed_in_as:"Angemeldet als",points:"Punkte",find_stays:"Unterkünfte finden",settings:"Einstellungen",my_locations:"Meine Orte",my_bookings:"Meine Buchungen",no_bookings:"Keine Buchungen.",check_in:"Check-in",check_out:"Check-out",status:"Status",price:"Preis",payment_status:"Zahlung",cancel:"Stornieren",cancel_requested:"Stornierung angefordert",sign_in_prompt:"Zum Anzeigen bitte anmelden.",all_rights:"Alle Rechte vorbehalten."},
-      es:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Iniciar sesión",logout:"Cerrar sesión",my_page:"Mi cuenta",signed_in_as:"Conectado como",points:"Puntos",find_stays:"Buscar alojamientos",settings:"Configuración",my_locations:"Mis ubicaciones",my_bookings:"Mis reservas",no_bookings:"Sin reservas.",check_in:"Check‑in",check_out:"Check‑out",status:"Estado",price:"Precio",payment_status:"Pago",cancel:"Cancelar",cancel_requested:"Cancelación solicitada",sign_in_prompt:"Inicia sesión para ver tu cuenta.",all_rights:"Todos los derechos reservados."},
-      ru:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",logout:"Выйти",my_page:"Мой кабинет",signed_in_as:"Вошли как",points:"Баллы",find_stays:"Найти жильё",settings:"Настройки",my_locations:"Мои места",my_bookings:"Мои бронирования",no_bookings:"Бронирований нет.",check_in:"Заезд",check_out:"Выезд",status:"Статус",price:"Сумма",payment_status:"Оплата",cancel:"Отменить",cancel_requested:"Запрошена отмена",sign_in_prompt:"Войдите, чтобы просмотреть.",all_rights:"Все права защищены."},
-      it:{nav_home:"Home",nav_membership:"Abbonamento",nav_login:"Accedi",logout:"Esci",my_page:"Area personale",signed_in_as:"Collegato come",points:"Punti",find_stays:"Cerca alloggi",settings:"Impostazioni",my_locations:"Le mie posizioni",my_bookings:"Le mie prenotazioni",no_bookings:"Nessuna prenotazione.",check_in:"Check‑in",check_out:"Check‑out",status:"Stato",price:"Prezzo",payment_status:"Pagamento",cancel:"Annulla",cancel_requested:"Annullamento richiesto",sign_in_prompt:"Accedi per visualizzare.",all_rights:"Tutti i diritti riservati."},
-      zh:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",logout:"登出",my_page:"我的页面",signed_in_as:"登录帐号",points:"积分",find_stays:"查找住宿",settings:"设置",my_locations:"我的位置",my_bookings:"我的预订",no_bookings:"暂无预订。",check_in:"入住",check_out:"退房",status:"状态",price:"金额",payment_status:"支付",cancel:"取消",cancel_requested:"已申请取消",sign_in_prompt:"请登录以查看页面。",all_rights:"版权所有。"}
+    // ESC close
+    dlg.addEventListener('cancel', (ev) => { ev.preventDefault(); closeLoginPanel(); }, { once:true });
+
+    // backdrop click (click outside dialog rect)
+    const onBackdropClick = (e) => {
+      const r = dlg.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (!inside) closeLoginPanel();
     };
+    dlg.addEventListener('click', onBackdropClick, { once:true });
 
-    function getLang(){
-      return localStorage.getItem('lang') || (navigator.language||'en').slice(0,2);
-    }
-    function setLang(lang){
-      const pack = I18N[lang] || I18N.en;
-      document.querySelectorAll('[data-i18n]').forEach(el=>{
-        const k = el.getAttribute('data-i18n');
-        if(pack[k]) el.textContent = pack[k];
-      });
-      document.documentElement.lang = lang;
-      localStorage.setItem('lang', lang);
-    }
-  </script>
-
-  <!-- Firebase (modular v10) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    // TODO: replace with your live config (kept inline so page works standalone)
-   const firebaseConfig = {
-  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
-  authDomain: "stayworld-2570c.firebaseapp.com",
-  projectId: "stayworld-2570c",
-  storageBucket: "stayworld-2570c.firebasestorage.app",
-  messagingSenderId: "272599681686",
-  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
-  measurementId: "G-F8MXM3D7FJ"
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const yearEl = document.getElementById('year');
-    yearEl.textContent = new Date().getFullYear();
-
-    const langSelect = document.getElementById('langSelect');
-    const initialLang = getLang();
-    langSelect.value = I18N[initialLang] ? initialLang : 'en';
-    setLang(langSelect.value);
-    langSelect.addEventListener('change', ()=> setLang(langSelect.value));
-
-    const loginLink = document.getElementById('loginLink');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const userLevel = document.getElementById('userLevel');
-    const userName = document.getElementById('userName');
-    const userEmail = document.getElementById('userEmail');
-    const userPoints = document.getElementById('userPoints');
-
-    const bookingsList = document.getElementById('bookingsList');
-    const bookingsCount = document.getElementById('bookingsCount');
-    const locationsCount = document.getElementById('locationsCount');
-
-    let map, markers=[];
-    let gmapsLoaded = false;
-
-    function ensureGoogleMaps(cb){
-      if(gmapsLoaded){ cb(); return; }
-      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // AIzaSyDRUf7RDA9P7Iy8qyyDoAkvVtbouEEzwRY
-      if(!apiKey || apiKey.includes('YOUR_')){ console.warn('Google Maps API key missing'); return; }
-      window.__mapsInit = ()=>{ gmapsLoaded = true; cb(); };
-      const s=document.createElement('script');
-      s.src=`https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=__mapsInit`;
-      s.async=true; s.defer=true; document.head.appendChild(s);
-    }
-
-    function initMap(center={lat:39.0,lng:35.0}){ // Türkiye center by default
-      map = new google.maps.Map(document.getElementById('map'), {center, zoom:5});
-    }
-
-    function clearMarkers(){ markers.forEach(m=>m.setMap(null)); markers=[]; }
-
-    function renderBookings(list, lang){
-      const pack = I18N[lang]||I18N.en;
-      bookingsList.innerHTML = '';
-      if(!list.length){
-        const div = document.createElement('div');
-        div.className='empty';
-        div.innerHTML = `🗂️ <span>${pack.no_bookings}</span>`;
-        bookingsList.appendChild(div);
-        bookingsCount.textContent='0';
-        locationsCount.textContent='0';
-        return;
-      }
-      bookingsCount.textContent = String(list.length);
-      locationsCount.textContent = String(list.filter(b=>b.location && b.location.lat && b.location.lng).length);
-
-      // Map markers
-      const locs = list.map(b=>({
-        lat: b?.location?.lat, lng: b?.location?.lng, name: b?.stayName||'Stay', thumb:b?.thumbUrl
-      })).filter(x=>typeof x.lat==='number' && typeof x.lng==='number');
-
-      if(locs.length){
-        ensureGoogleMaps(()=>{
-          if(!map) initMap({lat:locs[0].lat, lng:locs[0].lng});
-          clearMarkers();
-          locs.forEach(l=>{
-            const m = new google.maps.Marker({position:{lat:l.lat,lng:l.lng}, map, title:l.name});
-            markers.push(m);
-          });
-          if(locs.length>1){
-            const bounds = new google.maps.LatLngBounds();
-            locs.forEach(l=>bounds.extend({lat:l.lat,lng:l.lng}));
-            map.fitBounds(bounds);
-          }
-        });
-      }
-
-      list.forEach(b=>{
-        const item = document.createElement('div');
-        item.className='booking';
-        const thumb = document.createElement('img');
-        thumb.className='thumb';
-        thumb.alt=b.stayName||'Stay';
-        thumb.src=b.thumbUrl||'/placeholder-stay.jpg';
-        const main = document.createElement('div');
-        const title = document.createElement('div');
-        title.style.fontWeight='700';
-        title.textContent = b.stayName || 'Stay';
-        const meta = document.createElement('div');
-        meta.className='muted';
-        meta.innerHTML = `${pack.check_in}: <b>${b.checkIn||'-'}</b> · ${pack.check_out}: <b>${b.checkOut||'-'}</b>`;
-        const meta2 = document.createElement('div');
-        meta2.className='muted';
-        meta2.innerHTML = `${pack.status}: <b>${b.status||'-'}</b> · ${pack.payment_status}: <b>${b.paymentStatus||'-'}</b> · ${pack.price}: <b>${b.amount||'-'}</b>`;
-        main.appendChild(title); main.appendChild(meta); main.appendChild(meta2);
-        const actions = document.createElement('div');
-        const cancelBtn = document.createElement('button');
-        cancelBtn.className='btn danger';
-        cancelBtn.textContent= b.status==='cancel_requested' ? pack.cancel_requested : pack.cancel;
-        cancelBtn.disabled = b.status==='cancel_requested';
-        cancelBtn.addEventListener('click', async ()=>{
-          try{
-            await updateDoc(doc(db,'bookings', b.id), { status:'cancel_requested' });
-            cancelBtn.textContent = pack.cancel_requested; cancelBtn.disabled=true; item.style.opacity=.8;
-          }catch(e){ alert('Cancel failed: '+e.message); }
-        });
-        actions.appendChild(cancelBtn);
-
-        item.appendChild(thumb); item.appendChild(main); item.appendChild(actions);
-        bookingsList.appendChild(item);
-      });
-    }
-
-    async function fetchUserBookings(uid){
-      const qRef = query(collection(db,'bookings'), where('userId','==', uid));
-      const snap = await getDocs(qRef);
-      return snap.docs.map(d=>({ id:d.id, ...d.data() }));
-    }
-
-    function computeLevel(points){
-      // Reflects StayWorld leveled rewards (bronze→elite)
-      if(points>=15000000) return 'Elite';
-      if(points>=7500000) return 'Diamond';
-      if(points>=4000000) return 'Platinum';
-      if(points>=2000000) return 'Gold';
-      if(points>=500000) return 'Silver';
-      return 'Bronze';
-    }
-
-    onAuthStateChanged(auth, async (user)=>{
-      const lang = getLang();
-      if(!user){
-        // Not logged in
-        document.getElementById('userName').textContent='—';
-        document.getElementById('userEmail').textContent= I18N[lang]?.sign_in_prompt || I18N.en.sign_in_prompt;
-        loginLink.style.display='inline-flex';
-        logoutBtn.style.display='none';
-        renderBookings([], lang);
-        return;
-      }
-      loginLink.style.display='none';
-      logoutBtn.style.display='inline-flex';
-
-      userName.textContent = user.displayName || 'Guest';
-      userEmail.textContent = user.email || '';
-
-      // Load profile from optional users collection (points)
-      let points=0;
-      try{
-        // You can expand to fetch from users/{uid}
-        // For now, infer points by summing amounts (demo)
-        const list = await fetchUserBookings(user.uid);
-        points = list.reduce((s,b)=> s + (Number(b.pointsEarned)||0), 0);
-        userPoints.textContent = String(points);
-        userLevel.textContent = computeLevel(points);
-        renderBookings(list, lang);
-      }catch(e){
-        console.error(e);
-        renderBookings([], lang);
-      }
+    // submit
+    const form = $$('#swLoginForm', dlg);
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();    // <-- 홈으로 튕김 방지
+      doEmailLogin();
     });
 
-    logoutBtn.addEventListener('click', async ()=>{
-      await signOut(auth);
-    });
-  </script>
-</body>
-</html>
+    // google
+    const gbtn = $$('#swGoogleBtn', dlg);
+    gbtn?.addEventListener('click', (e) => { e.preventDefault(); doGoogleLogin(); });
+
+    // i18n translate panel if helper exists
+    try { window.applyI18NPage?.(); } catch (_) {}
+
+    dlg.showModal();
+  }
+
+  function closeLoginPanel() {
+    const dlg = $$('#loginModal');
+    if (dlg && dlg.open) dlg.close();
+  }
+
+  // ------------ Login actions
+  function afterLoginSuccess() {
+    try { window.markLoggedIn?.(); } catch (_) {}
+    try { window.updateHostMenu?.(); } catch (_) {}
+    try { window.applyI18NPage?.(); } catch (_) {}
+    closeLoginPanel();
+  }
+
+  function doEmailLogin() {
+    // DEMO mode → localStorage만
+    if (window.ENV?.DEMO_MODE || !window.firebase?.auth) {
+      localStorage.setItem('sw_logged_in', 'true');
+      afterLoginSuccess();
+      return;
+    }
+    // Firebase 예시 (필요 시 활성화)
+    const email = $$('#swLoginEmail')?.value?.trim() || '';
+    const pwd   = $$('#swLoginPwd')?.value || '';
+    if (!email || !pwd) { alert('Enter email and password.'); return; }
+    firebase.auth().signInWithEmailAndPassword(email, pwd)
+      .then(() => { localStorage.setItem('sw_logged_in','true'); afterLoginSuccess(); })
+      .catch(err => alert(err?.message || 'Login failed.'));
+  }
+
+  function doGoogleLogin() {
+    if (window.ENV?.DEMO_MODE || !window.firebase?.auth) {
+      // 데모: 바로 로그인 처리
+      localStorage.setItem('sw_logged_in', 'true');
+      afterLoginSuccess();
+      return;
+    }
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+      .then(() => { localStorage.setItem('sw_logged_in','true'); afterLoginSuccess(); })
+      .catch(err => alert(err?.message || 'Google sign-in failed.'));
+  }
+
+  // ------------ Intercept login links to open panel
+  function interceptLoginLinks() {
+    // 조건: 템플릿/패널을 만들 수 있을 때만 개입 (그 외엔 기존 페이지 이동 허용)
+    const canOpen = true;
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (!a) return;
+
+      // (1) navAuthLink가 "Login" 상태이거나
+      if (a.id === 'navAuthLink' && (a.getAttribute('data-i18n') === 'nav_login' || /login/i.test(a.textContent))) {
+        if (canOpen) { e.preventDefault(); openLoginPanel(); }
+        return;
+      }
+      // (2) 또는 href가 login.html인 일반 링크
+      if (a.getAttribute('href') && /(^|\/)login\.html(\?.*)?$/i.test(a.getAttribute('href'))) {
+        if (canOpen) { e.preventDefault(); openLoginPanel(); }
+        return;
+      }
+      // 그 외는 패스
+    }, { capture: true });
+  }
+
+  // ------------ Minimal i18n fallback (키가 없을 때만)
+  function ensureI18nFallback() {
+    if (!window.I18N) return; // 프로젝트의 I18N 사용 중이면 그대로
+    // 없다면 아주 최소 키만 영어로…
+    window.I18N = {
+      EN: {
+        login_title: "Log in",
+        login_email: "Email",
+        login_password: "Password",
+        login_btn: "Login",
+        login_google: "Continue with Google",
+        login_no_account: "Don’t have an account?",
+        nav_signup: "Sign Up"
+      }
+    };
+    window.applyI18NPage = function(){ /* noop fallback */ };
+  }
+
+  // ------------ Expose
+  window.openLoginPanel = openLoginPanel;
+  window.closeLoginPanel = closeLoginPanel;
+
+  // ------------ Init
+  ensureI18nFallback();
+  ensureStyles();
+  ensureDialog();
+  ensureTemplate();
+  interceptLoginLinks();
+
+})();
