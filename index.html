@@ -750,5 +750,23 @@
 
   <!-- 로그인 모달(있다면) -->
   <script src="/assets/login-modal.js"></script>
+  <script>
+  // 호스트 드롭다운 클릭 토글 (모바일용)
+  const hostMenu = document.getElementById('hostMenu');
+  if (hostMenu) {
+    const toggle = hostMenu.querySelector('.dropdown-toggle');
+    let hideTimer;
+    toggle?.addEventListener('click', (e)=>{
+      e.preventDefault();
+      hostMenu.classList.toggle('open');
+    });
+    // 마우스가 벗어날 때 약간의 지연 후 닫기(실수 방지)
+    hostMenu.addEventListener('mouseleave', ()=>{
+      hideTimer = setTimeout(()=>hostMenu.classList.remove('open'), 180);
+    });
+    hostMenu.addEventListener('mouseenter', ()=> clearTimeout(hideTimer));
+  }
+</script>
+
 </body>
 </html>
