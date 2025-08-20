@@ -1,60 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>STAYWORLD — Log in</title>
-  <link rel="stylesheet" href="./assets/auth.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - StayWorld</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="header">
-    <div class="brand"><i class="logo"></i><span>STAYWORLD</span></div>
-    <nav class="nav">
-      <a href="/">Home</a>
-      <a href="/membership.html">Membership</a>
-      <a href="/host.html">Host</a>
-      <a href="/support.html">Support</a>
-      <a href="/signup.html">Sign up</a>
-    </nav>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="/" class="brand">
+        <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
+        <span class="brand-text">STAYWORLD</span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="membership.html">Membership</a>
+        <a href="signup.html">Sign Up</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="container">
-    <div class="card">
-      <small class="kicker">Welcome back</small>
-      <h1>Log in</h1>
-      <p class="sub">Access your bookings, rewards, and messages.</p>
+  <main class="container" style="max-width:480px; padding:40px 0;">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <label>Email</label>
+      <input type="email" id="loginEmail" required class="input" placeholder="you@example.com" />
 
-      <form id="form-login" autocomplete="on">
-        <div class="form-row">
-          <label for="email">Email</label>
-          <input id="email" type="email" placeholder="you@example.com" required/>
-        </div>
-        <div class="form-row">
-          <label for="password">Password</label>
-          <input id="password" type="password" placeholder="Your password" required/>
-        </div>
-        <button class="btn btn-primary" type="submit">Log in</button>
-      </form>
+      <label>Password</label>
+      <input type="password" id="loginPassword" required class="input" placeholder="********" />
 
-      <div class="hr"><div class="line"></div><div class="text">or</div><div class="line"></div></div>
+      <button type="submit" class="btn btn-gold" style="margin-top:16px;">Login</button>
+    </form>
 
-      <button id="btn-google" class="btn btn-google" type="button" aria-label="Continue with Google">
-        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-          <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.6 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 6 1.2 8.2 3.1l5.7-5.7C34.6 6 29.6 4 24 4 16 4 9 8.5 6.3 14.7z"/>
-          <path fill="#4CAF50" d="M24 44c5.1 0 9.8-1.9 13.3-5.1l-6.1-5.1C29 35.2 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8.1l-6.6 5.1C9 39.5 16 44 24 44z"/>
-          <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.1 3.3-4.5 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 6 1.2 8.2 3.1l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
-        </svg>
-        Continue with Google
-      </button>
+    <hr style="margin:30px 0;" />
 
-      <div id="error" class="err"></div>
-      <div id="ok" class="success"></div>
+    <button id="googleLoginBtn" class="btn btn-chip">Sign in with Google</button>
 
-      <p class="note">No account? <a class="link" href="/signup.html">Create one</a></p>
-    </div>
-    <p class="footer">© StayWorld</p>
+    <p style="margin-top:20px;">
+      Don’t have an account? <a href="signup.html">Sign Up</a>
+    </p>
   </main>
 
-<script type="module" src="./assets/auth.js"></script>
+  <script type="module" src="/assets/login-modal.js"></script>
 </body>
 </html>
+
