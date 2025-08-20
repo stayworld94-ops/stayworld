@@ -1,74 +1,26 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Host Dashboard — StayWorld</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{margin:0;background:#0b0f16;color:#e7e9ee;font-family:Inter,system-ui,sans-serif}
-    .container{max-width:1000px;margin:40px auto;padding:0 16px}
-    .btn{border:0;border-radius:14px;padding:10px 16px;cursor:pointer}
-    .btn-gold{background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#1a1205;font-weight:700}
-    .btn-chip{background:#121a26;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:8px 12px}
-    table{width:100%;border-collapse:collapse;margin-top:16px}
-    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
-    a{color:#f4d78c}
-    .toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Host Dashboard - StayWorld</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="toolbar">
-      <h1 style="margin:0" data-i18n="host_my_listings">My Listings</h1>
-      <div style="display:flex;gap:8px">
-        <a class="btn btn-gold" href="host-property-new.html" data-i18n="host_register_property">Register Property</a>
-        <button class="btn-chip" id="logoutBtn" data-i18n="logout">Logout</button>
-      </div>
-    </div>
+  <header>
+    <a href="/" class="brand">STAYWORLD</a>
+    <nav>
+      <a href="host-listing.html">New Listing</a>
+      <a href="host-dashboard.html" class="active">Dashboard</a>
+    </nav>
+  </header>
 
-    <table>
-      <thead>
-        <tr>
-          <th data-i18n="property_name">Property name</th>
-          <th data-i18n="address">Address</th>
-          <th data-i18n="nightly_price">Nightly price (USD)</th>
-        </tr>
-      </thead>
-      <tbody id="propList"></tbody>
-    </table>
+  <main class="container" style="padding:40px 0;">
+    <h1>Welcome, Host!</h1>
+    <button id="goDashboard">Go to Dashboard</button>
+    <button id="logoutBtn">Logout</button>
+  </main>
 
-    <p style="opacity:.8;margin-top:12px" data-i18n="footer_copy">© StayWorld — stayworldbooking.com</p>
-  </div>
-
-  <script src="i18n.js"></script>
-  <script>
-    // 로그인 체크
-    if(localStorage.getItem('sw_logged_in')!=='true'){
-      alert('Please login as host.');
-      location.href='host-login.html';
-    }
-
-    // 목록 렌더
-    const list = document.getElementById('propList');
-    const props = JSON.parse(localStorage.getItem('sw_props')||'[]');
-    if(props.length===0){
-      list.innerHTML = `<tr><td colspan="3">No listings yet.</td></tr>`;
-    }else{
-      list.innerHTML = props.map(p=>`
-        <tr>
-          <td>${p.name}</td>
-          <td>${p.addr||''}</td>
-          <td>$${(p.price||0).toFixed(0)}</td>
-        </tr>`).join('');
-    }
-
-    // 로그아웃
-    document.getElementById('logoutBtn').addEventListener('click', ()=>{
-      localStorage.removeItem('sw_logged_in');
-      if(typeof window.markLoggedOut==='function') window.markLoggedOut();
-      location.href='/';
-    });
-  </script>
-  <script src="/assets/login-modal.js"></script>
+  <script type="module" src="/assets/login-modal.js"></script>
 </body>
 </html>
