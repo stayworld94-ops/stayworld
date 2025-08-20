@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Host Login — StayWorld</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" style="max-width:420px;margin:60px auto">
+    <h1 data-i18n="host_login">Host Login</h1>
+    <form id="hostLoginForm" style="display:grid;gap:12px;margin-top:20px">
+      <input class="input" type="email" placeholder="Email" required>
+      <input class="input" type="password" placeholder="Password" required>
+      <button class="btn btn-gold" type="submit" data-i18n="host_login">Login</button>
+    </form>
+    <p style="margin-top:12px">
+      <a href="host-register.html" data-i18n="host_signup">Host Sign Up</a>
+    </p>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script>
+    document.getElementById('hostLoginForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      localStorage.setItem('sw_logged_in','true');
+      window.markLoggedIn?.();
+      alert('Welcome host!');
+      location.href='host-dashboard.html';
+    });
+  </script>
+</body>
+</html>
