@@ -1,150 +1,63 @@
-/* ============================
-   STAYWORLD Login Modal Logic (FINAL)
-   - Works with existing <dialog id="loginModal"> and <template id="loginTpl">
-   - Adds close (✕), ESC & backdrop-click close
-   - On success: sets sw_logged_in, redirects to home
-   ============================ */
+// assets/login.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-(function(){
-  // Utilities
-  const $ = (sel, scope)=> (scope||document).querySelector(sel);
+const firebaseConfig = {
+  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
+  authDomain: "stayworld-2570c.firebaseapp.com",
+  projectId: "stayworld-2570c",
+  storageBucket: "stayworld-2570c.firebasestorage.app",
+  messagingSenderId: "272599681686",
+  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
+  measurementId: "G-F8MXM3D7FJ"
+};
 
-  // Ensure close button exists even if template is old
-  function ensureCloseBtn(container){
-    if (!container) return;
-    const hasBtn = container.querySelector('[data-login-close]');
-    if (hasBtn) return;
-    const header = container.querySelector('.border-b') || container.firstElementChild;
-    const btn = document.createElement('button');
-    btn.setAttribute('type', 'button');
-    btn.setAttribute('data-login-close', '1');
-    btn.setAttribute('aria-label', 'Close');
-    btn.className = 'btn-icon btn-ghost-gold';
-    btn.textContent = '✕';
-    // Insert to header right
-    if (header && header.classList.contains('flex')) {
-      header.appendChild(btn);
-    } else {
-      // create a header wrapper if none
-      const bar = document.createElement('div');
-      bar.className = 'p-4 border-b border-white/10 flex items-center justify-between';
-      const h = document.createElement('h3');
-      h.className = 'text-lg font-bold';
-      h.textContent = 'Log in';
-      bar.appendChild(h);
-      bar.appendChild(btn);
-      container.prepend(bar);
-    }
-    btn.addEventListener('click', closeLogin);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 로그인 폼이 있다면(#login-form), 이메일 로그인 처리
+const loginForm = document.getElementById("login-form");
+const emailEl = document.getElementById("loginEmail");
+const pwEl = document.getElementById("loginPwd");
+const googleBtn = document.getElementById("btn-google-login"); // 있으면 사용(선택)
+
+function finishLogin(user){
+  localStorage.setItem("sw_logged_in","true");
+  localStorage.setItem("stayworldUser", JSON.stringify({
+    uid: user?.uid || "",
+    email: user?.email || "",
+    displayName: user?.displayName || ""
+  }));
+  try { window.markLoggedIn && window.markLoggedIn(); } catch {}
+  location.assign("/"); // 홈으로
+}
+
+loginForm?.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  try{
+    const cred = await signInWithEmailAndPassword(auth, emailEl.value.trim(), pwEl.value);
+    alert("✅ 로그인 성공");
+    finishLogin(cred.user);
+  }catch(err){
+    alert("❌ 로그인 실패: " + (err?.message || "다시 시도해 주세요."));
+    console.error(err);
   }
+});
 
-  function attachBackdropAndEsc(dlg){
-    if (!dlg) return;
-    // Backdrop click (only once per open)
-    function onClick(e){
-      const rect = dlg.getBoundingClientRect();
-      const inside = e.clientX >= rect.left && e.clientX <= rect.right &&
-                     e.clientY >= rect.top  && e.clientY <= rect.bottom;
-      if (!inside) closeLogin();
-    }
-    dlg.addEventListener('click', onClick, { once:true });
-
-    // ESC to close
-    function onCancel(ev){ ev.preventDefault(); closeLogin(); }
-    dlg.addEventListener('cancel', onCancel, { once:true });
+// 구글 로그인 버튼이 따로 있으면 처리
+googleBtn?.addEventListener("click", async ()=>{
+  try{
+    const provider = new GoogleAuthProvider();
+    const cred = await signInWithPopup(auth, provider);
+    alert("✅ Google 로그인 성공");
+    finishLogin(cred.user);
+  }catch(err){
+    alert("❌ Google 로그인 실패: " + (err?.message || "팝업 차단 여부를 확인해 주세요."));
+    console.error(err);
   }
-
-  function hydrateActions(container){
-    if (!container) return;
-    const googleBtn = container.querySelector('[data-login-google]');
-    if (googleBtn) googleBtn.addEventListener('click', googleLogin);
-    const submitBtn = container.querySelector('[data-login-submit]');
-    if (submitBtn) submitBtn.addEventListener('click', doLogin);
-    // Also bind the ✕ if template already has it
-    const xBtn = container.querySelector('[aria-label="Close"]');
-    if (xBtn) xBtn.addEventListener('click', closeLogin);
-  }
-
-  // Public: open & close
-  function openLogin(){
-    const dlg = $('#loginModal');
-    const tpl = $('#loginTpl');
-    if (!dlg){ console.warn('loginModal not found'); return; }
-
-    // Mount template
-    if (tpl){
-      dlg.innerHTML = tpl.innerHTML;
-    } else {
-      // fallback minimal content
-      dlg.innerHTML = [
-        '<div class="p-5 space-y-3">',
-        '<h3 class="text-lg font-bold mb-2">Log in</h3>',
-        '<input id="loginEmail" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Email"/>',
-        '<input id="loginPwd" type="password" class="w-full px-4 py-3 rounded-xl bg-[#0f0f15] border border-white/10" placeholder="Password"/>',
-        '<button data-login-submit class="btn btn-gold w-full">Log in</button>',
-        '<button data-login-google class="btn w-full bg-white text-black flex items-center justify-center gap-2"><span class="text-lg">G</span><span>Continue with Google</span></button>',
-        '</div>'
-      ].join('');
-    }
-
-    ensureCloseBtn(dlg);
-    hydrateActions(dlg);
-    dlg.showModal();
-    attachBackdropAndEsc(dlg);
-  }
-
-  function closeLogin(){
-    const dlg = $('#loginModal');
-    if (dlg && dlg.open) dlg.close();
-  }
-
-  // Demo login + optional Firebase hooks
-  function doLogin(){
-    if (window.ENV?.DEMO_MODE){
-      alert('Logged in (demo mode).');
-      localStorage.setItem('sw_logged_in', 'true');      // ✅ 로그인 상태 저장
-      location.href = '/';                               // ✅ 홈으로 이동 (헤더 버튼 토글 반영)
-      return;
-    }
-    if (window._fbReady && window.firebase?.auth){
-      const email = $('#loginEmail')?.value || '';
-      const pwd = $('#loginPwd')?.value || '';
-      firebase.auth().signInWithEmailAndPassword(email, pwd)
-        .then(()=>{
-          alert('Logged in!');
-          localStorage.setItem('sw_logged_in', 'true');  // ✅ 로그인 상태 저장
-          location.href = '/';                           // ✅ 홈으로 이동
-        })
-        .catch(e=> alert(e.message));
-    } else {
-      alert('Connect your auth backend (Firebase/OAuth) — not initialized.');
-    }
-  }
-
-  function googleLogin(){
-    if (window.ENV?.DEMO_MODE){
-      alert('Google login (demo mode).');
-      localStorage.setItem('sw_logged_in', 'true');      // ✅ 로그인 상태 저장
-      location.href = '/';                               // ✅ 홈으로 이동
-      return;
-    }
-    if (window._fbReady && window.firebase?.auth){
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider)
-        .then(()=>{
-          alert('Google login OK');
-          localStorage.setItem('sw_logged_in', 'true');  // ✅ 로그인 상태 저장
-          location.href = '/';                           // ✅ 홈으로 이동
-        })
-        .catch(e=> alert(e.message));
-    } else {
-      alert('Google OAuth not initialized.');
-    }
-  }
-
-  // expose to global
-  window.openLogin = openLogin;
-  window.closeLogin = closeLogin;
-  window.doLogin = doLogin;
-  window.googleLogin = googleLogin;
-})();
+});
