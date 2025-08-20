@@ -1,69 +1,30 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>StayWorld — My Listings</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/host-style.css" />
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage-compat.js"></script>
-  <script src="js/host-auth.js"></script>
+  <meta charset="utf-8">
+  <title>Host Dashboard — StayWorld</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body onload="__stayworldRequireAuth()">
-  <div class="container">
-    <div class="topbar">
-      <h1>My Listings</h1>
-      <div>
-        <a class="btn" href="host-property-new.html">+ Register Property</a>
-        <button class="btn" onclick="__stayworldLogout()">Logout</button>
-      </div>
-    </div>
+<body>
+  <div class="container" style="max-width:900px;margin:40px auto">
+    <h1 data-i18n="host_my_listings">My Listings</h1>
+    <p><a href="host-property-new.html" class="btn btn-gold" data-i18n="host_register_property">Register Property</a></p>
 
-    <div class="card" id="listWrap">
-      <div class="help">내가 등록한 숙소 목록입니다.</div>
-      <div id="listingGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:16px"></div>
-    </div>
+    <table border="1" width="100%" style="border-collapse:collapse;margin-top:20px">
+      <thead>
+        <tr><th>Property</th><th>Price</th><th>Status</th></tr>
+      </thead>
+      <tbody id="propList">
+        <!-- 동적 항목 추가 -->
+      </tbody>
+    </table>
   </div>
 
+  <script src="i18n.js"></script>
   <script>
-    (async function(){
-      const ctx = await __stayworldRequireAuth();
-      if(!ctx) return;
-      const { user } = ctx;
-      const grid = document.getElementById('listingGrid');
-
-      const snap = await db.collection('properties')
-        .where('hostId','==',user.uid)
-        .orderBy('createdAt','desc')
-        .get();
-
-      if(snap.empty){
-        grid.innerHTML = '<div class="notice">등록된 숙소가 없습니다. "Register Property"로 첫 숙소를 등록하세요.</div>';
-        return;
-      }
-
-      snap.forEach(doc=>{
-        const d = doc.data();
-        const img = (d.images && d.images[0]) ? d.images[0] : '';
-        const el = document.createElement('div');
-        el.className = 'card';
-        el.innerHTML = `
-          <div style="display:flex;gap:12px;align-items:flex-start">
-            <img src="${img}" alt="" style="width:96px;height:96px;object-fit:cover;border-radius:12px;background:#0f1520">
-            <div>
-              <h2 style="margin:0 0 6px">${d.title || '(제목 없음)'}</h2>
-              <div class="help">${d.city || ''} ${d.country || ''}</div>
-              <div class="help">${d.type || ''} · ${d.maxGuests||0} guests · ${d.bedrooms||0} bedrm</div>
-              <div style="margin-top:8px;font-weight:600">${d.pricePerNight||0} ${d.currency||''} / night</div>
-              <!-- TODO: 편집/삭제 페이지 연결 -->
-            </div>
-          </div>
-        `;
-        grid.appendChild(el);
-      });
-    })();
+    // 데모용: localStorage에서 등록한 숙소 불러오기
+    const list=document.getElementById('propList');
+    list.innerHTML=`<tr><td>Sample Apartment</td><td>$100</td><td>Active</td></tr>`;
   </script>
 </body>
 </html>
