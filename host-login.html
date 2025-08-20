@@ -1,32 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Host Login — StayWorld</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - StayWorld</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container" style="max-width:420px;margin:60px auto">
-    <h1 data-i18n="host_login">Host Login</h1>
-    <form id="hostLoginForm" style="display:grid;gap:12px;margin-top:20px">
-      <input class="input" type="email" placeholder="Email" required>
-      <input class="input" type="password" placeholder="Password" required>
-      <button class="btn btn-gold" type="submit" data-i18n="host_login">Login</button>
-    </form>
-    <p style="margin-top:12px">
-      <a href="host-register.html" data-i18n="host_signup">Host Sign Up</a>
-    </p>
-  </div>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="/" class="brand">
+        <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
+        <span class="brand-text">STAYWORLD</span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="membership.html">Membership</a>
+        <a href="signup.html">Sign Up</a>
+      </nav>
+    </div>
+  </header>
 
-  <script src="i18n.js"></script>
-  <script>
-    document.getElementById('hostLoginForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      localStorage.setItem('sw_logged_in','true');
-      window.markLoggedIn?.();
-      alert('Welcome host!');
-      location.href='host-dashboard.html';
-    });
-  </script>
+  <main class="container" style="max-width:480px; padding:40px 0;">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <label>Email</label>
+      <input type="email" id="loginEmail" required class="input" placeholder="you@example.com" />
+
+      <label>Password</label>
+      <input type="password" id="loginPassword" required class="input" placeholder="********" />
+
+      <button type="submit" class="btn btn-gold" style="margin-top:16px;">Login</button>
+    </form>
+
+    <hr style="margin:30px 0;" />
+
+    <button id="googleLoginBtn" class="btn btn-chip">Sign in with Google</button>
+
+    <p style="margin-top:20px;">
+      Don’t have an account? <a href="signup.html">Sign Up</a>
+    </p>
+  </main>
+
+  <script type="module" src="/assets/login-modal.js"></script>
 </body>
 </html>
