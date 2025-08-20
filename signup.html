@@ -1,98 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>STAYWORLD — Sign up</title>
-  <link rel="stylesheet" href="./assets/auth.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - StayWorld</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="header">
-    <div class="brand"><i class="logo"></i><span>STAYWORLD</span></div>
-    <nav class="nav">
-      <a href="/">Home</a>
-      <a href="/membership.html">Membership</a>
-      <a href="/host.html">Host</a>
-      <a href="/support.html">Support</a>
-      <a href="/login.html" id="navAuthLink">Login</a>
-    </nav>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="/" class="brand">
+        <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
+        <span class="brand-text">STAYWORLD</span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="membership.html">Membership</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="container">
-    <div class="card">
-      <small class="kicker">Create account</small>
-      <h1>Sign up</h1>
-      <p class="sub">Join StayWorld for verified stays, rewards, and global deals.</p>
+  <main class="container" style="max-width:480px; padding:40px 0;">
+    <h1>Sign Up</h1>
+    <form id="signupForm">
+      <label>Email</label>
+      <input type="email" id="signupEmail" required class="input" placeholder="you@example.com" />
 
-      <form id="form-signup" autocomplete="on">
-        <div class="form-row">
-          <label for="name">Full name</label>
-          <input id="name" type="text" placeholder="Your name" autocomplete="name" required/>
-        </div>
+      <label>Password</label>
+      <input type="password" id="signupPassword" required class="input" placeholder="********" />
 
-        <div class="form-row">
-          <label for="nickname">Nickname (optional)</label>
-          <input id="nickname" type="text" placeholder="Nickname (public)"/>
-        </div>
+      <button type="submit" class="btn btn-gold" style="margin-top:16px;">Sign Up</button>
+    </form>
 
-        <div class="form-row">
-          <label for="gender">Gender</label>
-          <select id="gender" required>
-            <option value="" selected disabled>Select gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <label for="birth">Date of birth</label>
-          <input id="birth" type="date" required/>
-        </div>
-
-        <div class="form-row">
-          <label for="email">Email</label>
-          <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required/>
-        </div>
-
-        <div class="form-row">
-          <label for="phone">Phone</label>
-          <input id="phone" type="tel" placeholder="+1 415 555 1234" autocomplete="tel" required/>
-        </div>
-
-        <div class="form-row">
-          <label for="nationality">Nationality</label>
-          <input id="nationality" type="text" placeholder="e.g., Korea" autocomplete="country-name" required/>
-        </div>
-
-        <div class="form-row">
-          <label for="city">City</label>
-          <input id="city" type="text" placeholder="e.g., Seoul" autocomplete="address-level2" required/>
-        </div>
-
-        <div class="form-row">
-          <label for="password">Password</label>
-          <input id="password" type="password" placeholder="Create a password" minlength="6" autocomplete="new-password" required/>
-        </div>
-
-        <button class="btn btn-primary" type="submit">Sign up</button>
-      </form>
-
-      <div class="hr"><div class="line"></div><div class="text">or</div><div class="line"></div></div>
-
-      <button id="btn-google" class="btn btn-google" type="button" aria-label="Continue with Google">
-        <!-- (SVG 아이콘은 그대로 두셔도 되고 삭제하셔도 됩니다) -->
-        Continue with Google
-      </button>
-
-      <div id="error" class="err"></div>
-      <div id="ok" class="success"></div>
-
-      <p class="note">Already have an account? <a class="link" href="/login.html">Log in</a></p>
-    </div>
-    <p class="footer">© StayWorld</p>
+    <p style="margin-top:20px;">
+      Already have an account? <a href="login.html">Login</a>
+    </p>
   </main>
 
-  <script type="module" src="./assets/signup.js"></script>
+  <script type="module" src="/assets/signup.js"></script>
 </body>
 </html>
