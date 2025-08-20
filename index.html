@@ -94,8 +94,7 @@
       <nav class="main-nav" aria-label="Primary">
         <a href="index.html" data-i18n="nav_home">Home</a>
         <a href="membership.html" data-i18n="nav_membership">Membership</a>
-<a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
-
+        <a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
       </nav>
 
       <div class="header-cta">
@@ -149,7 +148,7 @@
   <script>
   /* ------------------ I18N 사전 ------------------ */
   const I18N = {
-    EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+    EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"Logout",nav_signup:"Sign Up",language:"Language",
       hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search",
       feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",
@@ -174,9 +173,10 @@
         "Wide doorway":"Wide doorway","Accessible bathroom":"Accessible bathroom","Nature":"Nature","Camping":"Camping","Traditional":"Traditional",
         "Ski-in/out":"Ski-in/out","Wine country":"Wine country","TV":"TV","Netflix":"Netflix","Game console":"Game console",
         "BBQ grill":"BBQ grill","Patio":"Patio","Private garden":"Private garden","On-site":"On-site","Street":"Street","Paid garage":"Paid garage",
+        "Parking":"Parking",
         "4.5+":"4.5+","4.0+":"4.0+","Any":"Any","beds":"beds","baths":"baths"
       }},
-    KO:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",nav_signup:"가입하기",language:"언어",
+    KO:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",nav_logout:"로그아웃",nav_signup:"가입하기",language:"언어",
       hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
       placeholder_city:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색",
       feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",feat_rewards:"StayWorld+ 리워드",feat_rewards_sub:"예약마다 포인트 적립.",
@@ -200,9 +200,10 @@
         "Wide doorway":"넓은 출입구","Accessible bathroom":"장애인 화장실","Nature":"자연","Camping":"캠핑","Traditional":"전통",
         "Ski-in/out":"스키 인/아웃","Wine country":"와인 산지","TV":"TV","Netflix":"넷플릭스","Game console":"게임 콘솔",
         "BBQ grill":"바비큐 그릴","Patio":"파티오","Private garden":"개인 정원","On-site":"부지 내","Street":"노상","Paid garage":"유료 차고",
+        "Parking":"주차",
         "4.5+":"4.5+","4.0+":"4.0+","Any":"무관","beds":"침대","baths":"욕실"
       }},
-    JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_signup:"Sign Up",language:"Language",
+    JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"ログアウト",nav_signup:"Sign Up",language:"Language",
       hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
       placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
       feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
@@ -211,10 +212,13 @@
       f_staytype:"宿タイプ", f_review:"レビュー評価", f_beds:"ベッド&バス", f_pets:"ペット", f_checkin:"チェックイン",
       f_amen:"アメニティ", f_booking:"予約方法", f_verify:"認証", f_long:"長期滞在", f_biz:"ビジネス",
       f_loc:"場所", f_access:"アクセシビリティ", f_ex:"体験", f_view:"眺望", f_safe:"安全",
-      f_family:"家族向け", f_ent:"エンタ메", f_out:"屋外", f_park:"駐車",
-      footer_copy:"© StayWorld — stayworldbooking.com"
+      f_family:"家族向け", f_ent:"エンタメ", f_out:"屋外", f_park:"駐車",
+      footer_copy:"© StayWorld — stayworldbooking.com",
+      w:{
+        "Parking":"駐車場"
+      }
     },
-    ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_signup:"注册",language:"语言",
+    ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_logout:"退出登录",nav_signup:"注册",language:"语言",
       hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
       placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
       feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
@@ -224,9 +228,12 @@
       f_amen:"设施", f_booking:"预订方式", f_verify:"认证", f_long:"长住", f_biz:"商务",
       f_loc:"位置", f_access:"无障碍", f_ex:"体验", f_view:"景观", f_safe:"安全",
       f_family:"亲子", f_ent:"娱乐", f_out:"户外", f_park:"停车",
-      footer_copy:"© StayWorld — stayworldbooking.com"
+      footer_copy:"© StayWorld — stayworldbooking.com",
+      w:{
+        "Parking":"停车"
+      }
     },
-    FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_signup:"S’inscrire",language:"Langue",
+    FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_logout:"Déconnexion",nav_signup:"S’inscrire",language:"Langue",
       hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher",
       feat_verified:"Logements vérifiés",feat_verified_sub:"Meilleurs choix près de chez vous.",
@@ -237,9 +244,12 @@
       f_amen:"Équipements", f_booking:"Réservation", f_verify:"Vérification", f_long:"Long séjour", f_biz:"Affaires",
       f_loc:"Emplacement", f_access:"Accessibilité", f_ex:"Expériences", f_view:"Vue", f_safe:"Sécurité",
       f_family:"Famille", f_ent:"Divertissement", f_out:"Extérieur", f_park:"Parking",
-      footer_copy:"© StayWorld — stayworldbooking.com"
+      footer_copy:"© StayWorld — stayworldbooking.com",
+      w:{
+        "Parking":"Parking"
+      }
     },
-    ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_signup:"Regístrate",language:"Idioma",
+    ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_logout:"Cerrar sesión",nav_signup:"Regístrate",language:"Idioma",
       hero_luxury:"Estancias de lujo.",hero_reach:"Alcance global.",hero_sub:"Tarjetas, transferencia bancaria y cripto (BTC · ETH · USDT).",
       placeholder_city:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar",
       feat_verified:"Alojamientos verificados",feat_verified_sub:"Mejores opciones cerca de ti.",
@@ -250,9 +260,12 @@
       f_amen:"Servicios", f_booking:"Reserva", f_verify:"Verificación", f_long:"Larga estancia", f_biz:"Negocios",
       f_loc:"Ubicación", f_access:"Accesibilidad", f_ex:"Experiencias", f_view:"Vista", f_safe:"Seguridad",
       f_family:"Familia", f_ent:"Entretenimiento", f_out:"Exterior", f_park:"Aparcamiento",
-      footer_copy:"© StayWorld — stayworldbooking.com"
+      footer_copy:"© StayWorld — stayworldbooking.com",
+      w:{
+        "Parking":"Aparcamiento"
+      }
     },
-    DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_signup:"Registrieren",language:"Sprache",
+    DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_logout:"Abmelden",nav_signup:"Registrieren",language:"Sprache",
       hero_luxury:"Luxuriöse Aufenthalte.",hero_reach:"Globale Reichweite.",hero_sub:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen",
       feat_verified:"Verifizierte Unterkünfte",feat_verified_sub:"Top-Auswahl in deiner Nähe.",
@@ -263,9 +276,12 @@
       f_amen:"Ausstattung", f_booking:"Buchung", f_verify:"Verifizierung", f_long:"Langzeit", f_biz:"Geschäft",
       f_loc:"Lage", f_access:"Barrierefreiheit", f_ex:"Erlebnisse", f_view:"Aussicht", f_safe:"Sicherheit",
       f_family:"Familie", f_ent:"Entertainment", f_out:"Außenbereich", f_park:"Parken",
-      footer_copy:"© StayWorld — stayworldbooking.com"
+      footer_copy:"© StayWorld — stayworldbooking.com",
+      w:{
+        "Parking":"Parken"
+      }
     },
-    TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_signup:"Kaydol",language:"Dil",
+    TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_logout:"Çıkış",nav_signup:"Kaydol",language:"Dil",
       hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara",
       feat_verified:"Doğrulanmış konaklamalar",feat_rewards_sub:"Her rezervasyonda puan kazanın.",
@@ -276,9 +292,12 @@
       f_amen:"Olanaklar", f_booking:"Rezervasyon", f_verify:"Doğrulama", f_long:"Uzun konaklama", f_biz:"İş",
       f_loc:"Konum", f_access:"Erişilebilirlik", f_ex:"Deneyimler", f_view:"Manzara", f_safe:"Güvenlik",
       f_family:"Aile", f_ent:"Eğlence", f_out:"Açık alan", f_park:"Otopark",
-      footer_copy:"© StayWorld — stayworldbooking.com"
+      footer_copy:"© StayWorld — stayworldbooking.com",
+      w:{
+        "Parking":"Otopark"
+      }
     },
-    AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_signup:"إنشاء حساب",language:"اللغة",
+    AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_logout:"تسجيل الخروج",nav_signup:"إنشاء حساب",language:"اللغة",
       hero_luxury:"إقامات فاخرة.",hero_reach:"انتشار عالمي.",hero_sub:"بطاقات، تحويل بنكي وعملات مشفرة (BTC · ETH · USDT).",
       placeholder_city:"باريس، طوكيو، إسطنبول…",filters:"الفلاتر",search:"بحث",
       feat_verified:"إقامات موثوقة",feat_verified_sub:"أفضل الخيارات بالقرب منك.",
@@ -289,9 +308,12 @@
       f_amen:"المرافق", f_booking:"الحجز", f_verify:"التحقق", f_long:"إقامة طويلة", f_biz:"أعمال",
       f_loc:"الموقع", f_access:"إمكانية الوصول", f_ex:"الخبرات", f_view:"الإطلالة", f_safe:"السلامة",
       f_family:"العائلة", f_ent:"الترفيه", f_out:"خارجي", f_park:"موقف سيارات",
-      footer_copy:"© ستاي ورلد — stayworldbooking.com"
+      footer_copy:"© ستاي ورلد — stayworldbooking.com",
+      w:{
+        "Parking":"موقف سيارات"
+      }
     },
-    RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_signup:"Регистрация",language:"Язык",
+    RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_logout:"Выйти",nav_signup:"Регистрация",language:"Язык",
       hero_luxury:"Роскошное проживание.",hero_reach:"Глобальный охват.",hero_sub:"Карты, перевод и крипто (BTC · ETH · USDT).",
       placeholder_city:"Париж, Токио, Стамбул…",filters:"Фильтры",search:"Поиск",
       feat_verified:"Проверенные варианты",feat_verified_sub:"Лучшие места рядом с вами.",
@@ -302,7 +324,10 @@
       f_amen:"Удобства", f_booking:"Бронирование", f_verify:"Проверка", f_long:"Длительное проживание", f_biz:"Бизнес",
       f_loc:"Расположение", f_access:"Доступность", f_ex:"Впечатления", f_view:"Вид", f_safe:"Безопасность",
       f_family:"Семья", f_ent:"Развлечения", f_out:"На улице", f_park:"Парковка",
-      footer_copy:"© StayWorld — stayworldbooking.com"
+      footer_copy:"© StayWorld — stayworldbooking.com",
+      w:{
+        "Parking":"Парковка"
+      }
     }
   };
 
@@ -316,8 +341,8 @@
     const dict=I18N[lang]||I18N.EN;
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n'); if(dict[k]) el.textContent=dict[k];});
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder'); if(dict[k]) el.setAttribute('placeholder', dict[k]);});
-    if(typeof localizeDrawer==='function'){try{localizeDrawer();}catch(_){}}
-    // 디버그: 누락키 콘솔 표시
+    if(typeof localizeDrawer==='function'){try{localizeDrawer();}catch(_){}} // 필터도 갱신
+    // 누락키 콘솔 표시
     document.querySelectorAll('[data-i18n],[data-i18n-placeholder]').forEach(el=>{
       const k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-placeholder');
       if(!(k in dict) && !(k in (I18N.EN||{}))) console.warn('[i18n] Missing key:',k);
@@ -547,7 +572,6 @@
     const msgs=[];
     const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
     async function askAI(message,lang){
-      // 배포된 백엔드 엔드포인트 중 동작하는 것 사용
       for(const ep of ['/api/chat','/.netlify/functions/sw-chat']){
         try{
           const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
@@ -601,74 +625,58 @@
   ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
   </script>
 
-  <!-- 로그인/로그아웃 전환 스크립트 (홈 전용) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const navLogin = document.querySelector('.main-nav a[data-i18n="nav_login"]');
-      if (!navLogin) return;
-
-      function setLogin() {
-        navLogin.textContent = "Login";
-        navLogin.href = "login.html";
-        navLogin.onclick = null;
-      }
-
-      function setLogout() {
-        navLogin.textContent = "Logout";
-        navLogin.href = "#";
-        navLogin.onclick = (e) => {
-          e.preventDefault();
-          localStorage.removeItem("sw_logged_in");
-          alert("로그아웃 되었습니다.");
-          location.reload(); // 홈에서만 새로고침
-        };
-      }
-
-      const isLoggedIn = localStorage.getItem("sw_logged_in") === "true";
-      if (isLoggedIn) setLogout(); else setLogin();
-    });
-  </script>
-
   <!-- FOOTER -->
   <footer class="site-footer">
     <div class="container"><small data-i18n="footer_copy">© StayWorld — stayworldbooking.com</small></div>
   </footer>
 
-  <!-- 챗봇 FAB (처음엔 DOM에 없을 수도 있으므로 JS가 만들어줌) -->
+  <!-- AUTH UI: 네비의 Login/Logout 전환 (통합본: 이 블록만 사용) -->
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const navAuthLink = document.getElementById("navAuthLink");
+    document.addEventListener("DOMContentLoaded", () => {
+      const link = document.getElementById("navAuthLink");
+      if (!link) return;
 
-    function setLogin() {
-      navAuthLink.textContent = "Login";
-      navAuthLink.href = "/login.html";
-      navAuthLink.onclick = null;
-    }
+      function toLoginUI() {
+        link.setAttribute("data-i18n", "nav_login");
+        link.textContent = "Login";       // 초기 렌더용 (곧 i18n이 덮어씀)
+        link.href = "login.html";
+        link.onclick = null;
+        applyI18NPage?.();               // 다른 텍스트도 함께 갱신
+      }
 
-    function setLogout() {
-      navAuthLink.textContent = "Logout";
-      navAuthLink.href = "#";
-      navAuthLink.onclick = (e) => {
-        e.preventDefault();
-        localStorage.removeItem("sw_logged_in");
-        alert("로그아웃 되었습니다.");
-        location.href = "/";
+      function toLogoutUI() {
+        // 로그인 상태에서도 언어 변경 시 자동 번역되도록 data-i18n을 nav_logout으로 설정
+        link.setAttribute("data-i18n", "nav_logout");
+        link.textContent = "Logout";      // 초기 렌더용 (곧 i18n이 덮어씀)
+        link.href = "#";
+        link.onclick = (e) => {
+          e.preventDefault();
+          localStorage.removeItem("sw_logged_in");
+          alert("로그아웃 되었습니다.");
+          toLoginUI();
+          location.href = "/";            // 홈으로
+        };
+        applyI18NPage?.();
+      }
+
+      // 외부( signup.js / login.js )에서 성공 시 호출
+      window.markLoggedIn = function () {
+        localStorage.setItem("sw_logged_in", "true");
+        toLogoutUI();
       };
-    }
+      // 필요 시 외부에서 명시적 로그아웃 호출
+      window.markLoggedOut = function () {
+        localStorage.removeItem("sw_logged_in");
+        toLoginUI();
+      };
 
-    // ✅ 로그인 성공 시 실행할 함수 (signup.js나 login.js에서 호출 가능)
-    window.markLoggedIn = function() {
-      localStorage.setItem("sw_logged_in", "true");
-      setLogout();
-    };
+      // 첫 로드 시 상태 반영
+      if (localStorage.getItem("sw_logged_in") === "true") toLogoutUI();
+      else toLoginUI();
+    });
+  </script>
 
-    // 페이지 로드할 때 상태 확인
-    const isLoggedIn = localStorage.getItem("sw_logged_in") === "true";
-    if (isLoggedIn) setLogout();
-    else setLogin();
-  });
-</script>
-<script src="/assets/login-modal.js"></script>
+  <!-- 로그인 모달(있다면) -->
+  <script src="/assets/login-modal.js"></script>
 </body>
 </html>
-
