@@ -30,6 +30,15 @@
     .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
     .btn-chip{background:var(--chip);color:#dfe3ea;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
 
+    /* ---- Host dropdown (추가) ---- */
+    .nav-item.dropdown{position:relative}
+    .nav-link.dropdown-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;font-weight:600;opacity:.95}
+    .dropdown-panel{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);min-width:220px;background:#0f1520;border:1px solid var(--line);border-radius:12px;padding:8px;display:none;z-index:30;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+    .nav-item.dropdown:hover .dropdown-panel{display:block}
+    .dropdown-item{display:block;padding:10px 12px;border-radius:8px;color:#e7e9ee;text-decoration:none;white-space:nowrap}
+    .dropdown-item:hover{background:#121a26}
+    .dropdown-divider{height:1px;background:var(--line);margin:6px 0}
+
     /* Hero */
     .hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
     .hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}.accent{color:#f1cf84}
@@ -86,7 +95,6 @@
   <header class="site-header">
     <div class="container header-row">
       <a href="/" class="brand">
-        <!-- 절대경로로 고정 -->
         <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
         <span class="brand-text">STAYWORLD</span>
       </a>
@@ -94,6 +102,23 @@
       <nav class="main-nav" aria-label="Primary">
         <a href="index.html" data-i18n="nav_home">Home</a>
         <a href="membership.html" data-i18n="nav_membership">Membership</a>
+
+        <!-- ===== Host 메뉴 (i18n 적용 완료) ===== -->
+        <div class="nav-item dropdown" id="hostMenu">
+          <button class="nav-link dropdown-toggle" data-i18n="nav_host">Host</button>
+          <div class="dropdown-panel">
+            <!-- 비로그인 상태 -->
+            <a href="host-login.html"  class="dropdown-item" data-host-visible="signedOut" data-i18n="host_login">Host Login</a>
+            <a href="host-register.html" class="dropdown-item" data-host-visible="signedOut" data-i18n="host_signup">Host Sign Up</a>
+            <div class="dropdown-divider" data-host-visible="signedOut"></div>
+            <!-- 로그인 상태 -->
+            <a href="host-property-new.html" class="dropdown-item" data-host-visible="signedIn" data-i18n="host_register_property">Register Property</a>
+            <a href="host-dashboard.html" class="dropdown-item" data-host-visible="signedIn" data-i18n="host_my_listings">My Listings</a>
+            <button class="dropdown-item" data-host-visible="signedIn" id="hostLogoutBtn" type="button" data-i18n="host_logout">Logout</button>
+          </div>
+        </div>
+        <!-- =========================== -->
+
         <a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
       </nav>
 
@@ -149,6 +174,7 @@
   /* ------------------ I18N 사전 ------------------ */
   const I18N = {
     EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"Logout",nav_signup:"Sign Up",language:"Language",
+      nav_host:"Host",host_login:"Host Login",host_signup:"Host Sign Up",host_register_property:"Register Property",host_my_listings:"My Listings",host_logout:"Logout",
       hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search",
       feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",
@@ -177,6 +203,7 @@
         "4.5+":"4.5+","4.0+":"4.0+","Any":"Any","beds":"beds","baths":"baths"
       }},
     KO:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",nav_logout:"로그아웃",nav_signup:"가입하기",language:"언어",
+      nav_host:"호스트",host_login:"호스트 로그인",host_signup:"호스트 가입",host_register_property:"숙소 등록",host_my_listings:"호스트 등록목록",host_logout:"로그아웃",
       hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
       placeholder_city:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색",
       feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",feat_rewards:"StayWorld+ 리워드",feat_rewards_sub:"예약마다 포인트 적립.",
@@ -204,6 +231,7 @@
         "4.5+":"4.5+","4.0+":"4.0+","Any":"무관","beds":"침대","baths":"욕실"
       }},
     JA:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"ログアウト",nav_signup:"Sign Up",language:"Language",
+      nav_host:"ホスト",host_login:"ホストログイン",host_signup:"ホスト登録",host_register_property:"物件を登録",host_my_listings:"マイリスティング",host_logout:"ログアウト",
       hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
       placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
       feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
@@ -214,11 +242,10 @@
       f_loc:"場所", f_access:"アクセシビリティ", f_ex:"体験", f_view:"眺望", f_safe:"安全",
       f_family:"家族向け", f_ent:"エンタメ", f_out:"屋外", f_park:"駐車",
       footer_copy:"© StayWorld — stayworldbooking.com",
-      w:{
-        "Parking":"駐車場"
-      }
+      w:{"Parking":"駐車場"}
     },
     ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_logout:"退出登录",nav_signup:"注册",language:"语言",
+      nav_host:"房东",host_login:"房东登录",host_signup:"房东注册",host_register_property:"登记房源",host_my_listings:"我的房源",host_logout:"退出登录",
       hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
       placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
       feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
@@ -229,11 +256,10 @@
       f_loc:"位置", f_access:"无障碍", f_ex:"体验", f_view:"景观", f_safe:"安全",
       f_family:"亲子", f_ent:"娱乐", f_out:"户外", f_park:"停车",
       footer_copy:"© StayWorld — stayworldbooking.com",
-      w:{
-        "Parking":"停车"
-      }
+      w:{"Parking":"停车"}
     },
     FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_logout:"Déconnexion",nav_signup:"S’inscrire",language:"Langue",
+      nav_host:"Hôte",host_login:"Connexion hôte",host_signup:"Inscription hôte",host_register_property:"Enregistrer un logement",host_my_listings:"Mes annonces",host_logout:"Déconnexion",
       hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher",
       feat_verified:"Logements vérifiés",feat_verified_sub:"Meilleurs choix près de chez vous.",
@@ -245,11 +271,10 @@
       f_loc:"Emplacement", f_access:"Accessibilité", f_ex:"Expériences", f_view:"Vue", f_safe:"Sécurité",
       f_family:"Famille", f_ent:"Divertissement", f_out:"Extérieur", f_park:"Parking",
       footer_copy:"© StayWorld — stayworldbooking.com",
-      w:{
-        "Parking":"Parking"
-      }
+      w:{"Parking":"Parking"}
     },
     ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_logout:"Cerrar sesión",nav_signup:"Regístrate",language:"Idioma",
+      nav_host:"Anfitrión",host_login:"Inicio de sesión de anfitrión",host_signup:"Registro de anfitrión",host_register_property:"Registrar propiedad",host_my_listings:"Mis anuncios",host_logout:"Cerrar sesión",
       hero_luxury:"Estancias de lujo.",hero_reach:"Alcance global.",hero_sub:"Tarjetas, transferencia bancaria y cripto (BTC · ETH · USDT).",
       placeholder_city:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar",
       feat_verified:"Alojamientos verificados",feat_verified_sub:"Mejores opciones cerca de ti.",
@@ -261,11 +286,10 @@
       f_loc:"Ubicación", f_access:"Accesibilidad", f_ex:"Experiencias", f_view:"Vista", f_safe:"Seguridad",
       f_family:"Familia", f_ent:"Entretenimiento", f_out:"Exterior", f_park:"Aparcamiento",
       footer_copy:"© StayWorld — stayworldbooking.com",
-      w:{
-        "Parking":"Aparcamiento"
-      }
+      w:{"Parking":"Aparcamiento"}
     },
     DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_logout:"Abmelden",nav_signup:"Registrieren",language:"Sprache",
+      nav_host:"Gastgeber",host_login:"Gastgeber-Login",host_signup:"Gastgeber-Registrierung",host_register_property:"Unterkunft registrieren",host_my_listings:"Meine Inserate",host_logout:"Abmelden",
       hero_luxury:"Luxuriöse Aufenthalte.",hero_reach:"Globale Reichweite.",hero_sub:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen",
       feat_verified:"Verifizierte Unterkünfte",feat_verified_sub:"Top-Auswahl in deiner Nähe.",
@@ -277,11 +301,10 @@
       f_loc:"Lage", f_access:"Barrierefreiheit", f_ex:"Erlebnisse", f_view:"Aussicht", f_safe:"Sicherheit",
       f_family:"Familie", f_ent:"Entertainment", f_out:"Außenbereich", f_park:"Parken",
       footer_copy:"© StayWorld — stayworldbooking.com",
-      w:{
-        "Parking":"Parken"
-      }
+      w:{"Parking":"Parken"}
     },
     TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_logout:"Çıkış",nav_signup:"Kaydol",language:"Dil",
+      nav_host:"Ev Sahibi",host_login:"Ev Sahibi Girişi",host_signup:"Ev Sahibi Kaydı",host_register_property:"İlan Oluştur",host_my_listings:"İlanlarım",host_logout:"Çıkış",
       hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",
       placeholder_city:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara",
       feat_verified:"Doğrulanmış konaklamalar",feat_rewards_sub:"Her rezervasyonda puan kazanın.",
@@ -293,11 +316,10 @@
       f_loc:"Konum", f_access:"Erişilebilirlik", f_ex:"Deneyimler", f_view:"Manzara", f_safe:"Güvenlik",
       f_family:"Aile", f_ent:"Eğlence", f_out:"Açık alan", f_park:"Otopark",
       footer_copy:"© StayWorld — stayworldbooking.com",
-      w:{
-        "Parking":"Otopark"
-      }
+      w:{"Parking":"Otopark"}
     },
     AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_logout:"تسجيل الخروج",nav_signup:"إنشاء حساب",language:"اللغة",
+      nav_host:"المضيف",host_login:"تسجيل دخول المضيف",host_signup:"تسجيل المضيف",host_register_property:"تسجيل عقار",host_my_listings:"قوائمي",host_logout:"تسجيل الخروج",
       hero_luxury:"إقامات فاخرة.",hero_reach:"انتشار عالمي.",hero_sub:"بطاقات، تحويل بنكي وعملات مشفرة (BTC · ETH · USDT).",
       placeholder_city:"باريس، طوكيو، إسطنبول…",filters:"الفلاتر",search:"بحث",
       feat_verified:"إقامات موثوقة",feat_verified_sub:"أفضل الخيارات بالقرب منك.",
@@ -309,11 +331,10 @@
       f_loc:"الموقع", f_access:"إمكانية الوصول", f_ex:"الخبرات", f_view:"الإطلالة", f_safe:"السلامة",
       f_family:"العائلة", f_ent:"الترفيه", f_out:"خارجي", f_park:"موقف سيارات",
       footer_copy:"© ستاي ورلد — stayworldbooking.com",
-      w:{
-        "Parking":"موقف سيارات"
-      }
+      w:{"Parking":"موقف سيارات"}
     },
     RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_logout:"Выйти",nav_signup:"Регистрация",language:"Язык",
+      nav_host:"Хост",host_login:"Вход хоста",host_signup:"Регистрация хоста",host_register_property:"Добавить объект",host_my_listings:"Мои объявления",host_logout:"Выйти",
       hero_luxury:"Роскошное проживание.",hero_reach:"Глобальный охват.",hero_sub:"Карты, перевод и крипто (BTC · ETH · USDT).",
       placeholder_city:"Париж, Токио, Стамбул…",filters:"Фильтры",search:"Поиск",
       feat_verified:"Проверенные варианты",feat_verified_sub:"Лучшие места рядом с вами.",
@@ -325,9 +346,7 @@
       f_loc:"Расположение", f_access:"Доступность", f_ex:"Впечатления", f_view:"Вид", f_safe:"Безопасность",
       f_family:"Семья", f_ent:"Развлечения", f_out:"На улице", f_park:"Парковка",
       footer_copy:"© StayWorld — stayworldbooking.com",
-      w:{
-        "Parking":"Парковка"
-      }
+      w:{"Parking":"Парковка"}
     }
   };
 
@@ -638,23 +657,23 @@
 
       function toLoginUI() {
         link.setAttribute("data-i18n", "nav_login");
-        link.textContent = "Login";       // 초기 렌더용 (곧 i18n이 덮어씀)
+        link.textContent = "Login";
         link.href = "login.html";
         link.onclick = null;
-        applyI18NPage?.();               // 다른 텍스트도 함께 갱신
+        applyI18NPage?.();
       }
 
       function toLogoutUI() {
-        // 로그인 상태에서도 언어 변경 시 자동 번역되도록 data-i18n을 nav_logout으로 설정
         link.setAttribute("data-i18n", "nav_logout");
-        link.textContent = "Logout";      // 초기 렌더용 (곧 i18n이 덮어씀)
+        link.textContent = "Logout";
         link.href = "#";
         link.onclick = (e) => {
           e.preventDefault();
           localStorage.removeItem("sw_logged_in");
           alert("로그아웃 되었습니다.");
           toLoginUI();
-          location.href = "/";            // 홈으로
+          updateHostMenu();
+          location.href = "/";
         };
         applyI18NPage?.();
       }
@@ -663,16 +682,40 @@
       window.markLoggedIn = function () {
         localStorage.setItem("sw_logged_in", "true");
         toLogoutUI();
+        updateHostMenu();
       };
       // 필요 시 외부에서 명시적 로그아웃 호출
       window.markLoggedOut = function () {
         localStorage.removeItem("sw_logged_in");
         toLoginUI();
+        updateHostMenu();
       };
 
       // 첫 로드 시 상태 반영
       if (localStorage.getItem("sw_logged_in") === "true") toLogoutUI();
       else toLoginUI();
+
+      // ---- Host 메뉴 보이기/숨기기 ----
+      function updateHostMenu(){
+        const panel = document.querySelector('#hostMenu .dropdown-panel');
+        if(!panel) return;
+        const signedIn = localStorage.getItem('sw_logged_in') === 'true';
+        panel.querySelectorAll('[data-host-visible]').forEach(el=>el.style.display='none');
+        panel.querySelectorAll(`[data-host-visible="${signedIn?'signedIn':'signedOut'}"]`).forEach(el=>el.style.display='block');
+      }
+      window.updateHostMenu = updateHostMenu;
+      updateHostMenu();
+
+      // Host 로그아웃 버튼
+      const hostLogout = document.getElementById('hostLogoutBtn');
+      hostLogout?.addEventListener('click', (e)=>{
+        e.preventDefault();
+        localStorage.removeItem('sw_logged_in');
+        alert('로그아웃 되었습니다.');
+        toLoginUI();
+        updateHostMenu();
+        location.href = '/';
+      });
     });
   </script>
 
