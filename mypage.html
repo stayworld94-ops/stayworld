@@ -167,14 +167,14 @@
     import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // TODO: replace with your live config (kept inline so page works standalone)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_BUCKET",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+   const firebaseConfig = {
+  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
+  authDomain: "stayworld-2570c.firebaseapp.com",
+  projectId: "stayworld-2570c",
+  storageBucket: "stayworld-2570c.firebasestorage.app",
+  messagingSenderId: "272599681686",
+  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
+  measurementId: "G-F8MXM3D7FJ"
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -205,7 +205,7 @@
 
     function ensureGoogleMaps(cb){
       if(gmapsLoaded){ cb(); return; }
-      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // TODO: set your real key
+      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // AIzaSyDRUf7RDA9P7Iy8qyyDoAkvVtbouEEzwRY
       if(!apiKey || apiKey.includes('YOUR_')){ console.warn('Google Maps API key missing'); return; }
       window.__mapsInit = ()=>{ gmapsLoaded = true; cb(); };
       const s=document.createElement('script');
