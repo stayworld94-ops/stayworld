@@ -84,7 +84,23 @@
     .card h3{margin:0 0 6px}.card p{margin:0;opacity:.85}
 
     /* Map */
-    .map-section{padding:36px 0 60px}
+    .map-section{padding:36px 0 60px
+                <!-- [ADD] MY PAGE — 찜 리스트 + 지도(별마커) -->
+<section id="mypage" class="sw-section" style="display:none">
+  <div class="container">
+    <h2>My Page · Favorites ⭐</h2>
+    <div class="mypage-panels">
+      <div class="fav-list card">
+        <h3>My Favorites</h3>
+        <div id="favList"></div>
+      </div>
+      <div class="fav-map card">
+        <div id="favMap"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
     #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
     .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
 
