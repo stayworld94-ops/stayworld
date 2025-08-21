@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Upload ID — Host</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <main class="container" style="max-width:560px; padding:40px 0;">
+    <h1>신분증 업로드</h1>
+    <p class="muted">여권 또는 신분증 파일을 업로드해주세요. (심사 없이 완료 처리)</p>
+
+    <form id="idForm" style="display:grid; gap:12px; margin-top:16px;">
+      <input id="idFile" class="input" type="file" accept="image/*,application/pdf" required>
+      <button class="btn btn-primary" type="submit">업로드</button>
+    </form>
+
+    <p id="result" class="muted" style="margin-top:10px;"></p>
+  </main>
+
+  <script type="module" src="/assets/firebase.js"></script>
+  <script type="module">
+    import { app } from '/assets/firebase.js';
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user)=>{
+      if(!user){ alert('로그인이 필요합니다.'); location.href='/host-login.html'; }
+    });
+
+    document.getElementById('idForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const file = idFile.files[0];
+      if(!file) return;
+
+      const user = auth.currentUser;
+      const path = `host-ids/${user.uid}/${Date.now()}_${file.name}`;
+      const r = ref(storage, path);
+      await uploadBytes(r, file);
+      const url = await getDownloadURL(r);
+
+      await setDoc(doc(db,'hosts',user.uid), {
+        idUrl: url,
+        // ✅ 심사 없음: 업로드 완료 = 검증 완료
+        verified: true,
+        idUploadedAt: new Date().toISOString()
+      }, { merge:true });
+
+      result.textContent = '업로드 완료! 감사합니다.';
+    });
+  </script>
+</body>
+</html>
