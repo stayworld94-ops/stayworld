@@ -1,68 +1,77 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="utf-8">
   <title>Host Login — StayWorld</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/assets/style.css"> <!-- 공통 CSS -->
+
+  <!-- 통합 style.css -->
+  <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
-  <div class="container" style="max-width:520px; margin:60px auto; text-align:center;">
+  <header class="site-header">
+    <div class="header-row container">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">STAYWORLD</div>
+      </div>
+      <nav class="main-nav">
+        <a href="/host-register.html">Host Sign Up</a>
+        <a href="/host-login.html">Host Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding:60px 0; max-width:480px;">
     <h1 style="margin-bottom:20px;">Host Login</h1>
 
-    <div style="display:grid; gap:14px; text-align:left;">
-      <label>Email</label>
-      <input id="email" type="email" class="input" placeholder="Email">
+    <form id="hostLoginForm" style="display:grid;gap:16px;">
+      <label for="hostLoginEmail">이메일</label>
+      <input id="hostLoginEmail" class="input" type="email" placeholder="you@example.com" required>
 
-      <label>Password</label>
-      <input id="password" type="password" class="input" placeholder="Password">
+      <label for="hostLoginPassword">비밀번호</label>
+      <input id="hostLoginPassword" class="input" type="password" placeholder="••••••••" required>
 
-      <button id="loginBtn" class="btn-primary">Login</button>
-      <button id="googleBtn" class="btn-google">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"/>
-        Continue with Google
+      <button class="btn btn-gold" type="submit">로그인</button>
+    </form>
+
+    <div style="margin:18px 0; text-align:center;">
+      <button id="hostGoogleLogin" class="google-btn btn" type="button">
+        Sign in with Google
       </button>
     </div>
 
-    <p style="margin-top:16px;">
-      No account? <a href="host-register.html">Sign up here</a>
+    <p style="margin-top:20px;text-align:center;">
+      No account?
+      <a href="/host-register.html">Sign up here</a>
     </p>
-  </div>
+  </main>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { auth, googleProvider } from '/assets/firebase.js';
+    import { signInWithEmailAndPassword, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const firebaseConfig = {
-  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
-  authDomain: "stayworld-2570c.firebaseapp.com",
-  projectId: "stayworld-2570c",
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // 이메일 로그인
-    document.getElementById("loginBtn").addEventListener("click", async ()=>{
-      const email = document.getElementById("email").value.trim();
-      const pw = document.getElementById("password").value.trim();
+    const form = document.getElementById("hostLoginForm");
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
       try {
+        const email = document.getElementById("hostLoginEmail").value.trim();
+        const pw = document.getElementById("hostLoginPassword").value.trim();
         await signInWithEmailAndPassword(auth, email, pw);
-        alert("Host login success!");
-        location.href = "host-dashboard.html";
-      } catch(e) {
-        alert("Login failed: " + e.message);
+        alert("Host 로그인 성공!");
+        location.href="/host-dashboard.html";
+      } catch(err) {
+        alert("로그인 오류: " + err.message);
       }
     });
 
-    // 구글 로그인
-    document.getElementById("googleBtn").addEventListener("click", async ()=>{
+    document.getElementById("hostGoogleLogin").addEventListener("click", async ()=>{
       try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-        alert("Google login success!");
-        location.href = "host-dashboard.html";
-      } catch(e) {
-        alert("Google login failed: " + e.message);
+        await signInWithPopup(auth, googleProvider);
+        alert("Host Google 로그인 성공!");
+        location.href="/host-dashboard.html";
+      } catch(err) {
+        alert("구글 로그인 오류: " + err.message);
       }
     });
   </script>
