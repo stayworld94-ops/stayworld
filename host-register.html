@@ -1,52 +1,88 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="utf-8">
   <title>Host Sign Up — StayWorld</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{margin:0;background:#0b0f16;color:#e7e9ee;font-family:Inter,system-ui,sans-serif}
-    .container{max-width:760px;margin:50px auto;padding:0 16px}
-    .input, textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0f1621;color:#e7e9ee}
-    .btn{border:0;border-radius:14px;padding:12px 18px;cursor:pointer}
-    .btn-gold{background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#1a1205;font-weight:700}
-    a{color:#f4d78c}
-  </style>
+  <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
-  <div class="container">
-    <h1 data-i18n="host_signup">Host Sign Up</h1>
+  <div class="container" style="max-width:560px; padding:40px 0;">
+    <h1>Host Sign Up</h1>
 
-    <form id="hostSignupForm" style="display:grid;gap:14px;margin-top:20px">
-      <label data-i18n="full_name">Full name</label>
-      <input class="input" type="text" data-i18n-placeholder="full_name" placeholder="Full name" required>
-
-      <label data-i18n="email">Email</label>
-      <input class="input" type="email" data-i18n-placeholder="email" placeholder="Email" required>
-
-      <label data-i18n="password">Password</label>
-      <input class="input" type="password" data-i18n-placeholder="password" placeholder="Password" required>
-
-      <label data-i18n="passport_upload">Upload Passport / ID</label>
-      <input class="input" type="file" accept="image/*,application/pdf" required>
-
-      <button class="btn btn-gold" type="submit" data-i18n="signup">Sign Up</button>
-
-      <p><span data-i18n="already_have_account">Already have an account?</span>
-        <a href="host-login.html" data-i18n="host_login">Host Login</a></p>
+    <!-- 이메일/비번 가입 -->
+    <form id="hostEmailSignup" style="display:grid; gap:14px; margin-top:16px;">
+      <label>이름</label>
+      <input id="hostName" class="input" type="text" placeholder="홍길동" required>
+      <label>이메일</label>
+      <input id="hostEmail" class="input" type="email" placeholder="you@example.com" required>
+      <label>비밀번호</label>
+      <input id="hostPw" class="input" type="password" placeholder="********" required>
+      <button class="btn btn-primary" type="submit">호스트 가입</button>
     </form>
+
+    <div style="margin:16px 0; text-align:center;">또는</div>
+
+    <!-- ✅ Google 연동 버튼 추가 -->
+    <button id="hostGoogleSignup" class="btn-google">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+      Sign up as Host with Google
+    </button>
+
+    <p style="margin-top:14px;">이미 계정이 있나요? <a href="/host-login.html">호스트 로그인</a></p>
   </div>
 
-  <script src="i18n.js"></script>
-  <script>
-    document.getElementById('hostSignupForm').addEventListener('submit', e=>{
+  <script type="module" src="/assets/firebase.js"></script>
+  <script type="module">
+    import { app } from '/assets/firebase.js';
+    import {
+      getAuth, createUserWithEmailAndPassword, updateProfile,
+      GoogleAuthProvider, signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, doc, setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // 이메일 가입 → hosts/{uid} 기록 후 신분증 업로드 페이지로
+    document.getElementById('hostEmailSignup').addEventListener('submit', async (e)=>{
       e.preventDefault();
-      localStorage.setItem('sw_logged_in','true');
-      if(typeof window.markLoggedIn==='function') window.markLoggedIn();
-      alert('Host account created!');
-      location.href='host-dashboard.html';
+      const name = hostName.value.trim();
+      const email = hostEmail.value.trim();
+      const pw = hostPw.value.trim();
+
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      if (name) await updateProfile(cred.user, { displayName: name });
+
+      await setDoc(doc(db, 'hosts', cred.user.uid), {
+        uid: cred.user.uid,
+        email: cred.user.email,
+        displayName: name || cred.user.displayName || '',
+        // ✅ 심사 없음: 그냥 가입 처리
+        verified: true,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
+
+      alert('호스트 가입 완료! 신분증을 업로드 해주세요.');
+      location.href = '/host-id.html';
+    });
+
+    // Google로 호스트 가입
+    document.getElementById('hostGoogleSignup').addEventListener('click', async ()=>{
+      const cred = await signInWithPopup(auth, provider);
+      await setDoc(doc(db, 'hosts', cred.user.uid), {
+        uid: cred.user.uid,
+        email: cred.user.email,
+        displayName: cred.user.displayName || '',
+        verified: true,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
+      alert('호스트 가입 완료! 신분증을 업로드 해주세요.');
+      location.href = '/host-id.html';
     });
   </script>
-  <script src="/assets/login-modal.js"></script>
 </body>
 </html>
