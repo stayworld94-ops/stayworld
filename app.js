@@ -238,3 +238,154 @@
   }
   if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
+/* ================== [ADD] Favorites(찜) + MyPage ================== */
+(function(){
+  // Firebase/전역 브릿지와 연동 (네 환경 변수명 우선)
+  const auth = (typeof firebaseAuth !== 'undefined') ? firebaseAuth : (window._sw?.auth || null);
+  const db   = (typeof firebaseDB   !== 'undefined') ? firebaseDB   : (window._sw?.db   || null);
+  const useFirestore = !!(auth && db && db.collection);
+
+  // 저장소: Firestore(있으면) / LocalStorage(없으면)
+  const FavStore = {
+    key(uid){ return `sw:favs:${uid || 'guest'}`; },
+    async getAll(uid){
+      if(useFirestore && auth.currentUser){
+        const snap = await db.collection('users').doc(uid).collection('favorites').get();
+        return snap.docs.map(d=>d.id);
+      }
+      try{ return JSON.parse(localStorage.getItem(this.key(uid))||'[]'); }catch{ return []; }
+    },
+    async set(uid, ids){
+      if(useFirestore && auth.currentUser){
+        const col = db.collection('users').doc(uid).collection('favorites');
+        const snap = await col.get();
+        const batch = db.batch();
+        snap.docs.forEach(d=>batch.delete(d.ref));
+        ids.forEach(id=>batch.set(col.doc(id), {addedAt: Date.now()}));
+        await batch.commit();
+        return;
+      }
+      localStorage.setItem(this.key(uid), JSON.stringify(ids));
+    }
+  };
+
+  // 상태 & 엘리먼트
+  let favSet = new Set();
+  const $btnMyPage = document.getElementById('btnMyPage');
+  const $secMy     = document.getElementById('mypage');
+  const $favList   = document.getElementById('favList');
+  let favMap, starIcon;
+
+  function showSection(id){
+    if(!$secMy) return;
+    if(id === 'mypage'){ $secMy.style.display=''; renderMyPage(); }
+    else { $secMy.style.display='none'; }
+  }
+  $btnMyPage?.addEventListener('click', ()=> showSection('mypage'));
+
+  async function initFavState(){
+    const uid = auth?.currentUser?.uid || 'guest';
+    const ids = await FavStore.getAll(uid);
+    favSet = new Set(ids);
+    syncFavIcons();
+    // 로그인 시 자동 오픈
+    if(localStorage.getItem('sw_logged_in') === 'true' || auth?.currentUser) showSection('mypage');
+  }
+
+  // 로그인 상태 → My Page 버튼 노출
+  function refreshMyPageBtn(){
+    const logged = (localStorage.getItem('sw_logged_in') === 'true') || !!auth?.currentUser;
+    if($btnMyPage) $btnMyPage.style.display = logged ? '' : 'none';
+  }
+
+  // Firebase Auth 변화 감지(있을 때만)
+  if(auth){
+    auth.onAuthStateChanged(()=>{ refreshMyPageBtn(); initFavState(); });
+  }
+
+  // 초기 진입
+  document.addEventListener('DOMContentLoaded', ()=>{ refreshMyPageBtn(); initFavState(); });
+
+  // 카드의 ★ 버튼 바인딩/동기화 (렌더 후 호출용)
+  function bindFavButtons(root=document){
+    root.querySelectorAll('.fav-btn').forEach(btn=>{
+      if(btn._bound) return; btn._bound = true;
+      btn.addEventListener('click', async (e)=>{
+        const id = e.currentTarget.dataset.id;
+        if(!id) return;
+        if(favSet.has(id)) favSet.delete(id); else favSet.add(id);
+        e.currentTarget.setAttribute('data-active', favSet.has(id));
+        const uid = auth?.currentUser?.uid || 'guest';
+        await FavStore.set(uid, [...favSet]);
+        if($secMy && $secMy.style.display !== 'none') renderMyPage();
+      });
+    });
+  }
+  function syncFavIcons(root=document){
+    root.querySelectorAll('.fav-btn').forEach(btn=>{
+      const id = btn.dataset.id;
+      btn.setAttribute('data-active', favSet.has(id));
+    });
+  }
+
+  // MyPage 렌더(리스트+지도)
+  function ensureFavMap(){
+    if(favMap) return favMap;
+    const el = document.getElementById('favMap');
+    if(!el || !window.L) return null;
+    favMap = L.map('favMap').setView([41.0082,28.9784], 3);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(favMap);
+    starIcon = L.divIcon({className:'leaflet-div-icon star', iconSize:[34,34], iconAnchor:[17,17]});
+    return favMap;
+  }
+  function renderMyPage(){
+    if(!$secMy) return;
+    // stays 전역이 있으면 사용, 없으면 샘플
+    const stays = window.stays || [
+      {id:'par-001', name:'Paris Center',      city:'Paris',    price:180, lat:48.8566, lng:2.3522},
+      {id:'ist-002', name:'Bosphorus View',    city:'Istanbul', price:120, lat:41.0082, lng:28.9784},
+      {id:'sel-003', name:'Gangnam Skyline',   city:'Seoul',    price:130, lat:37.5665, lng:126.9780},
+    ];
+    const picked = stays.filter(s=>favSet.has(s.id));
+
+    if($favList){
+      if(!picked.length){
+        $favList.innerHTML = `<div class="fav-empty" style="color:var(--muted)">No favorites yet. Click ★ on a stay.</div>`;
+      }else{
+        $favList.innerHTML = picked.map(s=>`
+          <div class="fav-row">
+            <div>
+              <div class="fav-title">${s.name}</div>
+              <div class="fav-meta">${s.city} · $${s.price}/night</div>
+            </div>
+            <button class="fav-btn" data-id="${s.id}" data-active="true" title="Unfavorite">★</button>
+          </div>`).join('');
+        bindFavButtons($favList);
+      }
+    }
+
+    const map = ensureFavMap();
+    if(map){
+      // 기존 마커 제거
+      const toRemove = [];
+      map.eachLayer(l=>{ if(l instanceof L.Marker) toRemove.push(l); });
+      toRemove.forEach(m=>map.removeLayer(m));
+      // 새 마커
+      const markers = [];
+      picked.forEach(s=>{
+        if(typeof s.lat !== 'number' || typeof s.lng !== 'number') return;
+        const mk = L.marker([s.lat, s.lng], {icon: starIcon})
+          .addTo(map).bindPopup(`<b>${s.name}</b><br>${s.city}`);
+        markers.push(mk);
+      });
+      if(markers.length){
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+      }
+    }
+  }
+
+  // 전역 헬퍼 공개: 카드 렌더 후 호출
+  window.SW_bindFavButtons = bindFavButtons;
+  window.SW_syncFavIcons  = syncFavIcons;
+})();
