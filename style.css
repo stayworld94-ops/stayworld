@@ -213,3 +213,30 @@ button:hover, .btn:hover, .google-btn:hover {
   background-color: #000000;   /* 반전 */
   color: #ffffff;
 }
+/* ===== [ADD] Favorites & MyPage ===== */
+.fav-btn{
+  appearance:none;border:0;background:transparent;cursor:pointer;
+  font-size:22px;line-height:1;color:#73809a;transition:transform .08s ease,color .15s ease
+}
+.fav-btn[data-active="true"]{ color: var(--gold, #c9a35b); }
+.fav-btn:active{ transform: scale(0.94); }
+
+#mypage .card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px
+}
+.mypage-panels{ display:grid; grid-template-columns:1.1fr .9fr; gap:14px }
+@media (max-width: 980px){ .mypage-panels{ grid-template-columns:1fr } }
+#favMap{ height:420px; border-radius:16px; border:1px solid var(--border); overflow:hidden }
+
+/* 찜 리스트 */
+.fav-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px dashed var(--border) }
+.fav-row:last-child{ border-bottom:0 }
+.fav-title{ font-weight:700 }
+.fav-meta{ font-size:13px; color: var(--muted) }
+
+/* Leaflet 별 아이콘 (CSS) */
+.leaflet-div-icon.star{
+  width:34px;height:34px;color:var(--gold,#c9a35b);border-radius:50%;
+  background: radial-gradient(circle at 50% 42%, currentColor 28%, transparent 29%) no-repeat center/100% 100%;
+  box-shadow:0 1px 6px rgba(0,0,0,.35)
+}
