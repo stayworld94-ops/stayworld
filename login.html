@@ -4,7 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login - StayWorld</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- ✅ 통합 스타일: 프로젝트 구조에 맞춰 /styles/style.css -->
+  <link rel="stylesheet" href="/styles/style.css?v=1" />
+
   <!-- 페이지 레이아웃 보정 + Google 버튼 가시성 -->
   <style>
     .auth-wrap{
@@ -21,7 +24,8 @@
     .auth-card h1{margin:6px 0 18px}
     .auth-card label{display:block;margin:12px 0 6px;opacity:.9}
     .auth-actions{margin-top:16px;display:flex;flex-direction:column;gap:10px}
-    /* Google 버튼(밝게) */
+
+    /* ✅ Google 버튼(항상 밝게) */
     #btnGoogle{
       display:flex;align-items:center;justify-content:center;gap:10px;
       width:100%;background:#ffffff;color:#111;
@@ -34,7 +38,7 @@
   </style>
 </head>
 <body>
-  <!-- HEADER (index와 동일한 구조 + i18n) -->
+  <!-- HEADER -->
   <header class="site-header">
     <div class="container header-row">
       <a href="/" class="brand">
@@ -86,8 +90,8 @@
 
       <div class="or" aria-hidden="true">OR</div>
 
-      <button id="btnGoogle" class="btn btn-chip" type="button" data-i18n="signin_google">
-        <!-- 아이콘 없어도 잘 보이도록 텍스트만 -->
+      <!-- ✅ 구글 로그인 버튼 -->
+      <button id="btnGoogle" class="btn google-btn" type="button" data-i18n="signin_google">
         Sign in with Google
       </button>
 
@@ -98,11 +102,10 @@
     </div>
   </main>
 
-  <!-- 하단 스크립트: 다국어 & 로그인 상태 토글 & 로그인 로직 -->
+  <!-- i18n (있으면 유지) -->
   <script src="i18n.js"></script>
- 
 
-  <!-- 현재 페이지에서 로그인/로그아웃 링크 즉시 반영 (데모) -->
+  <!-- 로그인/로그아웃 링크 토글 (데모) -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const link = document.getElementById('navAuthLink');
@@ -129,6 +132,55 @@
       if(localStorage.getItem('sw_logged_in')==='true') toLogoutUI(); else toLoginUI();
     });
   </script>
-<script src="/assets/login-modal.js"></script>
+
+  <!-- ✅ Firebase (인라인 모듈): 이메일 로그인 + Google 로그인 -->
+  <script type="module">
+    // 🔧 Firebase 콘솔 > 프로젝트 설정 > 일반 > SDK 설정에서 복사한 "웹 앱" 구성으로 교체
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID",
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, signInWithEmailAndPassword,
+      GoogleAuthProvider, signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // 이메일 로그인
+    document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pw = document.getElementById('loginPassword').value.trim();
+      try{
+        await signInWithEmailAndPassword(auth, email, pw);
+        localStorage.setItem('sw_logged_in','true');
+        alert('로그인 완료!');
+        location.href = '/';
+      }catch(err){
+        alert('로그인 오류: ' + err.message);
+      }
+    });
+
+    // Google 로그인
+    document.getElementById('btnGoogle').addEventListener('click', async ()=>{
+      try{
+        await signInWithPopup(auth, provider);
+        localStorage.setItem('sw_logged_in','true');
+        alert('Google 로그인 완료!');
+        location.href = '/';
+      }catch(err){
+        alert('Google 로그인 오류: ' + err.message);
+      }
+    });
+  </script>
+
+  <!-- ⚠️ 이 페이지에서는 /assets/login-modal.js 불필요/충돌 가능 → 제거 -->
 </body>
 </html>
