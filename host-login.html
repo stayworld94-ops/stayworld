@@ -1,32 +1,70 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Host Login - StayWorld</title>
-  <link rel="stylesheet" href="/style.css" />
+  <meta charset="utf-8">
+  <title>Host Login — StayWorld</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/style.css"> <!-- 공통 CSS -->
 </head>
 <body>
-  <header>
-    <a href="/" class="brand">STAYWORLD</a>
-    <nav>
-      <a href="host-register.html">Host Sign Up</a>
-      <a href="host-login.html" class="active">Host Login</a>
-    </nav>
-  </header>
+  <div class="container" style="max-width:520px; margin:60px auto; text-align:center;">
+    <h1 style="margin-bottom:20px;">Host Login</h1>
 
-  <main class="container" style="max-width:480px; padding:40px 0;">
-    <h1>Host Login</h1>
-    <label>Email</label>
-    <input type="email" id="email" />
-    <label>Password</label>
-    <input type="password" id="password" />
-    <button id="hostLoginBtn">Login</button>
-    <button id="hostGoogleBtn" class="btn-google">Continue with Google</button>
+    <div style="display:grid; gap:14px; text-align:left;">
+      <label>Email</label>
+      <input id="email" type="email" class="input" placeholder="Email">
 
-    <p>No account? <a href="host-register.html">Sign up here</a></p>
-  </main>
+      <label>Password</label>
+      <input id="password" type="password" class="input" placeholder="Password">
 
-  <script type="module" src="/assets/login-modal.js"></script>
+      <button id="loginBtn" class="btn-primary">Login</button>
+      <button id="googleBtn" class="btn-google">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"/>
+        Continue with Google
+      </button>
+    </div>
+
+    <p style="margin-top:16px;">
+      No account? <a href="host-register.html">Sign up here</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // 이메일 로그인
+    document.getElementById("loginBtn").addEventListener("click", async ()=>{
+      const email = document.getElementById("email").value.trim();
+      const pw = document.getElementById("password").value.trim();
+      try {
+        await signInWithEmailAndPassword(auth, email, pw);
+        alert("Host login success!");
+        location.href = "host-dashboard.html";
+      } catch(e) {
+        alert("Login failed: " + e.message);
+      }
+    });
+
+    // 구글 로그인
+    document.getElementById("googleBtn").addEventListener("click", async ()=>{
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        alert("Google login success!");
+        location.href = "host-dashboard.html";
+      } catch(e) {
+        alert("Google login failed: " + e.message);
+      }
+    });
+  </script>
 </body>
 </html>
