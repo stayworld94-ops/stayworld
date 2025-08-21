@@ -129,7 +129,6 @@ header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-i
 .leaflet-pane, .leaflet-top, .leaflet-bottom{z-index:1}
 
 /* -------------------- Filters — Drawer -------------------- */
-/* (JS가 동적으로 #filterDrawer 를 생성/제어) */
 #filterDrawer{ position: fixed; inset: 0; display: none; z-index: 1200; }
 #filterDrawer[aria-hidden="false"]{ display:flex; pointer-events:auto; }
 #filterDrawer[aria-hidden="true"]{ display:none; pointer-events:none; }
@@ -148,7 +147,6 @@ header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-i
 #filterDrawer .drawer-foot{ border-bottom:0; border-top:1px solid var(--border) }
 #filterDrawer .drawer-body{ padding:14px }
 
-/* 20+ 그룹 그리드 */
 #filterDrawer .filter-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px }
 #filterDrawer .sw-filter-group{
   background:linear-gradient(180deg,#14141b,#0d0d13);
@@ -158,28 +156,22 @@ header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-i
 #filterDrawer label{ display:block; margin:6px 0; }
 #filterDrawer input[type=checkbox], #filterDrawer input[type=radio]{ width:18px; height:18px; vertical-align:middle; }
 
-/* 레거시 .modal 시스템이 있더라도 'open' 아닐 때 클릭 못 하도록 안전 처리 */
+/* 레거시 .modal 시스템 안전 처리 */
 .modal{display:none !important; pointer-events:none !important;}
 .modal.open{display:block !important; pointer-events:auto !important;}
-
-/* 바디 스크롤 잠금 */
 .modal-open, .modal-open body{overflow:hidden!important}
 
 /* -------------------- Chat (FAB + Panel) -------------------- */
-#chatFab{
-  position:fixed; right:16px; bottom:16px; z-index:1300;
+#chatFab{ position:fixed; right:16px; bottom:16px; z-index:1300;
   width:56px;height:56px;border-radius:999px; border:1px solid rgba(212,177,102,.45);
   background:radial-gradient(70% 70% at 30% 30%, var(--gold-2), var(--gold));
   color:#111;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;
   box-shadow:0 10px 40px rgba(0,0,0,.45); transition:.2s
 }
 #chatFab:hover{ transform: translateY(-2px); box-shadow:0 16px 50px rgba(0,0,0,.55) }
-
-#botPanel{
-  position:fixed; right:16px; bottom:86px; width:min(360px,92vw);
+#botPanel{ position:fixed; right:16px; bottom:86px; width:min(360px,92vw);
   border:1px solid #23232b; border-radius:18px; background:#101018; z-index:1300;
-  box-shadow:0 20px 60px rgba(0,0,0,.5); overflow:hidden
-}
+  box-shadow:0 20px 60px rgba(0,0,0,.5); overflow:hidden }
 #botPanel[hidden]{ display:none !important; }
 .sw-bot-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #1b1b20 }
 .sw-bot-body{ padding:12px; max-height:320px; overflow:auto }
@@ -196,7 +188,7 @@ header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-i
   .search-bar{grid-template-columns:1fr 1fr 1fr auto}
 }
 @media (max-width:920px){
-  .main-nav{display:none} /* 모바일 네비 붕괴 방지 */
+  .main-nav{display:none}
   .header-cta{min-width:auto}
   .hero-title{font-size:40px}
 }
@@ -205,17 +197,10 @@ header, .nav, .nav-links, .sw-header, .sw-header-inner { position: relative; z-i
 }
 
 /* -------------------- Clickability & Safety -------------------- */
-/* 어디서든 버튼/폼은 항상 클릭 가능 */
 button, a, input, select, label { pointer-events:auto; }
-
-/* 혹시 전역 오버레이가 DOM에 남아 있더라도 비활성 시 클릭 차단 못 하게 */
 [data-overlay]:not(.open){ pointer-events:none !important; }
 
-/* 검색 UX */
-.search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
-/* ... 기존 style.css 내용 ... */
-
-/* ===== 버튼 대비 강화 (추가) ===== */
+/* -------------------- Extra: Button Contrast Boost -------------------- */
 button, .btn, .google-btn {
   background-color: #ffffff;   /* 밝은 배경 */
   color: #000000;              /* 어두운 텍스트 */
