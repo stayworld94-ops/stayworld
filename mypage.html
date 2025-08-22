@@ -220,7 +220,7 @@
 
     function ensureGoogleMaps(cb){
       if(gmapsLoaded){ cb(); return; }
-      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // TODO: 실제 키로 교체
+      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // TODO: AIzaSyDRUf7RDA9P7Iy8qyyDoAkvVtbouEEzwRY
       if(!apiKey || apiKey.includes('YOUR_')){ console.warn('Google Maps API key missing'); return; }
       window.__mapsInit = ()=>{ gmapsLoaded = true; cb(); };
       const s=document.createElement('script');
