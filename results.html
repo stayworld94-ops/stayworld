@@ -37,5 +37,89 @@
   <footer class="site-footer">© StayWorld</footer>
   <script src="i18n.js"></script>
   <script src="/assets/login-modal.js"></script>
+  <!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>StayWorld — 결과</title>
+  <style>
+    .card{border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center}
+    .meta{opacity:.8;font-size:14px}
+    .actions button{padding:10px 14px;border-radius:10px;border:1px solid #111;cursor:pointer}
+  </style>
+</head>
+<body>
+  <header>
+    <span data-auth-state>로그인 필요</span>
+    <button id="google-login">Google로 로그인</button>
+  </header>
+
+  <main>
+    <!-- 예시 카드 1 -->
+    <div class="card" 
+         data-listing-id="LST_1001"
+         data-title="보스포루스 뷰 럭셔리 스위트"
+         data-price="120000"
+         data-currency="TRY">
+      <div>
+        <div class="title">보스포루스 뷰 럭셔리 스위트</div>
+        <div class="meta">최대 3인 · 1침실 · 체크인 2025-09-01 / 체크아웃 2025-09-03</div>
+      </div>
+      <div class="actions">
+        <button class="book-btn">예약하기</button>
+      </div>
+    </div>
+
+    <!-- 예시 카드 2 -->
+    <div class="card" 
+         data-listing-id="LST_2002"
+         data-title="탁심 센터 프리미엄 아파트"
+         data-price="90000"
+         data-currency="TRY">
+      <div>
+        <div class="title">탁심 센터 프리미엄 아파트</div>
+        <div class="meta">최대 2인 · 스튜디오 · 체크인 2025-09-05 / 체크아웃 2025-09-07</div>
+      </div>
+      <div class="actions">
+        <button class="book-btn">예약하기</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase & 예약 스크립트 -->
+  <script type="module" src="/js/app.js"></script>
+  <script type="module">
+    import { auth, googleLogin } from "/js/app.js";
+    import { bookNow } from "/js/bookings.js";
+
+    // 로그인 버튼
+    document.getElementById("google-login")?.addEventListener("click", async () => {
+      await googleLogin();
+      alert("로그인 성공");
+    });
+
+    // "예약하기" 버튼 이벤트
+    document.querySelectorAll(".book-btn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const card = e.target.closest(".card");
+        const listingId = card.dataset.listingId;
+        const listingTitle = card.dataset.title;
+        const priceTotal = Number(card.dataset.price);
+        const currency = card.dataset.currency || "TRY";
+
+        // 데모용 고정 날짜/인원 (실서비스는 달력 입력값 참조)
+        const checkIn = "2025-09-01";
+        const checkOut = "2025-09-03";
+        const guests = 2;
+
+        const id = await bookNow({ listingId, listingTitle, checkIn, checkOut, guests, priceTotal, currency });
+        if (id) console.log("예약 생성:", id);
+      });
+    });
+  </script>
+  <script type="module" src="/js/bookings.js"></script>
+</body>
+</html>
+
 </body>
 </html>
