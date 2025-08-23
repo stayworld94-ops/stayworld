@@ -1,8 +1,6 @@
-// Firebase 불러오기
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Firebase 설정
 const firebaseConfig = {
   apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
   authDomain: "stayworld-2570c.firebaseapp.com",
@@ -13,30 +11,32 @@ const firebaseConfig = {
   measurementId: "G-F8MXM3D7FJ"
 };
 
-// Firebase 초기화
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-// 회원가입 폼 이벤트
+// 이메일 회원가입
 document.getElementById("signupForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const email = document.getElementById("signupEmail").value;
-  const password = document.getElementById("signupPassword").value;
+  const email = document.getElementById("signupEmail").value.trim();
+  const pw = document.getElementById("signupPassword").value.trim();
 
   try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-    alert("회원가입 성공! 🎉");
-
-    // ✅ 로그인 처리 (홈 네비게이션 업데이트)
-    if (window.markLoggedIn) {
-      window.markLoggedIn(cred.user);
-    }
-
-    // 홈으로 이동
+    const cred = await createUserWithEmailAndPassword(auth, email, pw);
+    alert(`회원가입 성공! 🎉\n가입 이메일: ${cred.user.email}\n\nStayWorld에 오신 걸 환영합니다.`);
     window.location.href = "index.html";
   } catch (err) {
     alert("회원가입 실패: " + err.message);
+  }
+});
+
+// Google 회원가입
+document.getElementById("googleSignup")?.addEventListener("click", async () => {
+  try {
+    const cred = await signInWithPopup(auth, provider);
+    alert(`Google 회원가입 완료! 🎉\n가입 이메일: ${cred.user.email}\n\nStayWorld에 오신 걸 환영합니다.`);
+    window.location.href = "index.html";
+  } catch (err) {
+    alert("Google 로그인 오류: " + err.message);
   }
 });
