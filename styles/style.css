@@ -1,14 +1,11 @@
-/* ===== Reset & 기본 설정 ===== */
+/* ===== 기본 Reset ===== */
 body {
   margin:0;
-  font-family: "Noto Sans", "Inter", sans-serif;
+  font-family:"Noto Sans","Inter",sans-serif;
   background:#0f1420;
   color:#fff;
 }
-.container {
-  margin:0 auto;
-  padding:0 16px;
-}
+.container { margin:0 auto; padding:0 16px; }
 
 /* ===== 입력창 ===== */
 .input {
@@ -38,33 +35,18 @@ body {
   text-decoration:none;
   border:none;
 }
-.btn-gold {
-  background:#f5c542;
-  color:#111;
-}
-.btn-gold:hover {
-  background:#e5b93a;
-}
+.btn-gold { background:#f5c542; color:#111; }
+.btn-gold:hover { background:#e5b93a; }
 
 /* ===== Google 버튼 ===== */
 .google-btn {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  width:100%;
-  background:#fff;
-  color:#111;
+  display:flex; align-items:center; justify-content:center;
+  gap:10px; width:100%;
+  background:#fff; color:#111;
   border:1px solid rgba(0,0,0,.15);
   border-radius:12px;
   padding:12px 14px;
-  font-weight:700;
-  cursor:pointer;
+  font-weight:700; cursor:pointer;
 }
-.google-btn img {
-  width:20px;
-  height:20px;
-}
-.google-btn:hover {
-  filter:brightness(0.97);
-}
+.google-btn img { width:20px; height:20px; }
+.google-btn:hover { filter:brightness(0.97); }
