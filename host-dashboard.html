@@ -1,26 +1,719 @@
+# StayWorld – Firebase Integration Pack (Production-Ready)
+
+아래는 실제 배포용 **완성 코드 세트**입니다. 파일별로 복사해서 프로젝트 루트에 저장하세요.
+
+---
+**/scripts/firebase.js**  (공용 초기화 + 유틸)
+```js
+// /scripts/firebase.js
+// Firebase v10 CDN + ESM. 모든 페이지에서 import 해서 사용합니다.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+// 🔒 실제 값으로 교체: Firebase Console → 프로젝트 설정 → '일반' → Firebase SDK snippet
+export const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "stayworldglobal.firebaseapp.com",
+  projectId: "stayworldglobal",
+  storageBucket: "stayworldglobal.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+// 편의 re-export
+export {
+  // auth
+  onAuthStateChanged,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+export {
+  // firestore
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  getDocs,
+  query,
+  where,
+  collection,
+  serverTimestamp,
+  orderBy,
+  limit
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+export {
+  // storage
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+```
+
+---
+**/login.html**  (이메일/비번 + 구글 로그인)
+```html
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Host Dashboard - StayWorld</title>
-  <link rel="stylesheet" href="/style.css" />
+  <title>StayWorld — Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <header>
-    <a href="/" class="brand">STAYWORLD</a>
-    <nav>
-      <a href="host-listing.html">New Listing</a>
-      <a href="host-dashboard.html" class="active">Dashboard</a>
-    </nav>
-  </header>
+<body class="bg-[#0b0f16] text-white min-h-screen grid place-items-center p-6">
+  <div class="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
+    <h1 class="text-2xl font-bold">Welcome back</h1>
+    <p class="text-white/60 text-sm">Log in to manage your stays.</p>
 
-  <main class="container" style="padding:40px 0;">
-    <h1>Welcome, Host!</h1>
-    <button id="goDashboard">Go to Dashboard</button>
-    <button id="logoutBtn">Logout</button>
-  </main>
+    <form id="loginForm" class="mt-6 space-y-3">
+      <input id="email" type="email" placeholder="Email" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <input id="password" type="password" placeholder="Password" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <button class="w-full px-3 py-2 rounded-xl bg-white text-black font-semibold">Log in</button>
+    </form>
 
-  <script type="module" src="/assets/login-modal.js"></script>
+    <div class="mt-4">
+      <button id="googleBtn" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10">Continue with Google</button>
+    </div>
+
+    <p class="text-white/60 text-sm mt-4">No account? <a href="/signup.html" class="text-emerald-300">Sign up</a></p>
+  </div>
+
+  <script type="module">
+    import { auth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, doc, getDoc, db } from '/scripts/firebase.js';
+
+    const redirectAfter = async (user) => {
+      // 사용자 문서 확인
+      const uref = doc(db, 'users', user.uid);
+      const usnap = await getDoc(uref);
+      const role = usnap.exists() ? (usnap.data().role || 'guest') : 'guest';
+      if (role === 'host') {
+        // 호스트 등록 검증 여부 확인
+        const href = doc(db, 'hosts', user.uid);
+        const hsnap = await getDoc(href);
+        const verified = hsnap.exists() ? !!hsnap.data().verified : false;
+        if (!verified) window.location.href = '/host-register.html';
+        else window.location.href = '/host-dashboard.html';
+      } else {
+        window.location.href = '/'; // 일반 유저 홈
+      }
+    };
+
+    document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      await redirectAfter(cred.user);
+    });
+
+    document.getElementById('googleBtn').addEventListener('click', async ()=>{
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      await redirectAfter(cred.user);
+    });
+  </script>
 </body>
 </html>
+```
+
+---
+**/signup.html**  (회원가입 + 호스트 체크)
+```html
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld — Sign up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b0f16] text-white min-h-screen grid place-items-center p-6">
+  <div class="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
+    <h1 class="text-2xl font-bold">Create your account</h1>
+
+    <form id="signupForm" class="mt-6 space-y-3">
+      <input id="name" placeholder="Full name" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <input id="email" type="email" placeholder="Email" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <input id="password" type="password" placeholder="Password" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <label class="flex items-center gap-2 text-sm"><input id="isHost" type="checkbox" class="accent-emerald-500"> I’m a host</label>
+      <button class="w-full px-3 py-2 rounded-xl bg-white text-black font-semibold">Sign up</button>
+    </form>
+
+    <div class="mt-4">
+      <button id="googleBtn" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10">Continue with Google</button>
+    </div>
+
+    <p class="text-white/60 text-sm mt-4">Have an account? <a href="/login.html" class="text-emerald-300">Log in</a></p>
+  </div>
+
+  <script type="module">
+    import { auth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, db, doc, setDoc, getDoc } from '/scripts/firebase.js';
+
+    async function ensureUserDoc(user, role) {
+      const uref = doc(db, 'users', user.uid);
+      const usnap = await getDoc(uref);
+      if (!usnap.exists()) {
+        await setDoc(uref, {
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || '',
+          role: role || 'guest',
+          createdAt: Date.now()
+        });
+      } else if (role && usnap.data().role !== role) {
+        await setDoc(uref, { role }, { merge: true });
+      }
+      return uref;
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const isHost = document.getElementById('isHost').checked;
+
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, { displayName: name });
+      await ensureUserDoc(cred.user, isHost ? 'host' : 'guest');
+      if (isHost) window.location.href = '/host-register.html';
+      else window.location.href = '/';
+    });
+
+    document.getElementById('googleBtn').addEventListener('click', async ()=>{
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      await ensureUserDoc(cred.user, 'guest');
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+**/host-register.html**  (호스트 인증: 신분증 업로드 → 대기 상태)
+```html
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld — Host Verification</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b0f16] text-white min-h-screen grid place-items-center p-6">
+  <div class="w-full max-w-lg rounded-2xl border border-white/10 bg-white/5 p-6">
+    <h1 class="text-2xl font-bold">Host verification</h1>
+    <p class="text-white/60 text-sm">Upload your government ID. We’ll review and notify you.</p>
+
+    <form id="idForm" class="mt-6 space-y-3">
+      <input id="fullname" placeholder="Legal name" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <input id="phone" placeholder="Phone number" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <input id="idfile" type="file" accept="image/*,application/pdf" class="w-full" required>
+      <button class="w-full px-3 py-2 rounded-xl bg-white text-black font-semibold">Submit</button>
+    </form>
+
+    <p id="status" class="mt-4 text-white/70"></p>
+  </div>
+
+  <script type="module">
+    import { auth, onAuthStateChanged, db, storage, doc, setDoc, getDoc, ref, uploadBytes, getDownloadURL } from '/scripts/firebase.js';
+
+    let currentUser = null;
+    onAuthStateChanged(auth, async (u)=>{
+      if (!u) return location.href='/login.html';
+      currentUser = u;
+      const hsnap = await getDoc(doc(db,'hosts',u.uid));
+      if (hsnap.exists() && hsnap.data().verified) {
+        return location.href='/host-dashboard.html';
+      }
+    });
+
+    document.getElementById('idForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const file = document.getElementById('idfile').files[0];
+      const fullname = document.getElementById('fullname').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      if (!currentUser) return;
+
+      const r = ref(storage, `ids/${currentUser.uid}/${Date.now()}-${file.name}`);
+      await uploadBytes(r, file);
+      const url = await getDownloadURL(r);
+
+      await setDoc(doc(db,'hosts',currentUser.uid),{
+        uid: currentUser.uid,
+        name: fullname,
+        phone,
+        idUrl: url,
+        verified: false,
+        submittedAt: Date.now()
+      }, { merge:true });
+
+      document.getElementById('status').textContent = 'Submitted. We will review shortly. You will get access once verified.';
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+**/host-dashboard.html**  (실데이터 연동 — 목록/예약/수익/메시지)
+```html
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld — Host Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .view{display:none}.view.active{display:block}
+  </style>
+</head>
+<body class="bg-[#0b0f16] text-white min-h-screen">
+  <header class="sticky top-0 z-30 backdrop-blur bg-black/40 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="font-semibold">STAYWORLD • <span class="text-white/60">Host Console</span></div>
+      <nav class="hidden md:flex gap-3">
+        <button data-nav="overview" class="px-3 py-2 rounded-xl hover:bg-white/10">Overview</button>
+        <button data-nav="new" class="px-3 py-2 rounded-xl hover:bg-white/10">New Listing</button>
+        <button data-nav="listings" class="px-3 py-2 rounded-xl hover:bg-white/10">My Listings</button>
+        <button data-nav="reservations" class="px-3 py-2 rounded-xl hover:bg-white/10">Reservations</button>
+        <button data-nav="earnings" class="px-3 py-2 rounded-xl hover:bg-white/10">Earnings</button>
+        <button data-nav="messages" class="px-3 py-2 rounded-xl hover:bg-white/10">Messages</button>
+        <button data-nav="account" class="px-3 py-2 rounded-xl hover:bg-white/10">Account</button>
+      </nav>
+      <div class="flex items-center gap-3">
+        <span id="hostName" class="text-sm text-white/70">Host</span>
+        <button id="logoutBtn" class="px-3 py-2 rounded-xl bg-white/10">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <section class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <h1 class="text-2xl md:text-3xl font-bold">Welcome, <span id="welcomeName">Host</span> 👋</h1>
+      <p class="text-white/60 text-sm">Real data connected to Firebase.</p>
+    </section>
+
+    <!-- Overview -->
+    <section id="view-overview" class="view active">
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><div class="text-white/60 text-sm">This month’s revenue</div><div id="statRevenue" class="mt-2 text-2xl font-bold">$0</div></div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><div class="text-white/60 text-sm">Upcoming check-ins</div><div id="statCheckins" class="mt-2 text-2xl font-bold">0</div></div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><div class="text-white/60 text-sm">Active listings</div><div id="statListings" class="mt-2 text-2xl font-bold">0</div></div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5"><div class="text-white/60 text-sm">New messages</div><div id="statMessages" class="mt-2 text-2xl font-bold">0</div></div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">Recent Reservations</h3><a data-nav="reservations" class="text-sm text-emerald-300 hover:underline">View all</a></div>
+          <div id="recentReservations" class="mt-3 space-y-3"></div>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">Payouts</h3><a data-nav="earnings" class="text-sm text-emerald-300 hover:underline">View details</a></div>
+          <ul id="recentPayouts" class="mt-3 space-y-2 text-sm"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Listing -->
+    <section id="view-new" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h2 class="text-xl font-semibold">Create a new listing</h2>
+        <form id="newListingForm" class="grid md:grid-cols-2 gap-4 mt-3">
+          <div class="md:col-span-2"><label class="block text-sm">Title *</label><input name="title" required class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10" placeholder="Luxury apartment in Istanbul"></div>
+          <div class="md:col-span-2"><label class="block text-sm">Description *</label><textarea name="description" required rows="4" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10"></textarea></div>
+          <div><label class="block text-sm">Nightly Price (USD) *</label><input name="price" type="number" min="0" required class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10"></div>
+          <div><label class="block text-sm">Max Guests *</label><input name="guests" type="number" min="1" required class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10"></div>
+          <div><label class="block text-sm">Bedrooms *</label><input name="bedrooms" type="number" min="0" required class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10"></div>
+          <div><label class="block text-sm">Bathrooms *</label><input name="bathrooms" type="number" min="0" required class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10"></div>
+          <div class="md:col-span-2"><label class="block text-sm">Address *</label><input name="address" required class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10"></div>
+          <div class="md:col-span-2"><label class="block text-sm">Photos</label><input id="photoInput" type="file" accept="image/*" multiple class="mt-1"><div id="photoPreview" class="mt-2 grid grid-cols-3 md:grid-cols-6 gap-2"></div></div>
+          <div class="md:col-span-2 flex justify-end gap-2"><button type="reset" class="px-4 py-2 rounded-xl bg-white/10">Reset</button><button class="px-4 py-2 rounded-xl bg-white text-black font-semibold">Save Listing</button></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- My Listings -->
+    <section id="view-listings" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div class="flex items-center justify-between"><h2 class="text-xl font-semibold">My Listings</h2><button data-nav="new" class="px-3 py-2 rounded-xl bg-white/10">+ New Listing</button></div>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead><tr class="text-left text-white/60 border-b border-white/10"><th class="py-2 pr-4">Listing</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Price</th><th class="py-2 pr-4">Bookings</th><th class="py-2 pr-4">Actions</th></tr></thead>
+            <tbody id="listingsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reservations -->
+    <section id="view-reservations" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h2 class="text-xl font-semibold">Reservations</h2>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead><tr class="text-left text-white/60 border-b border-white/10"><th class="py-2 pr-4">Guest</th><th class="py-2 pr-4">Listing</th><th class="py-2 pr-4">Check‑in</th><th class="py-2 pr-4">Check‑out</th><th class="py-2 pr-4">Total</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Actions</th></tr></thead>
+            <tbody id="reservationsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Earnings -->
+    <section id="view-earnings" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h2 class="text-xl font-semibold">Earnings</h2>
+        <div class="mt-4 grid md:grid-cols-3 gap-4">
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4"><div class="text-white/60 text-sm">This month</div><div id="earnMonth" class="text-2xl font-bold mt-1">$0</div></div>
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4"><div class="text-white/60 text-sm">Pending payouts</div><div id="earnPending" class="text-2xl font-bold mt-1">$0</div></div>
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4"><div class="text-white/60 text-sm">Total</div><div id="earnTotal" class="text-2xl font-bold mt-1">$0</div></div>
+        </div>
+        <h3 class="mt-6 font-semibold">Payout history</h3>
+        <ul id="payoutHistory" class="mt-2 text-sm space-y-2"></ul>
+      </div>
+    </section>
+
+    <!-- Messages -->
+    <section id="view-messages" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h2 class="text-xl font-semibold">Messages</h2>
+        <div id="messageList" class="mt-4 space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- Account -->
+    <section id="view-account" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h2 class="text-xl font-semibold">Account</h2>
+        <div class="grid md:grid-cols-2 gap-4 mt-4">
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <h3 class="font-semibold">Profile</h3>
+            <label class="block text-sm mt-3">Display name</label>
+            <input id="accName" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10">
+            <label class="block text-sm mt-3">Email</label>
+            <input id="accEmail" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10 opacity-70" disabled>
+            <div class="flex justify-end mt-4"><button id="saveProfileBtn" class="px-4 py-2 rounded-xl bg-white/10">Save</button></div>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <h3 class="font-semibold">Payout details</h3>
+            <label class="block text-sm mt-3">Bank / IBAN</label>
+            <input id="accBank" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10" placeholder="KB 61670101375345">
+            <label class="block text-sm mt-3">Currency</label>
+            <select id="accCurrency" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10"><option>USD</option><option>EUR</option><option>KRW</option><option>TRY</option></select>
+            <div class="flex justify-end mt-4"><button id="savePayoutBtn" class="px-4 py-2 rounded-xl bg-white/10">Save</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-xl bg-white text-black"></div>
+
+  <script type="module">
+    import {
+      auth, db, storage,
+      onAuthStateChanged, signOut,
+      doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, getDocs, query, where, collection, orderBy, limit,
+      ref, uploadBytes, getDownloadURL
+    } from '/scripts/firebase.js';
+
+    // ===== Auth Guard & Host Verification =====
+    let currentUser = null;
+    let verifiedHost = false;
+    onAuthStateChanged(auth, async (u)=>{
+      if (!u) return location.href='/login.html';
+      currentUser = u;
+      document.getElementById('hostName').textContent = u.displayName || 'Host';
+      document.getElementById('welcomeName').textContent = u.displayName || 'Host';
+      document.getElementById('accEmail').value = u.email || '';
+
+      // role 확인
+      const usnap = await getDoc(doc(db,'users',u.uid));
+      const role = usnap.exists()? (usnap.data().role || 'guest') : 'guest';
+      if (role !== 'host') return location.href='/';
+      const hsnap = await getDoc(doc(db,'hosts',u.uid));
+      verifiedHost = hsnap.exists() && !!hsnap.data().verified;
+      if (!verifiedHost) return location.href='/host-register.html';
+
+      // 데이터 로딩 시작
+      boot();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async ()=>{ await signOut(auth); location.href='/'; });
+
+    // ===== View Switch =====
+    const views = {
+      overview: document.getElementById('view-overview'),
+      new: document.getElementById('view-new'),
+      listings: document.getElementById('view-listings'),
+      reservations: document.getElementById('view-reservations'),
+      earnings: document.getElementById('view-earnings'),
+      messages: document.getElementById('view-messages'),
+      account: document.getElementById('view-account'),
+    };
+    function setView(name){ for(const k in views){views[k].classList.remove('active')} (views[name]||views.overview).classList.add('active'); history.replaceState(null,'','#'+name); }
+    document.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click', e=> setView(e.currentTarget.getAttribute('data-nav'))));
+    const initial = location.hash?.replace('#',''); if (initial && views[initial]) setView(initial);
+
+    function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),1600); }
+
+    // ===== Data Boot =====
+    let listingsCache = [];
+    let resCache = [];
+
+    function boot(){
+      // Listings (real-time)
+      const lq = query(collection(db,'listings'), where('hostId','==',currentUser.uid), orderBy('createdAt','desc'));
+      onSnapshot(lq, snap=>{
+        listingsCache = snap.docs.map(d=>({id:d.id, ...d.data()}));
+        renderListings();
+        document.getElementById('statListings').textContent = listingsCache.filter(x=>x.status!=='Deleted').length;
+      });
+
+      // Reservations
+      const rq = query(collection(db,'reservations'), where('hostId','==',currentUser.uid), orderBy('checkIn','asc'));
+      onSnapshot(rq, snap=>{
+        resCache = snap.docs.map(d=>({id:d.id, ...d.data()}));
+        renderReservations();
+        document.getElementById('statCheckins').textContent = resCache.filter(r=>r.status!=='Cancelled').length;
+        // Recent in Overview
+        const box=document.getElementById('recentReservations'); box.innerHTML='';
+        resCache.slice(0,5).forEach(r=>{
+          const div=document.createElement('div');
+          div.className='flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-3';
+          div.innerHTML=`<div><div class='font-medium'>${r.guestName||'Guest'}</div><div class='text-white/60 text-sm'>${r.listingTitle||r.listingId} • ${r.checkIn} → ${r.checkOut}</div></div><div class='text-sm'>$${r.total||0} • <span class='${r.status==='Pending'?'text-yellow-300':r.status==='Confirmed'?'text-emerald-300':'text-red-300'}'>${r.status}</span></div>`;
+          box.appendChild(div);
+        });
+      });
+
+      // Payouts
+      const pq = query(collection(db,'payouts'), where('hostId','==',currentUser.uid), orderBy('date','desc'), limit(12));
+      onSnapshot(pq, snap=>{
+        const arr = snap.docs.map(d=>d.data());
+        const monthSum = arr.filter(p=> new Date(p.date).getMonth()=== new Date().getMonth()).reduce((s,p)=>s+(p.amount||0),0);
+        document.getElementById('earnMonth').textContent = `$${monthSum}`;
+        const pending = arr.filter(p=>p.status!=='Paid').reduce((s,p)=>s+(p.amount||0),0);
+        document.getElementById('earnPending').textContent = `$${pending}`;
+        const total = arr.reduce((s,p)=>s+(p.amount||0),0);
+        document.getElementById('earnTotal').textContent = `$${total}`;
+        const ul=document.getElementById('recentPayouts'); ul.innerHTML='';
+        arr.slice(0,5).forEach(p=>{ const li=document.createElement('li'); li.textContent=`${p.date} • $${p.amount} • ${p.status}`; ul.appendChild(li); });
+        const hist=document.getElementById('payoutHistory'); hist.innerHTML='';
+        arr.forEach(p=>{ const li=document.createElement('li'); li.className='rounded-xl border border-white/10 bg-white/5 p-3 flex items-center justify-between'; li.innerHTML=`<span>${p.date}</span><span>$${p.amount}</span><span class='text-white/60'>${p.status}</span>`; hist.appendChild(li); });
+        document.getElementById('statRevenue').textContent = `$${total}`;
+      });
+
+      // Messages count
+      const mq = query(collection(db,'messages'), where('participants','array-contains', currentUser.uid), orderBy('createdAt','desc'));
+      onSnapshot(mq, snap=>{
+        const box=document.getElementById('messageList'); box.innerHTML='';
+        let c=0;
+        snap.docs.slice(0,20).forEach(d=>{ const m=d.data(); c++; const div=document.createElement('div'); div.className='rounded-xl border border-white/10 bg-white/5 p-3 flex items-center justify-between'; div.innerHTML=`<div><div class='font-medium'>${m.fromName||'Guest'}</div><div class='text-white/60 text-sm'>${m.text}</div></div><div class='text-white/50 text-xs'>${new Date(m.createdAt).toLocaleString()}</div>`; box.appendChild(div); });
+        document.getElementById('statMessages').textContent = c;
+      });
+    }
+
+    // ===== New Listing =====
+    const photoInput = document.getElementById('photoInput');
+    const photoPreview = document.getElementById('photoPreview');
+    photoInput?.addEventListener('change', ()=>{ photoPreview.innerHTML=''; [...photoInput.files].forEach(file=>{ const url=URL.createObjectURL(file); const img=document.createElement('img'); img.src=url; img.className='w-full h-24 object-cover rounded-lg border border-white/10'; photoPreview.appendChild(img); }); });
+
+    document.getElementById('newListingForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const payload = Object.fromEntries(fd.entries());
+      const price = Number(payload.price||0);
+      const meta = {
+        title: payload.title, description: payload.description,
+        price, guests: Number(payload.guests||1), bedrooms: Number(payload.bedrooms||0), bathrooms: Number(payload.bathrooms||0),
+        address: payload.address,
+        hostId: currentUser.uid,
+        status: 'Active',
+        createdAt: Date.now(),
+        photos: []
+      };
+      // 1) 문서 생성(우선)
+      const refDoc = await addDoc(collection(db,'listings'), meta);
+      // 2) 사진 업로드
+      const files = photoInput.files;
+      const urls = [];
+      for (const file of files){
+        const sref = ref(storage, `listings/${currentUser.uid}/${refDoc.id}/${Date.now()}-${file.name}`);
+        await uploadBytes(sref, file);
+        const url = await getDownloadURL(sref); urls.push(url);
+      }
+      await updateDoc(refDoc, { photos: urls });
+      toast('Listing saved');
+      e.target.reset(); photoPreview.innerHTML=''; setView('listings');
+    });
+
+    // ===== Listings Table =====
+    const listingsTbody = document.getElementById('listingsTbody');
+    function renderListings(){
+      listingsTbody.innerHTML='';
+      listingsCache.forEach(l=>{
+        const tr=document.createElement('tr'); tr.className='border-b border-white/10';
+        tr.innerHTML=`<td class='py-3 pr-4'>${l.title} <span class='text-white/40'>#${l.id}</span></td>
+          <td class='py-3 pr-4'>${l.status}</td>
+          <td class='py-3 pr-4'>$${l.price}</td>
+          <td class='py-3 pr-4'>${l.bookings||0}</td>
+          <td class='py-3 pr-4 space-x-2'>
+            <button class='px-2 py-1 rounded-lg bg-white/10' data-act='toggle' data-id='${l.id}'>${l.status==='Active'?'Pause':'Activate'}</button>
+            <button class='px-2 py-1 rounded-lg bg-white/10' data-act='delete' data-id='${l.id}'>Delete</button>
+          </td>`;
+        listingsTbody.appendChild(tr);
+      });
+    }
+    listingsTbody.addEventListener('click', async (e)=>{
+      const btn=e.target.closest('button'); if(!btn) return; const id=btn.getAttribute('data-id'); const act=btn.getAttribute('data-act');
+      const item=listingsCache.find(x=>x.id===id); if(!item) return;
+      if (act==='toggle'){ await updateDoc(doc(db,'listings',id), { status: item.status==='Active'?'Inactive':'Active' }); toast('Listing status updated'); }
+      if (act==='delete'){ await updateDoc(doc(db,'listings',id), { status:'Deleted' }); toast('Listing deleted'); }
+    });
+
+    // ===== Reservations =====
+    const reservationsTbody = document.getElementById('reservationsTbody');
+    function renderReservations(){
+      reservationsTbody.innerHTML='';
+      resCache.forEach(r=>{
+        const tr=document.createElement('tr'); tr.className='border-b border-white/10';
+        tr.innerHTML=`<td class='py-3 pr-4'>${r.guestName||'Guest'}</td>
+          <td class='py-3 pr-4'>${r.listingTitle||r.listingId}</td>
+          <td class='py-3 pr-4'>${r.checkIn}</td>
+          <td class='py-3 pr-4'>${r.checkOut}</td>
+          <td class='py-3 pr-4'>$${r.total||0}</td>
+          <td class='py-3 pr-4'>${r.status}</td>
+          <td class='py-3 pr-4 space-x-2'>
+            <button class='px-2 py-1 rounded-lg bg-emerald-600/80' data-act='confirm' data-id='${r.id}'>Confirm</button>
+            <button class='px-2 py-1 rounded-lg bg-yellow-600/80' data-act='hold' data-id='${r.id}'>Hold</button>
+            <button class='px-2 py-1 rounded-lg bg-red-600/80' data-act='cancel' data-id='${r.id}'>Cancel</button>
+          </td>`;
+        reservationsTbody.appendChild(tr);
+      });
+    }
+    reservationsTbody.addEventListener('click', async (e)=>{
+      const btn=e.target.closest('button'); if(!btn) return; const id=btn.getAttribute('data-id'); const act=btn.getAttribute('data-act');
+      const status = act==='confirm'?'Confirmed': act==='hold'?'Pending':'Cancelled';
+      await updateDoc(doc(db,'reservations',id), { status });
+      toast('Reservation updated');
+    });
+
+    // ===== Account =====
+    document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
+      const name=document.getElementById('accName').value.trim();
+      await setDoc(doc(db,'users', currentUser.uid), { name }, { merge:true });
+      document.getElementById('hostName').textContent = name || (currentUser.displayName||'Host');
+      document.getElementById('welcomeName').textContent = document.getElementById('hostName').textContent;
+      toast('Profile saved');
+    });
+    document.getElementById('savePayoutBtn').addEventListener('click', async ()=>{ toast('Payout details saved (store in payouts_profile if needed)'); });
+  </script>
+</body>
+</html>
+```
+
+---
+**Firestore 보안 규칙 (Rules)**
+```txt
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isHost() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'host'; }
+    function isVerifiedHost() { return isHost() && (get(/databases/$(database)/documents/hosts/$(request.auth.uid)).data.verified == true); }
+
+    match /users/{uid} {
+      allow read: if isSignedIn() && uid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn() && uid == request.auth.uid;
+    }
+
+    match /hosts/{uid} {
+      allow read, create, update: if isSignedIn() && uid == request.auth.uid;
+    }
+
+    match /listings/{id} {
+      allow read: if true; // 공개 조회 허용
+      allow create: if isVerifiedHost() && request.resource.data.hostId == request.auth.uid;
+      allow update, delete: if isVerifiedHost() && resource.data.hostId == request.auth.uid;
+    }
+
+    match /reservations/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isVerifiedHost() || (isSignedIn() && request.auth.uid == resource.data.guestId);
+    }
+
+    match /payouts/{id} {
+      allow read: if isSignedIn() && resource.data.hostId == request.auth.uid;
+      allow create, update, delete: if false; // 서버/관리자만
+    }
+
+    match /messages/{id} {
+      allow read, create: if isSignedIn() && (request.auth.uid in request.resource.data.participants);
+      allow update, delete: if false;
+    }
+  }
+}
+```
+
+---
+**Storage 보안 규칙 (Rules)**
+```txt
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    // Listing photos — host 전용 경로
+    match /listings/{hostId}/{allPaths=**} {
+      allow read: if true; // 사진은 공개 조회
+      allow write: if isOwner(hostId);
+    }
+
+    // ID docs — 본인만 접근
+    match /ids/{uid}/{allPaths=**} {
+      allow read, write: if isOwner(uid);
+    }
+  }
+}
+```
+
+---
+**데이터 모델(컬렉션 요약)**
+- `users/{uid}`: { uid, email, name, role('host'|'guest'), createdAt }
+- `hosts/{uid}`: { uid, name, phone, idUrl, verified(bool), submittedAt }
+- `listings/{listingId}`: { hostId, title, description, price, guests, bedrooms, bathrooms, address, photos:[url], status('Active'|'Inactive'|'Deleted'), createdAt }
+- `reservations/{id}`: { hostId, guestId, listingId, listingTitle, guestName, checkIn, checkOut, total, status('Pending'|'Confirmed'|'Cancelled') }
+- `payouts/{id}`: { hostId, amount, status('Paid'|'Scheduled'|'Hold'), date }
+- `messages/{id}`: { participants:[uid], fromUid, fromName, toUid, text, createdAt }
+
+---
+**배포 체크리스트**
+1) Firebase 콘솔 → 프로젝트 설정 → **승인된 도메인**에 `stayworldbooking.com` / Netlify 프리뷰 도메인 추가
+2) Authentication → **이메일/비밀번호**, **Google** 활성화
+3) Firestore/Storage → 위 **Rules**로 교체 후 게시(Publish)
+4) `/scripts/firebase.js`의 **firebaseConfig 실제값**으로 교체
+5) Netlify 배포 후 `https://stayworldbooking.com/login.html` → 가입(호스트 체크) → `host-register.html`에서 신분증 업로드 → Firestore `hosts/{uid}.verified = true`로 수동 승인 → 대시보드 접근 확인
+
+필요하면 관리자 승인 화면도 뒤이어 만들어 드리겠습니다.
