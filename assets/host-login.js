@@ -15,19 +15,19 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// 이메일 로그인
+// ✅ 호스트 로그인
 document.getElementById("hostLoginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("hostLoginEmail").value.trim();
   const pw = document.getElementById("hostLoginPw").value.trim();
 
-  if (!email || !pw) {
-    alert("이메일과 비밀번호를 입력하세요.");
-    return;
-  }
-
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pw);
+    localStorage.setItem("sw_logged_in", "true");
+    localStorage.setItem("sw_user_email", cred.user.email);
+
+    if (window.markLoggedIn) window.markLoggedIn();
+
     alert(`호스트 로그인 성공! 🎉\n환영합니다, ${cred.user.email} 님`);
     window.location.href = "host-dashboard.html";
   } catch (err) {
@@ -35,7 +35,7 @@ document.getElementById("hostLoginForm")?.addEventListener("submit", async (e) =
   }
 });
 
-// 구글 로그인 (중복 클릭 방지 포함)
+// ✅ 구글 호스트 로그인
 let isGoogleSigningIn = false;
 document.getElementById("hostGoogleLogin")?.addEventListener("click", async () => {
   if (isGoogleSigningIn) return;
@@ -43,6 +43,11 @@ document.getElementById("hostGoogleLogin")?.addEventListener("click", async () =
 
   try {
     const cred = await signInWithPopup(auth, provider);
+    localStorage.setItem("sw_logged_in", "true");
+    localStorage.setItem("sw_user_email", cred.user.email);
+
+    if (window.markLoggedIn) window.markLoggedIn();
+
     alert(`Google 호스트 로그인 완료! 🎉\n환영합니다, ${cred.user.email} 님`);
     window.location.href = "host-dashboard.html";
   } catch (err) {
