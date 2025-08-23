@@ -17,7 +17,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// ✅ 이메일로 호스트 가입
+// ✅ 이메일 호스트 가입
 document.getElementById("hostEmailSignup")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = hostName.value.trim();
@@ -47,26 +47,28 @@ document.getElementById("hostEmailSignup")?.addEventListener("submit", async (e)
   }
 });
 
-// ✅ 구글로 호스트 가입
-document.getElementById("hostGoogleSignup")?.addEventListener("click", async () => {
-  try {
-    const cred = await signInWithPopup(auth, provider);
+// ✅ 구글 호스트 가입
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("hostGoogleSignup")?.addEventListener("click", async () => {
+    try {
+      const cred = await signInWithPopup(auth, provider);
 
-    await setDoc(doc(db, "hosts", cred.user.uid), {
-      uid: cred.user.uid,
-      email: cred.user.email,
-      displayName: cred.user.displayName || "",
-      verified: true,
-      createdAt: new Date().toISOString()
-    }, { merge: true });
+      await setDoc(doc(db, "hosts", cred.user.uid), {
+        uid: cred.user.uid,
+        email: cred.user.email,
+        displayName: cred.user.displayName || "",
+        verified: true,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
 
-    localStorage.setItem("sw_logged_in", "true");
-    localStorage.setItem("sw_user_email", cred.user.email);
-    if (window.markLoggedIn) window.markLoggedIn();
+      localStorage.setItem("sw_logged_in", "true");
+      localStorage.setItem("sw_user_email", cred.user.email);
+      if (window.markLoggedIn) window.markLoggedIn();
 
-    alert(`Google 호스트 가입 완료! 🎉\n환영합니다, ${cred.user.email} 님\n이제 신분증을 업로드해주세요.`);
-    location.href = "host-id.html";
-  } catch (err) {
-    alert("Google 호스트 가입 실패: " + err.message);
-  }
+      alert(`Google 호스트 가입 완료! 🎉\n환영합니다, ${cred.user.email} 님\n이제 신분증을 업로드해주세요.`);
+      location.href = "host-id.html";
+    } catch (err) {
+      alert("Google 호스트 가입 실패: " + err.message);
+    }
+  });
 });
