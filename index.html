@@ -769,23 +769,101 @@
 
   <!-- 로그인 모달(있다면) -->
   <script src="/assets/login-modal.js"></script>
+   <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container"><small data-i18n="footer_copy">© StayWorld — stayworldbooking.com</small></div>
+  </footer>
+
+  <!-- AUTH UI: 네비의 Login/Logout 전환 -->
   <script>
-  // 호스트 드롭다운 클릭 토글 (모바일용)
-  const hostMenu = document.getElementById('hostMenu');
-  if (hostMenu) {
-    const toggle = hostMenu.querySelector('.dropdown-toggle');
-    let hideTimer;
-    toggle?.addEventListener('click', (e)=>{
-      e.preventDefault();
-      hostMenu.classList.toggle('open');
+    document.addEventListener("DOMContentLoaded", () => {
+      const link = document.getElementById("navAuthLink");
+      const adminMenu = document.getElementById("adminMenu");
+
+      function toLoginUI() {
+        link.setAttribute("data-i18n", "nav_login");
+        link.textContent = "Login";
+        link.href = "login.html";
+        link.onclick = null;
+        applyI18NPage?.();
+      }
+
+      function toLogoutUI() {
+        link.setAttribute("data-i18n", "nav_logout");
+        link.textContent = "Logout";
+        link.href = "#";
+        link.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();   // ✅ 로그인 정보 전체 초기화
+          alert("로그아웃 되었습니다.");
+          toLoginUI();
+          updateRoleMenus();
+          location.href = "/";
+        };
+        applyI18NPage?.();
+      }
+
+      // 외부 JS (signup.js / login.js / host-login.js / admin-login.js) 에서 호출
+      window.markLoggedIn = function (role="user") {
+        localStorage.setItem("sw_logged_in", "true");
+        localStorage.setItem("sw_user_role", role);   // ✅ 역할 저장
+        toLogoutUI();
+        updateRoleMenus();
+      };
+
+      window.markLoggedOut = function () {
+        localStorage.clear();
+        toLoginUI();
+        updateRoleMenus();
+      };
+
+      // --- Host & Admin 메뉴 표시 제어 ---
+      function updateRoleMenus() {
+        const role = localStorage.getItem("sw_user_role");
+        const signedIn = localStorage.getItem("sw_logged_in") === "true";
+
+        // Host 메뉴
+        const hostPanel = document.querySelector("#hostMenu .dropdown-panel");
+        if (hostPanel) {
+          hostPanel.querySelectorAll("[data-host-visible]").forEach(el => el.style.display="none");
+          if (!signedIn) {
+            hostPanel.querySelectorAll('[data-host-visible="signedOut"]').forEach(el=>el.style.display="block");
+          } else if (role === "host") {
+            hostPanel.querySelectorAll('[data-host-visible="hostOnly"]').forEach(el=>el.style.display="block");
+          }
+        }
+
+        // Admin 메뉴
+        if (adminMenu) {
+          adminMenu.style.display = (role==="admin") ? "block" : "none";
+        }
+      }
+      window.updateRoleMenus = updateRoleMenus;
+
+      // 초기 UI 반영
+      if (localStorage.getItem("sw_logged_in") === "true") toLogoutUI();
+      else toLoginUI();
+      updateRoleMenus();
+
+      // Host 로그아웃 버튼
+      const hostLogout = document.getElementById("hostLogoutBtn");
+      hostLogout?.addEventListener("click", (e)=>{
+        e.preventDefault();
+        localStorage.clear();
+        alert("호스트 로그아웃 되었습니다.");
+        toLoginUI();
+        updateRoleMenus();
+        location.href = "/";
+      });
     });
-    // 마우스가 벗어날 때 약간의 지연 후 닫기(실수 방지)
-    hostMenu.addEventListener('mouseleave', ()=>{
-      hideTimer = setTimeout(()=>hostMenu.classList.remove('open'), 180);
-    });
-    hostMenu.addEventListener('mouseenter', ()=> clearTimeout(hideTimer));
-  }
-</script>
+  </script>
+
+  <!-- 사이트 공통 인증 브리지 -->
+  <script src="/assets/auth-bridge.js"></script>
+  <script src="/assets/login-modal.js"></script>
+</body>
+</html>
+
 <!-- ... (본문 및 다른 스크립트 동일 유지) ... -->
 
 <!-- 사이트 공통 인증 브리지 (반드시 마지막에, defer 없이 일반 include 권장) -->
