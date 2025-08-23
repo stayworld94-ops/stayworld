@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STAYWORLD — Luxury Global Reach</title>
+
+  <!-- Leaflet (지도) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
+  <!-- 통합 CSS -->
+  <style>
+    :root{--bg:#0b0f16;--panel:#101018;--text:#e7e9ee;--muted:#cfd6e6;--line:rgba(255,255,255,.08);--chip:#121a26;--gold1:#f4d78c;--gold2:#c9a35b}
+    *{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;line-height:1.5}
+    a{color:inherit;text-decoration:none}.container{max-width:1120px;margin:0 auto;padding:0 16px}
+    img{max-width:100%;display:block}
+
+    /* Header */
+    .site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
+    .brand{display:flex;align-items:center;gap:10px}.brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+    .brand-text{font-weight:800;letter-spacing:.6px}
+    .main-nav{display:flex;gap:28px;justify-content:center;flex:1}
+    .header-cta{display:flex;align-items:center;gap:12px}
+    .lang-label{font-size:12px;opacity:.7}
+    .lang-select{appearance:none;background:#101826;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:8px 32px 8px 10px}
+    .btn{border:0;padding:10px 14px;border-radius:12px;cursor:pointer}
+    .btn-ghost{background:transparent;color:#cfcfcf}.btn-ghost:hover{background:rgba(255,255,255,.06)}
+    .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
+    .btn-chip{background:var(--chip);color:#dfe3ea;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+
+    /* ---- Host dropdown (추가) ---- */
+    .nav-item.dropdown{position:relative}
+    .nav-link.dropdown-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;font-weight:600;opacity:.95}
+    /* 수정본 */
+.dropdown-panel{
+  position:absolute;
+  top:100%;                 /* 버튼에 딱 붙여서 간격 제거 */
+  left:50%;
+  transform:translate(-50%, 8px);  /* 자연스럽게 아래로 8px 내려 보이게 */
+  min-width:220px;
+  background:#0f1520;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:8px;
+  z-index:30;
+  box-shadow:0 16px 40px rgba(0,0,0,.45);
+
+  /* 보였다/사라졌다 부드럽게 (display 대신 visibility/opacity 사용) */
+  visibility:hidden;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .12s ease, transform .12s ease, visibility .12s;
+}
+
+/* 호버/포커스/열림 상태에서 보여주기 */
+.nav-item.dropdown:hover .dropdown-panel,
+.nav-item.dropdown:focus-within .dropdown-panel,
+.nav-item.dropdown.open .dropdown-panel{
+  visibility:visible;
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%, 0);
+}
+
+    .dropdown-item{display:block;padding:10px 12px;border-radius:8px;color:#e7e9ee;text-decoration:none;white-space:nowrap}
+    .dropdown-item:hover{background:#121a26}
+    .dropdown-divider{height:1px;background:var(--line);margin:6px 0}
+
+    /* Hero */
+    .hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
+    .hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}.accent{color:#f1cf84}
+    .hero-sub{opacity:.85;margin:8px 0 28px}
+    .search-bar{display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;gap:10px;align-items:center}
+    .input{background:#0f1621;border:1px solid var(--line);color:var(--text);padding:12px 14px;border-radius:12px}
+    .input::placeholder{color:#a7b0bf}
+    .search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
+    .btn.loading{opacity:.65;pointer-events:none}
+
+    /* 카드 */
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+    .card{background:#0f1420;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+    .card h3{margin:0 0 6px}.card p{margin:0;opacity:.85}
+
+    /* Map */
+    .map-section{padding:36px 0 60px
+                <!-- [ADD] MY PAGE — 찜 리스트 + 지도(별마커) -->
+<section id="mypage" class="sw-section" style="display:none">
+  <div class="container">
+    <h2>My Page · Favorites ⭐</h2>
+    <div class="mypage-panels">
+      <div class="fav-list card">
+        <h3>My Favorites</h3>
+        <div id="favList"></div>
+      </div>
+      <div class="fav-map card">
+        <div id="favMap"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
+    .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
+
+    /* 필터 드로어 */
+    #filterDrawer{position:fixed;inset:0;display:none;z-index:2147483637;align-items:stretch;justify-content:flex-end}
+    #filterDrawer[aria-hidden="false"]{display:flex}
+    #filterDrawer .back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+    #filterDrawer .panel{position:relative;margin-left:auto;width:min(780px,92vw);max-height:92vh;overflow:auto;background:var(--panel);border-left:1px solid var(--line);border-top-left-radius:16px;border-bottom-left-radius:16px;display:flex;flex-direction:column}
+    #filterDrawer .head,#filterDrawer .foot{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+    #filterDrawer .foot{border-bottom:0;border-top:1px solid var(--line)}
+    #filterGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px}
+    #filterDrawer .box{background:#0f1420;border:1px solid var(--line);border-radius:12px;padding:12px}
+    #filterDrawer h4{margin:0 0 8px;font-size:14px}
+    .sw-badge{position:absolute;top:-8px;right:-8px;background:#ffd36e;color:#1a1205;border-radius:999px;font-size:11px;padding:2px 6px}
+
+    /* 챗봇 */
+    #chatFab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;z-index:2147483639;background:linear-gradient(180deg,var(--gold1),var(--gold2));box-shadow:0 14px 30px rgba(201,163,91,.35);font-size:22px}
+    #botPanel{position:fixed;right:20px;bottom:86px;width:min(360px,88vw);height:480px;background:#101018;border:1px solid #23232b;border-radius:16px;z-index:2147483638;display:none;box-shadow:0 20px 60px rgba(0,0,0,.5);color:var(--text)}
+    #botPanel .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
+    #botPanel .body{height:360px;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+    #botPanel .row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+    #botInput{flex:1;background:#0f1621;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px}
+    #botSend{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#1a1205;font-weight:700}
+    .msg{max-width:80%;padding:10px 12px;border-radius:12px}.me{align-self:flex-end;background:#132132}.ai{align-self:flex-start;background:#121820}
+
+    /* Footer */
+    .site-footer{padding:28px 0;border-top:1px solid var(--line);opacity:.8}
+
+    /* Responsive */
+    @media (max-width:920px){.main-nav{display:none}.hero-title{font-size:40px}.search-bar{grid-template-columns:1fr 1fr 1fr auto}}
+    @media (max-width:640px){.hero-title{font-size:34px}.features{grid-template-columns:1fr}}
+  </style>
+</head>
+
+<body>
+  <!-- HEADER -->
+  ... (이후 전체 본문 유지) ...
+</body>
+</html>
