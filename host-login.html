@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <title>Host Login — StayWorld</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles/style.css?v=1">
+
+  <script src="assets/load-css.js"></script>
 </head>
 <body>
-  <main class="container" style="padding:60px 0; max-width:520px;">
+  <main class="container" style="max-width:520px; padding:60px 0;">
     <h1>Host Login</h1>
 
-    <form id="hostLoginForm" style="display:grid; gap:14px; margin-top:16px;">
-      <label>이메일</label>
+    <form id="hostLoginForm" style="display:grid; gap:14px;">
+      <label for="hostLoginEmail">이메일</label>
       <input id="hostLoginEmail" class="input" type="email" placeholder="you@example.com" required>
-      <label>비밀번호</label>
+      <label for="hostLoginPw">비밀번호</label>
       <input id="hostLoginPw" class="input" type="password" placeholder="********" required>
       <button class="btn btn-gold" type="submit">로그인</button>
     </form>
