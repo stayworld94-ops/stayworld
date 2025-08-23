@@ -717,3 +717,246 @@ service firebase.storage {
 5) Netlify 배포 후 `https://stayworldbooking.com/login.html` → 가입(호스트 체크) → `host-register.html`에서 신분증 업로드 → Firestore `hosts/{uid}.verified = true`로 수동 승인 → 대시보드 접근 확인
 
 필요하면 관리자 승인 화면도 뒤이어 만들어 드리겠습니다.
+
+
+---
+**/admin-dashboard.html**  (관리자 전용: 호스트 검수/승인, 페ayout 생성)
+```html
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld — Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>.view{display:none}.view.active{display:block}</style>
+</head>
+<body class="bg-[#0b0f16] text-white min-h-screen">
+  <header class="sticky top-0 z-30 backdrop-blur bg-black/40 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="font-semibold">STAYWORLD • <span class="text-white/60">Admin Console</span></div>
+      <nav class="hidden md:flex gap-3">
+        <button data-nav="hosts" class="px-3 py-2 rounded-xl hover:bg-white/10">Host Reviews</button>
+        <button data-nav="payouts" class="px-3 py-2 rounded-xl hover:bg-white/10">Payouts</button>
+        <button data-nav="search" class="px-3 py-2 rounded-xl hover:bg-white/10">Search</button>
+      </nav>
+      <div class="flex items-center gap-3">
+        <span id="adminName" class="text-sm text-white/70">Admin</span>
+        <button id="logoutBtn" class="px-3 py-2 rounded-xl bg-white/10">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <section class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <h1 class="text-2xl md:text-3xl font-bold">Welcome, <span id="welcomeName">Admin</span> 🔐</h1>
+      <p class="text-white/60 text-sm">Approve hosts, and manage payouts.</p>
+    </section>
+
+    <!-- HOST REVIEWS -->
+    <section id="view-hosts" class="view active">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Pending host verifications</h2>
+          <div class="text-white/60 text-sm">Only admins can access</div>
+        </div>
+        <div id="hostList" class="mt-4 grid md:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- PAYOUTS -->
+    <section id="view-payouts" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h2 class="text-xl font-semibold">Create payout</h2>
+        <form id="payoutForm" class="grid md:grid-cols-4 gap-3 mt-3">
+          <input id="pHostId" placeholder="Host UID" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10 md:col-span-2" required>
+          <input id="pAmount" type="number" min="0" placeholder="Amount" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+          <select id="pStatus" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10">
+            <option>Scheduled</option>
+            <option>Paid</option>
+            <option>Hold</option>
+          </select>
+          <button class="px-3 py-2 rounded-xl bg-white text-black font-semibold">Save</button>
+        </form>
+        <div id="payoutMsg" class="text-white/70 text-sm mt-2"></div>
+      </div>
+    </section>
+
+    <!-- SEARCH / QUICK TOOLS -->
+    <section id="view-search" class="view">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h2 class="text-xl font-semibold">Quick search</h2>
+        <form id="srchForm" class="grid md:grid-cols-3 gap-3 mt-3">
+          <input id="qEmail" placeholder="User email" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10">
+          <input id="qUid" placeholder="User UID" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10">
+          <button class="px-3 py-2 rounded-xl bg-white text-black font-semibold">Find</button>
+        </form>
+        <div id="srchOut" class="mt-3 text-sm text-white/80"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-xl bg-white text-black"></div>
+
+  <script type="module">
+    import {
+      auth, db,
+      onAuthStateChanged, signOut,
+      doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, getDocs, query, where, collection, orderBy,
+      serverTimestamp
+    } from '/scripts/firebase.js';
+
+    // ===== Admin Guard =====
+    let currentUser=null;
+    onAuthStateChanged(auth, async (u)=>{
+      if (!u) return location.href='/login.html';
+      currentUser=u;
+      document.getElementById('adminName').textContent = u.displayName || 'Admin';
+      document.getElementById('welcomeName').textContent = u.displayName || 'Admin';
+
+      const usnap = await getDoc(doc(db,'users',u.uid));
+      const role = usnap.exists()? (usnap.data().role||'guest') : 'guest';
+      if (role!=='admin') return location.href='/';
+
+      // Load pending hosts
+      loadPendingHosts();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async ()=>{ await signOut(auth); location.href='/'; });
+
+    // Nav
+    const views={hosts:document.getElementById('view-hosts'), payouts:document.getElementById('view-payouts'), search:document.getElementById('view-search')};
+    function setView(name){ for(const k in views){views[k].classList.remove('active')} (views[name]||views.hosts).classList.add('active'); history.replaceState(null,'','#'+name); }
+    document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',e=>setView(e.currentTarget.getAttribute('data-nav'))));
+    const initial=location.hash?.replace('#',''); if(initial&&views[initial]) setView(initial);
+
+    function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),1600); }
+
+    // ===== Host Reviews =====
+    async function loadPendingHosts(){
+      const list=document.getElementById('hostList'); list.innerHTML='';
+      const qref = query(collection(db,'hosts'), where('verified','==', false), orderBy('submittedAt','desc'));
+      const snap = await getDocs(qref);
+      if (snap.empty){ list.innerHTML = '<div class="text-white/60">No pending hosts.</div>'; return; }
+      snap.forEach(d=>{
+        const h=d.data();
+        const card=document.createElement('div');
+        card.className='rounded-xl border border-white/10 bg-white/5 p-4';
+        card.innerHTML=`<div class='flex items-start justify-between gap-3'>
+            <div>
+              <div class='font-semibold'>${h.name||'(no name)'} <span class='text-white/40'>#${d.id}</span></div>
+              <div class='text-white/60 text-sm mt-1'>${h.phone||''}</div>
+              <div class='text-white/60 text-sm mt-1'><a class='underline' href='${h.idUrl}' target='_blank' rel='noopener'>View ID</a></div>
+            </div>
+            <div class='flex gap-2'>
+              <button class='px-3 py-2 rounded-xl bg-emerald-500/90' data-act='approve' data-id='${d.id}'>Approve</button>
+              <button class='px-3 py-2 rounded-xl bg-red-500/90' data-act='reject' data-id='${d.id}'>Reject</button>
+            </div>
+          </div>`;
+        list.appendChild(card);
+      });
+
+      list.addEventListener('click', async (e)=>{
+        const btn=e.target.closest('button'); if(!btn) return;
+        const id=btn.getAttribute('data-id'); const act=btn.getAttribute('data-act');
+        if (act==='approve'){
+          await updateDoc(doc(db,'hosts',id), { verified:true, reviewedAt: Date.now(), reviewedBy: currentUser.uid });
+          await setDoc(doc(db,'users',id), { role:'host' }, { merge:true });
+          toast('Host approved'); loadPendingHosts();
+        }
+        if (act==='reject'){
+          await updateDoc(doc(db,'hosts',id), { verified:false, reviewedAt: Date.now(), reviewedBy: currentUser.uid, reason:'rejected' });
+          toast('Host rejected'); loadPendingHosts();
+        }
+      }, { once:true });
+    }
+
+    // ===== Payouts =====
+    document.getElementById('payoutForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const hostId=document.getElementById('pHostId').value.trim();
+      const amount=Number(document.getElementById('pAmount').value||0);
+      const status=document.getElementById('pStatus').value;
+      await setDoc(doc(collection(db,'payouts')), { hostId, amount, status, date: new Date().toISOString(), createdAt: serverTimestamp(), createdBy: currentUser.uid });
+      document.getElementById('payoutMsg').textContent = 'Payout saved.';
+      e.target.reset();
+    });
+
+    // ===== Quick Search =====
+    document.getElementById('srchForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email=document.getElementById('qEmail').value.trim();
+      const uid=document.getElementById('qUid').value.trim();
+      let out='';
+      if (uid){
+        const us=await getDoc(doc(db,'users',uid));
+        out += us.exists()? JSON.stringify(us.data(), null, 2) : 'No user';
+      }
+      if (email){
+        // users 컬렉션에 email 색인 필요(또는 auth admin API). 여기서는 간단 안내만.
+        out += (out?'
+
+':'') + 'Tip: Add Firestore index on users.email to query by email.';
+      }
+      document.getElementById('srchOut').textContent = out || 'Enter UID or email.';
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+**업데이트된 Firestore Rules (Admin 권한 포함)**
+```txt
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function userDoc(uid) { return get(/databases/$(database)/documents/users/$(uid)); }
+    function isAdmin() { return isSignedIn() && userDoc(request.auth.uid).data.role == 'admin'; }
+    function isHost() { return isSignedIn() && userDoc(request.auth.uid).data.role == 'host'; }
+    function isVerifiedHost() { return isHost() && (get(/databases/$(database)/documents/hosts/$(request.auth.uid)).data.verified == true); }
+
+    match /users/{uid} {
+      allow read: if isSignedIn() && uid == request.auth.uid || isAdmin();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn() && uid == request.auth.uid || isAdmin();
+    }
+
+    match /hosts/{uid} {
+      allow read: if isSignedIn() && (uid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && uid == request.auth.uid;
+      allow update: if (isSignedIn() && uid == request.auth.uid) || isAdmin();
+    }
+
+    match /listings/{id} {
+      allow read: if true;
+      allow create: if isVerifiedHost() && request.resource.data.hostId == request.auth.uid;
+      allow update, delete: if (isVerifiedHost() && resource.data.hostId == request.auth.uid) || isAdmin();
+    }
+
+    match /reservations/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isAdmin() || isVerifiedHost() || (isSignedIn() && request.auth.uid == resource.data.guestId);
+    }
+
+    match /payouts/{id} {
+      allow read: if isSignedIn() && (resource.data.hostId == request.auth.uid || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /messages/{id} {
+      allow read, create: if isSignedIn() && (request.auth.uid in request.resource.data.participants || request.auth.uid in resource.data.participants);
+      allow update, delete: if false;
+    }
+  }
+}
+```
+
+---
+**관리자 지정 방법**
+- 간단: Firestore에서 수동으로 `users/{adminUid}.role = 'admin'` 설정 (콘솔로 1회 세팅)
+- 필요 시 전용 **admin-setup.html** 만들어 최초 1회만 실행하도록 해줄 수도 있음(보안상 URL/조건 제한 권장)
+
+이제 `/admin-dashboard.html`로 접속하면, `users.role === 'admin'` 계정만 접근하고 **대기 중 호스트 목록**이 뜨고, **Approve/Reject** 버튼으로 `hosts/{uid}.verified`를 업데이트합니다. 또한 **Payouts** 탭에서 특정 호스트에게 지급건을 생성할 수 있어요.
