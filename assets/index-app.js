@@ -1,62 +1,130 @@
-document.addEventListener("DOMContentLoaded", ()=>{
+// assets/index-app.js
 
-  /* 지도 */
-  let map = L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+document.addEventListener("DOMContentLoaded", () => {
+  /* ---------------- Filters Drawer ---------------- */
+  const drawer = document.getElementById("filterDrawer");
+  const btnFilters = document.getElementById("btnFilters");
+
+  btnFilters?.addEventListener("click", () => {
+    drawer.setAttribute("aria-hidden", "false");
+  });
+  document.querySelector("#filterDrawer .drawer-backdrop")
+    ?.addEventListener("click", () => drawer.setAttribute("aria-hidden","true"));
+  document.getElementById("closeFilter")
+    ?.addEventListener("click", () => drawer.setAttribute("aria-hidden","true"));
+  document.getElementById("resetFilter")
+    ?.addEventListener("click", () => {
+      drawer.querySelectorAll("input").forEach(i => i.checked = false);
+    });
+  document.getElementById("applyFilter")
+    ?.addEventListener("click", () => {
+      alert("필터 적용됨 ✅");
+      drawer.setAttribute("aria-hidden","true");
+    });
+
+  /* ---------------- Search + AutoComplete ---------------- */
+  const searchInput = document.getElementById("searchDestination");
+  const statusEl = document.getElementById("searchStatus");
+  let map = L.map("map").setView([48.8566, 2.3522], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:'&copy; OpenStreetMap'
+  }).addTo(map);
   let marker;
 
-  function goTo(lat,lon,label){
-    if(marker) marker.remove();
-    marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup();
-    map.setView([lat,lon],13);
+  async function geocode(q) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`;
+    const r = await fetch(url);
+    const data = await r.json();
+    return data.map(d => ({
+      label:d.display_name,
+      lat:+d.lat,
+      lon:+d.lon
+    }));
   }
 
-  /* 검색 + 미리보기 */
-  const input=document.getElementById("searchDestination");
-  const sugg=document.getElementById("searchSuggestions");
-  input.addEventListener("input", async ()=>{
-    const q=input.value.trim();
-    sugg.innerHTML="";
-    if(!q) return;
-    try{
-      const url=`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`;
-      const r=await fetch(url);
-      const data=await r.json();
-      data.forEach(item=>{
-        const div=document.createElement("div");
-        div.className="sugg-item";
-        div.textContent=item.display_name;
-        div.onclick=()=>{
-          goTo(+item.lat,+item.lon,item.display_name);
-          input.value=item.display_name;
-          sugg.innerHTML="";
-        };
-        sugg.appendChild(div);
+  async function runSearch() {
+    const q = searchInput.value.trim();
+    if (!q) return;
+    statusEl.textContent = "Searching…"; statusEl.style.opacity=1;
+    try {
+      const results = await geocode(q);
+      if(results[0]){
+        if(marker) marker.remove();
+        marker = L.marker([results[0].lat, results[0].lon]).addTo(map)
+          .bindPopup(results[0].label).openPopup();
+        map.setView([results[0].lat, results[0].lon], 13);
+        statusEl.textContent = `Found: ${results[0].label}`;
+      } else {
+        statusEl.textContent = "No results";
+      }
+    } catch(e){ statusEl.textContent = "Error"; }
+    setTimeout(()=>statusEl.style.opacity=0,3000);
+  }
+  document.getElementById("btnSearch")?.addEventListener("click", runSearch);
+
+  // AutoComplete preview
+  const acBox = document.createElement("div");
+  acBox.style.position="absolute"; acBox.style.background="#101018"; acBox.style.color="#fff";
+  acBox.style.zIndex="2000"; acBox.style.width="100%"; acBox.style.maxHeight="200px";
+  acBox.style.overflowY="auto"; acBox.style.border="1px solid rgba(255,255,255,.1)";
+  acBox.style.display="none";
+  searchInput.parentNode.style.position="relative";
+  searchInput.parentNode.appendChild(acBox);
+
+  searchInput.addEventListener("input", async (e)=>{
+    const q=e.target.value.trim();
+    if(q.length<2){ acBox.style.display="none"; return;}
+    const results = await geocode(q);
+    acBox.innerHTML="";
+    results.forEach(r=>{
+      const item=document.createElement("div");
+      item.textContent=r.label;
+      item.style.padding="6px 10px";
+      item.style.cursor="pointer";
+      item.addEventListener("click",()=>{
+        searchInput.value=r.label;
+        runSearch();
+        acBox.style.display="none";
       });
-    }catch(e){}
+      acBox.appendChild(item);
+    });
+    acBox.style.display=results.length?"block":"none";
   });
 
-  document.getElementById("btnSearch").addEventListener("click", async ()=>{
-    const q=input.value.trim();
-    if(!q) return;
-    const url=`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
-    const r=await fetch(url); const d=await r.json();
-    if(d[0]) goTo(+d[0].lat,+d[0].lon,d[0].display_name);
-    else alert("검색 결과 없음");
-  });
+  /* ---------------- Chatbot ---------------- */
+  const fab=document.getElementById("chatFab");
+  const panel=document.getElementById("botPanel");
+  const input=document.getElementById("botInput");
+  const send=document.getElementById("botSend");
+  const body=document.getElementById("botBody");
+  const msgs=[];
 
-  /* 필터 Drawer */
-  document.getElementById("btnFilters").addEventListener("click", ()=>{
-    let d=document.getElementById("filterDrawer");
-    if(!d){
-      d=document.createElement("div"); d.id="filterDrawer";
-      d.innerHTML=`<div class="back"></div>
-      <div class="panel"><div class="head"><h3>Filters</h3><button id="closeF">X</button></div>
-      <div style="padding:20px">필터 옵션들 (Wi-Fi, 가격, 평점...)</div></div>`;
-      document.body.appendChild(d);
-      d.querySelector(".back").onclick=()=>d.remove();
-      d.querySelector("#closeF").onclick=()=>d.remove();
-    }
-  });
+  const add=(txt,me)=>{
+    const d=document.createElement("div");
+    d.className=`sw-bot-msg ${me?"me":"ai"}`;
+    d.textContent=txt; body.appendChild(d); body.scrollTop=body.scrollHeight;
+  };
 
+  async function askAI(message,lang){
+    try{
+      const r=await fetch("/.netlify/functions/sw-chat",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({messages:[...msgs,{role:"user",content:message}],lang})
+      });
+      const d=await r.json();
+      return d.reply||"(no reply)";
+    }catch(_){return "(server error)";}
+  }
+
+  async function sendIt(){
+    const v=input.value.trim(); if(!v) return;
+    add(v,true); msgs.push({role:"user",content:v}); input.value="";
+    add("…",false); const dots=body.lastChild;
+    const reply=await askAI(v,(document.getElementById("lang").value||"EN").toLowerCase());
+    dots.remove(); add(reply,false); msgs.push({role:"assistant",content:reply});
+  }
+
+  send?.addEventListener("click",sendIt);
+  input?.addEventListener("keydown",e=>{if(e.key==="Enter") sendIt();});
+  fab?.addEventListener("click",()=>{panel.hidden=!panel.hidden;});
 });
