@@ -1,8 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getAuth, createUserWithEmailAndPassword, updateProfile,
-  GoogleAuthProvider, signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -20,17 +17,12 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// 이메일 호스트 가입
-document.getElementById("hostRegisterForm")?.addEventListener("submit", async (e) => {
+// ✅ 이메일로 호스트 가입
+document.getElementById("hostEmailSignup")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("hostName").value.trim();
-  const email = document.getElementById("hostEmail").value.trim();
-  const pw = document.getElementById("hostPw").value.trim();
-
-  if (!email || !pw) {
-    alert("이메일과 비밀번호를 입력하세요.");
-    return;
-  }
+  const name = hostName.value.trim();
+  const email = hostEmail.value.trim();
+  const pw = hostPw.value.trim();
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pw);
@@ -40,23 +32,23 @@ document.getElementById("hostRegisterForm")?.addEventListener("submit", async (e
       uid: cred.user.uid,
       email: cred.user.email,
       displayName: name || cred.user.displayName || "",
-      verified: false,
+      verified: true,
       createdAt: new Date().toISOString()
-    });
+    }, { merge: true });
 
-    alert(`호스트 가입 완료! 🎉\n가입 이메일: ${cred.user.email}\n\n신분증을 업로드해주세요.`);
-    window.location.href = "host-id.html";
+    localStorage.setItem("sw_logged_in", "true");
+    localStorage.setItem("sw_user_email", cred.user.email);
+    if (window.markLoggedIn) window.markLoggedIn();
+
+    alert(`호스트 가입 완료! 🎉\n환영합니다, ${cred.user.email} 님\n이제 신분증을 업로드해주세요.`);
+    location.href = "host-id.html";
   } catch (err) {
     alert("호스트 가입 실패: " + err.message);
   }
 });
 
-// 구글 호스트 가입
-let isGoogleRegistering = false;
-document.getElementById("hostGoogleRegister")?.addEventListener("click", async () => {
-  if (isGoogleRegistering) return;
-  isGoogleRegistering = true;
-
+// ✅ 구글로 호스트 가입
+document.getElementById("hostGoogleSignup")?.addEventListener("click", async () => {
   try {
     const cred = await signInWithPopup(auth, provider);
 
@@ -64,15 +56,17 @@ document.getElementById("hostGoogleRegister")?.addEventListener("click", async (
       uid: cred.user.uid,
       email: cred.user.email,
       displayName: cred.user.displayName || "",
-      verified: false,
+      verified: true,
       createdAt: new Date().toISOString()
-    });
+    }, { merge: true });
 
-    alert(`Google 호스트 가입 완료! 🎉\n가입 이메일: ${cred.user.email}\n\n신분증을 업로드해주세요.`);
-    window.location.href = "host-id.html";
+    localStorage.setItem("sw_logged_in", "true");
+    localStorage.setItem("sw_user_email", cred.user.email);
+    if (window.markLoggedIn) window.markLoggedIn();
+
+    alert(`Google 호스트 가입 완료! 🎉\n환영합니다, ${cred.user.email} 님\n이제 신분증을 업로드해주세요.`);
+    location.href = "host-id.html";
   } catch (err) {
-    alert("Google 가입 오류: " + err.message);
-  } finally {
-    isGoogleRegistering = false;
+    alert("Google 호스트 가입 실패: " + err.message);
   }
 });
