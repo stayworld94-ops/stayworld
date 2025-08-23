@@ -4,91 +4,33 @@
   <meta charset="utf-8">
   <title>Host Sign Up — StayWorld</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- ✅ 스타일 경로 교정 -->
-  <link rel="stylesheet" href="/styles/style.css?v=1">
+
+  <script src="assets/load-css.js"></script>
 </head>
 <body>
   <main class="container" style="max-width:560px; padding:40px 0;">
     <h1>Host Sign Up</h1>
 
-    <form id="hostEmailSignup" style="display:grid; gap:14px; margin-top:16px;">
-      <label>이름</label>
+    <form id="hostRegisterForm" style="display:grid; gap:14px;">
+      <label for="hostName">이름</label>
       <input id="hostName" class="input" type="text" placeholder="홍길동" required>
-      <label>이메일</label>
+      <label for="hostEmail">이메일</label>
       <input id="hostEmail" class="input" type="email" placeholder="you@example.com" required>
-      <label>비밀번호</label>
+      <label for="hostPw">비밀번호</label>
       <input id="hostPw" class="input" type="password" placeholder="********" required>
       <button class="btn btn-gold" type="submit">호스트 가입</button>
     </form>
 
     <div style="margin:16px 0; text-align:center;">또는</div>
 
-    <!-- ✅ .google-btn 클래스 적용 -->
-    <button id="hostGoogleSignup" class="btn google-btn" type="button">
+    <button id="hostGoogleRegister" class="btn google-btn" type="button">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
-      Sign up as Host with Google
+      Sign up with Google
     </button>
 
-    <p style="margin-top:14px;">이미 계정이 있나요? <a href="/host-login.html">호스트 로그인</a></p>
+    <p style="margin-top:14px;">이미 계정이 있나요? <a href="host-login.html">호스트 로그인</a></p>
   </main>
 
-  <!-- ✅ 인라인 모듈: 경로문제 제거용 (필요 시 나중에 공통파일로 분리) -->
-  <script type="module">
-    // 🔧 여기에 본인 프로젝트 구성값 넣기 (Firebase 콘솔 > 프로젝트 설정 > SDK 설정)
-  const firebaseConfig = {
-  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
-  authDomain: "stayworld-2570c.firebaseapp.com",
-  projectId: "stayworld-2570c",
-  storageBucket: "stayworld-2570c.firebasestorage.app",
-  messagingSenderId: "272599681686",
-  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
-  measurementId: "G-F8MXM3D7FJ"
-};
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    // 이메일로 호스트 가입
-    document.getElementById('hostEmailSignup').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const name = hostName.value.trim();
-      const email = hostEmail.value.trim();
-      const pw = hostPw.value.trim();
-
-      const cred = await createUserWithEmailAndPassword(auth, email, pw);
-      if (name) await updateProfile(cred.user, { displayName: name });
-
-      await setDoc(doc(db, 'hosts', cred.user.uid), {
-        uid: cred.user.uid,
-        email: cred.user.email,
-        displayName: name || cred.user.displayName || '',
-        verified: true,                              // ✅ 심사 없음
-        createdAt: new Date().toISOString()
-      }, { merge: true });
-
-      alert('호스트 가입 완료! 신분증을 업로드 해주세요.');
-      location.href = '/host-id.html';
-    });
-
-    // 구글로 호스트 가입
-    document.getElementById('hostGoogleSignup').addEventListener('click', async ()=>{
-      const cred = await signInWithPopup(auth, provider);
-      await setDoc(doc(db, 'hosts', cred.user.uid), {
-        uid: cred.user.uid,
-        email: cred.user.email,
-        displayName: cred.user.displayName || '',
-        verified: true,                              // ✅ 심사 없음
-        createdAt: new Date().toISOString()
-      }, { merge: true });
-
-      alert('호스트 가입 완료! 신분증을 업로드 해주세요.');
-      location.href = '/host-id.html';
-    });
-  </script>
+  <script type="module" src="assets/host-register.js"></script>
 </body>
 </html>
