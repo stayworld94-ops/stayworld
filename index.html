@@ -10,69 +10,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 
   <!-- 통합 CSS -->
-  <style>
-    :root{--bg:#0b0f16;--panel:#101018;--text:#e7e9ee;--muted:#cfd6e6;--line:rgba(255,255,255,.08);--chip:#121a26;--gold1:#f4d78c;--gold2:#c9a35b}
-    *{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;line-height:1.5}
-    a{color:inherit;text-decoration:none}.container{max-width:1120px;margin:0 auto;padding:0 16px}
-    img{max-width:100%;display:block}
-
-    /* Header */
-    .site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-    .header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
-    .brand{display:flex;align-items:center;gap:10px}.brand-logo{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
-    .brand-text{font-weight:800;letter-spacing:.6px}
-    .main-nav{display:flex;gap:28px;justify-content:center;flex:1}
-    .header-cta{display:flex;align-items:center;gap:12px}
-    .lang-label{font-size:12px;opacity:.7}
-    .lang-select{appearance:none;background:#101826;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:8px 32px 8px 10px}
-    .btn{border:0;padding:10px 14px;border-radius:12px;cursor:pointer}
-    .btn-ghost{background:transparent;color:#cfcfcf}.btn-ghost:hover{background:rgba(255,255,255,.06)}
-    .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
-    .btn-chip{background:var(--chip);color:#dfe3ea;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
-
-    /* Host dropdown */
-    .nav-item.dropdown{position:relative}
-    .nav-link.dropdown-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;font-weight:600;opacity:.95}
-    .dropdown-panel{position:absolute;top:100%;left:50%;transform:translate(-50%,8px);min-width:220px;background:#0f1520;border:1px solid var(--line);border-radius:12px;padding:8px;z-index:30;box-shadow:0 16px 40px rgba(0,0,0,.45);visibility:hidden;opacity:0;pointer-events:none;transition:opacity .12s ease, transform .12s ease, visibility .12s}
-    .nav-item.dropdown:hover .dropdown-panel,
-    .nav-item.dropdown:focus-within .dropdown-panel,
-    .nav-item.dropdown.open .dropdown-panel{visibility:visible;opacity:1;pointer-events:auto;transform:translate(-50%,0)}
-    .dropdown-item{display:block;padding:10px 12px;border-radius:8px;color:#e7e9ee;text-decoration:none;white-space:nowrap}
-    .dropdown-item:hover{background:#121a26}
-    .dropdown-divider{height:1px;background:var(--line);margin:6px 0}
-
-    /* Hero */
-    .hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
-    .hero-title{font-size:48px;letter-spacing:.2px;margin:10px 0 8px}.accent{color:#f1cf84}
-    .hero-sub{opacity:.85;margin:8px 0 28px}
-    .search-bar{display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;gap:10px;align-items:center}
-    .input{background:#0f1621;border:1px solid var(--line);color:var(--text);padding:12px 14px;border-radius:12px}
-    .input::placeholder{color:#a7b0bf}
-    .search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
-    .btn.loading{opacity:.65;pointer-events:none}
-
-    /* Card */
-    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
-    .card{background:#0f1420;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
-    .card h3{margin:0 0 6px}.card p{margin:0;opacity:.85}
-
-    /* Map */
-    #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
-    .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
-
-    /* Chatbot */
-    #chatFab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;z-index:2147483639;background:linear-gradient(180deg,var(--gold1),var(--gold2));box-shadow:0 14px 30px rgba(201,163,91,.35);font-size:22px}
-    #botPanel{position:fixed;right:20px;bottom:86px;width:min(360px,88vw);height:480px;background:#101018;border:1px solid #23232b;border-radius:16px;z-index:2147483638;display:none;box-shadow:0 20px 60px rgba(0,0,0,.5);color:var(--text)}
-    #botPanel .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
-    #botPanel .body{height:360px;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
-    #botPanel .row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
-    #botInput{flex:1;background:#0f1621;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px}
-    #botSend{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#1a1205;font-weight:700}
-    .msg{max-width:80%;padding:10px 12px;border-radius:12px}.me{align-self:flex-end;background:#132132}.ai{align-self:flex-start;background:#121820}
-
-    /* Footer */
-    .site-footer{padding:28px 0;border-top:1px solid var(--line);opacity:.8}
-  </style>
+  <link rel="stylesheet" href="/assets/style.css" />
 </head>
 
 <body>
@@ -85,24 +23,38 @@
       </a>
 
       <nav class="main-nav" aria-label="Primary">
+        <!-- [ADD] My Page 버튼 (로그인 시 노출) -->
+        <button class="btn btn-gold" id="btnMyPage" data-goto="mypage" style="display:none">My Page</button>
+
         <a href="index.html" data-i18n="nav_home">Home</a>
         <a href="membership.html" data-i18n="nav_membership">Membership</a>
 
-        <!-- Host 메뉴 -->
+        <!-- ===== Host 메뉴 ===== -->
         <div class="nav-item dropdown" id="hostMenu">
           <button class="nav-link dropdown-toggle" data-i18n="nav_host">Host</button>
           <div class="dropdown-panel">
-            <!-- 비로그인 -->
-            <a href="host-login.html" class="dropdown-item" data-host-visible="signedOut" data-i18n="host_login">Host Login</a>
+            <!-- 비로그인 상태 -->
+            <a href="host-login.html"  class="dropdown-item" data-host-visible="signedOut" data-i18n="host_login">Host Login</a>
             <a href="host-register.html" class="dropdown-item" data-host-visible="signedOut" data-i18n="host_signup">Host Sign Up</a>
             <div class="dropdown-divider" data-host-visible="signedOut"></div>
-            <!-- 로그인 상태 -->
-            <a href="host-property-new.html" class="dropdown-item" data-host-visible="signedIn" data-i18n="host_register_property">Register Property</a>
-            <a href="host-dashboard.html" class="dropdown-item" data-host-visible="signedIn" data-i18n="host_my_listings">My Listings</a>
-            <button class="dropdown-item" data-host-visible="signedIn" id="hostLogoutBtn" type="button" data-i18n="host_logout">Logout</button>
+            <!-- 호스트 로그인 상태 -->
+            <a href="host-property-new.html" class="dropdown-item" data-host-visible="hostOnly" data-i18n="host_register_property">Register Property</a>
+            <a href="host-dashboard.html" class="dropdown-item" data-host-visible="hostOnly" data-i18n="host_my_listings">My Listings</a>
+            <button class="dropdown-item" data-host-visible="hostOnly" id="hostLogoutBtn" type="button" data-i18n="host_logout">Logout</button>
           </div>
         </div>
 
+        <!-- ===== Admin 메뉴 ===== -->
+        <div class="nav-item dropdown" id="adminMenu" style="display:none">
+          <button class="nav-link dropdown-toggle">Admin</button>
+          <div class="dropdown-panel">
+            <a href="admin-dashboard.html" class="dropdown-item">Dashboard</a>
+            <a href="admin-users.html" class="dropdown-item">Users</a>
+            <a href="admin-settings.html" class="dropdown-item">Settings</a>
+          </div>
+        </div>
+
+        <!-- Auth 링크 -->
         <a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
       </nav>
 
@@ -153,13 +105,110 @@
     <div class="container"><div id="map" aria-label="Map" role="region"></div></div>
   </section>
 
-  <!-- FOOTER -->
+  <!-- My Page -->
+  <section id="mypage" class="sw-section" style="display:none">
+    <div class="container">
+      <h2>My Page · Favorites ⭐</h2>
+      <div class="mypage-panels">
+        <div class="fav-list card"><h3>My Favorites</h3><div id="favList"></div></div>
+        <div class="fav-map card"><div id="favMap"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container"><small data-i18n="footer_copy">© StayWorld — stayworldbooking.com</small></div>
   </footer>
 
-  <!-- === JS: 번역, 지도, 챗봇, 인증 === -->
-  <script src="/assets/auth-bridge.js"></script>
-  <script src="/assets/login-modal.js"></script>
+  <!-- ===== SCRIPTS: 번역 / 필터 / 지도 / 챗봇 / Auth ===== -->
+  <script src="/assets/index-app.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const link = document.getElementById("navAuthLink");
+      const myPageBtn = document.getElementById("btnMyPage");
+      const adminMenu = document.getElementById("adminMenu");
+
+      function toLoginUI() {
+        link.setAttribute("data-i18n", "nav_login");
+        link.textContent = "Login";
+        link.href = "login.html";
+        link.onclick = null;
+        myPageBtn.style.display="none";
+        applyI18NPage?.();
+      }
+
+      function toLogoutUI() {
+        link.setAttribute("data-i18n", "nav_logout");
+        link.textContent = "Logout";
+        link.href = "#";
+        link.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          alert("로그아웃 되었습니다.");
+          toLoginUI();
+          updateRoleMenus();
+          location.href = "/";
+        };
+        myPageBtn.style.display="inline-block";
+        applyI18NPage?.();
+      }
+
+      // ✅ 로그인 성공 시 호출 (role: user/host/admin)
+      window.markLoggedIn = function (role="user") {
+        localStorage.setItem("sw_logged_in", "true");
+        localStorage.setItem("sw_user_role", role);
+        toLogoutUI();
+        updateRoleMenus();
+        alert("환영합니다! 로그인되었습니다.");
+      };
+
+      window.markLoggedOut = function () {
+        localStorage.clear();
+        toLoginUI();
+        updateRoleMenus();
+      };
+
+      // --- Host & Admin 메뉴 제어 ---
+      function updateRoleMenus() {
+        const role = localStorage.getItem("sw_user_role");
+        const signedIn = localStorage.getItem("sw_logged_in") === "true";
+
+        // Host 메뉴
+        const hostPanel = document.querySelector("#hostMenu .dropdown-panel");
+        if (hostPanel) {
+          hostPanel.querySelectorAll("[data-host-visible]").forEach(el => el.style.display="none");
+          if (!signedIn) {
+            hostPanel.querySelectorAll('[data-host-visible="signedOut"]').forEach(el=>el.style.display="block");
+          } else if (role === "host") {
+            hostPanel.querySelectorAll('[data-host-visible="hostOnly"]').forEach(el=>el.style.display="block");
+          }
+        }
+
+        // Admin 메뉴
+        if (adminMenu) {
+          adminMenu.style.display = (role==="admin") ? "block" : "none";
+        }
+      }
+      window.updateRoleMenus = updateRoleMenus;
+
+      // 초기 상태 반영
+      if (localStorage.getItem("sw_logged_in") === "true") toLogoutUI();
+      else toLoginUI();
+      updateRoleMenus();
+
+      // Host 로그아웃 버튼
+      const hostLogout = document.getElementById("hostLogoutBtn");
+      hostLogout?.addEventListener("click", (e)=>{
+        e.preventDefault();
+        localStorage.clear();
+        alert("호스트 로그아웃 되었습니다.");
+        toLoginUI();
+        updateRoleMenus();
+        location.href = "/";
+      });
+    });
+  </script>
 </body>
 </html>
