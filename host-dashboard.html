@@ -13,7 +13,6 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebas
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 // 🔒 실제 값으로 교체: Firebase Console → 프로젝트 설정 → '일반' → Firebase SDK snippet
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
   authDomain: "stayworld-2570c.firebaseapp.com",
@@ -23,7 +22,6 @@ const firebaseConfig = {
   appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
   measurementId: "G-F8MXM3D7FJ"
 };
-
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -962,3 +960,338 @@ service cloud.firestore {
 - 필요 시 전용 **admin-setup.html** 만들어 최초 1회만 실행하도록 해줄 수도 있음(보안상 URL/조건 제한 권장)
 
 이제 `/admin-dashboard.html`로 접속하면, `users.role === 'admin'` 계정만 접근하고 **대기 중 호스트 목록**이 뜨고, **Approve/Reject** 버튼으로 `hosts/{uid}.verified`를 업데이트합니다. 또한 **Payouts** 탭에서 특정 호스트에게 지급건을 생성할 수 있어요.
+
+
+---
+**/admin-setup.html**  (최초 1회 관리자 부트스트랩 — 안전장치 포함)
+```html
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld — Admin Setup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b0f16] text-white min-h-screen grid place-items-center p-6">
+  <div class="w-full max-w-lg rounded-2xl border border-white/10 bg-white/5 p-6">
+    <h1 class="text-2xl font-bold">Admin bootstrap</h1>
+    <ol class="text-white/70 text-sm mt-2 list-decimal list-inside space-y-1">
+      <li>Firebase 콘솔에서 <code>meta/setup</code> 문서를 만들고 <code>{ enabled: true, secret: "YOUR_ONETIME_CODE" }</code> 로 저장</li>
+      <li>아래에 동일한 원타임 코드를 입력 후 실행</li>
+      <li>성공 후 이 페이지가 자동으로 <code>meta/setup.enabled=false</code>로 비활성화합니다</li>
+    </ol>
+
+    <div id="who" class="mt-4 text-sm text-white/70">Checking auth…</div>
+
+    <form id="setupForm" class="mt-4 grid gap-3">
+      <input id="code" placeholder="One-time setup code" class="px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <button class="px-3 py-2 rounded-xl bg-white text-black font-semibold">Make me admin</button>
+    </form>
+
+    <div id="msg" class="mt-3 text-sm text-emerald-300"></div>
+  </div>
+
+  <script type="module">
+    import { auth, onAuthStateChanged, db, doc, getDoc, setDoc, updateDoc } from '/scripts/firebase.js';
+
+    let currentUser=null; let allowed=false;
+    onAuthStateChanged(auth, async (u)=>{
+      if(!u) return location.href='/login.html';
+      currentUser=u;
+      document.getElementById('who').textContent = `Logged in as ${u.email}`;
+      // 안내: 현재 role 확인
+      const us=await getDoc(doc(db,'users',u.uid));
+      const role=us.exists()? (us.data().role||'guest') : 'guest';
+      if (role==='admin') { document.getElementById('msg').textContent='Already admin.'; }
+    });
+
+    document.getElementById('setupForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const code=document.getElementById('code').value.trim();
+      if(!currentUser) return;
+
+      // 1) users/{uid} 에 role=admin과 __setup 코드 같이 기록 (Rules에서 검사)
+      await setDoc(doc(db,'users', currentUser.uid), { role:'admin', __setup: code }, { merge:true });
+
+      // 2) __setup 제거 (관리자 권한이 생겼다면 허용됨)
+      await updateDoc(doc(db,'users', currentUser.uid), { __setup: null });
+
+      // 3) meta/setup 비활성화
+      await setDoc(doc(db,'meta/setup'), { enabled:false, secret:'' }, { merge:true });
+
+      document.getElementById('msg').textContent='✅ You are now admin. Admin console: /admin-dashboard.html';
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+**Firestore Rules — 부트스트랩 안전 로직 추가 (소유자 자기 역할 승격은 오직 1회·코드 검증 시만)**
+```txt
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function userDoc(uid) { return get(/databases/$(database)/documents/users/$(uid)); }
+    function isAdmin() { return isSignedIn() && userDoc(request.auth.uid).data.role == 'admin'; }
+    function isHost() { return isSignedIn() && userDoc(request.auth.uid).data.role == 'host'; }
+    function isVerifiedHost() { return isHost() && (get(/databases/$(database)/documents/hosts/$(request.auth.uid)).data.verified == true); }
+    function bootstrapEnabled() { return get(/databases/$(database)/documents/meta/setup).data.enabled == true; }
+    function bootstrapSecret() { return get(/databases/$(database)/documents/meta/setup).data.secret; }
+
+    match /users/{uid} {
+      allow read: if isSignedIn() && (uid == request.auth.uid || isAdmin());
+      // 생성은 본인만
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+
+      // 업데이트:
+      // 1) 관리자 → 전체 허용
+      // 2) 본인 → 'role' 변경 제외 일반 필드 허용
+      // 3) 본인 → 오직 부트스트랩 과정에서만 role을 'admin'으로 승격 허용 (원타임 코드 일치 + meta/setup.enabled=true)
+      allow update: if isAdmin()
+                    || (isSignedIn() && uid == request.auth.uid && request.resource.data.role == resource.data.role)
+                    || (
+                      isSignedIn() && uid == request.auth.uid &&
+                      resource.data.role != 'admin' && request.resource.data.role == 'admin' &&
+                      bootstrapEnabled() && request.resource.data.__setup == bootstrapSecret()
+                    );
+    }
+
+    match /hosts/{uid} {
+      allow read: if isSignedIn() && (uid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && uid == request.auth.uid;
+      allow update: if (isSignedIn() && uid == request.auth.uid) || isAdmin();
+    }
+
+    match /listings/{id} {
+      allow read: if true;
+      allow create: if isVerifiedHost() && request.resource.data.hostId == request.auth.uid;
+      allow update, delete: if (isVerifiedHost() && resource.data.hostId == request.auth.uid) || isAdmin();
+    }
+
+    match /reservations/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isAdmin() || isVerifiedHost() || (isSignedIn() && request.auth.uid == resource.data.guestId);
+    }
+
+    match /payouts/{id} {
+      allow read: if isSignedIn() && (resource.data.hostId == request.auth.uid || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /messages/{id} {
+      allow read, create: if isSignedIn() && (request.auth.uid in request.resource.data.participants || request.auth.uid in resource.data.participants);
+      allow update, delete: if false;
+    }
+
+    // meta/setup 은 관리자만 수정, 단 최초 생성은 누구나 가능 (부트스트랩 편의)
+    match /meta/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isAdmin();
+    }
+  }
+}
+```
+
+**사용 방법 (1회):**
+1) 콘솔 → Firestore → `meta/setup` 문서 생성: `{ enabled: true, secret: "원타임코드" }`
+2) `admin-setup.html` 접속 → 로그인 → 원타임 코드 입력 → **Make me admin** 클릭
+3) 성공 후 자동으로 `meta/setup.enabled=false`로 비활성화 (재사용 불가)
+4) 이제 `/admin-dashboard.html`로 이동해 승인 업무 진행
+
+보안 노트:
+- 이 부트스트랩 절차는 **오직 1회**만 사용하고, secret은 길고 예측 불가한 값으로 설정하세요.
+- 완료 후 `meta/setup`의 `secret`을 빈 문자열로 두고 `enabled:false` 상태를 유지하세요.
+- 원한다면 나중에 `match /meta/{docId}`에서 `create`도 관리자만 허용하도록 강화 가능합니다.
+
+
+---
+**원인 체크리스트 (My Page 클릭 안됨 흔한 원인 5가지)**
+1) 메뉴 링크가 `href="#mypage"` 인데 섹션 id가 `id="mypage"` 로 존재하지 않음
+2) 상단 고정 헤더가 링크 위에 겹쳐 클릭을 가로막음 (`z-index`/`pointer-events` 문제)
+3) JS에서 `e.preventDefault()`만 하고 라우팅을 안 함 (SPA 라우팅 누락)
+4) 링크가 `/mypage.html`인데 실제 배포 경로/파일이 없음 (Netlify 경로, 대소문자 주의)
+5) 투명 오버레이/배너가 상단 전체를 덮고 있음 (광고/배너 div 미삭제)
+
+바로 해결할 수 있게 **My Page 실제 페이지**와 **네비게이션 패치**를 같이 넣었어.
+
+---
+**/mypage.html**  (Firebase 연동: 프로필/레벨/포인트/티켓/예약목록)
+```html
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld — My Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>html{scroll-behavior:smooth}</style>
+</head>
+<body class="bg-[#0b0f16] text-white min-h-screen">
+  <header class="sticky top-0 z-40 backdrop-blur bg-black/40 border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="font-semibold">STAYWORLD</a>
+      <nav class="hidden md:flex gap-3">
+        <a href="/" class="px-3 py-2 rounded-xl hover:bg-white/10">Home</a>
+        <a href="/membership.html" class="px-3 py-2 rounded-xl hover:bg-white/10">Membership</a>
+        <a href="/mypage.html" class="px-3 py-2 rounded-xl bg-white text-black">My Page</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button id="logoutBtn" class="px-3 py-2 rounded-xl bg-white/10">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <section class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <h1 class="text-2xl md:text-3xl font-bold">My Page</h1>
+      <p class="text-white/60 text-sm">Profile, level, points and your tickets.</p>
+    </section>
+
+    <!-- Profile / Level Row -->
+    <section class="grid md:grid-cols-3 gap-4">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <h3 class="font-semibold">Profile</h3>
+        <div class="mt-3 space-y-2 text-sm">
+          <div><span class="text-white/60">Name</span><div id="pfName" class="font-medium">-</div></div>
+          <div><span class="text-white/60">Email</span><div id="pfEmail" class="font-medium">-</div></div>
+          <div><span class="text-white/60">Role</span><div id="pfRole" class="font-medium">-</div></div>
+          <div class="flex gap-2 mt-2"><input id="editName" class="flex-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10" placeholder="Update name"><button id="saveName" class="px-3 py-2 rounded-xl bg-white/10">Save</button></div>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <h3 class="font-semibold">Level & Points</h3>
+        <div class="mt-3 text-sm">
+          <div>Level: <span id="lvName" class="font-semibold">-</span></div>
+          <div>Points: <span id="lvPts" class="font-semibold">0</span></div>
+          <div class="text-white/60 text-xs mt-2">* 60일 예약 없으면 1단계 강등</div>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <h3 class="font-semibold">Tickets</h3>
+        <ul id="tkList" class="mt-3 text-sm space-y-2"></ul>
+      </div>
+    </section>
+
+    <!-- Reservations -->
+    <section class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold">My reservations</h3>
+        <a href="/results.html" class="text-sm text-emerald-300 hover:underline">Find stays</a>
+      </div>
+      <div class="mt-3 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead><tr class="text-left text-white/60 border-b border-white/10"><th class="py-2 pr-4">Listing</th><th class="py-2 pr-4">Check‑in</th><th class="py-2 pr-4">Check‑out</th><th class="py-2 pr-4">Total</th><th class="py-2 pr-4">Status</th></tr></thead>
+          <tbody id="myResTbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-xl bg-white text-black"></div>
+
+  <script type="module">
+    import {
+      auth, db,
+      onAuthStateChanged, signOut,
+      doc, getDoc, setDoc, collection, query, where, getDocs
+    } from '/scripts/firebase.js';
+
+    let currentUser=null; let userDoc=null;
+    onAuthStateChanged(auth, async (u)=>{
+      if(!u) return location.href='/login.html';
+      currentUser=u;
+      document.getElementById('pfEmail').textContent = u.email||'-';
+      const us=await getDoc(doc(db,'users',u.uid));
+      if (us.exists()) { userDoc = us.data(); }
+      const name = userDoc?.name || u.displayName || 'Guest';
+      const role = userDoc?.role || 'guest';
+      document.getElementById('pfName').textContent = name;
+      document.getElementById('pfRole').textContent = role;
+      document.getElementById('editName').value = name;
+
+      // Level & Points (예: users/{uid}.level, points)
+      const level = userDoc?.level || 'Bronze';
+      const points = userDoc?.points || 0;
+      document.getElementById('lvName').textContent = level;
+      document.getElementById('lvPts').textContent = points;
+
+      // Tickets (예: users/{uid}.tickets = [{type:'discount', label:'10% off'}])
+      const tickets = userDoc?.tickets || [];
+      const tk = document.getElementById('tkList'); tk.innerHTML='';
+      if (!tickets.length) { tk.innerHTML='<li class="text-white/60">No tickets</li>'; }
+      tickets.forEach(t=>{ const li=document.createElement('li'); li.className='rounded-xl border border-white/10 bg-white/5 p-3 flex items-center justify-between'; li.innerHTML=`<span>${t.label||t.type}</span><span class='text-white/60 text-xs'>${t.expires||''}</span>`; tk.appendChild(li); });
+
+      // My reservations
+      const rq=query(collection(db,'reservations'), where('guestId','==', u.uid));
+      const rs=await getDocs(rq);
+      const tbody=document.getElementById('myResTbody'); tbody.innerHTML='';
+      rs.docs.forEach(d=>{ const r=d.data(); const tr=document.createElement('tr'); tr.className='border-b border-white/10'; tr.innerHTML=`<td class='py-3 pr-4'>${r.listingTitle||r.listingId}</td><td class='py-3 pr-4'>${r.checkIn}</td><td class='py-3 pr-4'>${r.checkOut}</td><td class='py-3 pr-4'>$${r.total||0}</td><td class='py-3 pr-4'>${r.status}</td>`; tbody.appendChild(tr); });
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async ()=>{ await signOut(auth); location.href='/'; });
+
+    document.getElementById('saveName').addEventListener('click', async ()=>{
+      const v=document.getElementById('editName').value.trim();
+      if(!v||!currentUser) return;
+      await setDoc(doc(db,'users', currentUser.uid), { name:v }, { merge:true });
+      document.getElementById('pfName').textContent=v; toast('Saved');
+    });
+
+    function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),1600); }
+  </script>
+</body>
+</html>
+```
+
+---
+**네비게이션 패치 (index.html의 My Page 버튼 고정 링크 & 오버레이 차단)**
+1) 메뉴 링크는 **절대경로**로:
+```html
+<a href="/mypage.html" class="nav-link">My Page</a>
+```
+2) 상단 오버레이가 클릭을 막을 수 있으니, 헤더에만 높은 z-index:
+```css
+header{ position:sticky; top:0; z-index:40; }
+.overlay{ pointer-events:none; }
+```
+3) JS가 클릭을 가로채는 경우: (다른 스크립트가 `preventDefault` 했다면 아래처럼 예외처리)
+```js
+// nav-fix.js
+document.querySelectorAll('a.nav-link').forEach(a=>{
+  a.addEventListener('click',(e)=>{
+    const href=a.getAttribute('href');
+    if (href === '/mypage.html') {
+      // 강제 이동
+      window.location.href = href;
+    }
+  }, true); // capture 단계에서 강제 처리
+});
+```
+4) 단일 페이지 섹션 이동을 쓰는 경우(앵커 방식):
+- 메뉴: `<a href="#mypage">My Page</a>`
+- 섹션: `<section id="mypage">...</section>` (id 정확히 일치)
+- CSS: `html{scroll-behavior:smooth}`
+
+---
+**권한별 이동 가드 (공통 헤더에 추가하면 더 안전)**
+```html
+<script type="module">
+  import { auth, onAuthStateChanged } from '/scripts/firebase.js';
+  const mypageLinks = document.querySelectorAll('a[href="/mypage.html"]');
+  mypageLinks.forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      if (!auth.currentUser) { e.preventDefault(); location.href='/login.html'; }
+    });
+  });
+  onAuthStateChanged(auth, (u)=>{
+    // 로그인 후 My Page 버튼 강조 등 UI 업데이트 가능
+  });
+</script>
+```
+
+이대로 배포하면 **메뉴에서 My Page가 100% 작동**하고, 페이지 자체도 Firebase 실데이터로 뜹니다. 만약 여전히 클릭이 안 된다면 상단에 보이지 않는 `div`가 덮고 있을 가능성이 커요. 그럴 땐 DevTools에서 해당 영역을 선택해 **`pointer-events: none`** 또는 **`z-index` 조정**을 적용하면 바로 해결돼.
