@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Host Login — StayWorld</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/styles/style.css?v=1">
+  <link rel="stylesheet" href="styles/style.css?v=1">
 </head>
 <body>
   <main class="container" style="padding:60px 0; max-width:520px;">
@@ -12,51 +12,22 @@
 
     <form id="hostLoginForm" style="display:grid; gap:14px; margin-top:16px;">
       <label>이메일</label>
-      <input id="email" class="input" type="email" placeholder="you@example.com" required>
+      <input id="hostLoginEmail" class="input" type="email" placeholder="you@example.com" required>
       <label>비밀번호</label>
-      <input id="pw" class="input" type="password" placeholder="********" required>
+      <input id="hostLoginPw" class="input" type="password" placeholder="********" required>
       <button class="btn btn-gold" type="submit">로그인</button>
     </form>
 
     <div style="margin:16px 0; text-align:center;">또는</div>
 
-    <button id="googleBtn" class="btn google-btn" type="button">
+    <button id="hostGoogleLogin" class="btn google-btn" type="button">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
       Sign in with Google
     </button>
 
-    <p style="margin-top:16px;">No account? <a href="/host-register.html">Sign up here</a></p>
+    <p style="margin-top:16px;">호스트가 아니신가요? <a href="host-register.html">호스트 가입</a></p>
   </main>
 
-  <script type="module">
-   const firebaseConfig = {
-  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
-  authDomain: "stayworld-2570c.firebaseapp.com",
-  projectId: "stayworld-2570c",
-  storageBucket: "stayworld-2570c.firebasestorage.app",
-  messagingSenderId: "272599681686",
-  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
-  measurementId: "G-F8MXM3D7FJ"
-};
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    document.getElementById('hostLoginForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const pw = document.getElementById('pw').value.trim();
-      await signInWithEmailAndPassword(auth, email, pw);
-      location.href = '/host-dashboard.html';
-    });
-
-    document.getElementById('googleBtn').addEventListener('click', async ()=>{
-      await signInWithPopup(auth, provider);
-      location.href = '/host-dashboard.html';
-    });
-  </script>
+  <script type="module" src="assets/host-login.js"></script>
 </body>
 </html>
