@@ -1,186 +1,33 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="utf-8" />
+  <title>Login — STAYWORLD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login - StayWorld</title>
-
-  <!-- ✅ 통합 스타일: 프로젝트 구조에 맞춰 /styles/style.css -->
-  <link rel="stylesheet" href="/styles/style.css?v=1" />
-
-  <!-- 페이지 레이아웃 보정 + Google 버튼 가시성 -->
-  <style>
-    .auth-wrap{
-      min-height:calc(100vh - 72px - 80px);
-      display:flex;align-items:center;justify-content:center;
-      padding:40px 16px;
-    }
-    .auth-card{
-      width:100%;max-width:480px;
-      background:#0f1420;border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;padding:24px;
-      box-shadow:0 8px 30px rgba(0,0,0,.25);
-    }
-    .auth-card h1{margin:6px 0 18px}
-    .auth-card label{display:block;margin:12px 0 6px;opacity:.9}
-    .auth-actions{margin-top:16px;display:flex;flex-direction:column;gap:10px}
-
-    /* ✅ Google 버튼(항상 밝게) */
-    #btnGoogle{
-      display:flex;align-items:center;justify-content:center;gap:10px;
-      width:100%;background:#ffffff;color:#111;
-      border:1px solid rgba(0,0,0,.15);border-radius:12px;
-      padding:12px 14px;font-weight:700;cursor:pointer;
-    }
-    #btnGoogle:hover{filter:brightness(0.97)}
-    .or{display:flex;align-items:center;gap:10px;margin:18px 0;opacity:.7}
-    .or::before,.or::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.12)}
-  </style>
+  <link rel="stylesheet" href="styles/style.css?v=1" />
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-row">
-      <a href="/" class="brand">
-        <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
-        <span class="brand-text">STAYWORLD</span>
-      </a>
+  <main class="container" style="max-width:520px; padding:60px 0;">
+    <h1>Login</h1>
 
-      <nav class="main-nav" aria-label="Primary">
-        <a href="index.html" data-i18n="nav_home">Home</a>
-        <a href="membership.html" data-i18n="nav_membership">Membership</a>
-        <a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
-      </nav>
+    <form id="loginForm" style="display:grid; gap:14px; margin-top:16px;">
+      <label for="loginEmail">이메일</label>
+      <input id="loginEmail" class="input" type="email" placeholder="you@example.com" required>
+      <label for="loginPassword">비밀번호</label>
+      <input id="loginPassword" class="input" type="password" placeholder="********" required>
+      <button class="btn btn-gold" type="submit">로그인</button>
+    </form>
 
-      <div class="header-cta">
-        <label for="lang" class="lang-label" data-i18n="language">Language</label>
-        <select id="lang" class="lang-select">
-          <option value="EN" selected>EN</option>
-          <option value="KO">KO</option>
-          <option value="JA">JA</option>
-          <option value="ZH">ZH</option>
-          <option value="FR">FR</option>
-          <option value="ES">ES</option>
-          <option value="DE">DE</option>
-          <option value="TR">TR</option>
-          <option value="AR">AR</option>
-          <option value="RU">RU</option>
-        </select>
-        <a href="signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign Up</a>
-      </div>
-    </div>
-  </header>
+    <div style="margin:16px 0; text-align:center;">또는</div>
 
-  <!-- MAIN -->
-  <main class="auth-wrap">
-    <div class="auth-card">
-      <h1 data-i18n="nav_login">Login</h1>
+    <button id="googleLogin" class="btn google-btn" type="button">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+      Sign in with Google
+    </button>
 
-      <form id="loginForm" novalidate>
-        <label for="loginEmail" data-i18n="email">Email</label>
-        <input type="email" id="loginEmail" required class="input" placeholder="you@example.com" />
-
-        <label for="loginPassword" data-i18n="password">Password</label>
-        <input type="password" id="loginPassword" required class="input" placeholder="********" />
-
-        <div class="auth-actions">
-          <button type="submit" class="btn btn-gold" data-i18n="nav_login">Login</button>
-        </div>
-      </form>
-
-      <div class="or" aria-hidden="true">OR</div>
-
-      <!-- ✅ 구글 로그인 버튼 -->
-      <button id="btnGoogle" class="btn google-btn" type="button" data-i18n="signin_google">
-        Sign in with Google
-      </button>
-
-      <p style="margin-top:18px;">
-        <span data-i18n="have_account_q">Don’t have an account?</span>
-        <a href="signup.html" data-i18n="nav_signup">Sign Up</a>
-      </p>
-    </div>
+    <p style="margin-top:16px;">계정이 없으신가요? <a href="signup.html">회원가입</a></p>
   </main>
 
-  <!-- i18n (있으면 유지) -->
-  <script src="i18n.js"></script>
-
-  <!-- 로그인/로그아웃 링크 토글 (데모) -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const link = document.getElementById('navAuthLink');
-      function toLoginUI(){
-        link.setAttribute('data-i18n','nav_login');
-        link.textContent='Login';
-        link.href='login.html';
-        link.onclick=null;
-        window.applyI18NPage?.();
-      }
-      function toLogoutUI(){
-        link.setAttribute('data-i18n','nav_logout');
-        link.textContent='Logout';
-        link.href='#';
-        link.onclick=(e)=>{
-          e.preventDefault();
-          localStorage.removeItem('sw_logged_in');
-          alert('로그아웃 되었습니다.');
-          toLoginUI();
-          location.reload();
-        };
-        window.applyI18NPage?.();
-      }
-      if(localStorage.getItem('sw_logged_in')==='true') toLogoutUI(); else toLoginUI();
-    });
-  </script>
-
-  <!-- ✅ Firebase (인라인 모듈): 이메일 로그인 + Google 로그인 -->
-  <script type="module">
-    // 🔧 Firebase 콘솔 > 프로젝트 설정 > 일반 > SDK 설정에서 복사한 "웹 앱" 구성으로 교체
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      appId: "YOUR_APP_ID",
-    };
-
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getAuth, signInWithEmailAndPassword,
-      GoogleAuthProvider, signInWithPopup
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    // 이메일 로그인
-    document.getElementById('loginForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const pw = document.getElementById('loginPassword').value.trim();
-      try{
-        await signInWithEmailAndPassword(auth, email, pw);
-        localStorage.setItem('sw_logged_in','true');
-        alert('로그인 완료!');
-        location.href = '/';
-      }catch(err){
-        alert('로그인 오류: ' + err.message);
-      }
-    });
-
-    // Google 로그인
-    document.getElementById('btnGoogle').addEventListener('click', async ()=>{
-      try{
-        await signInWithPopup(auth, provider);
-        localStorage.setItem('sw_logged_in','true');
-        alert('Google 로그인 완료!');
-        location.href = '/';
-      }catch(err){
-        alert('Google 로그인 오류: ' + err.message);
-      }
-    });
-  </script>
-
-  <!-- ⚠️ 이 페이지에서는 /assets/login-modal.js 불필요/충돌 가능 → 제거 -->
+  <script type="module" src="assets/login.js"></script>
 </body>
 </html>
