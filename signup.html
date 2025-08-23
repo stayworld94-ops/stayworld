@@ -4,87 +4,36 @@
   <meta charset="utf-8" />
   <title>Sign Up — STAYWORLD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- ✅ 통합 스타일 (네가 준 style.css 경로) -->
-  <link rel="stylesheet" href="/styles/style.css?v=1" />
+
+  <!-- ✅ CSS 자동 로드 -->
+  <script src="assets/load-css.js"></script>
 </head>
 <body>
   <main class="container" style="max-width:520px; padding:60px 0;">
-    <h1 style="margin-bottom:20px;">Sign Up</h1>
+    <h1>Sign Up</h1>
 
-    <!-- 이메일/비밀번호 가입 -->
-    <form id="emailSignup" style="display:grid; gap:14px;">
-      <label for="suEmail">이메일</label>
-      <input id="suEmail" class="input" type="email" placeholder="you@example.com" required />
+    <form id="signupForm" style="display:grid; gap:14px;">
+      <label for="signupEmail">이메일</label>
+      <input id="signupEmail" class="input" type="email" placeholder="you@example.com" required />
 
-      <label for="suPw">비밀번호</label>
-      <input id="suPw" class="input" type="password" placeholder="********" required />
+      <label for="signupPassword">비밀번호</label>
+      <input id="signupPassword" class="input" type="password" placeholder="********" required />
 
       <button class="btn btn-gold" type="submit">가입하기</button>
     </form>
 
     <div style="margin:16px 0; text-align:center;">또는</div>
 
-    <!-- ✅ 구글 연동 버튼 (밝은 스타일) -->
     <button id="googleSignup" class="btn google-btn" type="button">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
       Sign up with Google
     </button>
 
     <p style="margin-top:16px; text-align:center;">
-      이미 계정이 있나요? <a href="/login.html">로그인</a>
+      이미 계정이 있나요? <a href="login.html">로그인</a>
     </p>
   </main>
 
-  <!-- ✅ 인라인 모듈: 경로 이슈 없이 바로 동작하게 -->
-  <script type="module">
-    // 🔧 아래를 네 프로젝트의 "웹 앱" 구성값으로 교체 (Firebase 콘솔 > 프로젝트 설정 > 일반 > SDK 설정)
-   const firebaseConfig = {
-  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
-  authDomain: "stayworld-2570c.firebaseapp.com",
-  projectId: "stayworld-2570c",
-  storageBucket: "stayworld-2570c.firebasestorage.app",
-  messagingSenderId: "272599681686",
-  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
-  measurementId: "G-F8MXM3D7FJ"
-};
-
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getAuth, createUserWithEmailAndPassword,
-      GoogleAuthProvider, signInWithPopup
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // Firebase init
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    // 이메일/비밀번호 가입
-    document.getElementById('emailSignup').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = document.getElementById('suEmail').value.trim();
-      const pw = document.getElementById('suPw').value.trim();
-
-      try{
-        await createUserWithEmailAndPassword(auth, email, pw);
-        alert('가입 완료!');
-        // 사용자 마이페이지로 보내고 싶으면 아래를 '/mypage.html'로 바꿔도 됨
-        location.href = '/';
-      }catch(err){
-        alert('가입 오류: ' + err.message);
-      }
-    });
-
-    // 구글 가입
-    document.getElementById('googleSignup').addEventListener('click', async ()=>{
-      try{
-        await signInWithPopup(auth, provider);
-        alert('Google로 가입 완료!');
-        location.href = '/';
-      }catch(err){
-        alert('Google 로그인 오류: ' + err.message);
-      }
-    });
-  </script>
+  <script type="module" src="assets/signup.js"></script>
 </body>
 </html>
