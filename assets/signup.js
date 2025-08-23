@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
@@ -13,9 +13,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
 
-// 이메일 회원가입
+// ✅ 이메일/비밀번호 가입
 document.getElementById("signupForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("signupEmail").value.trim();
@@ -23,20 +22,14 @@ document.getElementById("signupForm")?.addEventListener("submit", async (e) => {
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pw);
-    alert(`회원가입 성공! 🎉\n가입 이메일: ${cred.user.email}\n\nStayWorld에 오신 걸 환영합니다.`);
+    localStorage.setItem("sw_logged_in", "true");
+    localStorage.setItem("sw_user_email", cred.user.email);
+
+    if (window.markLoggedIn) window.markLoggedIn();
+
+    alert(`회원가입 성공! 🎉\n환영합니다, ${cred.user.email} 님`);
     window.location.href = "index.html";
   } catch (err) {
     alert("회원가입 실패: " + err.message);
-  }
-});
-
-// Google 회원가입
-document.getElementById("googleSignup")?.addEventListener("click", async () => {
-  try {
-    const cred = await signInWithPopup(auth, provider);
-    alert(`Google 회원가입 완료! 🎉\n가입 이메일: ${cred.user.email}\n\nStayWorld에 오신 걸 환영합니다.`);
-    window.location.href = "index.html";
-  } catch (err) {
-    alert("Google 로그인 오류: " + err.message);
   }
 });
