@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <title>Login — STAYWORLD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <script src="assets/load-css.js"></script>
 </head>
 <body>
@@ -21,6 +20,7 @@
 
     <div style="margin:16px 0; text-align:center;">또는</div>
 
+    <!-- ✅ 버튼 id = googleLogin -->
     <button id="googleLogin" class="btn google-btn" type="button">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
       Sign in with Google
@@ -29,6 +29,7 @@
     <p style="margin-top:16px;">계정이 없으신가요? <a href="signup.html">회원가입</a></p>
   </main>
 
+  <!-- ✅ JS는 반드시 body 맨 아래 -->
   <script type="module" src="assets/login.js"></script>
 </body>
 </html>
