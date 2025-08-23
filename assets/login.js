@@ -23,6 +23,11 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pw);
+    localStorage.setItem("sw_logged_in", "true");
+    localStorage.setItem("sw_user_email", cred.user.email);
+
+    if (window.markLoggedIn) window.markLoggedIn();
+
     alert(`로그인 성공! 🎉\n환영합니다, ${cred.user.email} 님`);
     window.location.href = "index.html";
   } catch (err) {
@@ -38,6 +43,11 @@ document.getElementById("googleLogin")?.addEventListener("click", async () => {
 
   try {
     const cred = await signInWithPopup(auth, provider);
+    localStorage.setItem("sw_logged_in", "true");
+    localStorage.setItem("sw_user_email", cred.user.email);
+
+    if (window.markLoggedIn) window.markLoggedIn();
+
     alert(`Google 로그인 완료! 🎉\n환영합니다, ${cred.user.email} 님`);
     window.location.href = "index.html";
   } catch (err) {
