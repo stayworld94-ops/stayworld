@@ -21,22 +21,33 @@ document.getElementById("hostLoginForm")?.addEventListener("submit", async (e) =
   const email = document.getElementById("hostLoginEmail").value.trim();
   const pw = document.getElementById("hostLoginPw").value.trim();
 
+  if (!email || !pw) {
+    alert("이메일과 비밀번호를 입력하세요.");
+    return;
+  }
+
   try {
-    await signInWithEmailAndPassword(auth, email, pw);
-    alert("호스트 로그인 성공!");
+    const cred = await signInWithEmailAndPassword(auth, email, pw);
+    alert(`호스트 로그인 성공! 🎉\n환영합니다, ${cred.user.email} 님`);
     window.location.href = "host-dashboard.html";
   } catch (err) {
     alert("호스트 로그인 실패: " + err.message);
   }
 });
 
-// Google 로그인
+// 구글 로그인 (중복 클릭 방지 포함)
+let isGoogleSigningIn = false;
 document.getElementById("hostGoogleLogin")?.addEventListener("click", async () => {
+  if (isGoogleSigningIn) return;
+  isGoogleSigningIn = true;
+
   try {
-    await signInWithPopup(auth, provider);
-    alert("Google 호스트 로그인 완료!");
+    const cred = await signInWithPopup(auth, provider);
+    alert(`Google 호스트 로그인 완료! 🎉\n환영합니다, ${cred.user.email} 님`);
     window.location.href = "host-dashboard.html";
   } catch (err) {
     alert("Google 로그인 오류: " + err.message);
+  } finally {
+    isGoogleSigningIn = false;
   }
 });
