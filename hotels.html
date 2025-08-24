@@ -183,291 +183,35 @@
 
 <script type="module">
   /* =========================
-     City center & base state
+     Firestore, 상태, 함수들 (생략, 네 코드 그대로 유지)
+     ...
   ========================== */
-  let CITY_CENTER = { name:"Gdańsk", lat:54.352, lng:18.646 };
-  let hotels = []; // realtime from Firestore
 
-  /* =========================
-     i18n (10 languages)
-  ========================== */
-  const LANGS = {
-    en:{sort:'Sort',filter:'Filter',mapView:'Map',listView:'List',excellent:'Excellent',verygood:'Very good',superb:'Superb',reviews:'reviews',fromCenter:'from center',freeCancel:'Free cancellation',taxesIncluded:'Taxes & fees included',perStay:'total for 2 nights',currencyNote:'* Exchange rates are demo only.'},
-    ko:{sort:'정렬',filter:'필터',mapView:'지도',listView:'리스트',excellent:'우수함',verygood:'매우 좋음',superb:'아주 훌륭함',reviews:'이용후기',fromCenter:'도심에서',freeCancel:'무료 취소',taxesIncluded:'세금 및 기타요금 포함',perStay:'성인 2명, 2박 요금',currencyNote:'* 환율은 데모용입니다.'},
-    fr:{sort:'Trier',filter:'Filtrer',mapView:'Carte',listView:'Liste',excellent:'Excellent',verygood:'Très bien',superb:'Superbe',reviews:'avis',fromCenter:'du centre',freeCancel:'Annulation gratuite',taxesIncluded:'Taxes et frais inclus',perStay:'total pour 2 nuits',currencyNote:'* Taux de change de démonstration.'},
-    tr:{sort:'Sırala',filter:'Filtre',mapView:'Harita',listView:'Liste',excellent:'Mükemmel',verygood:'Çok iyi',superb:'Harika',reviews:'yorum',fromCenter:'merkezden',freeCancel:'Ücretsiz iptal',taxesIncluded:'Vergi ve ücretler dahil',perStay:'2 gece toplam',currencyNote:'* Kurlar demodur.'},
-    es:{sort:'Ordenar',filter:'Filtrar',mapView:'Mapa',listView:'Lista',excellent:'Excelente',verygood:'Muy bien',superb:'Estupendo',reviews:'reseñas',fromCenter:'del centro',freeCancel:'Cancelación gratuita',taxesIncluded:'Impuestos y tasas incluidos',perStay:'total por 2 noches',currencyNote:'* Tipos de cambio de demostración.'},
-    de:{sort:'Sortieren',filter:'Filter',mapView:'Karte',listView:'Liste',excellent:'Hervorragend',verygood:'Sehr gut',superb:'Fantastisch',reviews:'Bewertungen',fromCenter:'vom Zentrum',freeCancel:'Kostenlose Stornierung',taxesIncluded:'Steuern & Gebühren inkl.',perStay:'gesamt für 2 Nächte',currencyNote:'* Demo-Wechselkurse.'},
-    it:{sort:'Ordina',filter:'Filtra',mapView:'Mappa',listView:'Elenco',excellent:'Eccellente',verygood:'Ottimo',superb:'Superbo',reviews:'recensioni',fromCenter:'dal centro',freeCancel:'Cancellazione gratuita',taxesIncluded:'Tasse e oneri inclusi',perStay:'totale per 2 notti',currencyNote:'* Tassi di cambio dimostrativi.'},
-    ru:{sort:'Сортировка',filter:'Фильтр',mapView:'Карта',listView:'Список',excellent:'Превосходно',verygood:'Очень хорошо',superb:'Замечательно',reviews:'отзывов',fromCenter:'от центра',freeCancel:'Бесплатная отмена',taxesIncluded:'Налоги и сборы включены',perStay:'итого за 2 ночи',currencyNote:'* Демонстрационные курсы.'},
-    ja:{sort:'並べ替え',filter:'フィルター',mapView:'地図',listView:'リスト',excellent:'すばらしい',verygood:'とても良い',superb:'最高',reviews:'件のクチコミ',fromCenter:'中心部から',freeCancel:'キャンセル無料',taxesIncluded:'税・手数料込み',perStay:'2泊の合計',currencyNote:'* レートはデモ用です。'},
-    zh:{sort:'排序',filter:'筛选',mapView:'地图',listView:'列表',excellent:'很棒',verygood:'非常好',superb:'卓越',reviews:'条点评',fromCenter:'距中心',freeCancel:'可免费取消',taxesIncluded:'含税费',perStay:'共2晚',currencyNote:'* 汇率仅为演示。'}
-  };
-  const LANG_TO_DEFAULT_CURRENCY = { en:'USD', ko:'KRW', fr:'EUR', tr:'TRY', es:'EUR', de:'EUR', it:'EUR', ru:'RUB', ja:'JPY', zh:'CNY' };
-
-  /* =========================
-     Currency (sample rates)
-  ========================== */
-  const CURRENCIES = {
-    USD:{sym:'US$',rate:1,dp:0}, EUR:{sym:'€',rate:0.92,dp:0}, KRW:{sym:'₩',rate:1350,dp:0},
-    TRY:{sym:'₺',rate:33,dp:0},  JPY:{sym:'¥',rate:156,dp:0},  GBP:{sym:'£',rate:0.78,dp:0},
-    RUB:{sym:'₽',rate:95,dp:0},  CNY:{sym:'¥',rate:7.1,dp:0}
-  };
-
-  /* =========================
-     DOM refs
-  ========================== */
-  const langSel=document.getElementById('lang');
-  const curSel=document.getElementById('currency');
-  const listEl=document.getElementById('list');
-  const rateHint=document.getElementById('rateHint');
-
-  for(const k of Object.keys(LANGS)){
-    const o=document.createElement('option');
-    o.value=k;
-    o.textContent=new Intl.DisplayNames([k],{type:'language'}).of(k)||k;
-    langSel.appendChild(o);
-  }
-  for(const k of Object.keys(CURRENCIES)){
-    const o=document.createElement('option');
-    o.value=k; o.textContent=`${k} ${CURRENCIES[k].sym}`;
-    curSel.appendChild(o);
-  }
-
-  let state={lang:'ko',currency:'KRW',sort:'price-asc',filters:{priceMax:null,ratingMin:0,distanceMax:null,freeCancel:false}};
-  langSel.value=state.lang; curSel.value=state.currency;
-
-  /* =========================
-     Utils
-  ========================== */
-  const toRad = d => d*Math.PI/180;
-  function metersBetween(a,b){
-    const R=6371000, dLat=toRad(b.lat-a.lat), dLon=toRad(b.lng-a.lng);
-    const lat1=toRad(a.lat), lat2=toRad(b.lat);
-    const h=Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
-    return 2*R*Math.asin(Math.sqrt(h));
-  }
-  function formatDistance(m){ return m<950?`${Math.round(m/10)*10} m`:`${(m/1000).toFixed(1)} km`; }
-  function t(key){ return (LANGS[state.lang]&&LANGS[state.lang][key])||LANGS.en[key]||key; }
-  function money(usd){ const c=CURRENCIES[state.currency]; const val=usd*c.rate; return `${c.sym}${val.toFixed(c.dp)}`; }
-  function badgeLabel(code){ const map={limited:{en:'Limited-time deal',ko:'기간 한정 특가'},mobileOnly:{en:'Mobile only',ko:'모바일 전용 요금'},genius:{en:'Genius',ko:'Genius'},new:{en:'New',ko:'신규'}}; const l=map[code]||{en:code}; return l[state.lang]||l.en; }
-  function ratingTextFromScore(score){ if(score>=9) return t('superb'); if(score>=8.5) return t('excellent'); if(score>=8) return t('verygood'); return ''; }
-  const distanceFromCenter = h => metersBetween({lat:h.lat,lng:h.lng}, CITY_CENTER);
-
-  /* =========================
-     Render List
-  ========================== */
-  function renderList(){
-    listEl.innerHTML='';
-    const filtered=(hotels||[]).filter(h=>{
-      const dist=distanceFromCenter(h);
-      const priceConv=(h.priceUSD||0)*CURRENCIES[state.currency].rate;
-      if(state.filters.priceMax && priceConv>state.filters.priceMax) return false;
-      if(state.filters.ratingMin && (h.rating||0)<state.filters.ratingMin) return false;
-      if(state.filters.distanceMax && dist>state.filters.distanceMax) return false;
-      if(state.filters.freeCancel && !h.freeCancel) return false;
-      return true;
-    });
-
-    const sorted=[...filtered].sort((a,b)=>{
-      if(state.sort==='price-asc') return (a.priceUSD||0)-(b.priceUSD||0);
-      if(state.sort==='price-desc') return (b.priceUSD||0)-(a.priceUSD||0);
-      if(state.sort==='rating-desc') return (b.rating||0)-(a.rating||0);
-      if(state.sort==='distance-asc') return distanceFromCenter(a)-distanceFromCenter(b);
-      return 0;
-    });
-
-    for(const h of sorted){
-      const dist=formatDistance(distanceFromCenter(h));
-      const node=document.createElement('div'); node.className='card';
-      node.innerHTML=`
-        <div class="card-media">
-          <img src="${h.photo||''}" alt="${h.name||''}">
-          <div class="badge-row">${(h.badges||[]).map(b=>`<div class="badge">${badgeLabel(b)}</div>`).join('')}</div>
-          <div class="fav" data-id="${h.id||''}" title="Favorite">
-            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 21s-6.716-4.279-9.428-7.012C.96 12.35.5 10.862.5 9.32.5 6.387 2.8 4 5.6 4c1.56 0 3.01.73 3.9 1.872A5.018 5.018 0 0 1 13.4 4c2.8 0 5.1 2.387 5.1 5.32 0 1.542-.46 3.03-2.072 4.668C18.716 16.721 12 21 12 21z"/></svg>
-          </div>
-        </div>
-        <div class="card-body">
-          <div>
-            <div class="title">${h.name||''}</div>
-            <div class="meta"><span class="distance">${t('fromCenter')} ${dist}</span></div>
-            <div class="payline"><span class="old-price">${h.oldUSD?money(h.oldUSD):''}</span><span class="price">${money(h.priceUSD||0)}</span></div>
-            <div class="tax">${t('taxesIncluded')} • ${t('perStay')}</div>
-            <div class="cancel">${h.freeCancel?`✔ ${t('freeCancel')}`:''}</div>
-            <a href="/results.html?hotel=${encodeURIComponent(h.id||'')}&city=${encodeURIComponent(CITY_CENTER.name)}" class="btn gold book">Book</a>
-          </div>
-          <div class="rating">${(h.rating??'').toString()} <span style="font-weight:600;margin-left:6px">${ratingTextFromScore(h.rating||0)}</span><br><span style="font-size:12px;opacity:.85">${h.reviews||0} ${t('reviews')}</span></div>
-        </div>`;
-      listEl.appendChild(node);
-    }
-
-    // fav state
-    document.querySelectorAll('.fav').forEach(el=>{
-      const id=el.getAttribute('data-id');
-      if(localStorage.getItem('fav:'+id)==='1') el.classList.add('active');
-      el.addEventListener('click',()=>{
-        el.classList.toggle('active');
-        localStorage.setItem('fav:'+id, el.classList.contains('active')?'1':'0');
-      });
-    });
-  }
-
-  /* =========================
-     Map
-  ========================== */
-  const map=L.map('map',{zoomControl:true,attributionControl:false}).setView([CITY_CENTER.lat,CITY_CENTER.lng],13);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
-  let markers=[];
-  function renderMarkers(){
-    markers.forEach(m=>map.removeLayer(m)); markers=[];
-    (hotels||[]).forEach(h=>{
-      if(typeof h.lat!=='number'||typeof h.lng!=='number') return;
-      const html=`<div class="price-bubble">${money(h.priceUSD||0)}</div>`;
-      const icon=L.divIcon({className:'',html,iconSize:[10,10],iconAnchor:[20,20]});
-      const m=L.marker([h.lat,h.lng],{icon}).addTo(map);
-      m.bindPopup(`<b>${h.name||''}</b><br>${money(h.priceUSD||0)} • ${t('taxesIncluded')}<br>${t('fromCenter')} ${formatDistance(distanceFromCenter(h))}`);
-      markers.push(m);
-    });
-    if(markers.length){
-      const bounds=L.latLngBounds(markers.map(m=>m.getLatLng()));
-      map.fitBounds(bounds.pad(0.2));
-    }else{
-      map.setView([CITY_CENTER.lat,CITY_CENTER.lng],13);
-    }
-  }
-
-  /* =========================
-     UI text sync
-  ========================== */
-  function syncUITexts(){
-    document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.getAttribute('data-i18n'))});
-    rateHint.textContent=t('currencyNote');
-    renderList(); renderMarkers();
-  }
-
-  // language / currency
-  langSel.addEventListener('change',()=>{
-    state.lang=langSel.value;
-    if(LANG_TO_DEFAULT_CURRENCY[state.lang]){
-      state.currency=LANG_TO_DEFAULT_CURRENCY[state.lang];
-      curSel.value=state.currency;
-    }
-    syncUITexts();
-  });
-  curSel.addEventListener('change',()=>{ state.currency=curSel.value; renderList(); renderMarkers(); });
-
-  // sort & filters
-  document.getElementById('btnSort').addEventListener('click',()=>{
-    const order=['price-asc','price-desc','rating-desc','distance-asc'];
-    const idx=order.indexOf(state.sort);
-    state.sort=order[(idx+1)%order.length];
-    renderList();
-  });
-
-  const filterPanel=document.getElementById('filterPanel');
-  const filterBackdrop=document.getElementById('filterBackdrop');
-  const btnFilter=document.getElementById('btnFilter');
-  const btnCloseFilter=document.getElementById('btnCloseFilter');
-  const btnApplyFilters=document.getElementById('btnApplyFilters');
-  const btnResetFilters=document.getElementById('btnResetFilters');
   function openFilters(){ document.body.classList.add('filter-open'); }
   function closeFilters(){ document.body.classList.remove('filter-open'); }
   btnFilter.addEventListener('click',openFilters);
   btnCloseFilter.addEventListener('click',closeFilters);
   filterBackdrop.addEventListener('click',closeFilters);
 
-  const rngPrice=document.getElementById('fPrice');
-  const rngRating=document.getElementById('fRating');
-  const rngDistance=document.getElementById('fDistance');
-  const chkFree=document.getElementById('fFreeCancel');
-  const lblPrice=document.getElementById('fPriceVal');
-  const lblRating=document.getElementById('fRatingVal');
-  const lblDistance=document.getElementById('fDistanceVal');
-  const formatDistanceLabel=m=>m<1000?`${m} m`:`${(m/1000).toFixed(1)} km`;
-  function updateFilterLabels(){
-    const c=CURRENCIES[state.currency];
-    lblPrice.textContent=`${c.sym}${(+rngPrice.value).toFixed(0)}`;
-    lblRating.textContent=(+rngRating.value).toFixed(1);
-    lblDistance.textContent=formatDistanceLabel(+rngDistance.value);
-  }
-  ;['input','change'].forEach(ev=>{
-    rngPrice.addEventListener(ev,updateFilterLabels);
-    rngRating.addEventListener(ev,updateFilterLabels);
-    rngDistance.addEventListener(ev,updateFilterLabels);
-  });
-
-  btnApplyFilters.addEventListener('click',()=>{
-    state.filters.priceMax=+rngPrice.value;
-    state.filters.ratingMin=+rngRating.value;
-    state.filters.distanceMax=+rngDistance.value;
-    state.filters.freeCancel=chkFree.checked;
-    closeFilters(); renderList(); renderMarkers();
-  });
-  btnResetFilters.addEventListener('click',()=>{
-    rngPrice.value=1000; rngRating.value=0; rngDistance.value=10000; chkFree.checked=false;
-    updateFilterLabels();
-    state.filters={priceMax:null,ratingMin:0,distanceMax:null,freeCancel:false};
-    renderList(); renderMarkers();
-  });
-
-  document.getElementById('btnMapList').addEventListener('click',()=>{ document.getElementById('map').scrollIntoView({behavior:'smooth'}); });
-
-  // init
-  updateFilterLabels(); syncUITexts();
-
-  /* =========================
-     Firestore (real-time)
-  ========================== */
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getFirestore, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-  // ⬇️ Replace with your Firebase project config (for panamapresident94@gmail.com)
-const firebaseConfig = {
-  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
-  authDomain: "stayworld-2570c.firebaseapp.com",
-  projectId: "stayworld-2570c",
-  storageBucket: "stayworld-2570c.firebasestorage.app",
-  messagingSenderId: "272599681686",
-  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
-  measurementId: "G-F8MXM3D7FJ"
-};
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  function subscribeHotels(){
-    onSnapshot(collection(db,'hotels'), (snapshot)=>{
-      hotels = [];
-      snapshot.forEach(doc=>hotels.push(doc.data()));
-
-      // Optional: a document like {center:true, city:"Seoul", lat:..., lng:...}
-      const centerDoc = hotels.find(h=>h.center===true);
-      if(centerDoc && typeof centerDoc.lat==='number' && typeof centerDoc.lng==='number'){
-        CITY_CENTER = { name:centerDoc.city||CITY_CENTER.name, lat:centerDoc.lat, lng:centerDoc.lng };
-      }
-      renderList(); renderMarkers();
-    });
-  }
-  subscribeHotels();
+  // 🔑 전역 노출
+  window.openFilters = openFilters;
+  window.closeFilters = closeFilters;
 </script>
-  <script>
+
+<script>
   // URL에 #filters 붙어있으면 자동으로 필터 열기
-  window.addEventListener('DOMContentLoaded', () => {
+  function maybeOpenFiltersFromHash() {
     if (location.hash === '#filters') {
-      // hotels.html에 openFilters 함수가 있으면 호출
-      if (typeof openFilters === 'function') {
-        openFilters();
-      }
-      // 혹시 openFilters가 없으면 강제로 패널 열기
-      const panel = document.getElementById('filterPanel');
-      if (panel) {
-        panel.classList.add('open');
+      if (typeof window.openFilters === 'function') {
+        window.openFilters();
+      } else {
+        document.body.classList.add('filter-open');
       }
     }
-  });
+  }
+  window.addEventListener('DOMContentLoaded', maybeOpenFiltersFromHash);
+  window.addEventListener('hashchange', maybeOpenFiltersFromHash);
 </script>
 
 </body>
-
 </html>
