@@ -212,6 +212,125 @@
   window.addEventListener('DOMContentLoaded', maybeOpenFiltersFromHash);
   window.addEventListener('hashchange', maybeOpenFiltersFromHash);
 </script>
+/* =========================
+   Deep-link via location.hash
+   예) /hotels.html#filters&sort=price-desc&rating=8.5&price=300&distance=3000&cancel=1&lang=ko&cur=KRW&lat=37.5665&lng=126.9780&city=Seoul
+========================= */
+
+// openFilters를 해시에서도 호출 가능하도록 전역 노출
+window.openFilters = openFilters;
+
+function parseHashParams() {
+  const h = (location.hash || '').replace(/^#/, '');
+  const parts = h ? h.split('&') : [];
+  const params = {};
+  for (const p of parts) {
+    if (!p) continue;
+    const [k, vRaw] = p.split('=');
+    const k2 = decodeURIComponent(k || '').trim().toLowerCase();
+    const v = decodeURIComponent((vRaw ?? '').trim());
+    // 값 없는 키(예: #filters)도 true로 처리
+    params[k2] = v === '' ? true : v;
+  }
+  return params;
+}
+
+function applyHashParams() {
+  const q = parseHashParams();
+  let needRerender = false;
+  let needRelayoutMap = false;
+
+  // 1) 필터 패널 자동 열기
+  if (q.filters === true || q.filters === '1' || q.filters === 'true') {
+    openFilters?.();
+  }
+
+  // 2) 정렬
+  const sortAllow = new Set(['price-asc','price-desc','rating-desc','distance-asc']);
+  if (q.sort && sortAllow.has(q.sort)) {
+    state.sort = q.sort;
+    needRerender = true;
+  }
+
+  // 3) 필터 값들: price(통화에 맞춘 최대값), rating(최소), distance(최대 m), cancel(무료취소)
+  // hash → 슬라이더/체크 UI에도 반영
+  if (q.price && !isNaN(+q.price)) {
+    document.getElementById('fPrice').value = +q.price;
+    state.filters.priceMax = +q.price;
+    needRerender = true;
+  }
+  if (q.rating && !isNaN(+q.rating)) {
+    document.getElementById('fRating').value = +q.rating;
+    state.filters.ratingMin = +q.rating;
+    needRerender = true;
+  }
+  if (q.distance && !isNaN(+q.distance)) {
+    document.getElementById('fDistance').value = +q.distance;
+    state.filters.distanceMax = +q.distance;
+    needRerender = true;
+  }
+  if (q.cancel !== undefined) {
+    const on = (q.cancel === true || q.cancel === '1' || q.cancel === 'true');
+    document.getElementById('fFreeCancel').checked = on;
+    state.filters.freeCancel = on;
+    needRerender = true;
+  }
+
+  // 4) 언어/통화
+  if (q.lang && LANGS[q.lang]) {
+    state.lang = q.lang;
+    document.getElementById('lang').value = q.lang;
+    // 언어가 바뀌었으면 기본 통화도 맞춰줄지 옵션 (해시에 cur 있으면 cur 우선)
+    if (!q.cur && LANG_TO_DEFAULT_CURRENCY[state.lang]) {
+      state.currency = LANG_TO_DEFAULT_CURRENCY[state.lang];
+      document.getElementById('currency').value = state.currency;
+    }
+    // 텍스트 갱신은 맨 마지막에
+  }
+  if (q.cur && CURRENCIES[q.cur]) {
+    state.currency = q.cur;
+    document.getElementById('currency').value = q.cur;
+  }
+
+  // 5) 중심도시/좌표 (선택)
+  // lat, lng가 있으면 지도의 중심을 해당 좌표로, city가 있으면 도시명도 교체
+  const latNum = q.lat !== undefined ? +q.lat : NaN;
+  const lngNum = q.lng !== undefined ? +q.lng : NaN;
+  if (!isNaN(latNum) && !isNaN(lngNum)) {
+    CITY_CENTER = {
+      name: q.city || CITY_CENTER.name,
+      lat: latNum,
+      lng: lngNum
+    };
+    needRelayoutMap = true;
+    needRerender = true;
+  } else if (q.city) {
+    // city만 있으면 이름만 교체
+    CITY_CENTER = { ...CITY_CENTER, name: q.city };
+  }
+
+  // UI 라벨 최신화
+  updateFilterLabels();
+
+  // 텍스트/i18n 동기화는 언어/통화 반영 후 실행
+  // 단, 이미 초기 렌더링된 뒤라면 중복 렌더 방지를 위해 플래그로 제어
+  if (q.lang || q.cur) {
+    syncUITexts();
+    // syncUITexts안에서 renderList/renderMarkers 호출하므로 아래 needRerender는 건너뛸 수 있음
+    needRerender = false;
+  }
+
+  if (needRerender) {
+    renderList();
+    renderMarkers();
+  } else if (needRelayoutMap) {
+    renderMarkers(); // 중심 바뀐 경우 마커/뷰 재계산
+  }
+}
+
+// 첫 로드 & 뒤로가기/앞으로가기에도 반응
+window.addEventListener('DOMContentLoaded', applyHashParams);
+window.addEventListener('hashchange', applyHashParams);
 
 </body>
 </html>
