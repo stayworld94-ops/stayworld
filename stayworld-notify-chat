@@ -1,0 +1,385 @@
+# Netlify Deploy Scaffold (Vite + Firebase)
+# 이 폴더/파일 구조를 레포에 넣으면 Netlify에서 바로 배포 가능
+# 모노레포 기준: web/ (프런트) + functions/ (Firebase Cloud Functions)
+
+
+# =============================================
+# FILE: web/netlify.toml
+# =============================================
+[build]
+  base = "web"
+  command = "npm run build"
+  publish = "dist"
+
+# SPA 라우팅 처리 (리액트 라우터/CSR 전용)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+
+# =============================================
+# FILE: web/package.json
+# =============================================
+{
+  "name": "stayworld-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5173"
+  },
+  "dependencies": {
+    "firebase": "^10.12.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.7",
+    "vite": "^5.3.0"
+  }
+}
+
+
+# =============================================
+# FILE: web/vite.config.js
+# =============================================
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})
+
+
+# =============================================
+# FILE: web/tailwind.config.js
+# =============================================
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,jsx,ts,tsx}',
+  ],
+  theme: { extend: {} },
+  plugins: [],
+}
+
+
+# =============================================
+# FILE: web/postcss.config.js
+# =============================================
+export default { plugins: { tailwindcss: {}, autoprefixer: {} } }
+
+
+# =============================================
+# FILE: web/.env.example  (Netlify UI에 환경변수로 넣으세요)
+# =============================================
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_VAPID_KEY=
+
+
+# =============================================
+# FILE: web/index.html
+# =============================================
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayWorld</title>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+# =============================================
+# FILE: web/src/main.jsx
+# =============================================
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './styles.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+
+
+# =============================================
+# FILE: web/src/styles.css
+# =============================================
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 추가 커스텀 스타일이 있으면 여기에 */
+
+
+# =============================================
+# FILE: web/public/firebase-messaging-sw.js
+# =============================================
+// Netlify에 배포 시, 사이트 루트에서 서비스워커가 제공됩니다.
+self.importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+self.importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+self.firebase.initializeApp({
+  apiKey: self.env?.VITE_FIREBASE_API_KEY || 'REPLACE_ME',
+  authDomain: 'REPLACE_ME.firebaseapp.com',
+  projectId: 'REPLACE_ME',
+  storageBucket: 'REPLACE_ME.appspot.com',
+  messagingSenderId: 'REPLACE_ME',
+  appId: 'REPLACE_ME',
+});
+const messaging = self.firebase.messaging();
+messaging.onBackgroundMessage((payload)=>{
+  const title = payload.notification?.title || 'STAYWORLD';
+  const options = { body: payload.notification?.body || '', icon: '/icon-192.png', badge: '/icon-192.png', data: payload.data || {} };
+  self.registration.showNotification(title, options);
+});
+
+
+# =============================================
+# FILE: web/src/App.jsx  (Firebase + 알림/채팅: Vite 환경변수 사용)
+# =============================================
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { initializeApp } from 'firebase/app'
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth'
+import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, onSnapshot, query, orderBy, serverTimestamp, writeBatch, getDocs } from 'firebase/firestore'
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { getMessaging, isSupported, getToken, onMessage } from 'firebase/messaging'
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
+  authDomain: "stayworld-2570c.firebaseapp.com",
+  projectId: "stayworld-2570c",
+  storageBucket: "stayworld-2570c.firebasestorage.app",
+  messagingSenderId: "272599681686",
+  appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
+  measurementId: "G-F8MXM3D7FJ"
+};
+const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY
+
+const app = initializeApp(firebaseConfig)
+const auth = getAuth(app)
+const db = getFirestore(app)
+const storage = getStorage(app)
+let messaging = null
+
+const DICT = {
+  ko: { brand: 'STAYWORLD', login: '로그인', logout: '로그아웃', notifications: '알림센터', all: '전체', messages: '메시지', system: '시스템', markAllRead: '모두 읽음', none: '표시할 알림이 없습니다.', categories: '알림 카테고리', allowPush: '웹 푸시는 브라우저 권한 승인 필요.', connectHost: '호스트 연결', viewStatus: '상태 알림 보기', verified: 'Verified', priceTax: '세금·기타 포함 / 1박', messagePlaceholder: '메시지 작성...', send: '보내기', report: '신고', block: '차단', blocked: '차단됨', offline: '오프라인', online: '온라인' },
+}
+const classNames = (...s) => s.filter(Boolean).join(' ')
+const formatTime = (d) => { const diff = Date.now() - d.getTime(); const m = Math.floor(diff/60000); if (m < 1) return '지금'; if (m < 60) return `${m}분 전`; const h = Math.floor(m/60); if (h < 24) return `${h}시간 전`; const day = Math.floor(h/24); return `${day}일 전` }
+
+const Icon = {
+  Bell: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={`w-6 h-6 ${p.className||''}`}><path strokeWidth="1.75" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.58 1.41L4 17h5"/><path strokeWidth="1.75" d="M10 17a2 2 0 0 0 4 0"/></svg>),
+  Close:(p)=>(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={`w-5 h-5 ${p.className||''}`}><path strokeWidth="1.75" d="m6 6 12 12M18 6 6 18"/></svg>),
+  Send:(p)=>(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={`w-5 h-5 ${p.className||''}`}><path strokeWidth="1.75" d="M22 2 11 13"/><path strokeWidth="1.75" d="M22 2 15 22l-4-9-9-4 20-7Z"/></svg>),
+  Shield:(p)=>(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={`w-4 h-4 ${p.className||''}`}><path strokeWidth="1.5" d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4Z"/></svg>),
+  Check:(p)=>(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={`w-4 h-4 ${p.className||''}`}><path strokeWidth="2" d="m4 13 5 5L20 7"/></svg>),
+  DoubleCheck:(p)=>(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={`w-4 h-4 ${p.className||''}`}><path strokeWidth="2" d="M1 14l4 4L14 5M8 14l4 4L23 5"/></svg>),
+  Paperclip:(p)=>(<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={`w-5 h-5 ${p.className||''}`}><path strokeWidth="1.75" d="M21.44 11.05 12.5 20a5 5 0 1 1-7.07-7.07l8.96-8.96a3.5 3.5 0 0 1 4.95 4.95l-9.9 9.9a2 2 0 0 1-2.83-2.83l8.13-8.13"/></svg>),
+}
+
+export default function App(){
+  const [lang] = useState('ko')
+  const t = (k) => DICT[lang][k]
+
+  const [user,setUser]=useState(null)
+  const [centerOpen,setCenterOpen]=useState(false)
+  const [activeTab,setActiveTab]=useState('all')
+
+  const [hosts,setHosts]=useState([])
+  const [activeHostId,setActiveHostId]=useState(null)
+  const [messages,setMessages]=useState([])
+  const [notifs,setNotifs]=useState([])
+  const [blockedIds,setBlockedIds]=useState(new Set())
+
+  const [draft,setDraft]=useState('')
+  const [typing,setTyping]=useState(false)
+  const fileRef=useRef(null)
+  const endRef=useRef(null)
+
+  const unread=useMemo(()=>notifs.filter(n=>!n.read).length,[notifs])
+
+  useEffect(()=> onAuthStateChanged(auth, async (u)=>{
+    setUser(u)
+    if(!u){ setMessages([]); setNotifs([]); setBlockedIds(new Set()); setActiveHostId(null); return }
+    const unsubH = onSnapshot(collection(db,'hosts'),(snap)=>{
+      const arr=snap.docs.map(d=>({id:d.id,...d.data()})); setHosts(arr); if(!activeHostId && arr[0]) setActiveHostId(arr[0].id)
+    })
+    const unsubN = onSnapshot(query(collection(db,'users',u.uid,'notifications'), orderBy('ts','desc')),(snap)=>{
+      const arr=snap.docs.map(d=>({id:d.id,...d.data(), ts:d.data().ts?.toDate?.()||new Date()})); setNotifs(arr)
+    })
+    const unsubB = onSnapshot(doc(db,'blocks',u.uid),(d)=>{ const ids=d.exists()? new Set(d.data().hostIds||[]): new Set(); setBlockedIds(ids) })
+
+    try{
+      if(await isSupported()){
+        messaging=getMessaging(app)
+        const swReg=await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        const token=await getToken(messaging,{ vapidKey, serviceWorkerRegistration: swReg })
+        if(token){ await setDoc(doc(db,'users',u.uid),{ fcmToken: token, fcmTokens: [token] },{ merge:true }) }
+        onMessage(messaging,(payload)=>{ setToast({open:true,title:payload?.notification?.title||'알림', body:payload?.notification?.body||''}) })
+      }
+    }catch(err){ console.warn('FCM init error', err) }
+
+    return ()=>{ unsubH(); unsubN(); unsubB() }
+  }),[])
+
+  useEffect(()=>{ if(!user||!activeHostId) return; const threadId=`${user.uid}_${activeHostId}`; const unsub=onSnapshot(query(collection(db,'threads',threadId,'messages'), orderBy('ts','asc')),(snap)=>{ const arr=snap.docs.map(d=>({id:d.id,...d.data(), ts:d.data().ts?.toDate?.()||new Date()})); setMessages(arr); setTimeout(()=>endRef.current?.scrollIntoView({behavior:'smooth'}),0) }); return ()=>unsub() },[user,activeHostId])
+
+  useEffect(()=>{ if(draft) setTyping(true); const id=setTimeout(()=>setTyping(false),1200); return ()=>clearTimeout(id) },[draft])
+
+  const markAllRead=async()=>{ if(!user) return; const qSnap=await getDocs(query(collection(db,'users',user.uid,'notifications'))); const batch=writeBatch(db); qSnap.forEach(d=>{ if(!d.data().read) batch.update(d.ref,{read:true}) }); await batch.commit() }
+  const handleReadOne=async(id)=>{ if(!user) return; await updateDoc(doc(db,'users',user.uid,'notifications',id),{read:true}) }
+  const toggleBlock=async()=>{ if(!user||!activeHostId) return; const next=new Set(blockedIds); if(next.has(activeHostId)) next.delete(activeHostId); else next.add(activeHostId); setBlockedIds(next); await setDoc(doc(db,'blocks',user.uid),{hostIds:[...next]},{merge:true}) }
+  const reportHost=async()=>{ if(!user||!activeHostId) return; await addDoc(collection(db,'reports'),{ uid:user.uid, hostId:activeHostId, reason:'user_click', ts:serverTimestamp() }); setToast({open:true,title:'신고 접수', body:'호스트 신고가 접수되었습니다.'}) }
+
+  const sendMessage=async(fileObj)=>{ if(!user||!activeHostId||blockedIds.has(activeHostId)) return; const text=(draft||'').trim(); if(!text && !fileObj) return; let attachment=null; if(fileObj){ const path=`chat_uploads/${user.uid}/${activeHostId}/${Date.now()}_${fileObj.name}`; const r=sRef(storage,path); await uploadBytes(r,fileObj); const url=await getDownloadURL(r); attachment={ name:fileObj.name, url, type:fileObj.type, size:fileObj.size } } const threadId=`${user.uid}_${activeHostId}`; await addDoc(collection(db,'threads',threadId,'messages'),{ from:'me', text:text||null, ts:serverTimestamp(), read:false, delivered:true, attachment }); setDraft(''); await addDoc(collection(db,'users',user.uid,'notifications'),{ type:'message', title:`호스트 ${activeHostId}`, body:text || (attachment?.name??'첨부파일'), ts:serverTimestamp(), read:false }) }
+  const handleFilePick=(e)=>{ const f=e.target.files?.[0]; if(!f) return; sendMessage(f); if(fileRef.current) fileRef.current.value='' }
+
+  const filteredNotifs=useMemo(()=>{ let n=notifs; if(activeTab==='messages') n=n.filter(x=>x.type==='message'); if(activeTab==='system') n=n.filter(x=>x.type!=='message'); return n.filter(x=>!(x.type==='message' && [...blockedIds].some(hid=> (x.title||'').includes(hid)))) },[notifs,activeTab,blockedIds])
+
+  const activeHost=hosts.find(h=>h.id===activeHostId)
+  const [toast,setToast]=useState({open:false,title:'',body:''})
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#0b0f16] to-[#0a0e15] text-[#e7e9ee]">
+      <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/5 border-b border-white/10">
+        <div className="max-w-6xl mx-auto flex items-center gap-3 px-4 py-3">
+          <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-200 to-yellow-600"/><div className="font-semibold tracking-wide">{DICT[lang].brand}</div></div>
+          <div className="ml-4 hidden md:block text-white/60 text-sm">Netlify · Vite</div>
+          <div className="ml-auto flex items-center gap-2">
+            <button onClick={()=>setCenterOpen(true)} className="relative p-2 rounded-xl hover:bg-white/10 transition" aria-label="Open notifications"><Icon.Bell/>{unread>0 && (<span className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 rounded-full bg-rose-500 text-white text-xs grid place-items-center">{unread}</span>)}</button>
+            {!user ? (
+              <button onClick={()=>signInWithPopup(auth,new GoogleAuthProvider())} className="px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/10">{DICT[lang].login}</button>
+            ) : (
+              <button onClick={()=>signOut(auth)} className="px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/10">{DICT[lang].logout}</button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-6 grid md:grid-cols-2 gap-6">
+        <section className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+          <a href="/reservation/RESV-20250910" className="block aspect-[16/9] bg-[url('https://images.unsplash.com/photo-1502920917128-1aa500764b6a?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center" aria-label="Reservation link"/>
+          <div className="p-4 flex items-start gap-3">
+            <div className="grow"><h3 className="text-lg font-semibold">Bosphorus View Suite · 이스탄불</h3><p className="text-sm text-white/70">무료 취소 · 인증 배지 <span className="inline-flex items-center gap-1 ml-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30"><Icon.Shield/> {DICT[lang].verified}</span></p></div>
+            <div className="text-right"><div className="text-xl font-bold">₺3,200</div><div className="text-xs text-white/70">{DICT[lang].priceTax}</div></div>
+          </div>
+          <div className="p-4 pt-0 flex gap-2">
+            <button onClick={()=> activeHostId? null : setActiveHostId(hosts[0]?.id)} className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">{DICT[lang].connectHost}</button>
+            <button onClick={()=> setToast({open:true,title:'예약 보류', body:'결제 확인 중입니다'})} className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">{DICT[lang].viewStatus}</button>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 overflow-hidden grid grid-cols-1 md:grid-cols-5">
+          <aside className="md:col-span-2 bg-white/5">
+            <div className="px-4 py-3 border-b border-white/10 font-semibold">{DICT[lang].messages}</div>
+            <div className="divide-y divide-white/10">
+              {hosts.map(h=> (
+                <button key={h.id} onClick={()=>setActiveHostId(h.id)} className={classNames('w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 text-left', activeHostId===h.id && 'bg-white/10')}>
+                  <div className="relative"><img src={h.avatar} alt={h.name} className="w-10 h-10 rounded-full object-cover"/><span className={`absolute -right-0.5 -bottom-0.5 w-3 h-3 rounded-full border-2 border-[#0b0f16] ${h.online? 'bg-emerald-400':'bg-slate-500'}`} title={h.online? DICT[lang].online: DICT[lang].offline}/></div>
+                  <div className="grow"><div className="flex items-center gap-2"><div className="font-medium">{h.name}</div>{h.verified && (<span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">{DICT[lang].verified}</span>)}{blockedIds.has(h.id) && (<span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-400/30">{DICT[lang].blocked}</span>)}</div><div className="text-xs text-white/70 line-clamp-1">{h.lastMessage}</div></div>
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <div className="md:col-span-3 flex flex-col bg-white/[0.04]">
+            <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
+              {activeHost && <img src={activeHost.avatar} className="w-8 h-8 rounded-full"/>}
+              <div className="font-semibold">{activeHost?.name || 'Host'}</div>
+              {activeHost && (<span className={`ml-2 text-xs px-2 py-0.5 rounded-full border ${activeHost.online? 'border-emerald-400/40 text-emerald-300' : 'border-white/20 text-white/60'}`}>{activeHost.online? DICT[lang].online: DICT[lang].offline}</span>)}
+              <div className="ml-auto flex gap-2">
+                <button onClick={reportHost} className="text-xs px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">신고</button>
+                <button onClick={toggleBlock} className="text-xs px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">{blockedIds.has(activeHostId)? '차단됨':'차단'}</button>
+              </div>
+            </div>
+
+            <div className="grow overflow-y-auto px-4 py-4 space-y-3">
+              {messages.map(m=> (
+                <div key={m.id} className={`max-w-[80%] p-3 rounded-2xl border ${m.from==='me'? 'ml-auto bg-white/10 border-white/10' : 'bg-black/20 border-white/10'}`}>
+                  {m.attachment? (
+                    <div>{m.attachment.type?.startsWith('image/')? (<img src={m.attachment.url} alt={m.attachment.name} className="rounded-lg max-h-60"/>): (<a href={m.attachment.url} download className="underline" rel="noreferrer">{m.attachment.name}</a>)}</div>
+                  ): (<div className="text-sm leading-relaxed whitespace-pre-wrap">{m.text}</div>)}
+                  <div className="flex items-center gap-1 text-[10px] text-white/60 mt-1">
+                    <span>{formatTime(m.ts)}</span>
+                    {m.from==='me' && (<span className="inline-flex items-center gap-1">{/* 배달/읽음 아이콘은 서버에서 업데이트 시 표시 */}</span>)}
+                  </div>
+                </div>
+              ))}
+              {typing && (<div className="max-w-[60%] p-3 rounded-2xl border bg-black/20 border-white/10"><div className="flex gap-1"><span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse"/><span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse"/><span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse"/></div></div>)}
+              <div ref={endRef}/>
+            </div>
+
+            <div className="p-3 border-t border-white/10 flex items-center gap-2">
+              <button onClick={()=>fileRef.current?.click()} className="p-2 rounded-xl bg-white/10 border border-white/10 hover:bg-white/15" title="첨부">📎</button>
+              <input ref={fileRef} type="file" className="hidden" onChange={handleFilePick}/>
+              <input value={draft} onChange={(e)=>setDraft(e.target.value)} onKeyDown={(e)=> e.key==='Enter' && sendMessage()} placeholder={DICT[lang].messagePlaceholder} className="grow bg-white/10 border border-white/10 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-white/20"/>
+              <button disabled={!user || !activeHostId || blockedIds.has(activeHostId)} onClick={()=>sendMessage()} className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 flex items-center gap-1 disabled:opacity-50">📤 {DICT[lang].send}</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {centerOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/50" onClick={()=>setCenterOpen(false)}/>
+          <div className="absolute right-0 top-0 h-full w-full max-w-md bg-[#0f1522] border-l border-white/10 shadow-2xl flex flex-col">
+            <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
+              <div className="font-semibold">{DICT[lang].notifications}</div>
+              <div className="ml-auto flex items-center gap-2">
+                <button onClick={markAllRead} className="text-sm px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10">{DICT[lang].markAllRead}</button>
+                <button onClick={()=>setCenterOpen(false)} className="p-1.5 rounded-xl hover:bg-white/10" aria-label="Close">✖️</button>
+              </div>
+            </div>
+            <div className="px-2 py-2 flex gap-2">
+              {[{key:'all',label:DICT[lang].all},{key:'messages',label:DICT[lang].messages},{key:'system',label:DICT[lang].system}].map(tbtn=> (
+                <button key={tbtn.key} onClick={()=>setActiveTab(tbtn.key)} className={`px-3 py-1.5 rounded-xl border ${activeTab===tbtn.key? 'bg-white/15 border-white/20':'bg-white/5 border-white/10 hover:bg-white/10'}`}>{tbtn.label}</button>
+              ))}
+            </div>
+            <div className="grow overflow-y-auto divide-y divide-white/10">
+              {filteredNotifs.map(n=> (
+                <div key={n.id} className={`px-4 py-3 flex items-start gap-3 ${!n.read? 'bg-white/5':''}`}>
+                  <div className={`mt-1 w-2 h-2 rounded-full ${n.read? 'bg-white/20':'bg-rose-400'}`}/>
+                  <div className="grow"><div className="text-sm font-medium">{n.title}</div><div className="text-xs text-white/75 mt-0.5">{n.body}</div><div className="text-[10px] text-white/50 mt-1">{formatTime(n.ts)}</div></div>
+                  {!n.read && (<button className="text-xs px-2 py-1 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10" onClick={()=>handleReadOne(n.id)}>읽음</button>)}
+                </div>
+              ))}
+              {filteredNotifs.length===0 && (<div className="px-4 py-10 text-center text-white/60">{DICT[lang].none}</div>)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Toast open={toast.open} onClose={()=>setToast(t=>({...t,open:false}))} title={toast.title} body={toast.body}/>
+      <footer className="max-w-6xl mx-auto px-4 py-10 text-center text-white/50 text-sm">© 2025 STAYWORLD — Netlify</footer>
+    </div>
+  )
+}
+
+function Toast({open,onClose,title,body}){ if(!open) return null; return (<div className="fixed inset-0 pointer-events-none z-[60]"><div className="absolute right-4 top-4 pointer-events-auto w-[340px] rounded-2xl bg-[#10141f] text-white shadow-2xl border border-white/10 p-4"><div className="font-semibold">{title}</div><div className="text-sm text-white/80 mt-1">{body}</div><button onClick={onClose} className="mt-3 text-sm px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20">닫기</button></div></div>) }
+
+
+# =============================================
+# NOTE: functions/, firestore.rules, storage.rules 는 기존 최종본 그대로 사용
+# - Cloud Functions는 계속 Firebase로 배포 (푸시/알림 트리거)
+# - 프런트는 Netlify에서 호스팅
+# =============================================
