@@ -145,11 +145,19 @@
       </a>
 
       <nav class="main-nav" aria-label="Primary">
-        <!-- [ADD] My Page 버튼 (로그인 시 노출) -->
-<button class="btn btn-gold" id="btnMyPage" data-goto="mypage" style="display:none">My Page</button>
+      <button class="btn btn-gold" id="btnMyPage">My Page</button>
 
-        <a href="index.html" data-i18n="nav_home">Home</a>
-        <a href="membership.html" data-i18n="nav_membership">Membership</a>
+<script>
+  const token = localStorage.getItem('authToken'); // 로그인 여부 확인
+  document.getElementById('btnMyPage').onclick = () => {
+    if (token) {
+      location.href = "/mypage.html";   // 로그인 상태 → 마이페이지
+    } else {
+      location.href = "/login.html";    // 로그아웃 상태 → 로그인 페이지
+    }
+  };
+</script>
+
 
         <!-- ===== Host 메뉴 (i18n 적용 완료) ===== -->
         <div class="nav-item dropdown" id="hostMenu">
