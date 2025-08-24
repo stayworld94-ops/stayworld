@@ -146,6 +146,14 @@
 
       <nav class="main-nav" aria-label="Primary">
       <button class="btn btn-gold" id="btnMyPage">My Page</button>
+       <button id="btnHomeFilters" class="btn">Filters</button>
+
+<script>
+  document.getElementById("btnHomeFilters").onclick = () => {
+    location.href = "/hotels.html#filters";  // hotels.html로 이동하면서 #filters 해시 붙이기
+  };
+</script>
+
 
 <script>
   const token = localStorage.getItem('authToken'); // 로그인 여부 확인
