@@ -1,4 +1,4 @@
- <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -30,40 +30,18 @@
     .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
     .btn-chip{background:var(--chip);color:#dfe3ea;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
 
-    /* ---- Host dropdown (추가) ---- */
+    /* ---- Host dropdown ---- */
     .nav-item.dropdown{position:relative}
     .nav-link.dropdown-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;font-weight:600;opacity:.95}
-    /* 수정본 */
-.dropdown-panel{
-  position:absolute;
-  top:100%;                 /* 버튼에 딱 붙여서 간격 제거 */
-  left:50%;
-  transform:translate(-50%, 8px);  /* 자연스럽게 아래로 8px 내려 보이게 */
-  min-width:220px;
-  background:#0f1520;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:8px;
-  z-index:30;
-  box-shadow:0 16px 40px rgba(0,0,0,.45);
-
-  /* 보였다/사라졌다 부드럽게 (display 대신 visibility/opacity 사용) */
-  visibility:hidden;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .12s ease, transform .12s ease, visibility .12s;
-}
-
-/* 호버/포커스/열림 상태에서 보여주기 */
-.nav-item.dropdown:hover .dropdown-panel,
-.nav-item.dropdown:focus-within .dropdown-panel,
-.nav-item.dropdown.open .dropdown-panel{
-  visibility:visible;
-  opacity:1;
-  pointer-events:auto;
-  transform:translate(-50%, 0);
-}
-
+    .dropdown-panel{
+      position:absolute; top:100%; left:50%; transform:translate(-50%, 8px);
+      min-width:220px; background:#0f1520; border:1px solid var(--line); border-radius:12px; padding:8px; z-index:30;
+      box-shadow:0 16px 40px rgba(0,0,0,.45); visibility:hidden; opacity:0; pointer-events:none;
+      transition:opacity .12s ease, transform .12s ease, visibility .12s;
+    }
+    .nav-item.dropdown:hover .dropdown-panel,
+    .nav-item.dropdown:focus-within .dropdown-panel,
+    .nav-item.dropdown.open .dropdown-panel{visibility:visible;opacity:1;pointer-events:auto;transform:translate(-50%,0)}
     .dropdown-item{display:block;padding:10px 12px;border-radius:8px;color:#e7e9ee;text-decoration:none;white-space:nowrap}
     .dropdown-item:hover{background:#121a26}
     .dropdown-divider{height:1px;background:var(--line);margin:6px 0}
@@ -84,27 +62,11 @@
     .card h3{margin:0 0 6px}.card p{margin:0;opacity:.85}
 
     /* Map */
-    .map-section{padding:36px 0 60px
-                <!-- [ADD] MY PAGE — 찜 리스트 + 지도(별마커) -->
-<section id="mypage" class="sw-section" style="display:none">
-  <div class="container">
-    <h2>My Page · Favorites ⭐</h2>
-    <div class="mypage-panels">
-      <div class="fav-list card">
-        <h3>My Favorites</h3>
-        <div id="favList"></div>
-      </div>
-      <div class="fav-map card">
-        <div id="favMap"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
+    .map-section{padding:36px 0 60px}
     #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
     .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
 
-    /* 필터 드로어 */
+    /* 필터 드로어 (index 전용) */
     #filterDrawer{position:fixed;inset:0;display:none;z-index:2147483637;align-items:stretch;justify-content:flex-end}
     #filterDrawer[aria-hidden="false"]{display:flex}
     #filterDrawer .back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
@@ -145,22 +107,9 @@
       </a>
 
       <nav class="main-nav" aria-label="Primary">
-      <button class="btn btn-gold" id="btnMyPage">My Page</button>
-     
+        <button class="btn btn-gold" id="btnMyPage">My Page</button>
 
-<script>
-  const token = localStorage.getItem('authToken'); // 로그인 여부 확인
-  document.getElementById('btnMyPage').onclick = () => {
-    if (token) {
-      location.href = "/mypage.html";   // 로그인 상태 → 마이페이지
-    } else {
-      location.href = "/login.html";    // 로그아웃 상태 → 로그인 페이지
-    }
-  };
-</script>
-
-
-        <!-- ===== Host 메뉴 (i18n 적용 완료) ===== -->
+        <!-- Host 메뉴 -->
         <div class="nav-item dropdown" id="hostMenu">
           <button class="nav-link dropdown-toggle" data-i18n="nav_host">Host</button>
           <div class="dropdown-panel">
@@ -174,7 +123,9 @@
             <button class="dropdown-item" data-host-visible="signedIn" id="hostLogoutBtn" type="button" data-i18n="host_logout">Logout</button>
           </div>
         </div>
-        <!-- =========================== -->
+
+        <!-- 멤버십 메뉴(추가) -->
+        <a href="membership.html" data-i18n="nav_membership">Membership</a>
 
         <a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
       </nav>
@@ -224,6 +175,22 @@
   <!-- MAP -->
   <section class="map-section">
     <div class="container"><div id="map" aria-label="Map" role="region"></div></div>
+  </section>
+
+  <!-- (분리해둔) MY PAGE 섹션: 필요 시 index에서 보일 때만 사용하고, 기본은 숨김 -->
+  <section id="mypage" class="sw-section" style="display:none">
+    <div class="container">
+      <h2>My Page · Favorites ⭐</h2>
+      <div class="mypage-panels">
+        <div class="fav-list card">
+          <h3>My Favorites</h3>
+          <div id="favList"></div>
+        </div>
+        <div class="fav-map card">
+          <div id="favMap"></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ====== SCRIPT: I18N + 드로어/지도/챗봇 ====== -->
@@ -407,25 +374,21 @@
     }
   };
 
-  // 키/단어 변환 도우미 (필터용)
   function tkey(k){const lang=(document.getElementById('lang')?.value||localStorage.getItem('sw_lang')||'EN');return (I18N[lang]||I18N.EN)[k]||I18N.EN[k]||k;}
   function wkey(word){const lang=(document.getElementById('lang')?.value||localStorage.getItem('sw_lang')||'EN');const dict=(I18N[lang]||I18N.EN).w||{};return dict[word]||word;}
 
-  // 페이지 텍스트 갱신
   function applyI18NPage(){
     const lang=(document.getElementById('lang')?.value||'EN');
     const dict=I18N[lang]||I18N.EN;
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n'); if(dict[k]) el.textContent=dict[k];});
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder'); if(dict[k]) el.setAttribute('placeholder', dict[k]);});
-    if(typeof localizeDrawer==='function'){try{localizeDrawer();}catch(_){}} // 필터도 갱신
-    // 누락키 콘솔 표시
+    if(typeof localizeDrawer==='function'){try{localizeDrawer();}catch(_){}} 
     document.querySelectorAll('[data-i18n],[data-i18n-placeholder]').forEach(el=>{
       const k=el.getAttribute('data-i18n')||el.getAttribute('data-i18n-placeholder');
       if(!(k in dict) && !(k in (I18N.EN||{}))) console.warn('[i18n] Missing key:',k);
     });
   }
 
-  // 언어 초기화/저장
   document.addEventListener('DOMContentLoaded', ()=>{
     const sel=document.getElementById('lang');
     const saved=localStorage.getItem('sw_lang');
@@ -434,26 +397,25 @@
     sel?.addEventListener('change', e=>{ localStorage.setItem('sw_lang', e.target.value); applyI18NPage(); setCurrencyByLang(e.target.value); });
   });
 
-  /* ------------------ 통화(10개) & 가격 표시 ------------------ */
+  /* ------------------ 통화 & 가격 ------------------ */
   const CURRENCIES = {
-    USD:{symbol:'$',  rate:1,      locale:'en-US', name:'USD'},
-    EUR:{symbol:'€',  rate:0.92,   locale:'fr-FR', name:'EUR'},
-    KRW:{symbol:'₩',  rate:1300,   locale:'ko-KR', name:'KRW'},
-    JPY:{symbol:'¥',  rate:155,    locale:'ja-JP', name:'JPY'},
-    CNY:{symbol:'¥',  rate:7.2,    locale:'zh-CN', name:'CNY'},
-    TRY:{symbol:'₺',  rate:33,     locale:'tr-TR', name:'TRY'},
-    RUB:{symbol:'₽',  rate:90,     locale:'ru-RU', name:'RUB'},
-    GBP:{symbol:'£',  rate:0.78,   locale:'en-GB', name:'GBP'},
-    AED:{symbol:'د.إ',rate:3.67,   locale:'ar-AE', name:'AED'},
-    CAD:{symbol:'$',  rate:1.36,   locale:'en-CA', name:'CAD'}
+    USD:{symbol:'$',rate:1,locale:'en-US',name:'USD'},
+    EUR:{symbol:'€',rate:0.92,locale:'fr-FR',name:'EUR'},
+    KRW:{symbol:'₩',rate:1300,locale:'ko-KR',name:'KRW'},
+    JPY:{symbol:'¥',rate:155,locale:'ja-JP',name:'JPY'},
+    CNY:{symbol:'¥',rate:7.2,locale:'zh-CN',name:'CNY'},
+    TRY:{symbol:'₺',rate:33,locale:'tr-TR',name:'TRY'},
+    RUB:{symbol:'₽',rate:90,locale:'ru-RU',name:'RUB'},
+    GBP:{symbol:'£',rate:0.78,locale:'en-GB',name:'GBP'},
+    AED:{symbol:'د.إ',rate:3.67,locale:'ar-AE',name:'AED'},
+    CAD:{symbol:'$',rate:1.36,locale:'en-CA',name:'CAD'}
   };
   const LANG_TO_CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
   function setCurrencyByLang(lang){
     const curSel=document.getElementById('currencySelect');
     if(!curSel) return;
     const code = LANG_TO_CUR[lang] || 'USD';
-    curSel.value = code;
-    updatePriceLabels();
+    curSel.value = code; updatePriceLabels();
   }
   function fmtMoney(usd){
     const curSel=document.getElementById('currencySelect'); if(!curSel) return '$'+usd.toFixed(0);
@@ -618,9 +580,12 @@
     if(priceBox) priceBox.textContent = tkey('f_price');
     updatePriceLabels();
   }
-  function openDrawer(){ const d=ensureDrawer(); d.setAttribute('aria-hidden','false'); muteFullscreenOverlays(); localizeDrawer(); }
-  function setBadge(text){ const btn=document.getElementById('btnFilters'); btn.style.position='relative'; let b=btn.querySelector('.sw-badge'); if(text){ if(!b){b=document.createElement('span');b.className='sw-badge';btn.appendChild(b);} b.textContent=text; } else if(b){b.remove();} }
-  document.getElementById('btnFilters').addEventListener('click',e=>{e.stopPropagation(); openDrawer();},{capture:true});
+
+  // ✅ 메인 Filters 버튼: hotels.html#filters 로 이동 (인덱스에선 드로어 대신 이동)
+  document.getElementById('btnFilters')?.addEventListener('click',(e)=>{
+    e.preventDefault();
+    location.href = '/hotels.html#filters';
+  },{capture:true});
 
   /* ------------------ 챗봇 ------------------ */
   function ensureChat(){
@@ -706,7 +671,7 @@
     <div class="container"><small data-i18n="footer_copy">© StayWorld — stayworldbooking.com</small></div>
   </footer>
 
-  <!-- AUTH UI: 네비의 Login/Logout 전환 (통합본: 이 블록만 사용) -->
+  <!-- AUTH UI: 네비의 Login/Logout 전환 -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const link = document.getElementById("navAuthLink");
@@ -735,24 +700,20 @@
         applyI18NPage?.();
       }
 
-      // 외부( signup.js / login.js )에서 성공 시 호출
       window.markLoggedIn = function () {
         localStorage.setItem("sw_logged_in", "true");
         toLogoutUI();
         updateHostMenu();
       };
-      // 필요 시 외부에서 명시적 로그아웃 호출
       window.markLoggedOut = function () {
         localStorage.removeItem("sw_logged_in");
         toLoginUI();
         updateHostMenu();
       };
 
-      // 첫 로드 시 상태 반영
       if (localStorage.getItem("sw_logged_in") === "true") toLogoutUI();
       else toLoginUI();
 
-      // ---- Host 메뉴 보이기/숨기기 ----
       function updateHostMenu(){
         const panel = document.querySelector('#hostMenu .dropdown-panel');
         if(!panel) return;
@@ -763,7 +724,6 @@
       window.updateHostMenu = updateHostMenu;
       updateHostMenu();
 
-      // Host 로그아웃 버튼
       const hostLogout = document.getElementById('hostLogoutBtn');
       hostLogout?.addEventListener('click', (e)=>{
         e.preventDefault();
@@ -773,41 +733,35 @@
         updateHostMenu();
         location.href = '/';
       });
+
+      // ✅ My Page 버튼: 로그인 여부로 분기 (초기 상단 스크립트 덮어쓰는 안전버전)
+      document.getElementById('btnMyPage')?.addEventListener('click', ()=>{
+        const loggedIn = localStorage.getItem('sw_logged_in') === 'true';
+        location.href = loggedIn ? '/mypage.html' : '/login.html';
+      });
     });
   </script>
 
   <!-- 로그인 모달(있다면) -->
   <script src="/assets/login-modal.js"></script>
   <script>
-  // 호스트 드롭다운 클릭 토글 (모바일용)
-  const hostMenu = document.getElementById('hostMenu');
-  if (hostMenu) {
-    const toggle = hostMenu.querySelector('.dropdown-toggle');
-    let hideTimer;
-    toggle?.addEventListener('click', (e)=>{
-      e.preventDefault();
-      hostMenu.classList.toggle('open');
-    });
-    // 마우스가 벗어날 때 약간의 지연 후 닫기(실수 방지)
-    hostMenu.addEventListener('mouseleave', ()=>{
-      hideTimer = setTimeout(()=>hostMenu.classList.remove('open'), 180);
-    });
-    hostMenu.addEventListener('mouseenter', ()=> clearTimeout(hideTimer));
-  }
-</script>
-<!-- ... (본문 및 다른 스크립트 동일 유지) ... -->
+    // 호스트 드롭다운 클릭 토글 (모바일용)
+    const hostMenu = document.getElementById('hostMenu');
+    if (hostMenu) {
+      const toggle = hostMenu.querySelector('.dropdown-toggle');
+      let hideTimer;
+      toggle?.addEventListener('click', (e)=>{
+        e.preventDefault();
+        hostMenu.classList.toggle('open');
+      });
+      hostMenu.addEventListener('mouseleave', ()=>{
+        hideTimer = setTimeout(()=>hostMenu.classList.remove('open'), 180);
+      });
+      hostMenu.addEventListener('mouseenter', ()=> clearTimeout(hideTimer));
+    }
+  </script>
 
-<!-- 사이트 공통 인증 브리지 (반드시 마지막에, defer 없이 일반 include 권장) -->
-<script src="/assets/auth-bridge.js"></script>
-<script>
-  // 클릭 시 호텔 페이지 열고 필터 드로어 자동 오픈
-  document.getElementById('btnInlineFilters').onclick = () => {
-    location.href = '/hotels.html#filters';
-  };
-</script>
- 
+  <!-- 사이트 공통 인증 브리지 -->
+  <script src="/assets/auth-bridge.js"></script>
 </body>
 </html>
-
- </body>
-</html> 
