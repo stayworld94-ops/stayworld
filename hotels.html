@@ -451,5 +451,23 @@ const firebaseConfig = {
   }
   subscribeHotels();
 </script>
+  <script>
+  // URL에 #filters 붙어있으면 자동으로 필터 열기
+  window.addEventListener('DOMContentLoaded', () => {
+    if (location.hash === '#filters') {
+      // hotels.html에 openFilters 함수가 있으면 호출
+      if (typeof openFilters === 'function') {
+        openFilters();
+      }
+      // 혹시 openFilters가 없으면 강제로 패널 열기
+      const panel = document.getElementById('filterPanel');
+      if (panel) {
+        panel.classList.add('open');
+      }
+    }
+  });
+</script>
+
 </body>
+
 </html>
