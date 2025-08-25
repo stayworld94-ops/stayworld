@@ -1,23 +1,85 @@
+<!-- settings.html -->
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Settings - StayWorld</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/lang.js"></script>
+  <script defer src="/settings.js"></script> <!-- 아래 2) 코드 -->
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="site-header"> ... (공통 헤더) ... </header>
+  <!-- 공통 헤더가 이미 include 된다면 그대로 두고, 아니라면 간단 네비 -->
+  <header class="site-header">
+    <nav>
+      <a href="/index.html">Home</a>
+      <a href="/membership.html">Membership</a>
+      <a class="active" href="/settings">Settings</a>
+      <a href="/logout.html">Logout</a>
+    </nav>
+  </header>
 
-  <!-- MAIN -->
-  <main class="container" style="padding:40px 16px;">
+  <main class="container">
     <h1 data-i18n="settings_title">Settings</h1>
-    <p data-i18n="settings_desc">Configure your preferences.</p>
-  </main>
+    <p class="muted" data-i18n="settings_desc">Configure your preferences.</p>
 
-  <footer class="site-footer">© StayWorld</footer>
-  <script src="i18n.js"></script>
-  <script src="/assets/login-modal.js"></script>
+    <form id="settingsForm" class="card-grid">
+      <!-- 언어 -->
+      <div class="card">
+        <h2 data-i18n="language">Language</h2>
+        <select name="language" id="language">
+          <option value="en">English</option><option value="ko">한국어</option>
+          <option value="fr">Français</option><option value="tr">Türkçe</option>
+          <option value="ja">日本語</option><option value="de">Deutsch</option>
+          <option value="es">Español</option><option value="ru">Русский</option>
+          <option value="it">Italiano</option><option value="zh">中文</option>
+        </select>
+      </div>
+
+      <!-- 테마 -->
+      <div class="card">
+        <h2 data-i18n="theme">Theme</h2>
+        <label><input type="radio" name="theme" value="dark" checked> Dark</label>
+        <label><input type="radio" name="theme" value="light"> Light</label>
+        <label><input type="radio" name="theme" value="system"> System</label>
+      </div>
+
+      <!-- 알림 -->
+      <div class="card">
+        <h2 data-i18n="notifications">Notifications</h2>
+        <label><input type="checkbox" name="notif_booking"> Booking updates</label>
+        <label><input type="checkbox" name="notif_promotions"> Promotions</label>
+        <label><input type="checkbox" name="notif_level"> Level / Points</label>
+      </div>
+
+      <!-- 보안 -->
+      <div class="card">
+        <h2 data-i18n="security">Security</h2>
+        <button type="button" id="enable2fa">Enable 2FA</button>
+        <button type="button" id="signoutAll">Sign out all devices</button>
+      </div>
+
+      <!-- 결제/통화 -->
+      <div class="card">
+        <h2 data-i18n="payments">Payments</h2>
+        <label>
+          <span data-i18n="currency">Default currency</span>
+          <select name="currency" id="currency">
+            <option value="USD">USD</option><option value="EUR">EUR</option>
+            <option value="TRY">TRY</option><option value="KRW">KRW</option>
+          </select>
+        </label>
+        <button type="button" id="manageCards">Manage cards</button>
+      </div>
+
+      <!-- 저장 -->
+      <div class="card full">
+        <button class="primary" type="submit" data-i18n="save">Save changes</button>
+        <span id="saveStatus" class="muted"></span>
+      </div>
+    </form>
+  </main>
 </body>
 </html>
