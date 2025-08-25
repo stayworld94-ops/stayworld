@@ -1,35 +1,96 @@
-import OpenAI from "openai";
+// netlify/functions/concierge.js  (CommonJS 스타일)
+const fetch = global.fetch; // Netlify Node 18+
 
-export async function handler(event, context) {
+function cors() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+function json(obj, status = 200) {
+  return {
+    statusCode: status,
+    headers: { "Content-Type": "application/json", ...cors() },
+    body: JSON.stringify(obj),
+  };
+}
+
+function quickRule(q) {
+  const s = (q || "").toLowerCase();
+  if (!s) return null;
+  if (/(contact|host|chat)/.test(s)) return "Connecting you to your host…";
+  if (/(booking|reservation|id)/.test(s))
+    return "Please share your booking ID (e.g., SW-2025-1234).";
+  if (/(cities|city|recommend)/.test(s))
+    return "Top picks: Istanbul · Tokyo · Paris · Bangkok · Barcelona.";
+  if (/(support|help)/.test(s)) return "Support is here 24/7. Tell me what happened.";
+  return null;
+}
+
+exports.handler = async (event) => {
+  // CORS preflight
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 204, headers: cors(), body: "" };
+  }
   if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: "Method Not Allowed"
-    };
+    return { statusCode: 405, headers: cors(), body: "Method Not Allowed" };
   }
 
   try {
-    const { message } = JSON.parse(event.body);
+    const body = JSON.parse(event.body || "{}");
+    const q = String(body.q || "").slice(0, 2000);
 
-    const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
+    // 1) 룰 기반 빠른 답변
+    const rule = quickRule(q);
+    if (rule) return json({ answer: rule });
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: message }]
-    });
+    // 2) OpenAI 호출 (키 없으면 기본 답변)
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) {
+      return json({
+        answer:
+          "I can help with bookings, hosts, or destinations. What do you need?",
+      });
+    }
 
-    return {
-      statusCode: 200,
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
       body: JSON.stringify({
-        reply: completion.choices[0].message.content
-      })
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are StayWorld Concierge. Be concise and helpful for travel/booking.",
+          },
+          { role: "user", content: q },
+        ],
+        temperature: 0.3,
+        max_tokens: 400,
+      }),
+    });
+
+    if (!r.ok) {
+      // OpenAI 에러시 안전한 기본 답변
+      return json({
+        answer:
+          "I can help with bookings, hosts, or destinations. What do you need?",
+      });
+    }
+    const data = await r.json();
+    const answer =
+      data?.choices?.[0]?.message?.content ||
+      "I can help with bookings, hosts, or destinations. What do you need?";
+    return json({ answer });
+  } catch (e) {
+    return json({
+      answer: "Something went wrong. Please try again.",
+      error: String(e && e.message ? e.message : e),
+    });
   }
-}
+};
