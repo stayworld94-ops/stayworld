@@ -30,12 +30,12 @@
 
   <main class="container">
     <section class="card">
-      <p>Fill in your info to apply as a host. Once approved, your account role will be upgraded.</p>
+      <p>Fill in your info to activate your host account. Once submitted, you can immediately register properties.</p>
       <form id="onboardForm">
         <label>Full Name<input id="fullName" required></label>
         <label>ID Verification Number<input id="idNumber" required></label>
         <label>Phone<input id="phone"></label>
-        <button type="submit" class="btn primary" style="margin-top:14px">Apply</button>
+        <button type="submit" class="btn primary" style="margin-top:14px">Activate Host Mode</button>
       </form>
     </section>
   </main>
@@ -70,12 +70,13 @@
           name:form.fullName.value,
           idNumber:form.idNumber.value,
           phone:form.phone.value,
-          role:"pending_host",
+          role:"host",
           createdAt:Date.now()
         };
-        await setDoc(doc(db,'hostApplications',user.uid),data);
-        alert("Application submitted! We'll review it soon.");
-        location.href="/mypage.html";
+        // ✅ users/{uid} 문서에 바로 host 역할 저장
+        await setDoc(doc(db,'users',user.uid), data, {merge:true});
+        alert("🎉 You are now a host! You can register your properties.");
+        location.href="/host.html";
       });
     });
   </script>
