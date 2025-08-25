@@ -63,7 +63,8 @@
   }
 
   // 페이지 로드 시 자동 초기화 + 엔드포인트 연결
-  function init(){ ui({ brand:'STAYWORLD', endpoint:'/.netlify/functions/concierge' }) }
+function init(){ ui({ brand:'STAYWORLD', endpoint:'https://stayworld-notify-chat.netlify.app/.netlify/functions/concierge' }) }
+
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
