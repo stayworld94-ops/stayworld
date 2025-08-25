@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>StayWorld — Become a Host</title>
+  <link rel="icon" href="/stayworld-logo.png"/>
+  <style>
+    body{margin:0;font-family:Inter,system-ui;background:#0b0b0c;color:#e8eaed}
+    .container{max-width:700px;margin:0 auto;padding:24px}
+    header{padding:16px;border-bottom:1px solid #23252a;background:#131417}
+    h1{margin:0;font-size:22px}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:12px;
+      border:1px solid #23252a;background:#16181f;color:#e8eaed}
+    .btn.primary{background:linear-gradient(180deg,#1d2028,#181b22);border-color:#2a2f3a}
+    .card{background:#131417;border:1px solid #23252a;border-radius:16px;
+      margin-top:20px;padding:20px}
+    label{display:block;margin-top:12px;font-size:14px;color:#9aa0a6}
+    input{width:100%;margin-top:6px;padding:10px;border-radius:8px;
+      border:1px solid #23252a;background:#0f1115;color:#e8eaed}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>✨ Become a Host</h1>
+      <a href="/mypage.html" class="btn">← Back to My Page</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <p>Fill in your info to apply as a host. Once approved, your account role will be upgraded.</p>
+      <form id="onboardForm">
+        <label>Full Name<input id="fullName" required></label>
+        <label>ID Verification Number<input id="idNumber" required></label>
+        <label>Phone<input id="phone"></label>
+        <button type="submit" class="btn primary" style="margin-top:14px">Apply</button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
+      authDomain: "stayworld-2570c.firebaseapp.com",
+      projectId: "stayworld-2570c",
+      storageBucket: "stayworld-2570c.firebasestorage.app",
+      messagingSenderId: "272599681686",
+      appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
+      measurementId: "G-F8MXM3D7FJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const form=document.getElementById('onboardForm');
+
+    onAuthStateChanged(auth,(user)=>{
+      if(!user){ location.href="/login.html"; return; }
+      form.addEventListener('submit', async(e)=>{
+        e.preventDefault();
+        const data={
+          uid:user.uid,
+          name:form.fullName.value,
+          idNumber:form.idNumber.value,
+          phone:form.phone.value,
+          role:"pending_host",
+          createdAt:Date.now()
+        };
+        await setDoc(doc(db,'hostApplications',user.uid),data);
+        alert("Application submitted! We'll review it soon.");
+        location.href="/mypage.html";
+      });
+    });
+  </script>
+</body>
+</html>
