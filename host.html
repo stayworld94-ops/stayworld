@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>StayWorld — Host Dashboard</title>
+  <link rel="icon" href="/stayworld-logo.png"/>
+  <style>
+    :root{--border:#23252a;--card:#131417;--text:#e8eaed;--muted:#9aa0a6}
+    body{margin:0;background:#0b0b0c;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .grid{display:grid;gap:12px}
+    @media(min-width:900px){.grid-2{grid-template-columns:1fr 1fr}}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1115;color:var(--text)}
+    textarea{min-height:120px}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#16181f;color:var(--text);user-select:none}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+    .btn.primary{background:linear-gradient(180deg,#1d2028,#181b22);border-color:#2a2f3a}
+    .muted{color:var(--muted)}
+    .list{margin-top:16px}
+    .item{border:1px dashed var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Host Dashboard</h1>
+    <p class="muted">Create and manage your listings.</p>
+
+    <!-- 등록 폼 -->
+    <section class="card">
+      <h2 style="margin-top:0">New Listing</h2>
+      <div class="grid grid-2">
+        <div>
+          <label>Title</label>
+          <input id="title" placeholder="Cozy studio in Istanbul">
+        </div>
+        <div>
+          <label>Nightly Price (e.g., 120)</label>
+          <input id="price" type="number" min="0" step="1" placeholder="120">
+        </div>
+        <div>
+          <label>Address</label>
+          <input id="address" placeholder="Address for geocoding">
+        </div>
+        <div>
+          <label>City</label>
+          <input id="city" placeholder="Istanbul">
+        </div>
+        <div>
+          <label>Country</label>
+          <input id="country" placeholder="Türkiye">
+        </div>
+        <div>
+          <label>Capacity</label>
+          <input id="capacity" type="number" min="1" step="1" value="2">
+        </div>
+        <div>
+          <label>Amenities</label>
+          <select id="amenities" multiple>
+            <option>Wifi</option><option>Kitchen</option><option>Washer</option>
+            <option>Air conditioning</option><option>Parking</option><option>Pool</option>
+          </select>
+        </div>
+        <div>
+          <label>Status</label>
+          <select id="status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div style="grid-column:1 / -1">
+          <label>Description</label>
+          <textarea id="description" placeholder="Describe your place..."></textarea>
+        </div>
+
+        <div>
+          <label>Photos (up to 6)</label>
+          <input id="photos" type="file" accept="image/*" multiple>
+          <div class="muted">Large images are automatically resized by the browser.</div>
+        </div>
+
+        <div>
+          <label>Geocode</label>
+          <div class="row">
+            <button id="btnGeocode" class="btn">Geocode address</button>
+            <span id="geoPreview" class="muted"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <button id="btnSave" class="btn primary">Save listing</button>
+      </div>
+      <div id="saveMsg" class="muted" style="margin-top:8px"></div>
+    </section>
+
+    <!-- 내 숙소 리스트 -->
+    <section class="card" style="margin-top:18px">
+      <h2 style="margin-top:0">My Listings</h2>
+      <div id="myListings" class="list"></div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // ==== utils: safeClick (네 페이지와 동일 동작) ====
+    function safeClick(btn, handler, {cooldownMs=600}={}){
+      if(!btn || btn.dataset.bound) return; btn.dataset.bound="1";
+      let inFlight=false;
+      btn.addEventListener('click', async(ev)=>{
+        if(inFlight || btn.disabled) return;
+        inFlight=true;
+        const prev=btn.textContent; btn.disabled=true; btn.textContent='…';
+        try{ await handler(ev, btn); } finally {
+          setTimeout(()=>{ btn.disabled=false; btn.textContent=prev; inFlight=false; }, cooldownMs);
+        }
+      });
+    }
+
+    // ==== Firebase init (네 프로젝트) ====
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
+      authDomain: "stayworld-2570c.firebaseapp.com",
+      projectId: "stayworld-2570c",
+      storageBucket: "stayworld-2570c.firebasestorage.app",
+      messagingSenderId: "272599681686",
+      appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
+      measurementId: "G-F8MXM3D7FJ"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+    const st   = getStorage(app);
+
+    // ==== Google Maps single-load ====
+    let _gmapsPromise;
+    function getGoogleMaps(){
+      if(window.google?.maps) return Promise.resolve();
+      if(_gmapsPromise) return _gmapsPromise;
+      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // 실제 키로 교체
+      if(!apiKey || apiKey.includes('YOUR_')) return Promise.resolve();
+      _gmapsPromise = new Promise((resolve,reject)=>{
+        const cb='__mapsInit_'+Math.random().toString(36).slice(2);
+        window[cb]=()=>{ resolve(); delete window[cb]; };
+        const s=document.createElement('script');
+        s.src=`https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${cb}`;
+        s.async=true; s.defer=true; s.onerror=reject; document.head.appendChild(s);
+      });
+      return _gmapsPromise;
+    }
+    async function geocode(address){
+      await getGoogleMaps();
+      if(!window.google?.maps) throw new Error('Maps not available');
+      return new Promise((res,rej)=>{
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({address}, (results,status)=>{
+          if(status==='OK' && results?.[0]){
+            const p=results[0].geometry.location;
+            res({lat:p.lat(), lng:p.lng(), formatted:results[0].formatted_address});
+          } else rej(new Error(status));
+        });
+      });
+    }
+
+    // ==== DOM refs ====
+    const $ = (id)=>document.getElementById(id);
+    const title = $('title'), price = $('price'), address = $('address'), city = $('city'), country = $('country');
+    const capacity = $('capacity'), amenities = $('amenities'), description = $('description'), photos = $('photos');
+    const statusSel = $('status'), btnGeocode = $('btnGeocode'), geoPreview = $('geoPreview');
+    const btnSave = $('btnSave'), saveMsg = $('saveMsg'), myListings = $('myListings');
+
+    let currentGeo = null;
+
+    // preview geocode
+    safeClick(btnGeocode, async ()=>{
+      const addr = address.value.trim() || [address.value,city.value,country.value].filter(Boolean).join(', ');
+      if(!addr){ geoPreview.textContent='Enter address first'; return; }
+      try{
+        const g = await geocode(addr);
+        currentGeo = g;
+        geoPreview.textContent = `${g.lat}, ${g.lng} (${g.formatted})`;
+      }catch(e){ geoPreview.textContent = 'Geocode failed: '+e.message; }
+    });
+
+    async function uploadAllPhotos(listingId, files){
+      const out=[];
+      const max = Math.min(files.length, 6);
+      for(let i=0;i<max;i++){
+        const f = files[i];
+        const path = `listings/${listingId}/${Date.now()}_${i}_${f.name}`;
+        const r = ref(st, path);
+        await uploadBytes(r, f);
+        out.push(await getDownloadURL(r));
+      }
+      return out;
+    }
+
+    async function saveListing(uid){
+      const titleV = title.value.trim();
+      const priceV = Number(price.value||0);
+      const capacityV = Number(capacity.value||1);
+      if(!titleV) throw new Error('Title required');
+      if(priceV<0) throw new Error('Invalid price');
+
+      // 1) 문서 생성 (draft)
+      const docRef = await addDoc(collection(db,'listings'), {
+        host_id: uid,
+        title: titleV,
+        description: description.value.trim() || '',
+        price_nightly: priceV,
+        capacity: capacityV,
+        address: address.value.trim() || null,
+        city: city.value.trim() || null,
+        country: country.value.trim() || null,
+        amenities: Array.from(amenities.selectedOptions||[]).map(o=>o.value),
+        location: currentGeo ? { lat: currentGeo.lat, lng: currentGeo.lng, formatted: currentGeo.formatted } : null,
+        status: statusSel.value || 'draft',
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp(),
+        photos: []
+      });
+
+      // 2) 사진 업로드 후 URL 업데이트
+      let urls = [];
+      if(photos.files && photos.files.length){
+        urls = await uploadAllPhotos(docRef.id, photos.files);
+        await updateDoc(doc(db,'listings', docRef.id), { photos: urls, updated_at: serverTimestamp() });
+      }
+      return { id: docRef.id, photos: urls };
+    }
+
+    async function loadMyListings(uid){
+      myListings.innerHTML = '';
+      const qRef = query(collection(db,'listings'), where('host_id','==', uid));
+      const snap = await getDocs(qRef);
+      if(snap.empty){ myListings.innerHTML = '<div class="muted">No listings yet.</div>'; return; }
+      snap.forEach(d=>{
+        const L = d.data();
+        const el = document.createElement('div');
+        el.className='item';
+        el.innerHTML = `
+          <div><b>${L.title||'(untitled)'}</b> — ${L.status||'draft'} · ₺${L.price_nightly ?? '-'} · cap ${L.capacity ?? '-'}</div>
+          <div class="muted">${L.location?.formatted || [L.address,L.city,L.country].filter(Boolean).join(', ') || '-'}</div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn" data-action="publish" data-id="${d.id}">Publish</button>
+            <button class="btn" data-action="unpublish" data-id="${d.id}">Unpublish</button>
+          </div>
+        `;
+        myListings.appendChild(el);
+      });
+
+      // publish/unpublish (연타 방지)
+      myListings.querySelectorAll('button[data-action]').forEach(btn=>{
+        safeClick(btn, async (_e, b)=>{
+          const id = b.getAttribute('data-id');
+          const action = b.getAttribute('data-action');
+          const newStatus = action==='publish' ? 'published' : 'draft';
+          await updateDoc(doc(db,'listings', id), { status: newStatus, updated_at: serverTimestamp() });
+          b.textContent = 'Done';
+        }, {cooldownMs:700});
+      });
+    }
+
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){ location.href='/login.html?next=/host.html'; return; }
+      // 역할 확인 (host만 접근)
+      const u = await getDoc(doc(db,'users', user.uid));
+      const role = u.exists() ? (u.data().role || 'guest') : 'guest';
+      if(role!=='host'){
+        alert('Hosts only. Please request host access.');
+        location.href='/mypage.html';
+        return;
+      }
+      await loadMyListings(user.uid);
+
+      // 저장 버튼 (연타 방지)
+      safeClick(btnSave, async ()=>{
+        saveMsg.textContent='';
+        try{
+          const res = await saveListing(user.uid);
+          saveMsg.textContent = 'Saved: '+res.id;
+          // 폼 간단 초기화
+          document.querySelectorAll('input[type=text], textarea').forEach(i=> i.value='');
+          photos.value = '';
+          currentGeo = null; geoPreview.textContent='';
+          await loadMyListings(user.uid);
+        }catch(e){
+          saveMsg.textContent = 'Save failed: '+e.message;
+        }
+      }, {cooldownMs:900});
+    });
+  </script>
+</body>
+</html>
