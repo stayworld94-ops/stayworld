@@ -63,6 +63,11 @@
         <a href="membership.html" data-i18n="nav_membership">Membership</a>
         <a href="/login.html" id="loginLink" data-i18n="nav_login">Login</a>
         <button id="logoutBtn" class="btn" style="display:none" data-i18n="logout">Logout</button>
+
+        <!-- ✅ Host / Become a host (역할에 따라 토글됨) -->
+        <a id="hostLink" class="btn" href="/host.html" style="display:none" data-i18n="host">Host</a>
+        <a id="becomeHostLink" class="btn" href="/host-onboarding.html" style="display:none" data-i18n="become_host">Become a host</a>
+
         <select id="langSelect" class="select" aria-label="Language">
           <option value="en">English</option>
           <option value="ko">한국어</option>
@@ -140,16 +145,16 @@
   <!-- i18n (10 languages) -->
   <script>
     const I18N = {
-      en:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",logout:"Logout",my_page:"My Page",signed_in_as:"Signed in as",points:"Points",find_stays:"Find stays",settings:"Settings",my_locations:"My Locations",my_bookings:"My Bookings",no_bookings:"No bookings yet.",check_in:"Check-in",check_out:"Check-out",status:"Status",price:"Price",payment_status:"Payment",cancel:"Cancel",cancel_requested:"Cancel requested",sign_in_prompt:"Please sign in to view your page.",all_rights:"All rights reserved.",addr_placeholder:"Enter address",geo_btn:"Geocode address",geo_result_prefix:"Result"},
-      ko:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",logout:"로그아웃",my_page:"마이페이지",signed_in_as:"로그인 계정",points:"포인트",find_stays:"숙소 찾기",settings:"설정",my_locations:"내 위치 리스트",my_bookings:"내 예약",no_bookings:"아직 예약이 없습니다.",check_in:"체크인",check_out:"체크아웃",status:"상태",price:"결제금액",payment_status:"결제",cancel:"예약 취소",cancel_requested:"취소 요청됨",sign_in_prompt:"마이페이지 보기를 위해 로그인해주세요.",all_rights:"모든 권리 보유.",addr_placeholder:"주소 입력",geo_btn:"주소 좌표 변환",geo_result_prefix:"결과"},
-      fr:{nav_home:"Accueil",nav_membership:"Abonnement",nav_login:"Connexion",logout:"Déconnexion",my_page:"Mon espace",signed_in_as:"Connecté en tant que",points:"Points",find_stays:"Trouver des séjours",settings:"Paramètres",my_locations:"Mes lieux",my_bookings:"Mes réservations",no_bookings:"Aucune réservation.",check_in:"Arrivée",check_out:"Départ",status:"Statut",price:"Montant",payment_status:"Paiement",cancel:"Annuler",cancel_requested:"Annulation demandée",sign_in_prompt:"Veuillez vous connecter pour voir votre espace.",all_rights:"Tous droits réservés.",addr_placeholder:"Saisir l'adresse",geo_btn:"Géocoder l'adresse",geo_result_prefix:"Résultat"},
-      tr:{nav_home:"Ana sayfa",nav_membership:"Üyelik",nav_login:"Giriş",logout:"Çıkış",my_page:"Hesabım",signed_in_as:"Olarak giriş yapıldı",points:"Puan",find_stays:"Konaklama bul",settings:"Ayarlar",my_locations:"Konumlarım",my_bookings:"Rezervasyonlarım",no_bookings:"Rezervasyon yok.",check_in:"Giriş",check_out:"Çıkış",status:"Durum",price:"Tutar",payment_status:"Ödeme",cancel:"İptal",cancel_requested:"İptal talep edildi",sign_in_prompt:"Sayfanızı görmek için giriş yapın.",all_rights:"Tüm hakları saklıdır.",addr_placeholder:"Adres girin",geo_btn:"Adresi jeokodla",geo_result_prefix:"Sonuç"},
-      ja:{nav_home:"ホーム",nav_membership:"メンバーシップ",nav_login:"ログイン",logout:"ログアウト",my_page:"マイページ",signed_in_as:"ログイン中",points:"ポイント",find_stays:"宿泊先を探す",settings:"設定",my_locations:"マイロケーション",my_bookings:"予約一覧",no_bookings:"予約がありません。",check_in:"チェックイン",check_out:"チェックアウト",status:"ステータス",price:"金額",payment_status:"支払い",cancel:"キャンセル",cancel_requested:"キャンセル申請済み",sign_in_prompt:"表示するにはログインしてください。",all_rights:"無断転載禁止。",addr_placeholder:"住所を入力",geo_btn:"住所をジオコード",geo_result_prefix:"結果"},
-      de:{nav_home:"Startseite",nav_membership:"Mitgliedschaft",nav_login:"Anmelden",logout:"Abmelden",my_page:"Mein Bereich",signed_in_as:"Angemeldet als",points:"Punkte",find_stays:"Unterkünfte finden",settings:"Einstellungen",my_locations:"Meine Orte",my_bookings:"Meine Buchungen",no_bookings:"Keine Buchungen.",check_in:"Check-in",check_out:"Check-out",status:"Status",price:"Preis",payment_status:"Zahlung",cancel:"Stornieren",cancel_requested:"Stornierung angefordert",sign_in_prompt:"Zum Anzeigen bitte anmelden.",all_rights:"Alle Rechte vorbehalten.",addr_placeholder:"Adresse eingeben",geo_btn:"Adresse geokodieren",geo_result_prefix:"Ergebnis"},
-      es:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Iniciar sesión",logout:"Cerrar sesión",my_page:"Mi cuenta",signed_in_as:"Conectado como",points:"Puntos",find_stays:"Buscar alojamientos",settings:"Configuración",my_locations:"Mis ubicaciones",my_bookings:"Mis reservas",no_bookings:"Sin reservas.",check_in:"Check-in",check_out:"Check-out",status:"Estado",price:"Precio",payment_status:"Pago",cancel:"Cancelar",cancel_requested:"Cancelación solicitada",sign_in_prompt:"Inicia sesión para ver tu cuenta.",all_rights:"Todos los derechos reservados.",addr_placeholder:"Introducir dirección",geo_btn:"Geocodificar dirección",geo_result_prefix:"Resultado"},
-      ru:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",logout:"Выйти",my_page:"Мой кабинет",signed_in_as:"Вошли как",points:"Баллы",find_stays:"Найти жильё",settings:"Настройки",my_locations:"Мои места",my_bookings:"Мои бронирования",no_bookings:"Бронирований нет.",check_in:"Заезд",check_out:"Выезд",status:"Статус",price:"Сумма",payment_status:"Оплата",cancel:"Отменить",cancel_requested:"Запрошена отмена",sign_in_prompt:"Войдите, чтобы просмотреть.",all_rights:"Все права защищены.",addr_placeholder:"Введите адрес",geo_btn:"Геокодировать адрес",geo_result_prefix:"Результат"},
-      it:{nav_home:"Home",nav_membership:"Abbonamento",nav_login:"Accedi",logout:"Esci",my_page:"Area personale",signed_in_as:"Collegato come",points:"Punti",find_stays:"Cerca alloggi",settings:"Impostazioni",my_locations:"Le mie posizioni",my_bookings:"Le mie prenotazioni",no_bookings:"Nessuna prenotazione.",check_in:"Check-in",check_out:"Check-out",status:"Stato",price:"Prezzo",payment_status:"Pagamento",cancel:"Annulla",cancel_requested:"Annullamento richiesto",sign_in_prompt:"Accedi per visualizzare.",all_rights:"Tutti i diritti riservati.",addr_placeholder:"Inserisci indirizzo",geo_btn:"Geocodifica indirizzo",geo_result_prefix:"Risultato"},
-      zh:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",logout:"登出",my_page:"我的页面",signed_in_as:"登录帐号",points:"积分",find_stays:"查找住宿",settings:"设置",my_locations:"我的位置",my_bookings:"我的预订",no_bookings:"暂无预订。",check_in:"入住",check_out:"退房",status:"状态",price:"金额",payment_status:"支付",cancel:"取消",cancel_requested:"已申请取消",sign_in_prompt:"请登录以查看页面。",all_rights:"版权所有。",addr_placeholder:"输入地址",geo_btn:"地址地理编码",geo_result_prefix:"结果"}
+      en:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",logout:"Logout",my_page:"My Page",signed_in_as:"Signed in as",points:"Points",find_stays:"Find stays",settings:"Settings",my_locations:"My Locations",my_bookings:"My Bookings",no_bookings:"No bookings yet.",check_in:"Check-in",check_out:"Check-out",status:"Status",price:"Price",payment_status:"Payment",cancel:"Cancel",cancel_requested:"Cancel requested",sign_in_prompt:"Please sign in to view your page.",all_rights:"All rights reserved.",addr_placeholder:"Enter address",geo_btn:"Geocode address",geo_result_prefix:"Result",host:"Host",become_host:"Become a host"},
+      ko:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",logout:"로그아웃",my_page:"마이페이지",signed_in_as:"로그인 계정",points:"포인트",find_stays:"숙소 찾기",settings:"설정",my_locations:"내 위치 리스트",my_bookings:"내 예약",no_bookings:"아직 예약이 없습니다.",check_in:"체크인",check_out:"체크아웃",status:"상태",price:"결제금액",payment_status:"결제",cancel:"예약 취소",cancel_requested:"취소 요청됨",sign_in_prompt:"마이페이지 보기를 위해 로그인해주세요.",all_rights:"모든 권리 보유.",addr_placeholder:"주소 입력",geo_btn:"주소 좌표 변환",geo_result_prefix:"결과",host:"호스트",become_host:"호스트 신청"},
+      fr:{nav_home:"Accueil",nav_membership:"Abonnement",nav_login:"Connexion",logout:"Déconnexion",my_page:"Mon espace",signed_in_as:"Connecté en tant que",points:"Points",find_stays:"Trouver des séjours",settings:"Paramètres",my_locations:"Mes lieux",my_bookings:"Mes réservations",no_bookings:"Aucune réservation.",check_in:"Arrivée",check_out:"Départ",status:"Statut",price:"Montant",payment_status:"Paiement",cancel:"Annuler",cancel_requested:"Annulation demandée",sign_in_prompt:"Veuillez vous connecter pour voir votre espace.",all_rights:"Tous droits réservés.",addr_placeholder:"Saisir l'adresse",geo_btn:"Géocoder l'adresse",geo_result_prefix:"Résultat",host:"Hôte",become_host:"Devenir hôte"},
+      tr:{nav_home:"Ana sayfa",nav_membership:"Üyelik",nav_login:"Giriş",logout:"Çıkış",my_page:"Hesabım",signed_in_as:"Olarak giriş yapıldı",points:"Puan",find_stays:"Konaklama bul",settings:"Ayarlar",my_locations:"Konumlarım",my_bookings:"Rezervasyonlarım",no_bookings:"Rezervasyon yok.",check_in:"Giriş",check_out:"Çıkış",status:"Durum",price:"Tutar",payment_status:"Ödeme",cancel:"İptal",cancel_requested:"İptal talep edildi",sign_in_prompt:"Sayfanızı görmek için giriş yapın.",all_rights:"Tüm hakları saklıdır.",addr_placeholder:"Adres girin",geo_btn:"Adresi jeokodla",geo_result_prefix:"Sonuç",host:"Ev sahibi",become_host:"Ev sahibi ol"},
+      ja:{nav_home:"ホーム",nav_membership:"メンバーシップ",nav_login:"ログイン",logout:"ログアウト",my_page:"マイページ",signed_in_as:"ログイン中",points:"ポイント",find_stays:"宿泊先を探す",settings:"設定",my_locations:"マイロケーション",my_bookings:"予約一覧",no_bookings:"予約がありません。",check_in:"チェックイン",check_out:"チェックアウト",status:"ステータス",price:"金額",payment_status:"支払い",cancel:"キャンセル",cancel_requested:"キャンセル申請済み",sign_in_prompt:"表示するにはログインしてください。",all_rights:"無断転載禁止。",addr_placeholder:"住所を入力",geo_btn:"住所をジオコード",geo_result_prefix:"結果",host:"ホスト",become_host:"ホストになる"},
+      de:{nav_home:"Startseite",nav_membership:"Mitgliedschaft",nav_login:"Anmelden",logout:"Abmelden",my_page:"Mein Bereich",signed_in_as:"Angemeldet als",points:"Punkte",find_stays:"Unterkünfte finden",settings:"Einstellungen",my_locations:"Meine Orte",my_bookings:"Meine Buchungen",no_bookings:"Keine Buchungen.",check_in:"Check-in",check_out:"Check-out",status:"Status",price:"Preis",payment_status:"Zahlung",cancel:"Stornieren",cancel_requested:"Stornierung angefordert",sign_in_prompt:"Zum Anzeigen bitte anmelden.",all_rights:"Alle Rechte vorbehalten.",addr_placeholder:"Adresse eingeben",geo_btn:"Adresse geokodieren",geo_result_prefix:"Ergebnis",host:"Host",become_host:"Host werden"},
+      es:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Iniciar sesión",logout:"Cerrar sesión",my_page:"Mi cuenta",signed_in_as:"Conectado como",points:"Puntos",find_stays:"Buscar alojamientos",settings:"Configuración",my_locations:"Mis ubicaciones",my_bookings:"Mis reservas",no_bookings:"Sin reservas.",check_in:"Check-in",check_out:"Check-out",status:"Estado",price:"Precio",payment_status:"Pago",cancel:"Cancelar",cancel_requested:"Cancelación solicitada",sign_in_prompt:"Inicia sesión para ver tu cuenta.",all_rights:"Todos los derechos reservados.",addr_placeholder:"Introducir dirección",geo_btn:"Geocodificar dirección",geo_result_prefix:"Resultado",host:"Anfitrión",become_host:"Hazte anfitrión"},
+      ru:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",logout:"Выйти",my_page:"Мой кабинет",signed_in_as:"Вошли как",points:"Баллы",find_stays:"Найти жильё",settings:"Настройки",my_locations:"Мои места",my_bookings:"Мои бронирования",no_bookings:"Бронирований нет.",check_in:"Заезд",check_out:"Выезд",status:"Статус",price:"Сумма",payment_status:"Оплата",cancel:"Отменить",cancel_requested:"Запрошена отмена",sign_in_prompt:"Войдите, чтобы просмотреть.",all_rights:"Все права защищены.",addr_placeholder:"Введите адрес",geo_btn:"Геокодировать адрес",geo_result_prefix:"Результат",host:"Хост",become_host:"Стать хостом"},
+      it:{nav_home:"Home",nav_membership:"Abbonamento",nav_login:"Accedi",logout:"Esci",my_page:"Area personale",signed_in_as:"Collegato come",points:"Punti",find_stays:"Cerca alloggi",settings:"Impostazioni",my_locations:"Le mie posizioni",my_bookings:"Le mie prenotazioni",no_bookings:"Nessuna prenotazione.",check_in:"Check-in",check_out:"Check-out",status:"Stato",price:"Prezzo",payment_status:"Pagamento",cancel:"Annulla",cancel_requested:"Annullamento richiesto",sign_in_prompt:"Accedi per visualizzare.",all_rights:"Tutti i diritti riservati.",addr_placeholder:"Inserisci indirizzo",geo_btn:"Geocodifica indirizzo",geo_result_prefix:"Risultato",host:"Host",become_host:"Diventa host"},
+      zh:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",logout:"登出",my_page:"我的页面",signed_in_as:"登录帐号",points:"积分",find_stays:"查找住宿",settings:"设置",my_locations:"我的位置",my_bookings:"我的预订",no_bookings:"暂无预订。",check_in:"入住",check_out:"退房",status:"状态",price:"金额",payment_status:"支付",cancel:"取消",cancel_requested:"已申请取消",sign_in_prompt:"请登录以查看页面。",all_rights:"版权所有。",addr_placeholder:"输入地址",geo_btn:"地址地理编码",geo_result_prefix:"结果",host:"房东",become_host:"成为房东"}
     };
     function getLang(){ return localStorage.getItem('lang') || (navigator.language||'en').slice(0,2); }
     function setLang(lang){
@@ -169,7 +174,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // ===== Utils: safe click & once =====
     function safeClick(btn, handler, {cooldownMs=600}={}){
@@ -222,6 +227,9 @@
     // header refs
     const loginLink   = document.getElementById('loginLink');
     const logoutBtn   = document.getElementById('logoutBtn');
+    const hostLink    = document.getElementById('hostLink');
+    const becomeHostLink = document.getElementById('becomeHostLink');
+
     const userLevel   = document.getElementById('userLevel');
     const userName    = document.getElementById('userName');
     const userEmail   = document.getElementById('userEmail');
@@ -240,7 +248,6 @@
       const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // TODO: AIzaSyDRUf7RDA9P7Iy8qyyDoAkvVtbouEEzwRY
       if(!apiKey || apiKey.includes('YOUR_')){
         console.warn('Google Maps API key missing');
-        // 키 없을 때도 흐름 막지 않도록 resolve
         return Promise.resolve();
       }
       _gmapsPromise = new Promise((resolve, reject)=>{
@@ -425,6 +432,11 @@
     // ===== Auth state =====
     onAuthStateChanged(auth, async (user)=>{
       const lang = langSelect.value || getLang();
+
+      // 기본 토글 초기화
+      hostLink.style.display = 'none';
+      becomeHostLink.style.display = 'none';
+
       if(!user){
         userName.textContent='—';
         userEmail.textContent= I18N[lang]?.sign_in_prompt || I18N.en.sign_in_prompt;
@@ -437,6 +449,23 @@
       logoutBtn.style.display='inline-flex';
       userName.textContent = user.displayName || 'Guest';
       userEmail.textContent = user.email || '';
+
+      // ✅ 역할 확인 후 버튼 토글
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        const role = snap.exists() ? (snap.data().role || 'guest') : 'guest';
+        if (role === 'host') {
+          hostLink.style.display = 'inline-flex';
+          becomeHostLink.style.display = 'none';
+        } else {
+          hostLink.style.display = 'none';
+          becomeHostLink.style.display = 'inline-flex';
+        }
+      } catch (e) {
+        console.warn('role check failed', e);
+        hostLink.style.display = 'none';
+        becomeHostLink.style.display = 'none';
+      }
 
       try{
         const list = await fetchUserBookings(user.uid);
