@@ -113,3 +113,49 @@ onAuthStateChanged(auth, (u)=>{
 
 // 혹시 SSR/캐시 등으로 아주 빠르게 그려졌을 때 버튼이 아직 없을 수 있으니, 1초 뒤에도 한 번 더 점검
 setTimeout(()=> wireExistingLogoutButtons(!!auth.currentUser), 1000);
+<script type="module">
+// /scripts/auth-ui.js 내에 추가/수정
+import { auth, onAuthStateChanged, signOut } from '/scripts/firebase.js';
+
+const el = document.getElementById('authArea');
+
+function renderGuest() {
+  if (!el) return;
+  el.innerHTML = `
+    <a class="nav-login hard-login-link inline-flex items-center px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20"
+       href="/login.html" aria-label="Login">
+      <!-- 구글 아이콘 비슷한 모양 -->
+      <svg width="18" height="18" viewBox="0 0 24 24" class="mr-2"><path fill="currentColor" d="M21.35 11.1h-9v2.9h5.2c-.23 1.5-1.8 4.4-5.2 4.4a6 6 0 0 1 0-12a5.3 5.3 0 0 1 3.7 1.4l2-2A8.6 8.6 0 0 0 12.35 3a9 9 0 1 0 0 18c5.2 0 8.6-3.7 8.6-9c0-.6-.1-1.2-.2-1.9z"/></svg>
+      Login
+    </a>`;
+}
+
+function renderUser(u) {
+  if (!el) return;
+  const name = u.displayName || u.email || 'User';
+  el.innerHTML = `
+    <span class="text-white/70 mr-2">${name}</span>
+    <a href="/mypage.html" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20">My Page</a>
+    <button id="btnLogout" class="ml-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20">Logout</button>`;
+  document.getElementById('btnLogout')?.addEventListener('click', async () => {
+    await signOut(auth);
+    location.href = '/';
+  });
+}
+
+// 세션 변화에 따라 렌더
+onAuthStateChanged(auth, (u) => {
+  if (u) renderUser(u);
+  else renderGuest();
+});
+
+// ===== 강제 이동 가드 (다른 스크립트가 preventDefault 해도 동작) =====
+function forceNavToLogin(ev) {
+  const a = ev.target.closest('a.hard-login-link,[href="/login.html"]');
+  if (!a) return;
+  ev.stopPropagation();
+  // 어떤 preventDefault도 무시하고 이동
+  location.href = '/login.html';
+}
+document.addEventListener('click', forceNavToLogin, true); // capture 단계
+</script>
