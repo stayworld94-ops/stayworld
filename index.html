@@ -847,6 +847,71 @@
   <script type="module" src="/scripts/auth-ui.js"></script>
 </body>
 </html>
+<script type="module">
+  import {
+    db, collection, query, where, orderBy, limit, getDocs
+  } from '/scripts/firebase.js';
+
+  const grid = document.getElementById('recosGrid');
+  const skel = document.getElementById('recosSkeleton');
+
+  const fallbackImg = 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop';
+
+  function cardTemplate(item){
+    const firstPhoto = Array.isArray(item.photos) && item.photos.length ? item.photos[0] : fallbackImg;
+    const price = typeof item.price === 'number' ? item.price : 0;
+    const title = item.title || 'Untitled stay';
+    const address = item.address || '';
+    const id = item.id;
+
+    return `
+      <a href="/results.html?listing=${id}" class="rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/10 transition block">
+        <img src="${firstPhoto}" alt="${title}" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-semibold line-clamp-1">${title}</h3>
+            <div class="text-right shrink-0">
+              <div class="font-bold">$${price}</div>
+              <div class="text-xs text-white/60">/ night</div>
+            </div>
+          </div>
+          <div class="text-sm text-white/60 mt-1 line-clamp-1">${address}</div>
+          <div class="mt-3">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white text-black text-sm font-semibold">
+              예약하기
+            </span>
+          </div>
+        </div>
+      </a>
+    `;
+  }
+
+  async function loadFeatured(){
+    try{
+      // 활성 숙소 최신순 6개
+      const qref = query(
+        collection(db, 'listings'),
+        where('status', '==', 'Active'),
+        orderBy('createdAt', 'desc'),
+        limit(6)
+      );
+      const snap = await getDocs(qref);
+      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (!items.length){
+        skel.innerHTML = '<div class="text-white/60">표시할 숙소가 없습니다.</div>';
+        return;
+      }
+      grid.innerHTML = items.map(cardTemplate).join('');
+      skel.classList.add('hidden');
+      grid.classList.remove('hidden');
+    }catch(err){
+      console.error('loadFeatured error', err);
+      skel.innerHTML = '<div class="text-red-300">추천 숙소를 불러오지 못했습니다.</div>';
+    }
+  }
+
+  loadFeatured();
+</script>
 
 <script type="module" src="/scripts/auth-ui.js"></script>
 
