@@ -765,6 +765,48 @@
   <script src="/assets/auth-bridge.js"></script>
   <script defer src="/concierge.js"></script>
   <script defer src="https://stayworld-notify-chat.netlify.app/concierge.js"></script>
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>StayWorld — Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    header{position:sticky;top:0;z-index:50}
+    .overlay,.hero-cover{pointer-events:none}
+  </style>
+</head>
+<body class="bg-[#0b0f16] text-white min-h-screen">
+  <header class="backdrop-blur bg-black/40 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="font-semibold">STAYWORLD</a>
+      <nav class="hidden md:flex gap-3">
+        <a href="/membership.html" class="px-3 py-2 rounded-xl hover:bg-white/10">Membership</a>
+        <a href="/mypage.html" class="px-3 py-2 rounded-xl hover:bg-white/10">My Page</a>
+      </nav>
+      <div id="authArea"></div>
+    </div>
+  </header>
+
+  <!-- 로그인 성공 시에만 노출되는 배너 -->
+  <section id="welcomeBanner" class="hidden">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">
+        <p class="text-emerald-300 font-semibold">
+          환영합니다, <span data-welcome-name>Guest</span>님! 🎉
+        </p>
+        <p class="text-white/70 text-sm">즐거운 여행 준비를 시작해 보세요.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 나머지 홈 콘텐츠 ... -->
+
+  <!-- 공통 UI 스크립트 (반드시 body 종료 직전) -->
+  <script type="module" src="/scripts/auth-ui.js"></script>
+</body>
+</html>
 
 <script type="module" src="/scripts/auth-ui.js"></script>
 
