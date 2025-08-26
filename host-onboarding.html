@@ -1,83 +1,167 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko" class="dark">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>StayWorld — Become a Host</title>
-  <link rel="icon" href="/stayworld-logo.png"/>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body{margin:0;font-family:Inter,system-ui;background:#0b0b0c;color:#e8eaed}
-    .container{max-width:700px;margin:0 auto;padding:24px}
-    header{padding:16px;border-bottom:1px solid #23252a;background:#131417}
-    h1{margin:0;font-size:22px}
-    .btn{cursor:pointer;padding:10px 14px;border-radius:12px;
-      border:1px solid #23252a;background:#16181f;color:#e8eaed}
-    .btn.primary{background:linear-gradient(180deg,#1d2028,#181b22);border-color:#2a2f3a}
-    .card{background:#131417;border:1px solid #23252a;border-radius:16px;
-      margin-top:20px;padding:20px}
-    label{display:block;margin-top:12px;font-size:14px;color:#9aa0a6}
-    input{width:100%;margin-top:6px;padding:10px;border-radius:8px;
-      border:1px solid #23252a;background:#0f1115;color:#e8eaed}
+    .grid-preview img{ aspect-ratio:1/1; object-fit:cover; }
+    .progress{height:6px}
   </style>
 </head>
-<body>
-  <header>
-    <div class="container">
-      <h1>✨ Become a Host</h1>
-      <a href="/mypage.html" class="btn">← Back to My Page</a>
+<body class="bg-[#0b0f16] text-white min-h-screen">
+  <header class="sticky top-0 z-30 backdrop-blur bg-black/40 border-b border-white/10">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/mypage.html" class="text-emerald-300 hover:underline text-sm">← Back to My Page</a>
+      <div class="font-semibold">🌟 Become a Host</div>
+      <div></div>
     </div>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <p>Fill in your info to activate your host account. Once submitted, you can immediately register properties.</p>
-      <form id="onboardForm">
-        <label>Full Name<input id="fullName" required></label>
-        <label>ID Verification Number<input id="idNumber" required></label>
-        <label>Phone<input id="phone"></label>
-        <button type="submit" class="btn primary" style="margin-top:14px">Activate Host Mode</button>
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <section class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <h1 class="text-2xl font-bold">호스트 전환 신청</h1>
+      <p class="text-white/70 text-sm mt-2">
+        아래 정보를 입력하고 <b>신분증 또는 여권</b>을 업로드하세요.
+        <b class="text-emerald-300">최소 1장</b>은 반드시 업로드되어야 하며,
+        <b>업로드 수에는 제한이 없습니다.</b> 제출 즉시 호스트 모드가 활성화됩니다.
+      </p>
+
+      <form id="form" class="mt-6 grid gap-4">
+        <div>
+          <label class="block text-sm">성명(법적 이름) *</label>
+          <input id="fullname" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+        </div>
+        <div>
+          <label class="block text-sm">전화번호 *</label>
+          <input id="phone" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+        </div>
+
+        <div>
+          <label class="block text-sm">신분증/여권 파일 업로드 (이미지 또는 PDF) *</label>
+          <input id="files" type="file" accept="image/*,application/pdf" multiple class="mt-1 w-full" required>
+          <div id="hint" class="text-white/50 text-xs mt-1">
+            최소 1장 필수, 개수 제한 없음. (예: 앞/뒤, 여권, 셀피 등)
+          </div>
+          <div id="preview" class="grid grid-cols-3 gap-2 mt-2 grid-preview"></div>
+        </div>
+
+        <div class="progress w-full rounded bg-white/10 overflow-hidden hidden" id="barWrap">
+          <div id="bar" class="bg-emerald-400" style="width:0%"></div>
+        </div>
+
+        <div class="flex justify-end">
+          <button id="submitBtn" class="px-4 py-2 rounded-xl bg-white text-black font-semibold">
+            호스트 모드 활성화
+          </button>
+        </div>
       </form>
+
+      <p id="status" class="mt-4 text-white/70"></p>
     </section>
   </main>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      auth, onAuthStateChanged,
+      db, storage,
+      doc, getDoc, setDoc,
+      ref, uploadBytes, getDownloadURL
+    } from '/scripts/firebase.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
-      authDomain: "stayworld-2570c.firebaseapp.com",
-      projectId: "stayworld-2570c",
-      storageBucket: "stayworld-2570c.firebasestorage.app",
-      messagingSenderId: "272599681686",
-      appId: "1:272599681686:web:33f89b66f7ee6f6f0b50b7",
-      measurementId: "G-F8MXM3D7FJ"
-    };
+    let currentUser = null;
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    onAuthStateChanged(auth, async (u)=>{
+      if (!u) return location.href='/login.html';
+      currentUser = u;
 
-    const form=document.getElementById('onboardForm');
+      // 이미 호스트면 바로 대시보드로
+      const us = await getDoc(doc(db,'users',u.uid));
+      if (us.exists() && (us.data().role === 'host')) {
+        const hs = await getDoc(doc(db,'hosts',u.uid));
+        if (hs.exists()) return location.href='/host-dashboard.html';
+      }
+    });
 
-    onAuthStateChanged(auth,(user)=>{
-      if(!user){ location.href="/login.html"; return; }
-      form.addEventListener('submit', async(e)=>{
-        e.preventDefault();
-        const data={
-          uid:user.uid,
-          name:form.fullName.value,
-          idNumber:form.idNumber.value,
-          phone:form.phone.value,
-          role:"host",
-          createdAt:Date.now()
-        };
-        // ✅ users/{uid} 문서에 바로 host 역할 저장
-        await setDoc(doc(db,'users',user.uid), data, {merge:true});
-        alert("🎉 You are now a host! You can register your properties.");
-        location.href="/host.html";
+    // 미리보기
+    const filesEl = document.getElementById('files');
+    const hintEl = document.getElementById('hint');
+    const previewEl = document.getElementById('preview');
+    const barWrap = document.getElementById('barWrap');
+    const bar = document.getElementById('bar');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusEl = document.getElementById('status');
+
+    filesEl.addEventListener('change', ()=>{
+      previewEl.innerHTML = '';
+      const files = [...filesEl.files];
+      files.forEach((f,i)=>{
+        const card = document.createElement('div');
+        card.className = 'rounded-xl border border-white/10 bg-white/5 p-1';
+        if (f.type.startsWith('image/')){
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(f);
+          img.className = 'w-full h-24 rounded-lg';
+          card.appendChild(img);
+        }else{
+          card.innerHTML = `<div class="h-24 grid place-items-center text-xs text-white/70">PDF ${i+1}</div>`;
+        }
+        previewEl.appendChild(card);
       });
+      hintEl.textContent = files.length ? `선택됨: ${files.length}개` : '최소 1장 이상 업로드해야 합니다.';
+      submitBtn.disabled = files.length < 1;
+    });
+
+    // 제출
+    document.getElementById('form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const files = [...filesEl.files];
+      if (files.length < 1) { alert('최소 1장 업로드가 필요합니다.'); return; }
+
+      const fullname = document.getElementById('fullname').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      if (!fullname || !phone) return;
+
+      try{
+        submitBtn.disabled = true;
+        barWrap.classList.remove('hidden');
+        bar.style.width = '0%';
+
+        // 1) 파일 업로드 (여러 장)
+        const urls = [];
+        for (let i=0; i<files.length; i++){
+          const f = files[i];
+          const path = `ids/${currentUser.uid}/${Date.now()}-${i+1}-${f.name}`;
+          const sref = ref(storage, path);
+          await uploadBytes(sref, f);
+          const url = await getDownloadURL(sref);
+          urls.push(url);
+          bar.style.width = `${Math.round(((i+1)/files.length)*100)}%`;
+        }
+
+        // 2) hosts 문서 저장 (바로 활성화용 verified:true)
+        await setDoc(doc(db,'hosts', currentUser.uid), {
+          uid: currentUser.uid,
+          name: fullname,
+          phone,
+          idUrls: urls,
+          verified: true,          // ✅ 관리자 승인 없이 바로 활성화
+          submittedAt: Date.now()
+        }, { merge:true });
+
+        // 3) users.role = 'host' 로 전환(병합)
+        await setDoc(doc(db,'users', currentUser.uid), { role: 'host', name: fullname }, { merge:true });
+
+        statusEl.textContent = '✅ 호스트 모드가 활성화되었습니다. 잠시 후 대시보드로 이동합니다…';
+        setTimeout(()=> location.href='/host-dashboard.html', 600);
+      }catch(err){
+        console.error(err);
+        alert('처리 실패: ' + err.message);
+        submitBtn.disabled = false;
+      }
     });
   </script>
 </body>
