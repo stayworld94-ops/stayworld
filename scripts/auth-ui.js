@@ -1,10 +1,11 @@
-<script type="module">
 // /scripts/auth-ui.js
+// 헤더 로그인/로그아웃 UI + 홈 환영 배너 표시 (리다이렉트 과도 방지한 안전 버전)
+
 import { auth, onAuthStateChanged, signOut } from '/scripts/firebase.js';
 
-const authMount = document.getElementById('authArea');
+const authMount = document.getElementById('authArea'); // 헤더에 <div id="authArea"></div> 있으면 여기에 렌더
 
-/** 헤더: 미로그인 상태 UI */
+/** 미로그인 상태 UI */
 function renderGuest() {
   if (!authMount) return;
   authMount.innerHTML = `
@@ -16,7 +17,7 @@ function renderGuest() {
   `;
 }
 
-/** 헤더: 로그인 상태 UI */
+/** 로그인 상태 UI */
 function renderUser(u) {
   if (!authMount) return;
   const name = u.displayName || u.email || 'User';
@@ -27,17 +28,21 @@ function renderUser(u) {
   `;
   document.getElementById('btnLogout')?.addEventListener('click', async () => {
     await signOut(auth);
-    location.href = '/';
+    // 보호 페이지면 홈으로, 아니면 새로고침
+    const protectedPages = ['/host-dashboard.html','/host-register.html','/admin-dashboard.html'];
+    if (protectedPages.includes(location.pathname)) location.href = '/';
+    else location.reload();
   });
 }
 
 /** 홈(index.html) 전용 환영 배너 표시 */
 function showWelcomeBanner(u) {
-  const banner = document.getElementById('welcomeBanner');
-  if (!banner) return;                 // 홈이 아니면 아무 것도 안 함
+  const banner = document.getElementById('welcomeBanner'); // 홈에만 존재
+  if (!banner) return;
   if (!u) { banner.classList.add('hidden'); return; }
   const name = u.displayName || u.email || 'Guest';
-  banner.querySelector('[data-welcome-name]').textContent = name;
+  const span = banner.querySelector('[data-welcome-name]');
+  if (span) span.textContent = name;
   banner.classList.remove('hidden');
 }
 
@@ -50,9 +55,8 @@ function forceNavToLogin(ev) {
 }
 document.addEventListener('click', forceNavToLogin, true);
 
-/** 상태 구독 */
+/** 상태 구독: 헤더 UI/환영배너 갱신, 과도한 자동 리다이렉트 없음 */
 onAuthStateChanged(auth, (u) => {
   if (u) { renderUser(u); showWelcomeBanner(u); }
   else   { renderGuest(); showWelcomeBanner(null); }
 });
-</script>
