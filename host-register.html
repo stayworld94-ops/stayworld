@@ -1,159 +1,134 @@
 <!doctype html>
-<html lang="ko" class="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StayWorld — Host Verification</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>StayWorld — Host Register</title>
+
+  <link rel="stylesheet" href="/styles.css" />
+  <!-- 공통 스크립트들 (네 사이트의 공통 include와 동일 순서 권장) -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+  <script src="/scripts/firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage-compat.js"></script>
+  <!-- Firestore를 네가 firebase.js에서 초기화해 window.firebaseDB로 내보내면 그대로 사용됨 -->
+  <script src="/scripts/firebase.js"></script>
+  <script src="/scripts/auth.js"></script>
+  <script src="/lang.js"></script>
+  <script src="/app.js"></script>
+
   <style>
-    .grid-preview img{ aspect-ratio:1/1; object-fit:cover; }
-    .progress{height:6px}
+    .container { max-width: 960px; margin: 40px auto; padding: 0 16px; }
+    .card { background: var(--panel,#101018); border: 1px solid var(--line,rgba(255,255,255,.08)); border-radius: 16px; padding: 18px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .row { display:flex; flex-direction:column; gap:6px; }
+    label { font-size: 13px; opacity: .85; }
+    input, select, textarea { background: #0d1117; border: 1px solid #222; color: #e7e9ee; padding:10px; border-radius:10px; }
+    .btn { padding: 10px 14px; border-radius: 10px; border: 1px solid #333; cursor: pointer; }
+    .btn.primary { background: #c9a35b; border-color: #c9a35b; color: #111; font-weight: 600; }
+    .muted { color: #cfd6e6; opacity: .8; font-size: 13px; }
+    .thumbs { display:flex; gap:10px; flex-wrap: wrap; margin-top:8px;}
+    .thumbs img { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; border:1px solid #222; }
+    .two { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
   </style>
 </head>
-<body class="bg-[#0b0f16] text-white min-h-screen grid place-items-center p-6">
-  <div class="w-full max-w-lg rounded-2xl border border-white/10 bg-white/5 p-6">
-    <a href="/mypage.html" class="text-emerald-300 hover:underline text-sm">&larr; 마이페이지로</a>
-    <h1 class="text-2xl font-bold mt-2">호스트 인증</h1>
-    <p class="text-white/60 text-sm">
-      아래 정보를 입력하고 <b>신분증 또는 여권</b>을 업로드하세요.
-      <b class="text-emerald-300">최소 1장</b>은 반드시 업로드되어야 하며,
-      <b>업로드 수에는 제한이 없습니다.</b>
-    </p>
+<body>
+  <div id="global-header"></div>
 
-    <form id="idForm" class="mt-6 space-y-4">
-      <div>
-        <label class="block text-sm">성명(법적 이름) *</label>
-        <input id="fullname" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
-      </div>
+  <main class="container">
+    <h1>Register a Listing</h1>
+    <p class="muted">Fill out details below. Photos are optional (up to 5).</p>
 
-      <div>
-        <label class="block text-sm">전화번호 *</label>
-        <input id="phone" class="w-full mt-1 px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
-      </div>
-
-      <div>
-        <label class="block text-sm">신분증/여권 파일 (이미지 또는 PDF) *</label>
-        <input id="idfiles" type="file" accept="image/*,application/pdf" multiple class="mt-1 w-full" required>
-        <div id="fileHint" class="text-white/50 text-xs mt-1">
-          최소 1장 필수, 개수 제한 없음. (예: 앞/뒤, 여권, 셀피 등)
+    <div class="card">
+      <form id="hostForm">
+        <div class="grid">
+          <div class="row">
+            <label>Title</label>
+            <input id="title" required placeholder="e.g., Bosphorus View Suite" />
+          </div>
+          <div class="row">
+            <label>City</label>
+            <input id="city" required placeholder="e.g., Istanbul" />
+          </div>
+          <div class="row">
+            <label>Country</label>
+            <input id="country" required placeholder="e.g., Türkiye" />
+          </div>
+          <div class="row">
+            <label>Stay Type</label>
+            <select id="stayType" required>
+              <option value="Hotel">Hotel</option>
+              <option value="Motel">Motel</option>
+              <option value="Hostel">Hostel</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Villa">Villa</option>
+              <option value="Ryokan">Ryokan</option>
+              <option value="Guesthouse">Guesthouse</option>
+              <option value="B&B">B&B</option>
+            </select>
+          </div>
+          <div class="row">
+            <label>Price</label>
+            <div class="two">
+              <input id="price" type="number" min="1" step="1" required placeholder="e.g., 120" />
+              <select id="currency" required>
+                <option value="USD">USD</option>
+                <option value="TRY">TRY</option>
+                <option value="KRW">KRW</option>
+                <option value="EUR">EUR</option>
+                <option value="JPY">JPY</option>
+                <option value="CNY">CNY</option>
+                <option value="RUB">RUB</option>
+              </select>
+            </div>
+            <small class="muted">We will store price in USD internally for filtering/sorting.</small>
+          </div>
+          <div class="row">
+            <label>Distance to center (km)</label>
+            <input id="distance" type="number" min="0" step="0.1" placeholder="e.g., 1.2" />
+          </div>
+          <div class="row">
+            <label>Rating (0 ~ 5)</label>
+            <input id="rating" type="number" min="0" max="5" step="0.1" placeholder="e.g., 4.6" />
+          </div>
+          <div class="row">
+            <label>Free cancellation</label>
+            <select id="freeCancel">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div class="row">
+            <label>Latitude / Longitude (optional)</label>
+            <div class="two">
+              <input id="lat" type="number" step="0.000001" placeholder="41.0082" />
+              <input id="lng" type="number" step="0.000001" placeholder="28.9784" />
+            </div>
+            <small class="muted">Optional. Used for map or MyPage favorites map.</small>
+          </div>
+          <div class="row" style="grid-column:1/-1">
+            <label>Description</label>
+            <textarea id="desc" rows="4" placeholder="Tell guests about the space, amenities, rules..."></textarea>
+          </div>
+          <div class="row" style="grid-column:1/-1">
+            <label>Photos (up to 5)</label>
+            <input id="photos" type="file" accept="image/*" multiple />
+            <div id="thumbs" class="thumbs"></div>
+          </div>
         </div>
-        <div id="preview" class="grid grid-cols-3 gap-2 mt-2 grid-preview"></div>
-      </div>
+        <div style="margin-top:16px; display:flex; gap:10px;">
+          <button class="btn primary" type="submit">Publish Listing</button>
+          <button class="btn" type="button" id="btnDraft">Save as Draft</button>
+        </div>
+        <p id="msg" class="muted" style="margin-top:10px;"></p>
+      </form>
+    </div>
+  </main>
 
-      <div class="progress w-full rounded bg-white/10 overflow-hidden hidden" id="barWrap">
-        <div id="bar" class="bg-emerald-400" style="width:0%"></div>
-      </div>
+  <div id="global-footer"></div>
 
-      <button id="submitBtn" class="w-full px-3 py-2 rounded-xl bg-white text-black font-semibold">제출하기</button>
-    </form>
-
-    <p id="status" class="mt-4 text-white/70"></p>
-  </div>
-
-  <script type="module">
-    import {
-      auth, onAuthStateChanged,
-      db, storage,
-      doc, setDoc, getDoc,
-      ref, uploadBytes, getDownloadURL
-    } from '/scripts/firebase.js';
-
-    // ===== Auth & redirect guards =====
-    let currentUser = null;
-    onAuthStateChanged(auth, async (u)=>{
-      if (!u) return location.href='/login.html';
-      currentUser = u;
-      // 이미 검증된 호스트는 대시보드로
-      const hsnap = await getDoc(doc(db,'hosts',u.uid));
-      if (hsnap.exists() && hsnap.data().verified) {
-        return location.href='/host-dashboard.html';
-      }
-    });
-
-    // ===== UI: file preview =====
-    const idfiles = document.getElementById('idfiles');
-    const preview = document.getElementById('preview');
-    const barWrap = document.getElementById('barWrap');
-    const bar = document.getElementById('bar');
-    const statusEl = document.getElementById('status');
-    const submitBtn = document.getElementById('submitBtn');
-
-    idfiles.addEventListener('change', ()=>{
-      preview.innerHTML = '';
-      const files = [...idfiles.files];
-      files.forEach((f, i)=>{
-        const box = document.createElement('div');
-        box.className = 'rounded-xl border border-white/10 bg-white/5 p-1';
-        if (f.type.startsWith('image/')) {
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(f);
-          img.className = 'w-full h-24 rounded-lg';
-          box.appendChild(img);
-        } else {
-          box.innerHTML = `<div class="h-24 grid place-items-center text-xs text-white/70">PDF ${i+1}</div>`;
-        }
-        preview.appendChild(box);
-      });
-      document.getElementById('fileHint').textContent =
-        files.length >= 1
-          ? `선택됨: ${files.length}개`
-          : '최소 1장 이상 업로드해야 합니다.';
-      submitBtn.disabled = files.length < 1;
-    });
-
-    // ===== Submit & upload =====
-    document.getElementById('idForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const files = [...idfiles.files];
-      if (files.length < 1) {
-        alert('최소 1장 이상의 신분증/여권 파일을 업로드해야 합니다.');
-        return;
-      }
-
-      const fullname = document.getElementById('fullname').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      if (!fullname || !phone) return; // HTML required가 막지만 이중 체크
-
-      // 진행률 바
-      barWrap.classList.remove('hidden');
-      bar.style.width = '0%';
-      submitBtn.disabled = true;
-
-      try{
-        const urls = [];
-        for (let i=0; i<files.length; i++){
-          const f = files[i];
-          const path = `ids/${currentUser.uid}/${Date.now()}-${i+1}-${f.name}`;
-          const sref = ref(storage, path);
-          await uploadBytes(sref, f);
-          const url = await getDownloadURL(sref);
-          urls.push(url);
-          bar.style.width = `${Math.round(((i+1)/files.length)*100)}%`;
-        }
-
-        // Firestore: 여러 장 → 배열 저장
-        await setDoc(doc(db,'hosts', currentUser.uid), {
-          uid: currentUser.uid,
-          name: fullname,
-          phone,
-          idUrls: urls,           // ✅ 다중 이미지/파일
-          verified: false,        // (관리자 승인 플로우 유지 시)
-          submittedAt: Date.now()
-        }, { merge:true });
-
-        statusEl.textContent = '제출 완료 ✅ 검토 후 접근 권한이 부여됩니다.';
-      }catch(err){
-        console.error(err);
-        alert('업로드 실패: ' + err.message);
-        submitBtn.disabled = false;
-      }
-    });
-  </script>
+  <script src="/scripts/hosts.js"></script>
   <script type="module" src="/scripts/auth-ui.js"></script>
-</body>
-</html>
-
 </body>
 </html>
