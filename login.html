@@ -49,69 +49,102 @@
 
   <!-- 로그인 페이지 전용 스크립트 -->
   <script type="module">
-    import {
-      auth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup,
-      db, doc, getDoc
-    } from '/scripts/firebase.js';
+   <script type="module">
+  import {
+    auth, onAuthStateChanged,
+    signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup,
+    db, doc, getDoc, setDoc
+  } from '/scripts/firebase.js';
 
-    const loading = document.getElementById('loading');
-    const form = document.getElementById('loginForm');
-    const googleBox = document.getElementById('googleBox');
-    const signupLine = document.getElementById('signupLine');
+  const loading = document.getElementById('loading');
+  const form = document.getElementById('loginForm');
+  const googleBox = document.getElementById('googleBox');
+  const signupLine = document.getElementById('signupLine');
 
-    // 역할에 따라 이동
-    async function redirectAfter(user){
-      try{
-        const uref = doc(db,'users',user.uid);
-        const usnap = await getDoc(uref);
-        const role = usnap.exists() ? (usnap.data().role || 'guest') : 'guest';
-
-        if (role === 'host'){
-          // 호스트 검증 여부 확인
-          const hsnap = await getDoc(doc(db,'hosts',user.uid));
-          const verified = hsnap.exists() ? !!hsnap.data().verified : false;
-          location.href = verified ? '/host-dashboard.html' : '/host-register.html';
-        } else if (role === 'admin'){
-          location.href = '/admin-dashboard.html';
-        } else {
-          location.href = '/';
-        }
-      }catch(e){
-        // 실패시 기본 홈
-        location.href = '/';
-      }
+  // 1) 최초 로그인 시 user 문서 보장
+  async function ensureUserDoc(user){
+    const uref = doc(db, 'users', user.uid);
+    const usnap = await getDoc(uref);
+    if (!usnap.exists()){
+      await setDoc(uref, {
+        uid: user.uid,
+        email: user.email || '',
+        name: user.displayName || '',
+        role: 'guest',
+        createdAt: Date.now()
+      }, { merge: true });
+      return { role: 'guest' };
     }
+    return usnap.data();
+  }
 
-    // 세션 체크: 이미 로그인되어 있으면 즉시 리다이렉트
-    import { onAuthStateChanged } from '/scripts/firebase.js';
-    onAuthStateChanged(auth, (u)=>{
-      if (u){
-        loading.classList.remove('flex'); loading.classList.add('hidden');
-        form.classList.add('hidden'); googleBox.classList.add('hidden'); signupLine.classList.add('hidden');
-        redirectAfter(u); // 바로 이동
-      }else{
-        // 미로그인: 폼 노출
-        loading.classList.add('hidden');
-        form.classList.remove('hidden'); googleBox.classList.remove('hidden'); signupLine.classList.remove('hidden');
+  // 2) 역할별 이동
+  async function redirectAfter(user){
+    try{
+      const u = await ensureUserDoc(user);
+      const role = u.role || 'guest';
+
+      if (role === 'admin'){
+        location.href = '/admin-dashboard.html';
+        return;
       }
-    });
 
-    // 이메일/비번 로그인
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
+      if (role === 'host'){
+        // 호스트 검증 체크
+        const hs = await getDoc(doc(db, 'hosts', user.uid));
+        const verified = hs.exists() ? !!hs.data().verified : false;
+        location.href = verified ? '/host-dashboard.html' : '/host-register.html'; // 또는 '/host-onboarding.html'
+        return;
+      }
+
+      // 게스트는 마이페이지로
+      location.href = '/mypage.html';
+    }catch(err){
+      console.error('[redirectAfter]', err);
+      // 문제 있으면 최소 홈으로
+      location.href = '/';
+    }
+  }
+
+  // 세션 상태에 따라 폼/리다이렉트 처리
+  onAuthStateChanged(auth, (u)=>{
+    if (u){
+      loading.classList.remove('flex'); loading.classList.add('hidden');
+      form.classList.add('hidden'); googleBox.classList.add('hidden'); signupLine.classList.add('hidden');
+      redirectAfter(u);
+    }else{
+      loading.classList.add('hidden');
+      form.classList.remove('hidden'); googleBox.classList.remove('hidden'); signupLine.classList.remove('hidden');
+    }
+  });
+
+  // 이메일/비번 로그인
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    try{
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const cred = await signInWithEmailAndPassword(auth, email, password);
       await redirectAfter(cred.user);
-    });
+    }catch(err){
+      alert('로그인 실패: ' + (err.message || err.code));
+      console.error(err);
+    }
+  });
 
-    // 구글 로그인
-    document.getElementById('googleBtn').addEventListener('click', async ()=>{
+  // 구글 로그인
+  document.getElementById('googleBtn').addEventListener('click', async ()=>{
+    try{
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       await redirectAfter(cred.user);
-    });
-  </script>
+    }catch(err){
+      alert('구글 로그인 실패: ' + (err.message || err.code));
+      console.error(err);
+    }
+  });
+</script>
+
   <script type="module" src="/scripts/auth-ui.js"></script>
 
 </body>
