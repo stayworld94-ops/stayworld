@@ -1,39 +1,58 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8" />
-  <title>Sign Up — STAYWORLD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- ✅ CSS 자동 로드 -->
-  <script src="assets/load-css.js"></script>
+  <title>StayWorld — Sign up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <main class="container" style="max-width:520px; padding:60px 0;">
-    <h1>Sign Up</h1>
+<body class="bg-[#0b0f16] text-white min-h-screen grid place-items-center p-6">
+  <div class="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
+    <h1 class="text-2xl font-bold">Create your account</h1>
 
-    <form id="signupForm" style="display:grid; gap:14px;">
-      <label for="signupEmail">이메일</label>
-      <input id="signupEmail" class="input" type="email" placeholder="you@example.com" required />
-
-      <label for="signupPassword">비밀번호</label>
-      <input id="signupPassword" class="input" type="password" placeholder="********" required />
-
-      <button class="btn btn-gold" type="submit">가입하기</button>
+    <form id="signupForm" class="mt-6 space-y-3">
+      <input id="name" placeholder="Full name" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <input id="email" type="email" placeholder="Email" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <input id="password" type="password" placeholder="Password" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10" required>
+      <label class="flex items-center gap-2 text-sm"><input id="isHost" type="checkbox" class="accent-emerald-500"> I’m a host</label>
+      <button class="w-full px-3 py-2 rounded-xl bg-white text-black font-semibold">Sign up</button>
     </form>
 
-    <div style="margin:16px 0; text-align:center;">또는</div>
+    <div class="mt-4">
+      <button id="googleBtn" class="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/10">Continue with Google</button>
+    </div>
 
-    <button id="googleSignup" class="btn google-btn" type="button">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
-      Sign up with Google
-    </button>
+    <p class="text-white/60 text-sm mt-4">Have an account? <a href="/login.html" class="text-emerald-300">Log in</a></p>
+  </div>
 
-    <p style="margin-top:16px; text-align:center;">
-      이미 계정이 있나요? <a href="login.html">로그인</a>
-    </p>
-  </main>
+  <script type="module">
+    import { auth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, db, doc, setDoc, getDoc } from '/scripts/firebase.js';
 
-  <script type="module" src="assets/signup.js"></script>
+    async function ensureUserDoc(user, role){
+      const uref = doc(db, 'users', user.uid);
+      const usnap = await getDoc(uref);
+      if (!usnap.exists()){
+        await setDoc(uref, { uid:user.uid, email:user.email, name:user.displayName||'', role:role||'guest', createdAt: Date.now() });
+      }else if(role && usnap.data().role !== role){
+        await setDoc(uref, { role }, { merge:true });
+      }
+    }
+
+    signupForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const cred = await createUserWithEmailAndPassword(auth, email.value.trim(), password.value);
+      await updateProfile(cred.user, { displayName: name.value.trim() });
+      const role = isHost.checked ? 'host' : 'guest';
+      await ensureUserDoc(cred.user, role);
+      location.href = role === 'host' ? '/host-register.html' : '/';
+    });
+
+    googleBtn.addEventListener('click', async ()=>{
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      await ensureUserDoc(cred.user, 'guest');
+      location.href = '/';
+    });
+  </script>
 </body>
 </html>
