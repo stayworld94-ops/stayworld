@@ -1,20 +1,47 @@
-<!-- 모든 페이지에서 공통으로 포함 -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
-<script src="/scripts/firebase-config.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage-compat.js"></script>
-<script src="/scripts/firebase.js"></script>
-<script src="/scripts/auth.js"></script>
-<script src="/scripts/map.js"></script>
-<script src="/scripts/stripe.js"></script>
-<script src="/lang.js"></script>
-<script src="/app.js"></script>
-/* ================== STAYWORLD — app.js ================== */
+/* ================== STAYWORLD — app.js (FINAL) ================== */
 (function(){
   const $  = (s,sc)=> (sc||document).querySelector(s);
   const $$ = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
   const on = (el,ev,fn)=> el && el.addEventListener(ev,fn,{passive:false});
+
+  // ==== [Currency & Price Formatting] =======================================
+  // 언어→통화 매핑과 환율(간이값). 슬라이더/비교는 USD, 표시는 각 통화로.
+  const LANG_CURRENCY = {
+    ko:"KRW", tr:"TRY", en:"USD", fr:"EUR", ja:"JPY",
+    es:"EUR", de:"EUR", ru:"RUB", it:"EUR", zh:"CNY"
+  };
+  const RATES = { USD:1, KRW:1350, TRY:33, EUR:0.92, JPY:156, RUB:90, CNY:7.2 };
+
+  // 기존에 sw_lang 쓰고 있으므로 그대로 존중
+  let currentLang = localStorage.getItem("sw_lang") || (navigator.language||"en").slice(0,2).toLowerCase();
+  if(!['en','ko','tr','fr','ja','de','es','it','zh','ru'].includes(currentLang)) currentLang = 'en';
+  let currentCurrency = LANG_CURRENCY[currentLang] || "USD";
+  let nf = new Intl.NumberFormat(currentLang, { style:"currency", currency: currentCurrency });
+
+  const usdToDisplay = usd => usd * (RATES[currentCurrency] || 1);
+  const displayToUsd = val => {
+    const r = (RATES[currentCurrency] || 1) || 1;
+    return r ? (val / r) : val;
+  };
+
+  function refreshAllPrices(){
+    // 카드 가격 표기 (각 요소에 data-price-usd 속성 필요)
+    $$("[data-price-usd]").forEach(el=>{
+      const usd = parseFloat(el.getAttribute("data-price-usd") || "0");
+      el.textContent = nf.format(usdToDisplay(usd));
+    });
+  }
+
+  function onLanguageChange(newLang){
+    currentLang = newLang;
+    localStorage.setItem("sw_lang", newLang);
+    currentCurrency = LANG_CURRENCY[newLang] || "USD";
+    nf = new Intl.NumberFormat(newLang, { style:"currency", currency: currentCurrency });
+    // 번역 적용 이후 가격/라벨 즉시 갱신
+    refreshAllPrices();
+    if(typeof refreshFilterPriceLabels === 'function') refreshFilterPriceLabels();
+  }
+  // ==========================================================================
 
   /* -------- 공통 헤더/푸터 렌더 -------- */
   function renderHeader(){
@@ -66,12 +93,10 @@
       const logoutBtn = $('#btnLogout');
 
       if(user){
-        // 로그인 상태
         if(loginLink){ loginLink.textContent = 'My Page'; loginLink.href = '/host-register.html'; }
         if(signupBtn){ signupBtn.style.display = 'none'; }
         if(logoutBtn){ logoutBtn.style.display = 'inline-flex'; logoutBtn.onclick = async()=>{ await firebaseAuth.signOut(); location.href='/index.html'; }; }
       }else{
-        // 로그아웃 상태
         if(loginLink){ loginLink.textContent = 'Login'; loginLink.href = '/login.html'; }
         if(signupBtn){ signupBtn.style.display = 'inline-flex'; }
         if(logoutBtn){ logoutBtn.style.display = 'none'; }
@@ -104,7 +129,7 @@
     const msgs=[];
     const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;};
     async function askAI(message,lang){
-      for(const ep of ['/.netlify/functions/sw-chat']){ // 필요시 '/api/chat' 추가
+      for(const ep of ['/.netlify/functions/sw-chat']){
         try{
           const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})});
           if(r.ok){const d=await r.json(); if(d.reply) return d.reply;}
@@ -167,12 +192,19 @@
       const box=document.createElement('div'); box.className='box';
       box.innerHTML=`<h4>${g.t}</h4>`; grid.appendChild(box);
       if(g.kind==='price'){
+        // ==== [Filters: price label currency formatting] ====================
         box.insertAdjacentHTML('beforeend',`
           <div style="display:grid;gap:10px">
-            <div style="display:flex;justify-content:space-between;font-size:13px"><span>Price per night</span><span><span id="priceMinVal">100</span> ~ <span id="priceMaxVal">800</span></span></div>
-            <label style="font-size:12px;opacity:.8">Min</label><input type="range" id="priceMin" min="0" max="1000" step="10" value="100">
-            <label style="font-size:12px;opacity:.8">Max</label><input type="range" id="priceMax" min="0" max="5000" step="50" value="800">
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span>Price per night</span>
+              <span><span id="priceMinVal">100</span> ~ <span id="priceMaxVal">800</span></span>
+            </div>
+            <label style="font-size:12px;opacity:.8">Min</label>
+            <input type="range" id="priceMin" min="0" max="1000" step="10" value="100">
+            <label style="font-size:12px;opacity:.8">Max</label>
+            <input type="range" id="priceMax" min="0" max="5000" step="50" value="800">
           </div>`);
+        // ===================================================================
       }
       (g.inputs||[]).forEach(([type,id,attrs])=>{
         const wrap=document.createElement('div'); wrap.style.margin='6px 0';
@@ -193,16 +225,35 @@
     const close=()=>{d.setAttribute('aria-hidden','true');};
     on($('.back',d),'click',close);
     on($('#swClose',d),'click',close);
+
+    // 가격라벨 포맷터
+    window.refreshFilterPriceLabels = function refreshFilterPriceLabels(){
+      const minEl = $('#priceMin',d), maxEl = $('#priceMax',d);
+      if(!minEl || !maxEl) return;
+      const minUsd = parseFloat(minEl.value || '0');
+      const maxUsd = parseFloat(maxEl.value || '0');
+      $('#priceMinVal',d).textContent = nf.format(usdToDisplay(minUsd));
+      $('#priceMaxVal',d).textContent = nf.format(usdToDisplay(maxUsd));
+    };
+
     on($('#swReset',d),'click',()=>{
       $$('input[type=checkbox]',d).forEach(i=>i.checked=false);
       $$('input[type=radio]',d).forEach(i=>i.checked=/Any/i.test(i.nextSibling?.textContent||'Any'));
-      $('#priceMin').value=100; $('#priceMax').value=800;
-      $('#priceMinVal').textContent=100; $('#priceMaxVal').textContent=800;
+      $('#priceMin',d).value=100; $('#priceMax',d).value=800; // USD 기준
+      refreshFilterPriceLabels();
       setBadge('');
     });
-    on($('#swApply',d),'click',()=>{ const n=$$('input[type=checkbox]:checked, input[type=radio]:checked',d).length; setBadge(n?n.toString():''); close(); });
-    on($('#priceMin',d),'input',e=> $('#priceMinVal').textContent=e.target.value);
-    on($('#priceMax',d),'input',e=> $('#priceMaxVal').textContent=e.target.value);
+
+    on($('#swApply',d),'click',()=>{
+      const n=$$('input[type=checkbox]:checked, input[type=radio]:checked',d).length;
+      setBadge(n?n.toString():'');
+      close();
+      // 실제 필터링 로직이 카드에 data-* 붙어있다면 여기서 호출 가능
+      if(typeof applyCardFilters === 'function') applyCardFilters();
+    });
+
+    on($('#priceMin',d),'input',()=>refreshFilterPriceLabels());
+    on($('#priceMax',d),'input',()=>refreshFilterPriceLabels());
 
     function setBadge(text){
       const btn=$('#btnFilters'); if(!btn) return;
@@ -211,8 +262,24 @@
     }
 
     const btn = $('#btnFilters');
-    if(btn){ on(btn,'click',e=>{ e.stopPropagation(); d.setAttribute('aria-hidden','false'); }); }
+    if(btn){ on(btn,'click',e=>{ e.stopPropagation(); d.setAttribute('aria-hidden','false'); refreshFilterPriceLabels(); }); }
+
+    // 최초 1회 라벨 세팅
+    refreshFilterPriceLabels();
   }
+
+  // (선택) 카드 필터링 예시: 가격(USD), 평점, 거리, 무료취소
+  window.applyCardFilters = function applyCardFilters(){
+    const d = $('#filterDrawer');
+    const minUsd = parseFloat($('#priceMin',d)?.value || '0');
+    const maxUsd = parseFloat($('#priceMax',d)?.value || '999999');
+
+    $$('.hotel-card').forEach(card=>{
+      const priceUsd = parseFloat(card.getAttribute('data-price-usd') || '0');
+      const ok = priceUsd >= minUsd && priceUsd <= maxUsd;
+      card.classList.toggle('hide', !ok);
+    });
+  };
 
   /* -------- 지도 -------- */
   function initMapIfNeeded(){
@@ -222,6 +289,20 @@
     window.__swMap = map;
   }
 
+  // ==== [Language change wiring] ============================================
+  function wireLanguageSelect(){
+    const sel = $('#langSelect');
+    if(!sel) return;
+    sel.value = currentLang;
+    on(sel, 'change', ()=>{
+      const lang = sel.value;
+      // 네가 쓰는 i18n 적용
+      if(window.StayWorldI18n?.applyLang) StayWorldI18n.applyLang(lang);
+      onLanguageChange(lang);
+    });
+  }
+  // ==========================================================================
+
   /* -------- 페이지 초기화 -------- */
   function init(){
     renderHeader();
@@ -230,14 +311,21 @@
     ensureChat();
     ensureFilters();
     initMapIfNeeded();
+
+    // i18n 초기 적용
     if(window.StayWorldI18n?.applyLang){
       const saved = localStorage.getItem("sw_lang") || (navigator.language||"en").slice(0,2).toLowerCase();
       const final = ['en','ko','tr','fr','ja','de','es','it','zh','ru'].includes(saved) ? saved : 'en';
       StayWorldI18n.applyLang(final);
+      onLanguageChange(final);   // 통화/가격/라벨 싱크
     }
+
+    wireLanguageSelect();
+    refreshAllPrices();          // 페이지 내 가격 텍스트 초기 표기
   }
   if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
+
 /* ================== [ADD] Favorites(찜) + MyPage ================== */
 (function(){
   // Firebase/전역 브릿지와 연동 (네 환경 변수명 우선)
@@ -288,25 +376,20 @@
     const ids = await FavStore.getAll(uid);
     favSet = new Set(ids);
     syncFavIcons();
-    // 로그인 시 자동 오픈
     if(localStorage.getItem('sw_logged_in') === 'true' || auth?.currentUser) showSection('mypage');
   }
 
-  // 로그인 상태 → My Page 버튼 노출
   function refreshMyPageBtn(){
     const logged = (localStorage.getItem('sw_logged_in') === 'true') || !!auth?.currentUser;
     if($btnMyPage) $btnMyPage.style.display = logged ? '' : 'none';
   }
 
-  // Firebase Auth 변화 감지(있을 때만)
   if(auth){
     auth.onAuthStateChanged(()=>{ refreshMyPageBtn(); initFavState(); });
   }
 
-  // 초기 진입
   document.addEventListener('DOMContentLoaded', ()=>{ refreshMyPageBtn(); initFavState(); });
 
-  // 카드의 ★ 버튼 바인딩/동기화 (렌더 후 호출용)
   function bindFavButtons(root=document){
     root.querySelectorAll('.fav-btn').forEach(btn=>{
       if(btn._bound) return; btn._bound = true;
@@ -328,7 +411,6 @@
     });
   }
 
-  // MyPage 렌더(리스트+지도)
   function ensureFavMap(){
     if(favMap) return favMap;
     const el = document.getElementById('favMap');
@@ -340,7 +422,6 @@
   }
   function renderMyPage(){
     if(!$secMy) return;
-    // stays 전역이 있으면 사용, 없으면 샘플
     const stays = window.stays || [
       {id:'par-001', name:'Paris Center',      city:'Paris',    price:180, lat:48.8566, lng:2.3522},
       {id:'ist-002', name:'Bosphorus View',    city:'Istanbul', price:120, lat:41.0082, lng:28.9784},
@@ -366,11 +447,9 @@
 
     const map = ensureFavMap();
     if(map){
-      // 기존 마커 제거
       const toRemove = [];
       map.eachLayer(l=>{ if(l instanceof L.Marker) toRemove.push(l); });
       toRemove.forEach(m=>map.removeLayer(m));
-      // 새 마커
       const markers = [];
       picked.forEach(s=>{
         if(typeof s.lat !== 'number' || typeof s.lng !== 'number') return;
@@ -385,7 +464,6 @@
     }
   }
 
-  // 전역 헬퍼 공개: 카드 렌더 후 호출
   window.SW_bindFavButtons = bindFavButtons;
   window.SW_syncFavIcons  = syncFavIcons;
 })();
