@@ -1,9 +1,28 @@
-// scripts/firebase.js
+// /scripts/firebase.js
+// Firebase v10 CDN + ESM. 모든 페이지에서 import.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth }       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage }    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, getDocs, query, where, collection,
+  serverTimestamp, orderBy, limit
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getStorage,
+  ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+// 🔒 실제 콘솔 값으로 교체
 const firebaseConfig = {
   apiKey: "AIzaSyCyb0pn2sFTEPkL0Q1ALwZaV2QILWyP_fk",
   authDomain: "stayworld-2570c.firebaseapp.com",
@@ -14,10 +33,21 @@ const firebaseConfig = {
   measurementId: "G-F8MXM3D7FJ"
 };
 
-// Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
-// export 해서 다른 페이지에서 공통으로 사용
-export const auth    = getAuth(app);
-export const db      = getFirestore(app);
+// singletons
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// convenient re-exports
+export {
+  // auth
+  onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile,
+  // firestore
+  doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, getDocs, query, where, collection, serverTimestamp, orderBy, limit,
+  // storage
+  ref, uploadBytes, getDownloadURL
+};
