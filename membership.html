@@ -21,6 +21,9 @@
     .tier-muted{opacity:.65}
     .badge{position:absolute;right:16px;top:-10px;background:#f4d78c;color:#1a1205;border-radius:999px;padding:6px 12px;font-weight:700}
     .sticky-note{position:sticky;top:0;z-index:30;background:#0f1420;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:16px}
+    .bill-btn{cursor:pointer}
+    .btn-buy{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#2a2216;color:#fff;cursor:pointer}
+    .btn-basic{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#121a2a;color:#fff;cursor:pointer}
     @media (max-width: 840px){ .tier-grid{grid-template-columns:1fr} }
   </style>
 </head>
@@ -48,7 +51,7 @@
       <small id="downgradeSticky" class="note" style="display:block;margin-top:10px"></small>
     </section>
 
-    <!-- 등급 카드 + 혜택 (JS가 채움) -->
+    <!-- 등급 카드 + 혜택 -->
     <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
       <article class="tier-card" data-tier="Bronze">
         <h3>🥉 <span id="lbl_bronze"></span></h3><div class="benefits"></div>
@@ -69,12 +72,63 @@
         <h3>👑 <span id="lbl_elite"></span></h3><div class="benefits"></div>
       </article>
     </section>
+
+    <!-- 멤버십 요금제 (월/연 토글 + Stripe 링크) -->
+    <section class="card" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <h2 style="margin:0">Membership Plans</h2>
+        <div style="display:flex;border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden">
+          <button id="billMonthly" class="bill-btn" style="padding:8px 12px;background:#182033;color:#fff;border:0">Monthly</button>
+          <button id="billYearly" class="bill-btn" style="padding:8px 12px;background:transparent;color:#cfe; border:0">Yearly (2 months free)</button>
+        </div>
+      </div>
+
+      <div class="tier-grid" style="margin-top:12px">
+        <!-- BASIC -->
+        <article class="tier-card tier-muted">
+          <h3>Basic (Free)</h3>
+          <div class="benefit"><i>•</i><div>Booking, Reviews, Points</div></div>
+          <div class="benefit"><i>•</i><div>Loyalty Levels (Bronze→Elite)</div></div>
+          <button class="btn-basic">Keep Basic</button>
+        </article>
+
+        <!-- PLUS -->
+        <article class="tier-card" id="planPlus">
+          <h3>PLUS <small id="pricePlus" style="opacity:.8"></small></h3>
+          <div class="benefit"><i>•</i><div><b>+2% points boost</b> <small class="note">cap: up to $400 spend/mo (max $8)</small></div></div>
+          <div class="benefit"><i>•</i><div><b>0% booking fee / instant discount</b> <small class="note">cap: $10/booking × 3 per month</small></div></div>
+          <div class="benefit"><i>•</i><div>Early check-in / Late check-out <small class="note">(host-provided)</small></div></div>
+          <div class="benefit"><i>•</i><div>Secret Deals <small class="note">(host-funded)</small></div></div>
+          <div class="benefit"><i>•</i><div><b>Ticket</b> (delayed): 1× free-night after <b>2 months + $500</b></div></div>
+          <button id="btnPlusCheckout" class="btn-buy">Start PLUS</button>
+        </article>
+
+        <!-- BLACK -->
+        <article class="tier-card" id="planBlack">
+          <h3>BLACK <small id="priceBlack" style="opacity:.8"></small></h3>
+          <div class="benefit"><i>•</i><div><b>+4% points boost</b> <small class="note">cap: up to $600 spend/mo (max $24)</small></div></div>
+          <div class="benefit"><i>•</i><div><b>0% booking fee / instant discount</b> <small class="note">cap: $20/booking × 5 per month</small></div></div>
+          <div class="benefit"><i>•</i><div>VIP concierge (AI+staff) <small class="note">3 sessions/mo (extra paid)</small></div></div>
+          <div class="benefit"><i>•</i><div>Airport lounge & pickup <small class="note">(partners)</small></div></div>
+          <div class="benefit"><i>•</i><div><b>Tickets</b> (delayed): 2× free-night after <b>3 months + $1200</b></div></div>
+          <button id="btnBlackCheckout" class="btn-buy">Upgrade to BLACK</button>
+        </article>
+      </div>
+
+      <small class="note" style="display:block;margin-top:10px">
+        * All benefits have monthly caps. Early check-in/upgrade/secret deals are host-funded → our cost = 0.
+      </small>
+    </section>
   </main>
 
-  <!-- 로드 순서 고정 -->
+  <!-- 로드 순서 고정 (header/lang) -->
   <script src="/scripts/header.js" defer></script>
   <script src="/lang.js" defer></script>
-  <script src="/membership.js" defer></script>
+
+  <!-- 멤버십 로직 (Firebase + Stripe) -->
+  <script type="module" src="/membership.js"></script>
+
+  <!-- (선택) 로그인 모달 -->
   <script src="/assets/login-modal.js"></script>
 </body>
 </html>
