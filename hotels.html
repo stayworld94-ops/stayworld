@@ -6,8 +6,7 @@
   <title>STAYWORLD — Hotels</title>
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Leaflet -->
@@ -42,6 +41,7 @@
     .chip{display:inline-flex;gap:8px;align-items:center;padding:9px 12px;background:var(--chip);border:1px solid var(--line);border-radius:12px;color:var(--text);cursor:pointer}
     .chip:hover{background:#152033}
     .select{padding:8px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line);color:var(--text)}
+    .hint{color:var(--muted);font-size:12px;margin-left:8px}
 
     /* Layout */
     .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;padding:14px}
@@ -81,7 +81,7 @@
 
     /* Filter drawer */
     .filter-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);display:none;z-index:120}
-    .filter-panel{position:fixed;right:0;top:0;bottom:0;width:360px;max-width:92vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(0,0,0,.4);z-index:130;transform:translateX(100%);transition:transform .25s ease}
+    .filter-panel{position:fixed;right:0;top:0;bottom:0;width:380px;max-width:92vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(0,0,0,.4);z-index:130;transform:translateX(100%);transition:transform .25s ease}
     .filter-open .filter-panel{transform:translateX(0)}
     .filter-open .filter-backdrop{display:block}
     .filter-head{display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid var(--line)}
@@ -93,6 +93,8 @@
     .filter-actions{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(16,16,24,.6),rgba(16,16,24,0))}
     .btn.small{padding:8px 10px;border-radius:10px}
     .btn.reset{background:transparent;color:var(--muted)}
+    .checks{display:flex;flex-wrap:wrap;gap:8px}
+    .checks label{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border:1px solid var(--line);padding:6px 8px;border-radius:10px}
   </style>
 </head>
 <body>
@@ -101,236 +103,589 @@
     <div class="sw-header-inner">
       <a href="/index.html" class="sw-brand"><span class="sw-logo"></span><strong>STAYWORLD</strong></a>
       <nav class="sw-nav">
-        <a href="/index.html">Home</a>
-        <a href="/hotels.html" class="active">Hotels</a>
-        <a href="/membership.html">Membership</a>
-        <a href="/results.html">Search</a>
-        <a href="/host-register.html">Become a Host</a>
+        <a href="/index.html" data-i18n="nav.home">Home</a>
+        <a href="/hotels.html" class="active" data-i18n="nav.hotels">Hotels</a>
+        <a href="/membership.html" data-i18n="nav.membership">Membership</a>
+        <a href="/results.html" data-i18n="nav.search">Search</a>
+        <a href="/host-register.html" data-i18n="nav.becomeHost">Become a Host</a>
       </nav>
       <div class="sw-cta">
-        <a href="/login.html" class="btn ghost">Log in</a>
-        <a href="/signup.html" class="btn gold">Sign up</a>
+        <a href="/login.html" class="btn ghost" data-i18n="nav.login">Log in</a>
+        <a href="/signup.html" class="btn gold" data-i18n="nav.signup">Sign up</a>
       </div>
     </div>
   </header>
 
   <!-- Controls -->
   <div class="controls">
-    <div class="chip" id="btnSort">⇅ <span data-i18n="sort">정렬</span></div>
-    <div class="chip" id="btnFilter">☰ <span data-i18n="filter">필터</span></div>
-    <div class="chip" id="btnMapList">🗺️ <span data-i18n="mapView">지도</span></div>
-    <select class="select" id="lang"></select>
-    <select class="select" id="currency"></select>
+    <div class="chip" id="btnSort">⇅ <span data-i18n="controls.sort">Sort</span></div>
+    <div class="chip" id="btnFilter">☰ <span data-i18n="controls.filter">Filter</span></div>
+    <div class="chip" id="btnMapList">🗺️ <span data-i18n="controls.map">Map</span></div>
+    <select class="select" id="lang" aria-label="Language"></select>
+    <select class="select" id="currency" aria-label="Currency"></select>
+    <span class="hint" id="rateHint" data-i18n="controls.rateHint">* Demo rates. Connect a live FX API.</span>
   </div>
 
   <!-- Filter Drawer -->
   <div class="filter-backdrop" id="filterBackdrop"></div>
   <aside class="filter-panel" id="filterPanel" aria-hidden="true">
     <div class="filter-head">
-      <strong>Filters</strong>
+      <strong data-i18n="filters.title">Filters</strong>
       <button class="btn small reset" id="btnCloseFilter">✕</button>
     </div>
     <div class="filter-body">
       <div class="filter-row">
-        <label>Max price (converted)</label>
+        <label data-i18n="filters.maxPrice">Max price (converted)</label>
         <div class="range">
           <input type="range" id="fPrice" min="50" max="1000" step="10" value="1000"/>
           <span id="fPriceVal">—</span>
         </div>
       </div>
       <div class="filter-row">
-        <label>Minimum rating</label>
+        <label data-i18n="filters.minRating">Minimum rating</label>
         <div class="range">
-          <input type="range" id="fRating" min="0" max="10" step="0.1" value="0"/>
+          <input type="range" id="fRating" min="0" max="5" step="0.1" value="0"/>
           <span id="fRatingVal">0.0</span>
         </div>
       </div>
       <div class="filter-row">
-        <label>Max distance from center</label>
+        <label data-i18n="filters.maxDistance">Max distance from center (km)</label>
         <div class="range">
-          <input type="range" id="fDistance" min="200" max="10000" step="100" value="10000"/>
+          <input type="range" id="fDistance" min="0" max="30" step="1" value="30"/>
           <span id="fDistanceVal">—</span>
         </div>
       </div>
       <div class="filter-row">
-        <label><input type="checkbox" id="fFreeCancel"> Free cancellation only</label>
+        <label><input type="checkbox" id="fFreeCancel"> <span data-i18n="filters.freeCancel">Free cancellation only</span></label>
+      </div>
+
+      <!-- 20+ categories -->
+      <div class="filter-row">
+        <label data-i18n="filters.type">Stay type</label>
+        <div class="checks" id="fType">
+          <label><input type="checkbox" value="Hotel"><span data-i18n="type.hotel">Hotel</span></label>
+          <label><input type="checkbox" value="Motel"><span data-i18n="type.motel">Motel</span></label>
+          <label><input type="checkbox" value="Hostel"><span data-i18n="type.hostel">Hostel</span></label>
+          <label><input type="checkbox" value="Apartment"><span data-i18n="type.apartment">Apartment</span></label>
+          <label><input type="checkbox" value="Villa"><span data-i18n="type.villa">Villa</span></label>
+          <label><input type="checkbox" value="Ryokan"><span data-i18n="type.ryokan">Ryokan</span></label>
+          <label><input type="checkbox" value="Guesthouse"><span data-i18n="type.guesthouse">Guesthouse</span></label>
+          <label><input type="checkbox" value="B&B"><span data-i18n="type.bnb">B&B</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.amen">Amenities</label>
+        <div class="checks" id="fAmen">
+          <label><input type="checkbox" value="Wi-Fi"><span data-i18n="amen.wifi">Wi-Fi</span></label>
+          <label><input type="checkbox" value="Kitchen"><span data-i18n="amen.kitchen">Kitchen</span></label>
+          <label><input type="checkbox" value="Parking"><span data-i18n="amen.parking">Parking</span></label>
+          <label><input type="checkbox" value="Pool"><span data-i18n="amen.pool">Pool</span></label>
+          <label><input type="checkbox" value="Air conditioning"><span data-i18n="amen.ac">Air conditioning</span></label>
+          <label><input type="checkbox" value="Gym"><span data-i18n="amen.gym">Gym</span></label>
+          <label><input type="checkbox" value="Workspace"><span data-i18n="amen.workspace">Workspace</span></label>
+          <label><input type="checkbox" value="Washer"><span data-i18n="amen.washer">Washer</span></label>
+          <label><input type="checkbox" value="Dryer"><span data-i18n="amen.dryer">Dryer</span></label>
+          <label><input type="checkbox" value="Breakfast"><span data-i18n="amen.breakfast">Breakfast</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.booking">Booking</label>
+        <div class="checks" id="fBooking">
+          <label><input type="checkbox" value="Instant"><span data-i18n="book.instant">Instant book</span></label>
+          <label><input type="checkbox" value="Request"><span data-i18n="book.request">Request to book</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.verify">Verification</label>
+        <div class="checks" id="fVerify">
+          <label><input type="checkbox" value="Verified listings"><span data-i18n="verify.listings">Verified listings only</span></label>
+          <label><input type="checkbox" value="Verified reviews"><span data-i18n="verify.reviews">Verified reviews</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.long">Long-stay</label>
+        <div class="checks" id="fLong">
+          <label><input type="checkbox" value="Long deals"><span data-i18n="long.deals">Show long-stay deals</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.biz">Business</label>
+        <div class="checks" id="fBiz">
+          <label><input type="checkbox" value="B2B"><span data-i18n="biz.b2b">B2B-ready</span></label>
+          <label><input type="checkbox" value="Invoice"><span data-i18n="biz.invoice">Invoice available</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.acc">Accessibility</label>
+        <div class="checks" id="fAcc">
+          <label><input type="checkbox" value="Step-free"><span data-i18n="acc.stepfree">Step-free access</span></label>
+          <label><input type="checkbox" value="Elevator"><span data-i18n="acc.elevator">Elevator</span></label>
+          <label><input type="checkbox" value="Wide doorway"><span data-i18n="acc.doorway">Wide doorway</span></label>
+          <label><input type="checkbox" value="Accessible bathroom"><span data-i18n="acc.bathroom">Accessible bathroom</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.view">View</label>
+        <div class="checks" id="fView">
+          <label><input type="checkbox" value="Sea view"><span data-i18n="view.sea">Sea view</span></label>
+          <label><input type="checkbox" value="City view"><span data-i18n="view.city">City view</span></label>
+          <label><input type="checkbox" value="Mountain view"><span data-i18n="view.mountain">Mountain view</span></label>
+          <label><input type="checkbox" value="Garden"><span data-i18n="view.garden">Garden</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.safe">Safety</label>
+        <div class="checks" id="fSafe">
+          <label><input type="checkbox" value="CO alarm"><span data-i18n="safe.co">Carbon monoxide alarm</span></label>
+          <label><input type="checkbox" value="Smoke alarm"><span data-i18n="safe.smoke">Smoke alarm</span></label>
+          <label><input type="checkbox" value="First aid kit"><span data-i18n="safe.aid">First aid kit</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.family">Family</label>
+        <div class="checks" id="fFamily">
+          <label><input type="checkbox" value="Crib"><span data-i18n="family.crib">Crib</span></label>
+          <label><input type="checkbox" value="High chair"><span data-i18n="family.chair">High chair</span></label>
+          <label><input type="checkbox" value="Stroller friendly"><span data-i18n="family.stroller">Stroller friendly</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.ent">Entertainment</label>
+        <div class="checks" id="fEnt">
+          <label><input type="checkbox" value="TV"><span data-i18n="ent.tv">TV</span></label>
+          <label><input type="checkbox" value="Netflix"><span data-i18n="ent.netflix">Netflix</span></label>
+          <label><input type="checkbox" value="Game console"><span data-i18n="ent.console">Game console</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.out">Outdoor</label>
+        <div class="checks" id="fOut">
+          <label><input type="checkbox" value="BBQ"><span data-i18n="out.bbq">BBQ grill</span></label>
+          <label><input type="checkbox" value="Patio"><span data-i18n="out.patio">Patio</span></label>
+          <label><input type="checkbox" value="Private garden"><span data-i18n="out.garden">Private garden</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.park">Parking</label>
+        <div class="checks" id="fPark">
+          <label><input type="checkbox" value="On-site"><span data-i18n="park.onsite">On-site</span></label>
+          <label><input type="checkbox" value="Street"><span data-i18n="park.street">Street</span></label>
+          <label><input type="checkbox" value="Garage"><span data-i18n="park.garage">Paid garage</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.pets">Pets</label>
+        <div class="checks" id="fPets">
+          <label><input type="checkbox" value="Pet allowed"><span data-i18n="pets.allowed">Allowed</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.checkin">Check-in</label>
+        <div class="checks" id="fCheckin">
+          <label><input type="checkbox" value="Self"><span data-i18n="checkin.self">Self check-in</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.exp">Experiences</label>
+        <div class="checks" id="fExp">
+          <label><input type="checkbox" value="Nature"><span data-i18n="exp.nature">Nature</span></label>
+          <label><input type="checkbox" value="Camping"><span data-i18n="exp.camping">Camping</span></label>
+          <label><input type="checkbox" value="Traditional"><span data-i18n="exp.traditional">Traditional</span></label>
+          <label><input type="checkbox" value="Ski"><span data-i18n="exp.ski">Ski-in/out</span></label>
+          <label><input type="checkbox" value="Wine"><span data-i18n="exp.wine">Wine country</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.loc">Location</label>
+        <div class="checks" id="fLoc">
+          <label><input type="checkbox" value="Near airport"><span data-i18n="loc.airport">Near airport</span></label>
+          <label><input type="checkbox" value="Near station"><span data-i18n="loc.station">Near station</span></label>
+          <label><input type="checkbox" value="Near beach"><span data-i18n="loc.beach">Near beach</span></label>
+          <label><input type="checkbox" value="City center"><span data-i18n="loc.center">City center</span></label>
+        </div>
       </div>
     </div>
+
     <div class="filter-actions">
-      <button class="btn small reset" id="btnResetFilters">Reset</button>
-      <button class="btn small gold" id="btnApplyFilters">Apply</button>
+      <button class="btn small reset" id="btnResetFilters" data-i18n="filters.reset">Reset</button>
+      <button class="btn small gold" id="btnApplyFilters" data-i18n="filters.apply">Apply</button>
     </div>
   </aside>
 
   <!-- List + Map -->
   <div class="wrap">
     <div><div id="list"></div></div>
-    <div>
-      <div id="map"></div>
-      <div style="padding:8px 14px;color:var(--muted);font-size:12px" id="rateHint">* Exchange rates are sample for demo. Connect your FX API for live rates.</div>
-    </div>
+    <div><div id="map"></div></div>
   </div>
 
   <!-- Footer -->
   <footer class="sw-footer">
     <div class="sw-footer-inner">
-      <div class="sw-foot-col"><h4>STAYWORLD</h4><a href="/about.html">About</a><a href="/careers.html">Careers</a><a href="/press.html">Press</a></div>
-      <div class="sw-foot-col"><h4>Help</h4><a href="/help.html">Help Center</a><a href="/safety.html">Guest Protection</a><a href="/contact.html">Contact</a></div>
-      <div class="sw-foot-col"><h4>Legal</h4><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a><a href="/cookies.html">Cookies</a></div>
+      <div class="sw-foot-col"><h4>STAYWORLD</h4><a href="/about.html" data-i18n="foot.about">About</a><a href="/careers.html" data-i18n="foot.careers">Careers</a><a href="/press.html" data-i18n="foot.press">Press</a></div>
+      <div class="sw-foot-col"><h4 data-i18n="foot.help">Help</h4><a href="/help.html" data-i18n="foot.center">Help Center</a><a href="/safety.html" data-i18n="foot.protect">Guest Protection</a><a href="/contact.html" data-i18n="foot.contact">Contact</a></div>
+      <div class="sw-foot-col"><h4 data-i18n="foot.legal">Legal</h4><a href="/terms.html" data-i18n="foot.terms">Terms</a><a href="/privacy.html" data-i18n="foot.privacy">Privacy</a><a href="/cookies.html" data-i18n="foot.cookies">Cookies</a></div>
     </div>
     <div class="sw-copy">© 2025 STAYWORLD. All rights reserved.</div>
   </footer>
 
-<script type="module">
-  /* =========================
-     Firestore, 상태, 함수들 (생략, 네 코드 그대로 유지)
-     ...
-  ========================== */
+  <!-- (선택) Firebase / 공통 스크립트 -->
+  <script src="/scripts/firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage-compat.js"></script>
+  <script src="/scripts/firebase.js"></script>
+  <script src="/scripts/auth.js"></script>
 
-  function openFilters(){ document.body.classList.add('filter-open'); }
-  function closeFilters(){ document.body.classList.remove('filter-open'); }
-  btnFilter.addEventListener('click',openFilters);
-  btnCloseFilter.addEventListener('click',closeFilters);
-  filterBackdrop.addEventListener('click',closeFilters);
+  <script>
+    // ================== i18n dictionary ==================
+    const I18N = {
+      en:{
+        "nav.home":"Home","nav.hotels":"Hotels","nav.membership":"Membership","nav.search":"Search","nav.becomeHost":"Become a Host",
+        "nav.login":"Log in","nav.signup":"Sign up",
+        "controls.sort":"Sort","controls.filter":"Filter","controls.map":"Map","controls.rateHint":"* Demo rates. Connect a live FX API.",
+        "filters.title":"Filters","filters.maxPrice":"Max price (converted)","filters.minRating":"Minimum rating","filters.maxDistance":"Max distance from center (km)","filters.freeCancel":"Free cancellation only",
+        "filters.type":"Stay type","filters.amen":"Amenities","filters.booking":"Booking","filters.verify":"Verification","filters.long":"Long-stay","filters.biz":"Business","filters.acc":"Accessibility","filters.view":"View","filters.safe":"Safety","filters.family":"Family","filters.ent":"Entertainment","filters.out":"Outdoor","filters.park":"Parking","filters.pets":"Pets","filters.checkin":"Check-in","filters.exp":"Experiences","filters.loc":"Location","filters.reset":"Reset","filters.apply":"Apply",
+        "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Guesthouse","type.bnb":"B&B",
+        "amen.wifi":"Wi-Fi","amen.kitchen":"Kitchen","amen.parking":"Parking","amen.pool":"Pool","amen.ac":"Air conditioning","amen.gym":"Gym","amen.workspace":"Workspace","amen.washer":"Washer","amen.dryer":"Dryer","amen.breakfast":"Breakfast",
+        "book.instant":"Instant book","book.request":"Request to book",
+        "verify.listings":"Verified listings only","verify.reviews":"Verified reviews",
+        "long.deals":"Show long-stay deals",
+        "biz.b2b":"B2B-ready","biz.invoice":"Invoice available",
+        "acc.stepfree":"Step-free access","acc.elevator":"Elevator","acc.doorway":"Wide doorway","acc.bathroom":"Accessible bathroom",
+        "view.sea":"Sea view","view.city":"City view","view.mountain":"Mountain view","view.garden":"Garden",
+        "safe.co":"Carbon monoxide alarm","safe.smoke":"Smoke alarm","safe.aid":"First aid kit",
+        "family.crib":"Crib","family.chair":"High chair","family.stroller":"Stroller friendly",
+        "ent.tv":"TV","ent.netflix":"Netflix","ent.console":"Game console",
+        "out.bbq":"BBQ grill","out.patio":"Patio","out.garden":"Private garden",
+        "park.onsite":"On-site","park.street":"Street","park.garage":"Paid garage",
+        "pets.allowed":"Allowed",
+        "checkin.self":"Self check-in",
+        "exp.nature":"Nature","exp.camping":"Camping","exp.traditional":"Traditional","exp.ski":"Ski-in/out","exp.wine":"Wine country",
+        "loc.airport":"Near airport","loc.station":"Near station","loc.beach":"Near beach","loc.center":"City center",
+        "foot.about":"About","foot.careers":"Careers","foot.press":"Press","foot.help":"Help","foot.center":"Help Center","foot.protect":"Guest Protection","foot.contact":"Contact","foot.legal":"Legal","foot.terms":"Terms","foot.privacy":"Privacy","foot.cookies":"Cookies"
+      },
+      ko:{
+        "nav.home":"홈","nav.hotels":"숙소","nav.membership":"멤버십","nav.search":"검색","nav.becomeHost":"호스트 되기",
+        "nav.login":"로그인","nav.signup":"가입하기",
+        "controls.sort":"정렬","controls.filter":"필터","controls.map":"지도","controls.rateHint":"* 데모 환율입니다. 운영 시 환율 API를 연결하세요.",
+        "filters.title":"필터","filters.maxPrice":"최대 가격(환산)","filters.minRating":"최소 평점","filters.maxDistance":"도심까지 최대 거리(km)","filters.freeCancel":"무료 취소만",
+        "filters.type":"숙소 유형","filters.amen":"편의시설","filters.booking":"예약 방식","filters.verify":"검증","filters.long":"장기 숙박","filters.biz":"비즈니스","filters.acc":"접근성","filters.view":"전망","filters.safe":"안전","filters.family":"가족","filters.ent":"엔터테인먼트","filters.out":"아웃도어","filters.park":"주차","filters.pets":"반려동물","filters.checkin":"체크인","filters.exp":"경험","filters.loc":"위치","filters.reset":"초기화","filters.apply":"적용",
+        "type.hotel":"호텔","type.motel":"모텔","type.hostel":"호스텔","type.apartment":"아파트","type.villa":"빌라","type.ryokan":"료칸","type.guesthouse":"게스트하우스","type.bnb":"B&B",
+        "amen.wifi":"와이파이","amen.kitchen":"주방","amen.parking":"주차","amen.pool":"수영장","amen.ac":"에어컨","amen.gym":"피트니스","amen.workspace":"업무 공간","amen.washer":"세탁기","amen.dryer":"건조기","amen.breakfast":"조식",
+        "book.instant":"즉시 예약","book.request":"예약 요청",
+        "verify.listings":"검증된 숙소만","verify.reviews":"검증된 리뷰",
+        "long.deals":"장기 숙박 특가만 보기",
+        "biz.b2b":"B2B 지원","biz.invoice":"인보이스 제공",
+        "acc.stepfree":"무단차 출입","acc.elevator":"엘리베이터","acc.doorway":"넓은 출입문","acc.bathroom":"장애인 화장실",
+        "view.sea":"바다 전망","view.city":"도시 전망","view.mountain":"산 전망","view.garden":"정원",
+        "safe.co":"일산화탄소 감지기","safe.smoke":"연기 감지기","safe.aid":"구급상자",
+        "family.crib":"아기 침대","family.chair":"아기의자","family.stroller":"유모차 가능",
+        "ent.tv":"TV","ent.netflix":"넷플릭스","ent.console":"게임 콘솔",
+        "out.bbq":"바비큐 그릴","out.patio":"파티오","out.garden":"전용 정원",
+        "park.onsite":"현장 주차","park.street":"노상 주차","park.garage":"유료 차고",
+        "pets.allowed":"가능",
+        "checkin.self":"셀프 체크인",
+        "exp.nature":"자연","exp.camping":"캠핑","exp.traditional":"전통","exp.ski":"스키 인/아웃","exp.wine":"와인",
+        "loc.airport":"공항 인근","loc.station":"역 인근","loc.beach":"해변 인근","loc.center":"도심",
+        "foot.about":"회사 소개","foot.careers":"채용","foot.press":"보도자료","foot.help":"도움말","foot.center":"도움말 센터","foot.protect":"게스트 보호","foot.contact":"문의","foot.legal":"법적 고지","foot.terms":"이용약관","foot.privacy":"개인정보 처리방침","foot.cookies":"쿠키"
+      },
+      tr:{
+        "nav.home":"Ana sayfa","nav.hotels":"Konaklama","nav.membership":"Üyelik","nav.search":"Arama","nav.becomeHost":"Ev sahibi olun",
+        "nav.login":"Giriş","nav.signup":"Kaydol",
+        "controls.sort":"Sırala","controls.filter":"Filtre","controls.map":"Harita","controls.rateHint":"* Demo kur. Canlı kur API’si bağlayın.",
+        "filters.title":"Filtreler","filters.maxPrice":"Azami fiyat (çevrilmiş)","filters.minRating":"Asgari puan","filters.maxDistance":"Merkeze azami mesafe (km)","filters.freeCancel":"Yalnızca ücretsiz iptal",
+        "filters.type":"Konaklama türü","filters.amen":"Olanaklar","filters.booking":"Rezervasyon","filters.verify":"Doğrulama","filters.long":"Uzun konaklama","filters.biz":"İş","filters.acc":"Erişilebilirlik","filters.view":"Manzara","filters.safe":"Güvenlik","filters.family":"Aile","filters.ent":"Eğlence","filters.out":"Açık alan","filters.park":"Park","filters.pets":"Evcil","filters.checkin":"Giriş","filters.exp":"Deneyimler","filters.loc":"Konum","filters.reset":"Sıfırla","filters.apply":"Uygula",
+        "type.hotel":"Otel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Daire","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Pansiyon","type.bnb":"B&B",
+        "amen.wifi":"Wi-Fi","amen.kitchen":"Mutfak","amen.parking":"Otopark","amen.pool":"Havuz","amen.ac":"Klima","amen.gym":"Spor salonu","amen.workspace":"Çalışma alanı","amen.washer":"Çamaşır mak.","amen.dryer":"Kurutma mak.","amen.breakfast":"Kahvaltı",
+        "book.instant":"Anında rezervasyon","book.request":"Talep ile rezervasyon",
+        "verify.listings":"Yalnızca doğrulanmış ilanlar","verify.reviews":"Doğrulanmış yorumlar",
+        "long.deals":"Uzun konaklama fırsatları",
+        "biz.b2b":"B2B uyumlu","biz.invoice":"Fatura mevcut",
+        "acc.stepfree":"Basamaksız erişim","acc.elevator":"Asansör","acc.doorway":"Geniş kapı","acc.bathroom":"Erişilebilir banyo",
+        "view.sea":"Deniz manzarası","view.city":"Şehir manzarası","view.mountain":"Dağ manzarası","view.garden":"Bahçe",
+        "safe.co":"Karbon monoksit alarmı","safe.smoke":"Duman alarmı","safe.aid":"İlk yardım çantası",
+        "family.crib":"Bebek yatağı","family.chair":"Mama sandalyesi","family.stroller":"Bebek arabası uygun",
+        "ent.tv":"TV","ent.netflix":"Netflix","ent.console":"Oyun konsolu",
+        "out.bbq":"Mangal","out.patio":"Avlu","out.garden":"Özel bahçe",
+        "park.onsite":"Tesis içi","park.street":"Sokak","park.garage":"Ücretli otopark",
+        "pets.allowed":"İzinli",
+        "checkin.self":"Kendi kendine giriş",
+        "exp.nature":"Doğa","exp.camping":"Kamp","exp.traditional":"Geleneksel","exp.ski":"Kayak in/out","exp.wine":"Şarap bölgesi",
+        "loc.airport":"Havalimanına yakın","loc.station":"İstasyona yakın","loc.beach":"Plaja yakın","loc.center":"Şehir merkezi",
+        "foot.about":"Hakkımızda","foot.careers":"Kariyer","foot.press":"Basın","foot.help":"Yardım","foot.center":"Yardım Merkezi","foot.protect":"Misafir Koruma","foot.contact":"İletişim","foot.legal":"Hukuki","foot.terms":"Şartlar","foot.privacy":"Gizlilik","foot.cookies":"Çerezler"
+      },
+      // 필요시 fr/ja/de/es/it/zh/ru도 위 포맷 복제하여 추가 가능 (공간 절약을 위해 생략)
+    };
 
-  // 🔑 전역 노출
-  window.openFilters = openFilters;
-  window.closeFilters = closeFilters;
-</script>
+    function t(key){ const L = I18N[state.lang] || I18N.en; return L[key] || I18N.en[key] || key; }
+    function applyLang(){
+      document.querySelectorAll("[data-i18n]").forEach(el=>{
+        const k = el.getAttribute("data-i18n");
+        const txt = t(k);
+        if(txt) el.textContent = txt;
+      });
+    }
+  </script>
 
-<script>
-  // URL에 #filters 붙어있으면 자동으로 필터 열기
-  function maybeOpenFiltersFromHash() {
-    if (location.hash === '#filters') {
-      if (typeof window.openFilters === 'function') {
-        window.openFilters();
-      } else {
-        document.body.classList.add('filter-open');
+  <script>
+    // ================== App State / Currency ==================
+    const LANGS = { en:'English', ko:'한국어', tr:'Türkçe', fr:'Français', ja:'日本語', de:'Deutsch', es:'Español', it:'Italiano', zh:'中文', ru:'Русский' };
+    const CURRENCIES = { USD:'USD', KRW:'KRW', TRY:'TRY', EUR:'EUR', JPY:'JPY', CNY:'CNY', RUB:'RUB' };
+    const LANG_TO_DEFAULT_CURRENCY = { en:'USD', ko:'KRW', tr:'TRY', fr:'EUR', ja:'JPY', de:'EUR', es:'EUR', it:'EUR', zh:'CNY', ru:'RUB' };
+    const RATES = { USD:1, KRW:1350, TRY:33, EUR:0.92, JPY:156, RUB:90, CNY:7.2 }; // demo
+
+    let CITY_CENTER = { name:'Istanbul', lat:41.0082, lng:28.9784 };
+    let map, markersLayer;
+
+    const state = {
+      lang: (localStorage.getItem('sw_lang') || (navigator.language||'en').slice(0,2)).toLowerCase(),
+      currency: 'USD',
+      sort: 'price-asc',
+      filters: { priceMax:1000, ratingMin:0, distanceMax:30, freeCancel:false, type:new Set() },
+      listings: [],
+      nf: null
+    };
+    state.currency = LANG_TO_DEFAULT_CURRENCY[state.lang] || 'USD';
+    state.nf = new Intl.NumberFormat(state.lang, { style:'currency', currency: state.currency });
+
+    const $ = (s,sc)=> (sc||document).querySelector(s);
+    const $$ = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
+    const on = (el,ev,fn)=> el && el.addEventListener(ev,fn,{passive:false});
+    const usdToDisplay = usd => usd * (RATES[state.currency]||1);
+    const formatPriceFromUsd = usd => state.nf.format(usdToDisplay(usd));
+
+    function buildSelects(){
+      const langSel=$('#lang'), curSel=$('#currency');
+      langSel.innerHTML = Object.keys(LANGS).map(k=>`<option value="${k}">${LANGS[k]}</option>`).join('');
+      curSel.innerHTML = Object.keys(CURRENCIES).map(k=>`<option value="${k}">${k}</option>`).join('');
+      langSel.value = state.lang; curSel.value = state.currency;
+
+      on(langSel,'change', ()=>{
+        state.lang = langSel.value;
+        localStorage.setItem('sw_lang', state.lang);
+        if(!CURRENCIES[state.currency]) state.currency = LANG_TO_DEFAULT_CURRENCY[state.lang] || 'USD';
+        state.nf = new Intl.NumberFormat(state.lang, { style:'currency', currency: state.currency });
+        $('#currency').value = state.currency;
+        applyLang();
+        updateFilterLabels();
+        renderList(); renderMarkers();
+      });
+      on(curSel,'change', ()=>{
+        state.currency = curSel.value;
+        state.nf = new Intl.NumberFormat(state.lang, { style:'currency', currency: state.currency });
+        updateFilterLabels(); renderList(); renderMarkers();
+      });
+    }
+
+    // Map
+    function initMap(){
+      if(map) return;
+      map = L.map('map',{scrollWheelZoom:true}).setView([CITY_CENTER.lat, CITY_CENTER.lng], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+      markersLayer = L.layerGroup().addTo(map);
+    }
+    function renderMarkers(){
+      initMap();
+      markersLayer.clearLayers();
+      const items = getFilteredSorted(state.listings);
+      const pts = [];
+      items.forEach(it=>{
+        if(typeof it.lat !== 'number' || typeof it.lng!=='number') return;
+        const price = formatPriceFromUsd(it.price_usd||0);
+        const icon = L.divIcon({ className:'price-bubble', html: price, iconSize:[60,26] });
+        L.marker([it.lat,it.lng],{icon}).addTo(markersLayer).bindPopup(`<b>${it.title}</b><br>${it.city}, ${it.country}<br>${price}/night`);
+        pts.push([it.lat,it.lng]);
+      });
+      if(pts.length){
+        const group = L.featureGroup(pts.map(([a,b])=>L.marker([a,b])));
+        map.fitBounds(group.getBounds().pad(0.2));
       }
     }
-  }
-  window.addEventListener('DOMContentLoaded', maybeOpenFiltersFromHash);
-  window.addEventListener('hashchange', maybeOpenFiltersFromHash);
-</script>
-/* =========================
-   Deep-link via location.hash
-   예) /hotels.html#filters&sort=price-desc&rating=8.5&price=300&distance=3000&cancel=1&lang=ko&cur=KRW&lat=37.5665&lng=126.9780&city=Seoul
-========================= */
 
-// openFilters를 해시에서도 호출 가능하도록 전역 노출
-window.openFilters = openFilters;
-
-function parseHashParams() {
-  const h = (location.hash || '').replace(/^#/, '');
-  const parts = h ? h.split('&') : [];
-  const params = {};
-  for (const p of parts) {
-    if (!p) continue;
-    const [k, vRaw] = p.split('=');
-    const k2 = decodeURIComponent(k || '').trim().toLowerCase();
-    const v = decodeURIComponent((vRaw ?? '').trim());
-    // 값 없는 키(예: #filters)도 true로 처리
-    params[k2] = v === '' ? true : v;
-  }
-  return params;
-}
-
-function applyHashParams() {
-  const q = parseHashParams();
-  let needRerender = false;
-  let needRelayoutMap = false;
-
-  // 1) 필터 패널 자동 열기
-  if (q.filters === true || q.filters === '1' || q.filters === 'true') {
-    openFilters?.();
-  }
-
-  // 2) 정렬
-  const sortAllow = new Set(['price-asc','price-desc','rating-desc','distance-asc']);
-  if (q.sort && sortAllow.has(q.sort)) {
-    state.sort = q.sort;
-    needRerender = true;
-  }
-
-  // 3) 필터 값들: price(통화에 맞춘 최대값), rating(최소), distance(최대 m), cancel(무료취소)
-  // hash → 슬라이더/체크 UI에도 반영
-  if (q.price && !isNaN(+q.price)) {
-    document.getElementById('fPrice').value = +q.price;
-    state.filters.priceMax = +q.price;
-    needRerender = true;
-  }
-  if (q.rating && !isNaN(+q.rating)) {
-    document.getElementById('fRating').value = +q.rating;
-    state.filters.ratingMin = +q.rating;
-    needRerender = true;
-  }
-  if (q.distance && !isNaN(+q.distance)) {
-    document.getElementById('fDistance').value = +q.distance;
-    state.filters.distanceMax = +q.distance;
-    needRerender = true;
-  }
-  if (q.cancel !== undefined) {
-    const on = (q.cancel === true || q.cancel === '1' || q.cancel === 'true');
-    document.getElementById('fFreeCancel').checked = on;
-    state.filters.freeCancel = on;
-    needRerender = true;
-  }
-
-  // 4) 언어/통화
-  if (q.lang && LANGS[q.lang]) {
-    state.lang = q.lang;
-    document.getElementById('lang').value = q.lang;
-    // 언어가 바뀌었으면 기본 통화도 맞춰줄지 옵션 (해시에 cur 있으면 cur 우선)
-    if (!q.cur && LANG_TO_DEFAULT_CURRENCY[state.lang]) {
-      state.currency = LANG_TO_DEFAULT_CURRENCY[state.lang];
-      document.getElementById('currency').value = state.currency;
+    // List
+    function card(it){
+      const img = (it.images&&it.images[0]) ? it.images[0] : 'https://picsum.photos/800/500?blur=0.2&random='+(it.id||Math.random());
+      const rating = it.rating ? Number(it.rating).toFixed(1) : '—';
+      const dist = (typeof it.distance_km==='number') ? `${it.distance_km} km` : '—';
+      const priceLine = formatPriceFromUsd(it.price_usd||0);
+      const cancel = it.free_cancel ? t('filters.freeCancel').replace(' only','') : ' ';
+      return `
+        <article class="card"
+          data-price-usd="${it.price_usd||0}"
+          data-rating="${it.rating||0}"
+          data-distance="${it.distance_km||999}"
+          data-free="${!!it.free_cancel}"
+          data-type="${it.stayType||''}">
+          <div class="card-media">
+            <img src="${img}" alt="${it.title}">
+            <div class="badge-row">
+              ${it.stayType?`<span class="badge">${t('filters.type')}: ${t('type.'+(it.stayType||'').toLowerCase())||it.stayType}</span>`:''}
+              ${it.verified?`<span class="badge">Verified</span>`:''}
+            </div>
+            <button class="fav" title="★">
+              <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </button>
+          </div>
+          <div class="card-body">
+            <div>
+              <div class="title">${it.title}</div>
+              <div class="meta">${it.city}, ${it.country} · <span class="distance">${dist}</span> ${t('filters.maxDistance').split('(')[0].toLowerCase()}</div>
+              <div class="payline"><span class="price">${priceLine}</span> <span class="tax">/ night</span></div>
+              <div class="cancel">${cancel}</div>
+              <a href="/booking.html?id=${encodeURIComponent(it.id||'')}" class="btn gold book">Book</a>
+            </div>
+            <div class="rating">${rating}</div>
+          </div>
+        </article>`;
     }
-    // 텍스트 갱신은 맨 마지막에
-  }
-  if (q.cur && CURRENCIES[q.cur]) {
-    state.currency = q.cur;
-    document.getElementById('currency').value = q.cur;
-  }
+    function renderList(){
+      const mount = $('#list'); const items = getFilteredSorted(state.listings);
+      mount.innerHTML = items.map(card).join('') || `<div class="hint">No listings yet.</div>`;
+    }
 
-  // 5) 중심도시/좌표 (선택)
-  // lat, lng가 있으면 지도의 중심을 해당 좌표로, city가 있으면 도시명도 교체
-  const latNum = q.lat !== undefined ? +q.lat : NaN;
-  const lngNum = q.lng !== undefined ? +q.lng : NaN;
-  if (!isNaN(latNum) && !isNaN(lngNum)) {
-    CITY_CENTER = {
-      name: q.city || CITY_CENTER.name,
-      lat: latNum,
-      lng: lngNum
-    };
-    needRelayoutMap = true;
-    needRerender = true;
-  } else if (q.city) {
-    // city만 있으면 이름만 교체
-    CITY_CENTER = { ...CITY_CENTER, name: q.city };
-  }
+    // Sort/Filter
+    function getFilteredSorted(list){
+      const maxUsd = Number((state.filters.priceMax / (RATES[state.currency]||1)).toFixed(2));
+      const filtered = list.filter(x=>{
+        if((x.price_usd||0) > maxUsd) return false;
+        if((x.rating||0) < state.filters.ratingMin) return false;
+        if(typeof x.distance_km==='number' && x.distance_km > state.filters.distanceMax) return false;
+        if(state.filters.freeCancel && !x.free_cancel) return false;
+        if(state.filters.type.size && !state.filters.type.has(x.stayType)) return false;
+        return true;
+      });
+      return filtered.sort((a,b)=>{
+        if(state.sort==='price-asc')   return (a.price_usd||0)-(b.price_usd||0);
+        if(state.sort==='price-desc')  return (b.price_usd||0)-(a.price_usd||0);
+        if(state.sort==='rating-desc') return (b.rating||0)-(a.rating||0);
+        if(state.sort==='distance-asc')return (a.distance_km||999)-(b.distance_km||999);
+        return 0;
+      });
+    }
 
-  // UI 라벨 최신화
-  updateFilterLabels();
+    // Filters UI
+    function openFilters(){ document.body.classList.add('filter-open'); }
+    function closeFilters(){ document.body.classList.remove('filter-open'); }
+    function updateFilterLabels(){
+      $('#fPriceVal').textContent = state.nf.format(state.filters.priceMax);
+      $('#fRatingVal').textContent = state.filters.ratingMin.toFixed(1);
+      $('#fDistanceVal').textContent = `${state.filters.distanceMax} km`;
+    }
+    function readChecks(containerId, targetSet){
+      targetSet.clear();
+      $$('#'+containerId+' input[type=checkbox]:checked').forEach(i=>targetSet.add(i.value));
+    }
+    function resetAllFilters(){
+      state.filters.priceMax=1000; state.filters.ratingMin=0; state.filters.distanceMax=30; state.filters.freeCancel=false;
+      state.filters.type.clear();
+      $('#fPrice').value=1000; $('#fRating').value=0; $('#fDistance').value=30; $('#fFreeCancel').checked=false;
+      $$('aside .checks input[type=checkbox]').forEach(i=>i.checked=false);
+      updateFilterLabels();
+    }
 
-  // 텍스트/i18n 동기화는 언어/통화 반영 후 실행
-  // 단, 이미 초기 렌더링된 뒤라면 중복 렌더 방지를 위해 플래그로 제어
-  if (q.lang || q.cur) {
-    syncUITexts();
-    // syncUITexts안에서 renderList/renderMarkers 호출하므로 아래 needRerender는 건너뛸 수 있음
-    needRerender = false;
-  }
+    // Data
+    async function loadListings(){
+      let db = (typeof firebaseDB!=='undefined') ? firebaseDB : null;
+      let useFS = !!(db && db.collection);
+      if(!db){
+        if(firebase.firestore){ db=firebase.firestore(); useFS=true; }
+        else if(firebase.database){ db=firebase.database(); useFS=false; }
+      }
+      try{
+        if(db){
+          if(useFS){
+            const snap = await db.collection('listings').where('status','==','published').orderBy('createdAt','desc').limit(60).get();
+            return snap.docs.map(d=>d.data());
+          }else{
+            const snap = await db.ref('listings').limitToLast(60).get();
+            const val = snap.val()||{};
+            return Object.values(val).filter(v=>v.status==='published').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+          }
+        }
+      }catch(e){ console.warn('DB load failed, use sample.', e); }
+      return [
+        {id:'ist-001', title:'Bosphorus View Suite', city:'Istanbul', country:'Türkiye', stayType:'Apartment', price_usd:120, rating:4.6, distance_km:1.2, free_cancel:true, lat:41.038, lng:29.01, images:[]},
+        {id:'par-002', title:'Paris Luxury Stay', city:'Paris', country:'France', stayType:'Hotel', price_usd:210, rating:4.9, distance_km:0.5, free_cancel:false, lat:48.8566, lng:2.3522, images:[]},
+        {id:'sel-003', title:'Seoul Riverside Motel', city:'Seoul', country:'Korea', stayType:'Motel', price_usd:75, rating:4.2, distance_km:3.5, free_cancel:true, lat:37.5665, lng:126.9780, images:[]},
+        {id:'tok-004', title:'Tokyo Premium Ryokan', city:'Tokyo', country:'Japan', stayType:'Ryokan', price_usd:320, rating:5.0, distance_km:0.8, free_cancel:true, lat:35.6762, lng:139.6503, images:[]},
+      ];
+    }
 
-  if (needRerender) {
-    renderList();
-    renderMarkers();
-  } else if (needRelayoutMap) {
-    renderMarkers(); // 중심 바뀐 경우 마커/뷰 재계산
-  }
-}
+    // Hash deeplink (선택)
+    function parseHashParams(){ const h=(location.hash||'').replace(/^#/,''); const parts=h?h.split('&'):[]; const p={}; for(const x of parts){ if(!x) continue; const [k,vRaw]=x.split('='); const k2=decodeURIComponent(k||'').trim().toLowerCase(); const v=decodeURIComponent((vRaw??'').trim()); p[k2]=v===''?true:v; } return p; }
+    function applyHashParams(){
+      const q=parseHashParams(); let rer=false, remap=false;
+      if(q.filters===true||q.filters==='1'||q.filters==='true') openFilters();
+      const allow=new Set(['price-asc','price-desc','rating-desc','distance-asc']); if(q.sort&&allow.has(q.sort)){ state.sort=q.sort; rer=true; }
+      if(q.price&&!isNaN(+q.price)){ state.filters.priceMax=+q.price; $('#fPrice').value=+q.price; rer=true; }
+      if(q.rating&&!isNaN(+q.rating)){ state.filters.ratingMin=+q.rating; $('#fRating').value=+q.rating; rer=true; }
+      if(q.distance&&!isNaN(+q.distance)){ state.filters.distanceMax=+q.distance; $('#fDistance').value=+q.distance; rer=true; }
+      if(q.cancel!==undefined){ const on=(q.cancel===true||q.cancel==='1'||q.cancel==='true'); state.filters.freeCancel=on; $('#fFreeCancel').checked=on; rer=true; }
+      if(q.lang && LANGS[q.lang]){ state.lang=q.lang; $('#lang').value=q.lang; if(!q.cur){ state.currency=LANG_TO_DEFAULT_CURRENCY[state.lang]||state.currency; $('#currency').value=state.currency; } state.nf=new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency}); applyLang(); }
+      if(q.cur && CURRENCIES[q.cur]){ state.currency=q.cur; $('#currency').value=q.cur; state.nf=new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency}); }
+      const lat = q.lat!==undefined ? +q.lat : NaN, lng = q.lng!==undefined ? +q.lng : NaN;
+      if(!isNaN(lat) && !isNaN(lng)){ CITY_CENTER={ name:q.city||CITY_CENTER.name, lat, lng }; remap=true; rer=true; }
+      else if(q.city){ CITY_CENTER={ ...CITY_CENTER, name:q.city }; }
+      updateFilterLabels(); if(rer){ renderList(); renderMarkers(); } else if(remap){ renderMarkers(); }
+    }
 
-// 첫 로드 & 뒤로가기/앞으로가기에도 반응
-window.addEventListener('DOMContentLoaded', applyHashParams);
-window.addEventListener('hashchange', applyHashParams);
+    // Wires
+    function wireFilters(){
+      on($('#btnFilter'),'click', openFilters);
+      on($('#btnCloseFilter'),'click', closeFilters);
+      on($('.filter-backdrop'),'click', closeFilters);
+      on($('#fPrice'),'input', e=>{ state.filters.priceMax=+e.target.value; updateFilterLabels(); });
+      on($('#fRating'),'input', e=>{ state.filters.ratingMin=+e.target.value; updateFilterLabels(); });
+      on($('#fDistance'),'input', e=>{ state.filters.distanceMax=+e.target.value; updateFilterLabels(); });
+      on($('#btnResetFilters'),'click', ()=>{ resetAllFilters(); renderList(); renderMarkers(); });
+      on($('#btnApplyFilters'),'click', ()=>{
+        readChecks('fType', state.filters.type);
+        state.filters.freeCancel = $('#fFreeCancel').checked;
+        closeFilters(); renderList(); renderMarkers();
+      });
+    }
+    function wireHeader(){
+      on($('#btnSort'),'click', ()=>{
+        const next={ 'price-asc':'price-desc','price-desc':'rating-desc','rating-desc':'distance-asc','distance-asc':'price-asc' }[state.sort]||'price-asc';
+        state.sort=next; renderList(); renderMarkers();
+        $('#btnSort').querySelector('span').textContent = t('controls.sort')+': '+next;
+      });
+      on($('#btnMapList'),'click', ()=>{ const s=$('#map').style; s.display=(s.display==='none')?'':'none'; });
+    }
 
+    window.addEventListener('DOMContentLoaded', async ()=>{
+      // 초기 언어 적용
+      if(!(I18N[state.lang])) state.lang='en';
+      buildSelects();
+      applyLang();
+
+      wireFilters(); wireHeader();
+      updateFilterLabels();
+
+      state.listings = await loadListings();
+      renderList(); renderMarkers();
+
+      applyHashParams();
+    });
+    window.addEventListener('hashchange', applyHashParams);
+  </script>
 </body>
 </html>
