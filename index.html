@@ -942,6 +942,111 @@
 </script>
 
 <script type="module" src="/scripts/auth-ui.js"></script>
+<script>
+/* ==== Notifications (toggle, badge, render, API) ==== */
+(function () {
+  const btn        = document.getElementById('notifBtn');
+  const panel      = document.getElementById('notifPanel');
+  const badge      = document.getElementById('notifBadge');
+  const list       = document.getElementById('notifList');
+  const markAllBtn = document.getElementById('markAllReadBtn');
+  let state = [];
+
+  if (!btn || !panel) return;
+
+  // 패널 토글
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const hidden = panel.hasAttribute('hidden');
+    document.querySelectorAll('.notif-panel').forEach(p => p.setAttribute('hidden',''));
+    if (hidden) panel.removeAttribute('hidden');
+    else panel.setAttribute('hidden','');
+  });
+
+  // 바깥 클릭/ESC 닫기
+  document.addEventListener('click', (e) => {
+    if (!panel.contains(e.target) && e.target !== btn) {
+      panel.setAttribute('hidden','');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') panel.setAttribute('hidden','');
+  });
+
+  // HTML escape
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  // 리스트/배지 렌더링
+  function render(items) {
+    const unread = items.filter(x => !x.read).length;
+    if (unread > 0) {
+      badge.textContent = unread > 99 ? '99+' : String(unread);
+      badge.removeAttribute('hidden');
+    } else {
+      badge.setAttribute('hidden','');
+    }
+
+    list.innerHTML = items.map(item => `
+      <li class="notif-item" data-id="${item.id}">
+        <span class="notif-dot" style="${item.read ? 'opacity:.25' : ''}"></span>
+        <div>
+          <div class="notif-title">${escapeHtml(item.title)}</div>
+          <div class="notif-desc">${escapeHtml(item.desc || '')}</div>
+        </div>
+        <div class="notif-time">${escapeHtml(item.time || '')}</div>
+      </li>
+    `).join('') || `
+      <li class="notif-item"><div class="notif-desc">No notifications</div></li>
+    `;
+  }
+
+  // 알림 가져오기
+  function fetchNotifications() {
+    fetch('/api/notifications', { credentials: 'include' })
+      .then(r => r.json())
+      .then(items => {
+        state = items;
+        render(state);
+      })
+      .catch(err => {
+        console.error("알림 불러오기 실패:", err);
+        // 샘플 데이터 fallback
+        state = [
+          { id: 1, title: 'Booking confirmed', desc: 'Istanbul • 2–5 Sep', time: '2m ago', read: false },
+          { id: 2, title: 'Level progress', desc: 'GOLD → 78% reached', time: '1h ago', read: false },
+          { id: 3, title: 'Promo', desc: 'Autumn deal unlocked', time: 'Yesterday', read: true }
+        ];
+        render(state);
+      });
+  }
+
+  // 전체 읽음 처리
+  markAllBtn?.addEventListener('click', () => {
+    fetch('/api/notifications/mark-all-read', {
+      method: 'POST',
+      credentials: 'include'
+    })
+      .then(() => {
+        state = state.map(it => ({...it, read: true}));
+        render(state);
+      })
+      .catch(err => console.error("전체 읽음 실패:", err));
+  });
+
+  // 초기 호출
+  fetchNotifications();
+
+  // 주기적으로 새로고침 (예: 30초마다)
+  setInterval(fetchNotifications, 30000);
+})();
+</script>
 
 </body>
 </html>
