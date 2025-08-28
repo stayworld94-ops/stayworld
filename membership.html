@@ -59,6 +59,22 @@
       <small id="downgradeSticky" class="note" style="display:block;margin-top:10px"></small>
     </section>
 
+    <!-- 이번 달 남은 혜택 / 다음 레벨 진행도 -->
+    <section class="card" id="perksLeftCard" style="margin-top:14px">
+      <h3 id="lbl_perksLeft">This month remaining</h3>
+      <div class="benefit"><i>•</i><div><span id="lbl_boostLeft">Points boost left:</span> <b id="uiBoostLeft">—</b></div></div>
+      <div class="benefit"><i>•</i><div><span id="lbl_discountLeft">Instant discount:</span> <b id="uiDiscountPerBooking">—</b> × <b id="uiDiscountRemaining">0</b> <span id="lbl_bookings">bookings</span></div></div>
+      <div class="benefit"><i>•</i><div><span id="lbl_ticketsEligible">Tickets:</span> <b id="uiTicketsEligible">—</b></div></div>
+      <small class="note" id="inheritNote">Higher tiers include all lower-level benefits.</small>
+    </section>
+
+    <section class="card" id="nextLevelCard" style="margin-top:14px">
+      <h3 id="lbl_nextLevel">Next level</h3>
+      <p id="nextLevelLine" class="note"></p>
+      <div class="gauge"><div id="nextLevelGaugeFill" style="width:0%"></div></div>
+      <div class="note" style="text-align:right;margin-top:6px" id="nextLevelPct">0%</div>
+    </section>
+
     <!-- 레벨(브론즈~엘리트) 혜택 카드 -->
     <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
       <article class="tier-card" data-tier="Bronze">
@@ -150,7 +166,7 @@
       </div>
 
       <small class="note" style="display:block;margin-top:10px">
-        * All benefits have monthly caps. Early check-in/upgrade/secret deals are host-funded → our cost = 0.
+        * All benefits have monthly caps. Early check-in/upgrade/secret deals are host-funded → our cost = 0. Higher tiers include all lower-level benefits.
       </small>
     </section>
   </main>
