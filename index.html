@@ -1,13 +1,10 @@
-<!doctype html>
-<html lang="en">
-<head>
-<!-- ▼▼ 기존 웰컴 바 영역을 이렇게 구성 (또는 id/class만 맞춰 추가) ▼▼ -->
+<!-- 웰컴 바 -->
 <div class="welcome-bar" id="welcomeBar">
   <span class="welcome-text">Welcome, <strong>GIJUN YOON</strong> 🎉</span>
 
-  <!-- 알림 아이콘 버튼 -->
+  <!-- 알림 버튼 -->
   <button class="notif-btn" id="notifBtn" aria-label="Notifications" title="Notifications">
-    <!-- 벨 아이콘 (SVG: 외부 의존성 없음) -->
+    <!-- 벨 아이콘 (SVG) -->
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
       <path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5-6.71V4a2 2 0 1 0-4 0v.29A7 7 0 0 0 5 11v5l-1.8 1.8A1 1 0 0 0 3.8 20h16.4a1 1 0 0 0 .7-1.7L19 16Z" fill="currentColor"/>
     </svg>
@@ -20,16 +17,13 @@
       <span>Notifications</span>
       <button id="markAllReadBtn" class="mark-read">Mark all read</button>
     </div>
-    <ul id="notifList" class="notif-list">
-      <!-- JS가 항목을 렌더링 -->
-    </ul>
+    <ul id="notifList" class="notif-list"></ul>
     <div class="notif-footer">
       <a href="/notifications.html">View all</a>
     </div>
   </div>
 </div>
-  
-  <meta charset="utf-8" />
+ <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>STAYWORLD — Luxury Global Reach</title>
 
