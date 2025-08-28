@@ -240,3 +240,107 @@ button:hover, .btn:hover, .google-btn:hover {
   background: radial-gradient(circle at 50% 42%, currentColor 28%, transparent 29%) no-repeat center/100% 100%;
   box-shadow:0 1px 6px rgba(0,0,0,.35)
 }
+/* ==== Notifications (알림 아이콘, 배지, 드롭다운) ==== */
+.notif-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #1a1f27, #11151b);
+  color: #f1c40f;   /* 아이콘 색상: 노란색 */
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.notif-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+}
+
+/* 배지 (빨강 바탕 + 흰색 숫자) */
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e53935;  /* 빨강 */
+  color: #fff;          /* 숫자 흰색 */
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-panel {
+  position: absolute;
+  right: 16px;
+  top: calc(100% + 8px);
+  width: 360px;
+  max-height: 70vh;
+  overflow: auto;
+  background: #0f1216;
+  color: #e6e9ef;
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.55);
+  z-index: 1000;
+}
+
+.notif-header,
+.notif-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.notif-footer {
+  border-top: 1px solid rgba(255,255,255,.06);
+  border-bottom: none;
+}
+
+.mark-read {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 999px;
+  color: #d7dbdf;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.mark-read:hover { background: rgba(255,255,255,.06); }
+
+.notif-list { list-style: none; margin: 0; padding: 6px 8px; }
+.notif-item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  transition: background .12s ease;
+}
+.notif-item:hover { background: rgba(255,255,255,.04); }
+
+/* 읽지 않은 알림 점은 노란색 */
+.notif-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f1c40f;
+  margin-top: 8px;
+}
+
+.notif-title { font-size: 14px; font-weight: 700; color: #fff; }
+.notif-desc  { font-size: 12px; opacity: .85; }
+.notif-time  { font-size: 11px; opacity: .6; white-space: nowrap; align-self: center; }
+
+@media (max-width: 520px) {
+  .notif-panel { right: 8px; width: calc(100vw - 16px); }
+}
