@@ -7,18 +7,13 @@
   <link rel="stylesheet" href="/style.css"/>
 
   <style>
-    /* --- Layout & theme --- */
     .page-wrap{max-width:1040px;margin:0 auto;padding:24px}
     .note{opacity:.85}
     .card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
     .sticky-note{position:sticky;top:0;z-index:30;background:#0f1420;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:16px}
-
-    /* --- Level progress --- */
     .gauge{width:100%;height:8px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
     .gauge > div{height:100%;background:#f4d78c}
     .badge{position:absolute;right:16px;top:-10px;background:#f4d78c;color:#1a1205;border-radius:999px;padding:6px 12px;font-weight:700}
-
-    /* --- Grid/cards --- */
     .tier-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
     .tier-card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
     .tier-card h3{display:flex;gap:8px;align-items:center;margin:0 0 8px}
@@ -26,28 +21,21 @@
     .benefit i{font-style:normal}
     .tier-active{outline:2px solid #f4d78c; box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
     .tier-muted{opacity:.65}
-
-    /* --- Buttons --- */
     .bill-btn{cursor:pointer}
     .btn-buy{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#2a2216;color:#fff;cursor:pointer}
     .btn-basic{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#121a2a;color:#fff;cursor:pointer}
-
     @media (max-width: 840px){ .tier-grid{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
-  <!-- 공통 헤더 -->
   <div id="site-header"></div>
 
   <main class="page-wrap">
-    <!-- 60일 자동강등 고정 안내 -->
     <div id="dwTop" class="sticky-note"></div>
 
-    <!-- 제목/설명 -->
     <h1 id="mb_title"></h1>
     <p id="mb_subtitle" class="note"></p>
 
-    <!-- 현재 등급 카드 -->
     <section class="card" style="position:relative; margin-top:14px">
       <h3 id="levelTitle"></h3>
       <div id="tierBadge" class="badge">5% back</div>
@@ -59,7 +47,7 @@
       <small id="downgradeSticky" class="note" style="display:block;margin-top:10px"></small>
     </section>
 
-    <!-- 레벨(브론즈~엘리트) 혜택 카드 -->
+    <!-- 레벨(브론즈~엘리트) 카드 -->
     <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
       <article class="tier-card" data-tier="Bronze">
         <h3>🥉 <span id="lbl_bronze"></span></h3>
@@ -87,7 +75,7 @@
       </article>
     </section>
 
-    <!-- 멤버십 요금제 (월/연 토글 + Stripe 링크) -->
+    <!-- 멤버십 요금제 -->
     <section class="card" style="margin-top:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
         <h2 style="margin:0">Membership Plans</h2>
@@ -98,7 +86,6 @@
       </div>
 
       <div class="tier-grid" style="margin-top:12px">
-        <!-- BASIC -->
         <article class="tier-card tier-muted">
           <h3>Basic (Free)</h3>
           <div class="benefit"><i>•</i><div>Booking, Reviews, Points</div></div>
@@ -106,7 +93,6 @@
           <button class="btn-basic">Keep Basic</button>
         </article>
 
-        <!-- PLUS -->
         <article class="tier-card" id="planPlus">
           <h3>PLUS <small id="pricePlus" style="opacity:.8"></small></h3>
           <div class="benefit"><i>•</i><div><b>+2% points boost</b> <small class="note">cap: up to $400 spend/mo (max $8)</small></div></div>
@@ -117,7 +103,6 @@
           <button id="btnPlusCheckout" class="btn-buy">Start PLUS</button>
         </article>
 
-        <!-- BLACK -->
         <article class="tier-card" id="planBlack">
           <h3>BLACK <small id="priceBlack" style="opacity:.8"></small></h3>
           <div class="benefit"><i>•</i><div><b>+4% points boost</b> <small class="note">cap: up to $600 spend/mo (max $24)</small></div></div>
@@ -135,41 +120,16 @@
     </section>
   </main>
 
-  <!-- 스크립트 로딩: 순서 주의 -->
+  <!-- 순서 중요 -->
   <script src="/scripts/header.js" defer></script>
   <script src="/lang.js" defer></script>
-  <!-- Module + cache busting -->
-  <script type="module" src="/membership.js?v=20250828"></script>
+
+  <!-- membership 로직 (파일명에 버전 포함) -->
+  <script type="module" src="/membership.v20250828.js" defer></script>
+
+  <!-- 폴백: 외부 스크립트. membership가 실패하거나 캐시/에러여도 레벨 혜택을 강제 표시 -->
+  <script src="/benefits-fallback.v20250828.js" defer></script>
+
   <script src="/assets/login-modal.js"></script>
-
-  <!-- Fallback: membership.js 실행 실패해도 레벨 혜택이 보이도록 안전 렌더 -->
-  <script>
-  (function(){
-    const MAP = {
-      Bronze:   ['—'],
-      Silver:   ['3% points back'],
-      Gold:     ['5% points back','Priority support'],
-      Platinum: ['7% points back','Priority support','Early check-in/late out'],
-      Diamond:  ['10% points back','Priority support','Secret Deals+'],
-      Elite:    ['15% points back','Priority support','Secret Deals+','Upgrades when available']
-    };
-    function render(){
-      // 상단 안내/타이틀 기본값(외부 스크립트 미실행 대비)
-      var dw=document.getElementById('dwTop'); if(dw && !dw.textContent) dw.textContent='No booking for 60 days → auto demotion by 1 level (notification sent).';
-      var t=document.getElementById('mb_title'); if(t && !t.textContent) t.textContent='Membership + Levels (Stacked Benefits)';
-      var st=document.getElementById('mb_subtitle'); if(st && !st.textContent) st.textContent='Membership gives instant perks; levels reward long-term activity. Use both for maximum value.';
-
-      document.querySelectorAll('.tier-card[data-tier]').forEach(function(card){
-        var tier = card.getAttribute('data-tier');
-        var box  = card.querySelector('.benefits');
-        if(!box) return;
-        if(box.children.length>0) return; // 이미 채워져 있으면 스킵
-        var items = MAP[tier] || [];
-        box.innerHTML = items.map(function(t){return '<div class="benefit"><i>•</i><div>'+t+'</div></div>';}).join('');
-      });
-    }
-    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', render); else render();
-  })();
-  </script>
 </body>
 </html>
