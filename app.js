@@ -168,7 +168,7 @@
       "exp.nature":"自然","exp.camping":"キャンプ","exp.traditional":"伝統体験","exp.ski":"スキー in/out","exp.wine":"ワイン産地",
       "loc.airport":"空港近く","loc.station":"駅近く","loc.beach":"ビーチ近く","loc.center":"中心部",
       "foot.about":"会社情報","foot.careers":"採用情報","foot.press":"プレス","foot.help":"ヘルプ","foot.center":"ヘルプセンター",
-      "foot.protect":"ゲスト保護","foot.contact":"お問い合わせ","foot.legal":"法的事項","foot.terms":"利用規約",
+      "foot.protect":"ゲ스트保護","foot.contact":"お問い合わせ","foot.legal":"法的事項","foot.terms":"利用規約",
       "foot.privacy":"プライバシー","foot.cookies":"クッキー",
       "buttons.book":"予約","labels.perNight":"/ 泊","labels.from":"最低","labels.night":"泊"
     },
@@ -417,10 +417,19 @@
     return r ? (val / r) : val;
   };
 
+  // [KEEP+ADD] 기존 [data-price-usd] 처리 + .price 요소가 부모에 data-price-usd만 가진 경우도 지원
   function refreshAllPrices(){
-    // 카드 가격 표기 (각 요소에 data-price-usd 속성 필요)
+    // 1) data-price-usd 직접 붙은 엘리먼트
     $$("[data-price-usd]").forEach(el=>{
       const usd = parseFloat(el.getAttribute("data-price-usd") || "0");
+      el.textContent = nf.format(usdToDisplay(usd));
+    });
+    // 2) .price 요소인데, 자신에게 data-price-usd가 없고 조상에만 있는 경우
+    $$(".price").forEach(el=>{
+      if(el.hasAttribute("data-price-usd")) return; // 위에서 처리됨
+      const holder = el.closest("[data-price-usd]");
+      if(!holder) return;
+      const usd = parseFloat(holder.getAttribute("data-price-usd") || "0");
       el.textContent = nf.format(usdToDisplay(usd));
     });
   }
@@ -479,7 +488,9 @@
   }
 
   /* -------- 로그인 상태 반영 -------- */
+  // [ADD] firebaseAuth 미정의 환경에서 오류 방지
   function bindAuthHeader(){
+    if(!(window.firebaseAuth && typeof firebaseAuth.onAuthStateChanged === 'function')) return;
     firebaseAuth.onAuthStateChanged(user=>{
       const loginLink = $('#t_nav_login');
       const signupBtn = $('#t_nav_signup');
@@ -679,6 +690,10 @@
     const mapEl = $('#map'); if(!mapEl) return;
     const map = L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+    // [ADD] 팝업 열릴 때 번역키 적용
+    if(map.on && typeof applyI18NPage === 'function'){
+      map.on('popupopen', ()=> applyI18NPage());
+    }
     window.__swMap = map;
   }
 
@@ -692,9 +707,36 @@
       // 네가 쓰는 i18n 적용
       if(window.StayWorldI18n?.applyLang) StayWorldI18n.applyLang(lang);
       onLanguageChange(lang);
+      // [ADD] 카드 라벨/가격 즉시 재적용
+      afterListRendered(document);
     });
   }
   // ==========================================================================
+
+  /* ===== [ADD] 카드 자동 현지화(템플릿 없어도 동작) ===================== */
+  function localizeCards(root=document){
+    // 버튼/라벨에 키 자동 부착 (중복부착 방지)
+    root.querySelectorAll('.card .btn.book, .card a.book, .card .book, a.btn.gold.book').forEach(el=>{
+      if(!el.hasAttribute('data-i18n')) el.setAttribute('data-i18n','buttons.book');
+    });
+    root.querySelectorAll('.card .tax, .card .per-night, .card .price-unit').forEach(el=>{
+      if(!el.hasAttribute('data-i18n')) el.setAttribute('data-i18n','labels.perNight');
+    });
+    // 가격 업데이트
+    refreshAllPrices();
+    // 번역 적용
+    if (typeof applyI18NPage === 'function') applyI18NPage();
+  }
+  function afterListRendered(root=document){ localizeCards(root); }
+  /* ====================================================================== */
+
+  // [ADD] 동적 리스트 자동 감지 (예: Ajax로 카드 갱신 시)
+  function watchList(){
+    const list = document.getElementById('list');
+    if(!list) return;
+    new MutationObserver(()=> afterListRendered(list))
+      .observe(list, {childList:true, subtree:true});
+  }
 
   /* -------- 페이지 초기화 -------- */
   function init(){
@@ -711,10 +753,18 @@
       const final = ['en','ko','tr','fr','ja','de','es','it','zh','ru'].includes(saved) ? saved : 'en';
       StayWorldI18n.applyLang(final);
       onLanguageChange(final);   // 통화/가격/라벨 싱크
+    } else {
+      // [ADD] 기본 적용
+      if(typeof applyI18NPage === 'function'){
+        applyI18NPage(currentLang);
+        onLanguageChange(currentLang);
+      }
     }
 
     wireLanguageSelect();
     refreshAllPrices();          // 페이지 내 가격 텍스트 초기 표기
+    afterListRendered(document); // [ADD] 페이지 최초 카드 현지화
+    watchList();                 // [ADD] 동적 갱신 감시
   }
   if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
@@ -777,7 +827,7 @@
     if($btnMyPage) $btnMyPage.style.display = logged ? '' : 'none';
   }
 
-  if(auth){
+  if(auth && typeof auth.onAuthStateChanged === 'function'){
     auth.onAuthStateChanged(()=>{ refreshMyPageBtn(); initFavState(); });
   }
 
