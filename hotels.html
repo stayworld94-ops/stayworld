@@ -522,44 +522,73 @@
 
     // List
     function card(it){
-      const img = (it.images&&it.images[0]) ? it.images[0] : 'https://picsum.photos/800/500?blur=0.2&random='+(it.id||Math.random());
-      const rating = it.rating ? Number(it.rating).toFixed(1) : '—';
-      const dist = (typeof it.distance_km==='number') ? `${it.distance_km} km` : '—';
-      const priceLine = formatPriceFromUsd(it.price_usd||0);
-      const cancel = it.free_cancel ? t('filters.freeCancel').replace(' only','') : ' ';
-      return `
-        <article class="card"
-          data-price-usd="${it.price_usd||0}"
-          data-rating="${it.rating||0}"
-          data-distance="${it.distance_km||999}"
-          data-free="${!!it.free_cancel}"
-          data-type="${it.stayType||''}">
-          <div class="card-media">
-            <img src="${img}" alt="${it.title}">
-            <div class="badge-row">
-              ${it.stayType?`<span class="badge">${t('filters.type')}: ${t('type.'+(it.stayType||'').toLowerCase())||it.stayType}</span>`:''}
-              ${it.verified?`<span class="badge">Verified</span>`:''}
-            </div>
-            <button class="fav" title="★">
-              <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-            </button>
+  const img = (it.images&&it.images[0]) ? it.images[0] : 'https://picsum.photos/800/500?blur=0.2&random='+(it.id||Math.random());
+  const rating = it.rating ? Number(it.rating).toFixed(1) : '—';
+  const dist = (typeof it.distance_km==='number') ? `${it.distance_km} km` : '—';
+  const stayTypeKey = 'type.' + (it.stayType||'').toLowerCase();
+  const typeText = (window.t ? t(stayTypeKey) : (I18N?.en?.[stayTypeKey]||it.stayType||''));
+
+  return `
+    <article class="card hotel-card"
+      data-price-usd="${it.price_usd||0}"
+      data-rating="${it.rating||0}"
+      data-distance="${it.distance_km||999}"
+      data-free="${!!it.free_cancel}"
+      data-type="${it.stayType||''}">
+      <div class="card-media">
+        <img src="${img}" alt="${it.title}">
+        <div class="badge-row">
+          ${it.stayType?`<span class="badge">${(window.t?t('filters.type'):'Type')}: ${typeText}</span>`:''}
+          ${it.verified?`<span class="badge">Verified</span>`:''}
+        </div>
+        <button class="fav fav-btn" data-id="${it.id||''}" title="★">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </button>
+      </div>
+
+      <div class="card-body">
+        <div>
+          <div class="title">${it.title}</div>
+          <div class="meta">${it.city}, ${it.country} · <span class="distance">${dist}</span></div>
+
+          <!-- ✅ 가격 표시는 USD 원가만 data-price-usd에 넣고, 텍스트는 JS가 통화/언어로 자동 변환 -->
+          <div class="payline">
+            <span class="price" data-price-usd="${it.price_usd||0}">$${it.price_usd||0}</span>
+            <span class="tax" data-i18n="labels.perNight">/ night</span>
           </div>
-          <div class="card-body">
-            <div>
-              <div class="title">${it.title}</div>
-              <div class="meta">${it.city}, ${it.country} · <span class="distance">${dist}</span> ${t('filters.maxDistance').split('(')[0].toLowerCase()}</div>
-              <div class="payline"><span class="price">${priceLine}</span> <span class="tax">/ night</span></div>
-              <div class="cancel">${cancel}</div>
-              <a href="/booking.html?id=${encodeURIComponent(it.id||'')}" class="btn gold book">Book</a>
-            </div>
-            <div class="rating">${rating}</div>
-          </div>
-        </article>`;
-    }
-    function renderList(){
-      const mount = $('#list'); const items = getFilteredSorted(state.listings);
-      mount.innerHTML = items.map(card).join('') || `<div class="hint">No listings yet.</div>`;
-    }
+
+          <div class="cancel">${it.free_cancel ? (window.t?t('filters.freeCancel').replace(' only',''):'Free cancellation') : ' '}</div>
+
+          <a href="/booking.html?id=${encodeURIComponent(it.id||'')}" class="btn gold book" data-i18n="buttons.book">Book</a>
+        </div>
+        <div class="rating">${rating}</div>
+      </div>
+    </article>`;
+}
+
+   function renderList(){
+  const mount = document.querySelector('#list');
+  const items = getFilteredSorted(state.listings);
+  mount.innerHTML = items.map(card).join('') || `<div class="hint">No listings yet.</div>`;
+
+  // ✅ 번역 적용 (둘 중 있는 함수 호출)
+  if (window.applyI18NPage) applyI18NPage();
+  else if (window.applyLang) applyLang();
+
+  // ✅ 통화/가격 포맷 적용 (내 app.js에 있는 함수. 없으면 안전하게 폴백)
+  if (typeof refreshAllPrices === 'function') refreshAllPrices();
+  else {
+    document.querySelectorAll('[data-price-usd]').forEach(el=>{
+      // 폴백: 그냥 USD로 표시
+      const usd = parseFloat(el.getAttribute('data-price-usd')||'0');
+      el.textContent = `$${usd.toFixed(0)}`;
+    });
+  }
+
+  // ✅ 즐겨찾기(★) 버튼 바인딩(있으면)
+  if (typeof window.SW_bindFavButtons === 'function') SW_bindFavButtons(mount);
+  if (typeof window.SW_syncFavIcons === 'function')  SW_syncFavIcons(mount);
+}
 
     // Sort/Filter
     function getFilteredSorted(list){
