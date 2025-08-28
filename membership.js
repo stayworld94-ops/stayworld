@@ -1,128 +1,200 @@
-// membership.js — i18n + 통화 + 누적(상위=하위혜택 포함) + 이번달 잔여혜택 + 다음레벨 진행도
-// 순수 프런트 JS (ESM). Firebase 연동은 하단 주석 참고.
+// membership.js — FINAL
+// 10 languages, 10 currencies, stacked benefits (with rich per-level additions),
+// monthly usage-left, next-level progress, locale overrides, safety margin FX.
 
-// ====== 설정 (손해 방지 캡/요금/레벨 기준) ======
+// ===== CONFIG (caps/prices/levels) =====
+const SAFETY_MARGIN = 1.07; // 7% margin to avoid loss
+
 const PLAN_CAPS = {
-  plus:  { boostRate: 0.02, boostMaxUSD:  8, discountPerBookingUSD: 10, bookingsPerMonth: 3 },
-  black: { boostRate: 0.04, boostMaxUSD: 24, discountPerBookingUSD: 20, bookingsPerMonth: 5 }
+  plus:  { boostRate:0.02, boostMaxUSD:  8, discountPerBookingUSD:10, bookingsPerMonth:3 },
+  black: { boostRate:0.04, boostMaxUSD: 24, discountPerBookingUSD:20, bookingsPerMonth:5 }
 };
 
-// 최근 12개월 사용금액(USD) 기준 레벨 임계값
 const LEVELS = [
-  { name: 'Bronze',   minUSD:    0 },
-  { name: 'Silver',   minUSD:  300 },
-  { name: 'Gold',     minUSD:  800 },
-  { name: 'Platinum', minUSD: 1500 },
-  { name: 'Diamond',  minUSD: 3000 },
-  { name: 'Elite',    minUSD: 6000 }
+  { name:'Bronze',   minUSD:0 },
+  { name:'Silver',   minUSD:300 },
+  { name:'Gold',     minUSD:800 },
+  { name:'Platinum', minUSD:1500 },
+  { name:'Diamond',  minUSD:3000 },
+  { name:'Elite',    minUSD:6000 },
 ];
 
-// 보수적 환율 (USD ->표시통화). 손해 방지 목적. 서버에서 주입 가능.
-const FX = { USD:1, KRW:1350, JPY:155, EUR:0.92, GBP:0.78, MXN:18, CLP:940, BRL:5.3 };
-
-// 표시용 멤버십 가격(USD 기준)
 const PRICES_USD = {
-  monthly: { plus: 9.99,  black: 24.99 },
-  yearly:  { plus: 99.00, black: 249.00 }
+  monthly:{ plus: 9.99,  black: 24.99 },
+  yearly: { plus: 99.00, black: 249.00 }
 };
 
-// 간단 i18n
+// ===== I18N (labels) =====
 const I18N = {
+  en:{monthLeft:'This month remaining',boostLeft:'Points boost left',instLeft:'Instant discount',perBooking:'per booking',bookings:'bookings',tickets:'Tickets',eligible:'Eligible now',notYet:'Not yet',nextLevel:'Next level',inherit:'Higher tiers include all lower-level benefits.',toGo:'{next} — {amount} left',maxLevel:'Top level reached'},
+  ko:{monthLeft:'이번 달 남은 혜택',boostLeft:'포인트 부스트 잔여',instLeft:'즉시할인 잔여',perBooking:'예약당',bookings:'회',tickets:'티켓',eligible:'지급 가능',notYet:'아직 조건 미달',nextLevel:'다음 레벨',inherit:'상위 레벨은 하위 레벨 혜택을 모두 포함합니다.',toGo:'{next} — {amount} 남음',maxLevel:'최상위 레벨입니다'},
+  ja:{monthLeft:'今月の残り特典',boostLeft:'ポイントブースト残高',instLeft:'即時割引残高',perBooking:'予約ごと',bookings:'回',tickets:'チケット',eligible:'受取可能',notYet:'まだ条件未達',nextLevel:'次のレベル',inherit:'上位レベルは下位の特典をすべて含みます。',toGo:'{next} — 残り {amount}',maxLevel:'最上位レベルです'},
+  es:{monthLeft:'Beneficios restantes este mes',boostLeft:'Impulso de puntos restante',instLeft:'Descuento instantáneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegible ahora',notYet:'Aún no',nextLevel:'Siguiente nivel',inherit:'Los niveles superiores incluyen los beneficios de los inferiores.',toGo:'{next} — faltan {amount}',maxLevel:'Nivel máximo alcanzado'},
+  fr:{monthLeft:'Avantages restants ce mois-ci',boostLeft:'Bonus de points restant',instLeft:'Remise immédiate',perBooking:'par réservation',bookings:'réservations',tickets:'Tickets',eligible:'Éligible',notYet:'Pas encore',nextLevel:'Niveau suivant',inherit:'Les niveaux supérieurs incluent les avantages des niveaux inférieurs.',toGo:'{next} — reste {amount}',maxLevel:'Niveau maximal atteint'},
+  de:{monthLeft:'Verbleibende Vorteile diesen Monat',boostLeft:'Punkte-Boost verbleibend',instLeft:'Sofortrabatt',perBooking:'pro Buchung',bookings:'Buchungen',tickets:'Tickets',eligible:'Jetzt verfügbar',notYet:'Noch nicht',nextLevel:'Nächstes Level',inherit:'Höhere Stufen enthalten alle Vorteile der unteren.',toGo:'{next} — noch {amount}',maxLevel:'Höchste Stufe erreicht'},
+  pt:{monthLeft:'Benefícios restantes neste mês',boostLeft:'Bônus de pontos restante',instLeft:'Desconto instantâneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegível agora',notYet:'Ainda não',nextLevel:'Próximo nível',inherit:'Níveis superiores incluem os benefícios dos inferiores.',toGo:'{next} — faltam {amount}',maxLevel:'Nível máximo atingido'},
+  zh:{monthLeft:'本月剩余权益',boostLeft:'积分加成剩余',instLeft:'即时折扣',perBooking:'每次预订',bookings:'次',tickets:'票券',eligible:'可领取',notYet:'暂不可',nextLevel:'下一级',inherit:'高等级包含所有低等级权益。',toGo:'{next} — 还差 {amount}',maxLevel:'已达最高等级'},
+  ru:{monthLeft:'Оставшиеся привилегии в этом месяце',boostLeft:'Остаток бонусных баллов',instLeft:'Мгновенная скидка',perBooking:'за бронирование',bookings:'раз',tickets:'Тикеты',eligible:'Доступно',notYet:'Пока нет',nextLevel:'Следующий уровень',inherit:'Высшие уровни включают все привилегии нижних.',toGo:'{next} — осталось {amount}',maxLevel:'Достигнут максимальный уровень'},
+  ar:{monthLeft:'المتبقي هذا الشهر',boostLeft:'رصيد تعزيز النقاط',instLeft:'خصم فوري',perBooking:'لكل حجز',bookings:'حجوزات',tickets:'تذاكر',eligible:'متاح الآن',notYet:'ليس بعد',nextLevel:'المستوى التالي',inherit:'المستويات الأعلى تتضمن مزايا المستويات الأدنى.',toGo:'{next} — متبقٍ {amount}',maxLevel:'أعلى مستوى'}
+};
+
+// 혜택 문구 i18n (영/한 제공, 그 외 언어는 en fallback)
+const BENEFIT_I18N = {
   en: {
-    monthLeft: 'This month remaining',
-    boostLeft: 'Points boost left',
-    instLeft: 'Instant discount',
-    perBooking: 'per booking',
-    bookings: 'bookings',
-    tickets: 'Tickets',
-    eligible: 'Eligible now',
-    notYet: 'Not yet',
-    nextLevel: 'Next level',
-    inherit: 'Higher tiers include all lower-level benefits.',
-    toGo: '{next} — {amount} left',
-    maxLevel: 'Top level reached'
+    dash:'—',
+    member_offers:'Member-only offers',
+    points3:'3% points back',
+    points5:'5% points back',
+    points7:'7% points back',
+    points10:'10% points back',
+    points15:'15% points back',
+    priority_support:'Priority support',
+    waitlist_priority:'Waitlist priority',
+    early_late:'Early check-in / Late check-out (host-provided)',
+    flexible_24h:'Flexible cancellation (24h, where allowed)',
+    upgrade_avail:'Room upgrade when available',
+    secret_deals:'Secret Deals+ (host-funded)',
+    birthday_2x:'Birthday month ×2 points',
+    lounge_partner:'Airport lounge (partners)',
+    pickup_partner:'Airport pickup (partners)',
+    overbooking_protect:'Overbooking protection',
+    concierge_vip:'VIP concierge (AI+staff, 3 sessions/mo)',
+    dedicated_channel:'Dedicated support channel',
+    status_match:'Status match (invite-only)',
+    secret_deals_plus:'Invite-only Secret Deals++'
   },
   ko: {
-    monthLeft: '이번 달 남은 혜택',
-    boostLeft: '포인트 부스트 잔여',
-    instLeft: '즉시할인 잔여',
-    perBooking: '예약당',
-    bookings: '회',
-    tickets: '티켓',
-    eligible: '지급 가능',
-    notYet: '아직 조건 미달',
-    nextLevel: '다음 레벨',
-    inherit: '상위 레벨은 하위 레벨 혜택을 모두 포함합니다.',
-    toGo: '{next} — {amount} 남음',
-    maxLevel: '최상위 레벨입니다'
-  },
-  es: {
-    monthLeft: 'Beneficios restantes este mes',
-    boostLeft: 'Impulso de puntos restante',
-    instLeft: 'Descuento instantáneo',
-    perBooking: 'por reserva',
-    bookings: 'reservas',
-    tickets: 'Tickets',
-    eligible: 'Elegible ahora',
-    notYet: 'Aún no',
-    nextLevel: 'Siguiente nivel',
-    inherit: 'Los niveles superiores incluyen los beneficios de los inferiores.',
-    toGo: '{next} — faltan {amount}',
-    maxLevel: 'Nivel máximo alcanzado'
+    dash:'—',
+    member_offers:'멤버 전용 오퍼',
+    points3:'3% 포인트 백',
+    points5:'5% 포인트 백',
+    points7:'7% 포인트 백',
+    points10:'10% 포인트 백',
+    points15:'15% 포인트 백',
+    priority_support:'우선 상담',
+    waitlist_priority:'대기자 우선',
+    early_late:'얼리 체크인 / 레이트 체크아웃 (호스트 제공)',
+    flexible_24h:'유연 취소 (24시간, 정책 허용 시)',
+    upgrade_avail:'객실 업그레이드 (가능 시)',
+    secret_deals:'시크릿 딜+ (호스트 부담)',
+    birthday_2x:'생일 달 포인트 2배',
+    lounge_partner:'공항 라운지 (제휴)',
+    pickup_partner:'공항 픽업 (제휴)',
+    overbooking_protect:'오버부킹 보호',
+    concierge_vip:'VIP 컨시어지 (AI+스태프, 월 3회)',
+    dedicated_channel:'전용 지원 채널',
+    status_match:'상태 매칭 (초대 한정)',
+    secret_deals_plus:'인바이트 전용 시크릿 딜++'
   }
 };
+function bt(key){
+  const lang = (new URLSearchParams(location.search).get('lang') || (document.documentElement.getAttribute('lang')||'').split('-')[0] || navigator.language.split('-')[0] || 'en').toLowerCase();
+  const pack = BENEFIT_I18N[lang] || BENEFIT_I18N.en;
+  return pack[key] || BENEFIT_I18N.en[key] || key;
+}
 
-// ====== 상태/로캘 ======
+// ===== CURRENCY (10 only) =====
+const SUPPORTED_CUR = new Set(['USD','EUR','GBP','JPY','KRW','CNY','MXN','BRL','RUB','AUD']);
+const FX = { USD:1, EUR:0.92, GBP:0.78, JPY:155, KRW:1350, CNY:7.3, MXN:18, BRL:5.3, RUB:90, AUD:1.5 };
+const ZERO_DEC = new Set(['JPY','KRW']);
+
+// Region -> one of 10
+function regionCurrency10(region){
+  switch(region){
+    case 'US': return 'USD';
+    case 'GB': return 'GBP';
+    case 'AU': return 'AUD';
+    case 'JP': return 'JPY';
+    case 'KR': return 'KRW';
+    case 'CN': return 'CNY';
+    case 'MX': return 'MXN';
+    case 'BR': return 'BRL';
+    case 'RU': return 'RUB';
+    // EU → EUR
+    case 'FR': case 'DE': case 'ES': case 'IT': case 'NL': case 'BE': case 'AT':
+    case 'IE': case 'PT': case 'FI': case 'GR': case 'SK': case 'SI': case 'HR':
+      return 'EUR';
+    default: return null;
+  }
+}
+function langCurrency10(lang){
+  switch(lang){
+    case 'ko': return 'KRW';
+    case 'ja': return 'JPY';
+    case 'zh': return 'CNY';
+    case 'es': return 'MXN';
+    case 'fr': case 'de': return 'EUR';
+    case 'pt': return 'BRL';
+    case 'ru': return 'RUB';
+    case 'en': return 'USD';
+    case 'ar': return 'USD'; // 10통화 제한 내에서 USD로 통일
+    default: return 'USD';
+  }
+}
+function detectRegionTag(){
+  const tag = document.documentElement.getAttribute('lang') || navigator.language || 'en-US';
+  const parts = tag.split('-');
+  for (let i=parts.length-1;i>=0;i--){
+    const s = parts[i];
+    if (s.length===2) return s.toUpperCase();
+  }
+  return 'US';
+}
+
+// ===== STATE =====
+const params = new URLSearchParams(location.search);
+const OVERRIDE_LANG = params.get('lang');     // ko, en, ...
+const OVERRIDE_CURR = params.get('currency'); // KRW, USD, ...
 const state = {
-  locale: (navigator.language || 'en-US'),
-  lang: (navigator.language || 'en').split('-')[0],
+  lang: (OVERRIDE_LANG || (document.documentElement.getAttribute('lang') || navigator.language || 'en')).split('-')[0],
   currency: 'USD',
-  billing: 'monthly', // 'monthly' | 'yearly'
-  profile: null,      // { spend12mUSD, lifetimeSpend, monthsActive }
-  membership: null,   // { plan:'plus'|'black'|null, billing, active }
-  usage: null         // { boostUSDGranted, discountBookingsUsed }
+  billing:'monthly',
+  profile:null, membership:null, usage:null
 };
-
-function pickCurrency(loc){
-  const lc = (loc || '').toLowerCase();
-  if (lc.startsWith('ko')) return 'KRW';
-  if (lc.startsWith('ja')) return 'JPY';
-  if (lc.startsWith('en-gb')) return 'GBP';
-  if (lc.startsWith('es-mx')) return 'MXN';
-  if (lc.startsWith('es-cl')) return 'CLP';
-  if (lc.startsWith('pt-br')) return 'BRL';
-  if (lc.startsWith('de') || lc.startsWith('fr') || lc.startsWith('it') || lc.startsWith('es')) return 'EUR';
+function pickCurrency10(){
+  if (OVERRIDE_CURR && SUPPORTED_CUR.has(OVERRIDE_CURR.toUpperCase())) return OVERRIDE_CURR.toUpperCase();
+  const region = regionCurrency10(detectRegionTag());
+  if (region && SUPPORTED_CUR.has(region)) return region;
+  const byLang = langCurrency10(state.lang);
+  if (SUPPORTED_CUR.has(byLang)) return byLang;
   return 'USD';
 }
-state.currency = pickCurrency(state.locale);
+state.currency = pickCurrency10();
 
 function t(key){
-  const pack = I18N[state.lang] || I18N.en;
-  return pack[key] || I18N.en[key] || key;
+  const pack = I18N[OVERRIDE_LANG || state.lang] || I18N.en;
+  return pack[key] ?? I18N.en[key] ?? key;
 }
 function moneyUSDtoLocal(usd){
   const code = state.currency;
   const rate = FX[code] || 1;
-  const v = usd * rate;
-  const noCents = (code==='JPY'||code==='KRW'||code==='CLP');
-  return new Intl.NumberFormat(state.locale, {
-    style:'currency', currency:code,
-    maximumFractionDigits: noCents ? 0 : 2
+  const v = usd * rate * SAFETY_MARGIN;
+  const localeGuess =
+    (state.lang==='ko')?'ko-KR':
+    (state.lang==='ja')?'ja-JP':
+    (state.lang==='es')?'es-ES':
+    (state.lang==='fr')?'fr-FR':
+    (state.lang==='de')?'de-DE':
+    (state.lang==='pt')?'pt-PT':
+    (state.lang==='zh')?'zh-CN':
+    (state.lang==='ru')?'ru-RU':
+    (state.lang==='ar')?'ar-SA':'en-US';
+  return new Intl.NumberFormat(localeGuess, {
+    style:'currency',
+    currency: code,
+    maximumFractionDigits: ZERO_DEC.has(code)?0:2
   }).format(v);
 }
 
-// ====== 유틸 ======
-const $ = (id) => document.getElementById(id);
-const setText = (id, text) => { const el=$(id); if(el) el.textContent = text; };
-const setGauge = (id, pct) => { const el=$(id); if(el) el.style.width = `${Math.max(0,Math.min(100,pct))}%`; };
+// ===== DOM helpers =====
+const $ = id => document.getElementById(id);
+const setText = (id, text) => { const el=$(id); if (el) el.textContent=text; };
+const setGauge = (id, pct) => { const el=$(id); if (el) el.style.width = `${Math.max(0,Math.min(100,pct))}%`; };
 
-// ====== 레벨 계산 ======
+// ===== Level logic =====
 function levelFromSpend(usd12m){
-  let idx = 0;
-  for (let i=0;i<LEVELS.length;i++){
-    if (usd12m >= LEVELS[i].minUSD) idx = i;
-  }
-  return { index: idx, name: LEVELS[idx].name };
+  let idx=0; for (let i=0;i<LEVELS.length;i++){ if (usd12m>=LEVELS[i].minUSD) idx=i; }
+  return { index:idx, name:LEVELS[idx].name };
 }
 function nextLevelProgress(usd12m){
   const cur = levelFromSpend(usd12m);
@@ -131,50 +203,62 @@ function nextLevelProgress(usd12m){
   if (!next) return { next:null, pct:100, leftUSD:0 };
   const span = next.minUSD - curMin;
   const done = Math.max(0, usd12m - curMin);
-  const pct = Math.max(0, Math.min(100, (done/span)*100 ));
-  const leftUSD = Math.max(0, next.minUSD - usd12m);
-  return { next: next.name, pct, leftUSD };
+  return { next: next.name, pct: Math.max(0,Math.min(100,(done/span)*100)), leftUSD: Math.max(0,next.minUSD-usd12m) };
 }
 
-// ====== 혜택(상위=하위 포함) 렌더 ======
-function stackedBenefits(){
-  const base = {
-    Bronze:   ['—'],
-    Silver:   ['3% points back'],
-    Gold:     ['5% points back','Priority support'],
-    Platinum: ['7% points back','Priority support','Early check-in/late out'],
-    Diamond:  ['10% points back','Priority support','Secret Deals+'],
-    Elite:    ['15% points back','Priority support','Secret Deals+','Upgrades when available']
+// ===== Stacked Benefits (expanded) =====
+function getMergedBenefits(){
+  // 레벨별 "추가" 혜택 (상위로 갈수록 더해짐)
+  const LEVEL_BENEFIT_KEYS = {
+    Bronze:   ['dash','member_offers'],
+    Silver:   ['points3','priority_support','waitlist_priority'],
+    Gold:     ['points5','priority_support','early_late','flexible_24h'],
+    Platinum: ['points7','upgrade_avail','secret_deals','dedicated_channel','birthday_2x'],
+    Diamond:  ['points10','upgrade_avail','secret_deals','lounge_partner','pickup_partner','overbooking_protect'],
+    Elite:    ['points15','concierge_vip','status_match','secret_deals_plus']
   };
-  const order = ['Bronze','Silver','Gold','Platinum','Diamond','Elite'];
-  const merged = {};
-  let acc = [];
+  const order=['Bronze','Silver','Gold','Platinum','Diamond','Elite'];
+  const merged={}, acc=[];
   for (const name of order){
-    acc = acc.concat(base[name]);
-    merged[name] = Array.from(new Set(acc)); // 중복 제거
+    const add = LEVEL_BENEFIT_KEYS[name].map(bt);
+    acc.push(...add);
+    merged[name] = Array.from(new Set(acc)); // 누적 + 중복 제거
   }
+  return merged;
+}
+function renderBenefits(){
+  const merged = getMergedBenefits();
   document.querySelectorAll('.tier-card[data-tier]').forEach(card=>{
     const tier = card.getAttribute('data-tier');
-    const box = card.querySelector('.benefits');
+    const box  = card.querySelector('.benefits');
     if (!box || !merged[tier]) return;
-    box.innerHTML = merged[tier].map(txt=>`<div class="benefit"><i>•</i><div>${txt}</div></div>`).join('');
+    box.innerHTML = merged[tier].map(v=>`<div class="benefit"><i>•</i><div>${v}</div></div>`).join('');
   });
   setText('inheritNote', t('inherit'));
 }
-
-// ====== 가격 표시 ======
-function renderPrices(){
-  const p = PRICES_USD[state.billing];
-  if ($('pricePlus'))  setText('pricePlus',  moneyUSDtoLocal(p.plus)  + (state.billing==='yearly'?' / yr':' / mo'));
-  if ($('priceBlack')) setText('priceBlack', moneyUSDtoLocal(p.black) + (state.billing==='yearly'?' / yr':' / mo'));
+// lang.js 등이 DOM을 바꿔도 복구
+function guardBenefits(){
+  const target = $('#tiersGrid'); if (!target) return;
+  let timer=null;
+  const mo=new MutationObserver(()=>{ clearTimeout(timer); timer=setTimeout(renderBenefits, 40); });
+  mo.observe(target,{subtree:true,childList:true,characterData:true});
+  renderBenefits();
 }
 
-// ====== 이번 달 잔여 혜택 ======
+// ===== Prices =====
+function renderPrices(){
+  const p = PRICES_USD[state.billing];
+  setText('pricePlus',  moneyUSDtoLocal(p.plus)  + (state.billing==='yearly'?' / yr':' / mo'));
+  setText('priceBlack', moneyUSDtoLocal(p.black) + (state.billing==='yearly'?' / yr':' / mo'));
+}
+
+// ===== Monthly usage-left =====
 function renderUsageLeft(){
   const m = state.membership;
-  if (!m || !m.plan || !PLAN_CAPS[m.plan]) { return; }
+  if (!m || !m.plan || !PLAN_CAPS[m.plan]) return;
   const caps = PLAN_CAPS[m.plan];
   const u = state.usage || { boostUSDGranted:0, discountBookingsUsed:0 };
+
   const boostLeftUSD = Math.max(0, caps.boostMaxUSD - (u.boostUSDGranted||0));
   const bookingsLeft = Math.max(0, (caps.bookingsPerMonth||0) - (u.discountBookingsUsed||0));
 
@@ -186,7 +270,6 @@ function renderUsageLeft(){
   setText('uiDiscountPerBooking', moneyUSDtoLocal(caps.discountPerBookingUSD));
   setText('uiDiscountRemaining', `${bookingsLeft}`);
 
-  // (간이) 티켓 지급 가능성 — 실제 발급은 서버에서 판단
   const eligible =
     (m.plan==='black' && (state.profile?.monthsActive||0) >= 3 && (state.profile?.lifetimeSpend||0) >= 1200) ||
     (m.plan==='plus'  && (state.profile?.monthsActive||0) >= 2 && (state.profile?.lifetimeSpend||0) >= 500);
@@ -194,22 +277,18 @@ function renderUsageLeft(){
   setText('uiTicketsEligible', eligible ? t('eligible') : t('notYet'));
 }
 
-// ====== 다음 레벨 진행 ======
+// ===== Next level =====
 function renderNextLevel(){
   const spend12m = state.profile?.spend12mUSD ?? state.profile?.lifetimeSpend ?? 0;
   const cur = levelFromSpend(spend12m);
-  const nx = nextLevelProgress(spend12m);
+  const nx  = nextLevelProgress(spend12m);
 
   setText('levelTitle', `Your Level: ${cur.name}`);
-  // 상단 게이지도 다음 레벨 기준 진행률로 표시
-  setGauge('gaugeFill', nx.pct);
-  setText('progressPct', `${Math.round(nx.pct)}%`);
-
-  // 레벨별 포인트 백 뱃지
-  const badgeMap = { Bronze:'0%', Silver:'3%', Gold:'5%', Platinum:'7%', Diamond:'10%', Elite:'15%' };
-  const badge = $('tierBadge'); if (badge) badge.textContent = `${badgeMap[cur.name]||'0%'} back`;
-
   setText('lbl_nextLevel', t('nextLevel'));
+
+  const badgeMap = { Bronze:'0%', Silver:'3%', Gold:'5%', Platinum:'7%', Diamond:'10%', Elite:'15%' };
+  const badge = $('#tierBadge'); if (badge) badge.textContent = `${badgeMap[cur.name]||'0%'} back`;
+
   if (nx.next){
     setText('nextLevelLine', t('toGo').replace('{next}', nx.next).replace('{amount}', moneyUSDtoLocal(nx.leftUSD)));
     setGauge('nextLevelGaugeFill', nx.pct);
@@ -219,54 +298,48 @@ function renderNextLevel(){
     setGauge('nextLevelGaugeFill', 100);
     setText('nextLevelPct', '100%');
   }
+  setGauge('gaugeFill', nx.pct);
+  setText('progressPct', `${Math.round(nx.pct)}%`);
 }
 
-// ====== 빌링 토글 ======
+// ===== Billing toggle =====
 function wireBilling(){
-  const m = $('billMonthly'), y = $('billYearly');
+  const m=$('billMonthly'), y=$('billYearly');
   if (m) m.addEventListener('click', ()=>{ state.billing='monthly'; renderPrices(); });
   if (y) y.addEventListener('click', ()=>{ state.billing='yearly';  renderPrices(); });
 }
 
-// ====== 초기 데이터 (데모 값; Firebase 연결 시 교체) ======
+// ===== Data (demo → replace with Firebase reads) =====
 async function fetchProfileAndUsage(){
-  // ----- 실제 서비스에서는 아래를 Firebase로 대체 -----
-  // import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js';
-  // import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js';
+  // Example Firebase:
+  // import { getAuth } from 'firebase/auth';
+  // import { getFirestore, doc, getDoc } from 'firebase/firestore';
   // const uid = getAuth().currentUser?.uid;
-  // const db = getFirestore();
-  // state.profile    = (await getDoc(doc(db, 'users', uid))).data();
-  // state.usage      = (await getDoc(doc(db, 'usage', `${uid}_${YYYYMM}`))).data();
-  // state.membership = (await getDoc(doc(db, 'memberships', uid))).data();
+  // const db  = getFirestore();
+  // state.profile    = (await getDoc(doc(db,'users',uid))).data();
+  // const yyyymm = new Date().toISOString().slice(0,7).replace('-','');
+  // state.usage      = (await getDoc(doc(db,'usage',`${uid}_${yyyymm}`))).data();
+  // state.membership = (await getDoc(doc(db,'memberships',uid))).data();
 
-  // ----- 데모 기본값 (빈 화면 방지) -----
-  state.profile = {
-    spend12mUSD: 920,      // 최근 12개월 사용
-    lifetimeSpend: 1800,
-    monthsActive: 4
-  };
+  // Demo defaults (non-empty UI)
+  state.profile    = { spend12mUSD: 920, lifetimeSpend: 1800, monthsActive: 4 };
   state.membership = { plan:'plus', billing: state.billing, active:true };
-  state.usage = { boostUSDGranted: 3.5, discountBookingsUsed: 1 };
+  state.usage      = { boostUSDGranted: 3.5, discountBookingsUsed: 1 };
 }
 
-// ====== 시작 ======
+// ===== Init =====
 async function start(){
-  // 고정 안내문 (미번역 기본)
-  setText('dwTop', 'No booking for 60 days → auto demotion by 1 level (notification sent).');
-  setText('mb_title', 'Membership + Levels (Stacked Benefits)');
-  setText('mb_subtitle', 'Membership gives instant perks; levels reward long-term activity. Use both for maximum value.');
+  setText('dwTop','No booking for 60 days → auto demotion by 1 level (notification sent).');
+  setText('mb_title','Membership + Levels (Stacked Benefits)');
+  setText('mb_subtitle','Membership gives instant perks; levels reward long-term activity. Use both for maximum value.');
   setText('inheritNote', t('inherit'));
 
   await fetchProfileAndUsage();
-  stackedBenefits();   // 상위=하위 포함 표시
-  renderPrices();      // 가격 로컬 통화
-  renderUsageLeft();   // 이번 달 잔여혜택
-  renderNextLevel();   // 다음 레벨 진행
-  wireBilling();       // 토글 바인딩
+  guardBenefits();
+  renderPrices();
+  renderUsageLeft();
+  renderNextLevel();
+  wireBilling();
 }
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', start);
-} else {
-  start();
-}
+if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start);
+else start();
