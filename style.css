@@ -344,3 +344,8 @@ button:hover, .btn:hover, .google-btn:hover {
 @media (max-width: 520px) {
   .notif-panel { right: 8px; width: calc(100vw - 16px); }
 }
+/* 웰컴 바를 알림 패널 기준 컨테이너로 */
+#welcomeBar.welcome-bar {
+  position: relative;
+  justify-content: space-between; /* 좌: Welcome 텍스트 / 우: 알림 버튼 */
+}
