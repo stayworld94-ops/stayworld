@@ -1,9 +1,13 @@
-// membership.js — FINAL (no-loss yearly, stacked benefits, 10 langs/10 currencies)
+// membership.js — FINAL2
+// - lang-change 실시간 반영
+// - 통화 선택 드롭다운(10개) 즉시 반영
+// - 연간 소폭 할인(손해방지 올림)
+// - 상위 레벨 = 하위 혜택 누적 (포인트 %는 최고치만 표시)
 
 // ===== CONFIG =====
-const SAFETY_MARGIN = 1.07;          // 표시 환율 안전마진
-const YEARLY_DISCOUNT_RATE = 0.92;   // 연간가 소폭 할인 = 8% (조절 가능)
-const ROUND_UP_TO_0_01 = v => Math.ceil(v*100)/100; // 손해 방지: 항상 올림
+const SAFETY_MARGIN = 1.07;          // 표시가에 7% 마진
+const YEARLY_DISCOUNT_RATE = 0.92;   // 연간 약 8% 할인 (원하면 숫자만 조정)
+const ROUND_UP_TO_0_01 = v => Math.ceil(v * 100) / 100;
 
 const PLAN_CAPS = {
   plus:  { boostRate:0.02, boostMaxUSD:  8, discountPerBookingUSD:10, bookingsPerMonth:3 },
@@ -19,7 +23,7 @@ const LEVELS = [
   { name:'Elite',    minUSD:6000 },
 ];
 
-// 월 정가 (원화/표시 변환은 아래 포맷터가 처리)
+// 월 정가(USD)
 const MONTHLY_PRICES_USD = { plus: 9.99, black: 24.99 };
 
 // ===== I18N (UI 라벨) =====
@@ -36,7 +40,7 @@ const I18N = {
   ar:{monthLeft:'المتبقي هذا الشهر',boostLeft:'رصيد تعزيز النقاط',instLeft:'خصم فوري',perBooking:'لكل حجز',bookings:'حجوزات',tickets:'تذاكر',eligible:'متاح الآن',notYet:'ليس بعد',nextLevel:'المستوى التالي',inherit:'المستويات الأعلى تتضمن مزايا المستويات الأدنى.',toGo:'{next} — متبقٍ {amount}',maxLevel:'أعلى مستوى'}
 };
 
-// 혜택 문구 (다국어)
+// 혜택 문구
 const BENEFIT_I18N = {
   en:{dash:'—',member_offers:'Member-only offers',points3:'3% points back',points5:'5% points back',points7:'7% points back',points10:'10% points back',points15:'15% points back',priority_support:'Priority support',waitlist_priority:'Waitlist priority',early_late:'Early check-in / Late check-out (host-provided)',flexible_24h:'Flexible cancellation (24h, where allowed)',upgrade_avail:'Room upgrade when available',secret_deals:'Secret Deals+ (host-funded)',birthday_2x:'Birthday month ×2 points',lounge_partner:'Airport lounge (partners)',pickup_partner:'Airport pickup (partners)',overbooking_protect:'Overbooking protection',concierge_vip:'VIP concierge (AI+staff, 3 sessions/mo)',dedicated_channel:'Dedicated support channel',status_match:'Status match (invite-only)',secret_deals_plus:'Invite-only Secret Deals++'},
   ko:{dash:'—',member_offers:'멤버 전용 오퍼',points3:'3% 포인트 백',points5:'5% 포인트 백',points7:'7% 포인트 백',points10:'10% 포인트 백',points15:'15% 포인트 백',priority_support:'우선 상담',waitlist_priority:'대기자 우선',early_late:'얼리 체크인 / 레이트 체크아웃 (호스트 제공)',flexible_24h:'유연 취소 (24시간, 정책 허용 시)',upgrade_avail:'객실 업그레이드 (가능 시)',secret_deals:'시크릿 딜+ (호스트 부담)',birthday_2x:'생일 달 포인트 2배',lounge_partner:'공항 라운지 (제휴)',pickup_partner:'공항 픽업 (제휴)',overbooking_protect:'오버부킹 보호',concierge_vip:'VIP 컨시어지 (AI+스태프, 월 3회)',dedicated_channel:'전용 지원 채널',status_match:'상태 매칭 (초대 한정)',secret_deals_plus:'인바이트 전용 시크릿 딜++'}
@@ -78,8 +82,8 @@ function detectRegionTag(){
 
 // ===== STATE =====
 const params = new URLSearchParams(location.search);
-const OVERRIDE_LANG = params.get('lang');     // ko, en, ...
-const OVERRIDE_CURR = params.get('currency'); // KRW, USD, ...
+const OVERRIDE_LANG = params.get('lang');
+const OVERRIDE_CURR = params.get('currency');
 const state = { lang:(OVERRIDE_LANG || (document.documentElement.getAttribute('lang')||navigator.language||'en')).split('-')[0], currency:'USD', billing:'monthly', profile:null, membership:null, usage:null };
 
 function pickCurrency10(){
@@ -106,7 +110,7 @@ const $=id=>document.getElementById(id);
 const setText=(id,txt)=>{const el=$(id); if(el) el.textContent=txt;};
 const setGauge=(id,pct)=>{const el=$(id); if(el) el.style.width=`${Math.max(0,Math.min(100,pct))}%`;};
 
-// ===== Level logic =====
+// ===== Levels =====
 function levelFromSpend(usd12m){ let idx=0; for(let i=0;i<LEVELS.length;i++){ if(usd12m>=LEVELS[i].minUSD) idx=i; } return {index:idx,name:LEVELS[idx].name}; }
 function nextLevelProgress(usd12m){
   const cur=levelFromSpend(usd12m), curMin=LEVELS[cur.index].minUSD, next=LEVELS[cur.index+1];
@@ -115,7 +119,7 @@ function nextLevelProgress(usd12m){
   return {next:next.name,pct:Math.max(0,Math.min(100,(done/span)*100)),leftUSD:Math.max(0,next.minUSD-usd12m)};
 }
 
-// ===== Stacked Benefits (상위=하위 포함, 포인트는 최상위 %만 표시) =====
+// ===== Stacked Benefits (상위=하위 포함, 포인트는 최고 %만) =====
 function getMergedBenefits(){
   const LEVEL_BENEFIT_KEYS={
     Bronze:['dash','member_offers'],
@@ -161,10 +165,8 @@ function guardBenefits(){
   mo.observe(target,{subtree:true,childList:true,characterData:true}); renderBenefits();
 }
 
-// ===== Pricing (연간 = 월×12×할인, 손해방지: 올림, 라벨 업데이트) =====
-function yearlyUSD(monthlyUSD){
-  return ROUND_UP_TO_0_01(monthlyUSD * 12 * YEARLY_DISCOUNT_RATE);
-}
+// ===== Pricing =====
+function yearlyUSD(monthlyUSD){ return ROUND_UP_TO_0_01(monthlyUSD * 12 * YEARLY_DISCOUNT_RATE); }
 function renderPrices(){
   const billing = state.billing;
   const p = (billing==='yearly')
@@ -179,7 +181,7 @@ function renderPrices(){
   if(y) y.textContent=`Yearly (save ${Math.round((1-YEARLY_DISCOUNT_RATE)*100)}%)`;
 }
 
-// ===== Monthly usage-left =====
+// ===== Usage left =====
 function renderUsageLeft(){
   const m=state.membership; if(!m||!m.plan||!PLAN_CAPS[m.plan]) return;
   const caps=PLAN_CAPS[m.plan]; const u=state.usage||{boostUSDGranted:0,discountBookingsUsed:0};
@@ -224,6 +226,31 @@ function wireBilling(){
   if(y) y.addEventListener('click', ()=>{ state.billing='yearly';  renderPrices(); });
 }
 
+// ===== 통화/언어 변경 핸들러 =====
+function setCurrency(code){
+  code = (code||'').toUpperCase();
+  if (!SUPPORTED_CUR.has(code)) return;
+  state.currency = code;
+  renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits();
+}
+function setLanguage(lang){
+  if (!lang) return;
+  state.lang = lang.split('-')[0];
+  // 통화 override 없으면 언어에 맞춰 자동 선택
+  if (!OVERRIDE_CURR) {
+    state.currency = pickCurrency10();
+    const sel = $('currencySelect'); if (sel && SUPPORTED_CUR.has(state.currency)) sel.value = state.currency;
+  }
+  renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits();
+}
+window.addEventListener('lang-change', (e)=> setLanguage(e.detail?.lang));
+
+function wireCurrencySelector(){
+  const sel = $('currencySelect'); if (!sel) return;
+  if (SUPPORTED_CUR.has(state.currency)) sel.value = state.currency;
+  sel.addEventListener('change', ()=> setCurrency(sel.value));
+}
+
 // ===== Demo data (Firebase 연결 전 임시) =====
 async function fetchProfileAndUsage(){
   state.profile    = { spend12mUSD: 920, lifetimeSpend: 1800, monthsActive: 4 };
@@ -244,5 +271,7 @@ async function start(){
   renderUsageLeft();
   renderNextLevel();
   wireBilling();
+  wireCurrencySelector();
+  setLanguage(state.lang); // 초기 렌더 보정
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
