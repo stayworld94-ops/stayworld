@@ -6,7 +6,8 @@
       "nav.home":"Home","nav.hotels":"Hotels","nav.membership":"Membership","nav.search":"Search","nav.becomeHost":"Become a Host",
       "nav.login":"Log in","nav.signup":"Sign up",
       "controls.sort":"Sort","controls.filter":"Filter","controls.map":"Map",
-      "controls.rateHint":"* Demo rates. Connect a live FX API.",
+      // HINT: was Demo -> now Live
+      "controls.rateHint":"✔ Live FX applied.",
       "filters.title":"Filters","filters.maxPrice":"Max price (converted)","filters.minRating":"Minimum rating",
       "filters.maxDistance":"Max distance from center (km)","filters.freeCancel":"Free cancellation only",
       "filters.type":"Stay type","filters.amen":"Amenities","filters.booking":"Booking","filters.verify":"Verification",
@@ -40,7 +41,7 @@
       "nav.home":"홈","nav.hotels":"숙소","nav.membership":"멤버십","nav.search":"검색","nav.becomeHost":"호스트 되기",
       "nav.login":"로그인","nav.signup":"가입하기",
       "controls.sort":"정렬","controls.filter":"필터","controls.map":"지도",
-      "controls.rateHint":"* 데모 환율입니다. 운영 시 환율 API를 연결하세요.",
+      "controls.rateHint":"✔ 실시간 환율 적용됨.",
       "filters.title":"필터","filters.maxPrice":"최대 가격(환산)","filters.minRating":"최소 평점",
       "filters.maxDistance":"도심까지 최대 거리(km)","filters.freeCancel":"무료 취소만",
       "filters.type":"숙소 유형","filters.amen":"편의시설","filters.booking":"예약 방식","filters.verify":"검증",
@@ -74,7 +75,7 @@
       "nav.home":"Ana sayfa","nav.hotels":"Konaklama","nav.membership":"Üyelik","nav.search":"Arama","nav.becomeHost":"Ev sahibi olun",
       "nav.login":"Giriş","nav.signup":"Kaydol",
       "controls.sort":"Sırala","controls.filter":"Filtre","controls.map":"Harita",
-      "controls.rateHint":"* Demo kur. Canlı kur API’si bağlayın.",
+      "controls.rateHint":"✔ Canlı kur uygulandı.",
       "filters.title":"Filtreler","filters.maxPrice":"Azami fiyat (çevrilmiş)","filters.minRating":"Asgari puan",
       "filters.maxDistance":"Merkeze azami mesafe (km)","filters.freeCancel":"Yalnızca ücretsiz iptal",
       "filters.type":"Konaklama türü","filters.amen":"Olanaklar","filters.booking":"Rezervasyon","filters.verify":"Doğrulama",
@@ -108,7 +109,7 @@
       "nav.home":"Accueil","nav.hotels":"Hébergements","nav.membership":"Adhésion","nav.search":"Recherche","nav.becomeHost":"Devenir hôte",
       "nav.login":"Connexion","nav.signup":"S’inscrire",
       "controls.sort":"Trier","controls.filter":"Filtrer","controls.map":"Carte",
-      "controls.rateHint":"* Taux démo. Connectez une API de change.",
+      "controls.rateHint":"✔ Taux de change en direct.",
       "filters.title":"Filtres","filters.maxPrice":"Prix max (converti)","filters.minRating":"Note minimale",
       "filters.maxDistance":"Distance max du centre (km)","filters.freeCancel":"Annulation gratuite uniquement",
       "filters.type":"Type d’hébergement","filters.amen":"Équipements","filters.booking":"Réservation","filters.verify":"Vérification",
@@ -142,7 +143,7 @@
       "nav.home":"ホーム","nav.hotels":"宿泊先","nav.membership":"メンバーシップ","nav.search":"検索","nav.becomeHost":"ホストになる",
       "nav.login":"ログイン","nav.signup":"登録",
       "controls.sort":"並び替え","controls.filter":"フィルター","controls.map":"地図",
-      "controls.rateHint":"* デモ為替レートです。運用時はFX APIを接続してください。",
+      "controls.rateHint":"✔ 実レート適用中。",
       "filters.title":"フィルター","filters.maxPrice":"最大価格（換算）","filters.minRating":"最小評価",
       "filters.maxDistance":"中心からの最大距離（km）","filters.freeCancel":"無料キャンセルのみ",
       "filters.type":"宿タイプ","filters.amen":"アメニティ","filters.booking":"予約方法","filters.verify":"認証",
@@ -168,7 +169,7 @@
       "exp.nature":"自然","exp.camping":"キャンプ","exp.traditional":"伝統体験","exp.ski":"スキー in/out","exp.wine":"ワイン産地",
       "loc.airport":"空港近く","loc.station":"駅近く","loc.beach":"ビーチ近く","loc.center":"中心部",
       "foot.about":"会社情報","foot.careers":"採用情報","foot.press":"プレス","foot.help":"ヘルプ","foot.center":"ヘルプセンター",
-      "foot.protect":"ゲ스트保護","foot.contact":"お問い合わせ","foot.legal":"法的事項","foot.terms":"利用規約",
+      "foot.protect":"ゲスト保護","foot.contact":"お問い合わせ","foot.legal":"法的事項","foot.terms":"利用規約",
       "foot.privacy":"プライバシー","foot.cookies":"クッキー",
       "buttons.book":"予約","labels.perNight":"/ 泊","labels.from":"最低","labels.night":"泊"
     },
@@ -176,7 +177,7 @@
       "nav.home":"Startseite","nav.hotels":"Unterkünfte","nav.membership":"Mitgliedschaft","nav.search":"Suche","nav.becomeHost":"Gastgeber werden",
       "nav.login":"Anmelden","nav.signup":"Registrieren",
       "controls.sort":"Sortieren","controls.filter":"Filtern","controls.map":"Karte",
-      "controls.rateHint":"* Demo-Wechselkurse. Binden Sie eine FX-API an.",
+      "controls.rateHint":"✔ Live-Wechselkurse aktiv.",
       "filters.title":"Filter","filters.maxPrice":"Max. Preis (umgerechnet)","filters.minRating":"Mindestbewertung",
       "filters.maxDistance":"Max. Entfernung zum Zentrum (km)","filters.freeCancel":"Nur kostenlose Stornierung",
       "filters.type":"Unterkunftstyp","filters.amen":"Ausstattung","filters.booking":"Buchung","filters.verify":"Verifizierung",
@@ -210,7 +211,7 @@
       "nav.home":"Inicio","nav.hotels":"Alojamientos","nav.membership":"Membresía","nav.search":"Buscar","nav.becomeHost":"Hazte anfitrión",
       "nav.login":"Iniciar sesión","nav.signup":"Registrarse",
       "controls.sort":"Ordenar","controls.filter":"Filtrar","controls.map":"Mapa",
-      "controls.rateHint":"* Tipos de cambio de demo. Conecta una API FX.",
+      "controls.rateHint":"✔ Tipos de cambio en vivo aplicados.",
       "filters.title":"Filtros","filters.maxPrice":"Precio máx. (convertido)","filters.minRating":"Calificación mínima",
       "filters.maxDistance":"Distancia máx. al centro (km)","filters.freeCancel":"Solo cancelación gratuita",
       "filters.type":"Tipo de estancia","filters.amen":"Servicios","filters.booking":"Reserva","filters.verify":"Verificación",
@@ -244,7 +245,7 @@
       "nav.home":"Home","nav.hotels":"Alloggi","nav.membership":"Abbonamento","nav.search":"Cerca","nav.becomeHost":"Diventa host",
       "nav.login":"Accedi","nav.signup":"Registrati",
       "controls.sort":"Ordina","controls.filter":"Filtra","controls.map":"Mappa",
-      "controls.rateHint":"* Tassi demo. Collega un’API FX.",
+      "controls.rateHint":"✔ Tassi di cambio in tempo reale.",
       "filters.title":"Filtri","filters.maxPrice":"Prezzo max (convertito)","filters.minRating":"Valutazione minima",
       "filters.maxDistance":"Distanza max dal centro (km)","filters.freeCancel":"Solo cancellazione gratuita",
       "filters.type":"Tipo di struttura","filters.amen":"Servizi","filters.booking":"Prenotazione","filters.verify":"Verifica",
@@ -278,7 +279,7 @@
       "nav.home":"首页","nav.hotels":"住宿","nav.membership":"会员","nav.search":"搜索","nav.becomeHost":"成为房东",
       "nav.login":"登录","nav.signup":"注册",
       "controls.sort":"排序","controls.filter":"筛选","controls.map":"地图",
-      "controls.rateHint":"* 演示汇率。上线请接入汇率API。",
+      "controls.rateHint":"✔ 已应用实时汇率。",
       "filters.title":"筛选","filters.maxPrice":"最高价格（折算）","filters.minRating":"最低评分",
       "filters.maxDistance":"距市中心最大距离（公里）","filters.freeCancel":"仅限可免费取消",
       "filters.type":"房源类型","filters.amen":"设施","filters.booking":"预订方式","filters.verify":"认证",
@@ -312,7 +313,7 @@
       "nav.home":"Главная","nav.hotels":"Жильё","nav.membership":"Подписка","nav.search":"Поиск","nav.becomeHost":"Стать хозяином",
       "nav.login":"Войти","nav.signup":"Регистрация",
       "controls.sort":"Сортировать","controls.filter":"Фильтр","controls.map":"Карта",
-      "controls.rateHint":"* Демонстрационные курсы. Подключите FX-API.",
+      "controls.rateHint":"✔ Применены живые курсы.",
       "filters.title":"Фильтры","filters.maxPrice":"Макс. цена (в пересчёте)","filters.minRating":"Мин. рейтинг",
       "filters.maxDistance":"Макс. расстояние от центра (км)","filters.freeCancel":"Только бесплатная отмена",
       "filters.type":"Тип размещения","filters.amen":"Удобства","filters.booking":"Бронирование","filters.verify":"Проверка",
@@ -397,19 +398,47 @@
   const $$ = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
   const on = (el,ev,fn)=> el && el.addEventListener(ev,fn,{passive:false});
 
-  // ==== [Currency & Price Formatting] =======================================
-  // 언어→통화 매핑과 환율(간이값). 슬라이더/비교는 USD, 표시는 각 통화로.
+  // ==== [Currency & Price Formatting with Live ExchangeRate-API] ============
   const LANG_CURRENCY = {
     ko:"KRW", tr:"TRY", en:"USD", fr:"EUR", ja:"JPY",
     es:"EUR", de:"EUR", ru:"RUB", it:"EUR", zh:"CNY"
   };
-  const RATES = { USD:1, KRW:1350, TRY:33, EUR:0.92, JPY:156, RUB:90, CNY:7.2 };
 
-  // 기존에 sw_lang 쓰고 있으므로 그대로 존중
+  // 실시간 환율: 기본은 USD=1, 나머지는 API로 채움
+  let RATES = { USD:1 };
   let currentLang = localStorage.getItem("sw_lang") || (navigator.language||"en").slice(0,2).toLowerCase();
   if(!['en','ko','tr','fr','ja','de','es','it','zh','ru'].includes(currentLang)) currentLang = 'en';
   let currentCurrency = LANG_CURRENCY[currentLang] || "USD";
   let nf = new Intl.NumberFormat(currentLang, { style:"currency", currency: currentCurrency });
+
+  async function fetchRates(base="USD"){
+    try{
+      const res = await fetch(`https://v6.exchangerate-api.com/v6/08df811def76a1ffa0c97f4a/latest/${base}`);
+      const data = await res.json();
+      if(data.result === "success"){
+        RATES = data.conversion_rates || RATES;
+        setFXStatus(true);
+        refreshAllPrices();
+        if(typeof refreshFilterPriceLabels === 'function') refreshFilterPriceLabels();
+      }else{
+        console.error("FX API error:", data);
+        setFXStatus(false);
+      }
+    }catch(err){
+      console.error("FX fetch failed:", err);
+      setFXStatus(false);
+    }
+  }
+
+  function setFXStatus(isLive){
+    // #fxStatus 있으면 우선 업데이트
+    const el = $('#fxStatus');
+    if(el) el.textContent = isLive ? t('controls.rateHint') : '* FX API unavailable. Using USD.';
+    // data-i18n="controls.rateHint" 요소들도 갱신
+    document.querySelectorAll('[data-i18n="controls.rateHint"]').forEach(n=>{
+      n.textContent = isLive ? t('controls.rateHint') : '* FX API unavailable. Using USD.';
+    });
+  }
 
   const usdToDisplay = usd => usd * (RATES[currentCurrency] || 1);
   const displayToUsd = val => {
@@ -417,16 +446,15 @@
     return r ? (val / r) : val;
   };
 
-  // [KEEP+ADD] 기존 [data-price-usd] 처리 + .price 요소가 부모에 data-price-usd만 가진 경우도 지원
   function refreshAllPrices(){
-    // 1) data-price-usd 직접 붙은 엘리먼트
+    // 1) data-price-usd 직접
     $$("[data-price-usd]").forEach(el=>{
       const usd = parseFloat(el.getAttribute("data-price-usd") || "0");
       el.textContent = nf.format(usdToDisplay(usd));
     });
-    // 2) .price 요소인데, 자신에게 data-price-usd가 없고 조상에만 있는 경우
+    // 2) .price 가 조상에 data-price-usd 가진 경우
     $$(".price").forEach(el=>{
-      if(el.hasAttribute("data-price-usd")) return; // 위에서 처리됨
+      if(el.hasAttribute("data-price-usd")) return;
       const holder = el.closest("[data-price-usd]");
       if(!holder) return;
       const usd = parseFloat(holder.getAttribute("data-price-usd") || "0");
@@ -439,7 +467,6 @@
     localStorage.setItem("sw_lang", newLang);
     currentCurrency = LANG_CURRENCY[newLang] || "USD";
     nf = new Intl.NumberFormat(newLang, { style:"currency", currency: currentCurrency });
-    // 번역 적용 이후 가격/라벨 즉시 갱신
     refreshAllPrices();
     if(typeof refreshFilterPriceLabels === 'function') refreshFilterPriceLabels();
   }
@@ -469,7 +496,7 @@
             <option value="ja">JA</option><option value="zh">ZH</option>
             <option value="fr">FR</option><option value="es">ES</option>
             <option value="de">DE</option><option value="tr">TR</option>
-            <option value="ar">AR</option><option value="ru">RU</option>
+            <option value="ru">RU</option>
           </select>
           <a id="t_nav_signup" href="/signup.html" class="btn btn-gold">Sign Up</a>
           <button id="btnLogout" class="btn btn-ghost" style="display:none">Logout</button>
@@ -488,7 +515,6 @@
   }
 
   /* -------- 로그인 상태 반영 -------- */
-  // [ADD] firebaseAuth 미정의 환경에서 오류 방지
   function bindAuthHeader(){
     if(!(window.firebaseAuth && typeof firebaseAuth.onAuthStateChanged === 'function')) return;
     firebaseAuth.onAuthStateChanged(user=>{
@@ -559,6 +585,7 @@
         <div class="head">
           <strong id="fTitle">Filters</strong>
           <div style="display:flex;gap:8px;align-items:center">
+            <span id="fxStatus" style="font-size:12px;opacity:.8" data-i18n="controls.rateHint"></span>
             <button id="swClose" class="btn btn-ghost">✕</button>
           </div>
         </div>
@@ -652,7 +679,6 @@
       const n=$$('input[type=checkbox]:checked, input[type=radio]:checked',d).length;
       setBadge(n?n.toString():'');
       close();
-      // 실제 필터링 로직이 카드에 data-* 붙어있다면 여기서 호출 가능
       if(typeof applyCardFilters === 'function') applyCardFilters();
     });
 
@@ -672,7 +698,7 @@
     refreshFilterPriceLabels();
   }
 
-  // (선택) 카드 필터링 예시: 가격(USD), 평점, 거리, 무료취소
+  // 카드 필터링(가격 USD 기준)
   window.applyCardFilters = function applyCardFilters(){
     const d = $('#filterDrawer');
     const minUsd = parseFloat($('#priceMin',d)?.value || '0');
@@ -690,7 +716,6 @@
     const mapEl = $('#map'); if(!mapEl) return;
     const map = L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-    // [ADD] 팝업 열릴 때 번역키 적용
     if(map.on && typeof applyI18NPage === 'function'){
       map.on('popupopen', ()=> applyI18NPage());
     }
@@ -704,33 +729,27 @@
     sel.value = currentLang;
     on(sel, 'change', ()=>{
       const lang = sel.value;
-      // 네가 쓰는 i18n 적용
       if(window.StayWorldI18n?.applyLang) StayWorldI18n.applyLang(lang);
       onLanguageChange(lang);
-      // [ADD] 카드 라벨/가격 즉시 재적용
       afterListRendered(document);
     });
   }
   // ==========================================================================
 
-  /* ===== [ADD] 카드 자동 현지화(템플릿 없어도 동작) ===================== */
+  /* ===== 카드 자동 현지화 ================================================== */
   function localizeCards(root=document){
-    // 버튼/라벨에 키 자동 부착 (중복부착 방지)
     root.querySelectorAll('.card .btn.book, .card a.book, .card .book, a.btn.gold.book').forEach(el=>{
       if(!el.hasAttribute('data-i18n')) el.setAttribute('data-i18n','buttons.book');
     });
     root.querySelectorAll('.card .tax, .card .per-night, .card .price-unit').forEach(el=>{
       if(!el.hasAttribute('data-i18n')) el.setAttribute('data-i18n','labels.perNight');
     });
-    // 가격 업데이트
     refreshAllPrices();
-    // 번역 적용
     if (typeof applyI18NPage === 'function') applyI18NPage();
   }
   function afterListRendered(root=document){ localizeCards(root); }
-  /* ====================================================================== */
 
-  // [ADD] 동적 리스트 자동 감지 (예: Ajax로 카드 갱신 시)
+  // 동적 리스트 감시
   function watchList(){
     const list = document.getElementById('list');
     if(!list) return;
@@ -752,9 +771,8 @@
       const saved = localStorage.getItem("sw_lang") || (navigator.language||"en").slice(0,2).toLowerCase();
       const final = ['en','ko','tr','fr','ja','de','es','it','zh','ru'].includes(saved) ? saved : 'en';
       StayWorldI18n.applyLang(final);
-      onLanguageChange(final);   // 통화/가격/라벨 싱크
+      onLanguageChange(final);
     } else {
-      // [ADD] 기본 적용
       if(typeof applyI18NPage === 'function'){
         applyI18NPage(currentLang);
         onLanguageChange(currentLang);
@@ -762,21 +780,22 @@
     }
 
     wireLanguageSelect();
-    refreshAllPrices();          // 페이지 내 가격 텍스트 초기 표기
-    afterListRendered(document); // [ADD] 페이지 최초 카드 현지화
-    watchList();                 // [ADD] 동적 갱신 감시
+    refreshAllPrices();
+    afterListRendered(document);
+    watchList();
+
+    // 실시간 환율 가져오기 시작
+    fetchRates("USD");
   }
   if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
 
 /* ================== [ADD] Favorites(찜) + MyPage ================== */
 (function(){
-  // Firebase/전역 브릿지와 연동 (네 환경 변수명 우선)
   const auth = (typeof firebaseAuth !== 'undefined') ? firebaseAuth : (window._sw?.auth || null);
   const db   = (typeof firebaseDB   !== 'undefined') ? firebaseDB   : (window._sw?.db   || null);
   const useFirestore = !!(auth && db && db.collection);
 
-  // 저장소: Firestore(있으면) / LocalStorage(없으면)
   const FavStore = {
     key(uid){ return `sw:favs:${uid || 'guest'}`; },
     async getAll(uid){
@@ -800,7 +819,6 @@
     }
   };
 
-  // 상태 & 엘리먼트
   let favSet = new Set();
   const $btnMyPage = document.getElementById('btnMyPage');
   const $secMy     = document.getElementById('mypage');
