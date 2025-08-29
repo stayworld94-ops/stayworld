@@ -369,3 +369,6 @@ ALL_LANGS.forEach(code=>{
 });
 
 /* ===== end of membership i18n merge block ===== */
+// lang.js — 언어 적용 후:
+document.documentElement.setAttribute('lang', newLangCode);   // ex) 'ko-KR'
+window.dispatchEvent(new CustomEvent('lang-change', { detail: { lang: newLangCode.split('-')[0] }}));
