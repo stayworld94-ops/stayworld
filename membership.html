@@ -1,191 +1,298 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StayWorld | Membership</title>
-  <link rel="stylesheet" href="/style.css"/>
-  <style>
-    .page-wrap{max-width:1040px;margin:0 auto;padding:24px}
-    .note{opacity:.85}
-    .card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
-    .sticky-note{position:sticky;top:0;z-index:30;background:#0f1420;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:16px}
-    .gauge{width:100%;height:8px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
-    .gauge>div{height:100%;background:#f4d78c}
-    .badge{position:absolute;right:16px;top:-10px;background:#f4d78c;color:#1a1205;border-radius:999px;padding:6px 12px;font-weight:700}
-    .tier-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-    .tier-card{background:#0f1420;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
-    .tier-card h3{display:flex;gap:8px;align-items:center;margin:0 0 8px}
-    .benefit{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
-    .benefit i{font-style:normal}
-    .tier-active{outline:2px solid #f4d78c;box-shadow:0 0 0 4px rgba(244,215,140,.15) inset}
-    .tier-muted{opacity:.65}
-    .bill-btn{cursor:pointer}
-    .btn-buy{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#2a2216;color:#fff;cursor:pointer}
-    .btn-basic{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#121a2a;color:#fff;cursor:pointer}
-    @media (max-width:840px){.tier-grid{grid-template-columns:1fr}}
-    select#currencySelect{background:#121a2a;border:1px solid rgba(255,255,255,.14);color:#cfe;border-radius:10px;padding:8px 10px}
-  </style>
-</head>
-<body>
-  <!-- 공통 헤더 -->
-  <div id="site-header"></div>
+// membership.js — FINAL7 (10 langs + currency auto + stacked benefits + yearly discount)
+window.__membershipVer = 'FINAL7';
 
-  <main class="page-wrap">
-    <!-- 60일 자동강등 고정 안내 -->
-    <div id="dwTop" class="sticky-note">No booking for 60 days → auto demotion by 1 level (notification sent).</div>
+// ===== CONFIG =====
+const SAFETY_MARGIN = 1.07;
+const YEARLY_DISCOUNT_RATE = 0.92;   // ~8% off yearly
+const ROUND_UP_TO_0_01 = v => Math.ceil(v * 100) / 100;
 
-    <!-- 제목/설명 -->
-    <h1 id="mb_title">Membership + Levels (Stacked Benefits)</h1>
-    <p id="mb_subtitle" class="note">Membership gives instant perks; levels reward long-term activity. Use both for maximum value.</p>
+const PLAN_CAPS = {
+  plus:  { boostRate:0.02, boostMaxUSD:  8, discountPerBookingUSD:10, bookingsPerMonth:3 },
+  black: { boostRate:0.04, boostMaxUSD: 24, discountPerBookingUSD:20, bookingsPerMonth:5 }
+};
 
-    <!-- 현재 등급 카드 -->
-    <section class="card" style="position:relative;margin-top:14px">
-      <h3 id="levelTitle">Your Level: Bronze</h3>
-      <div id="tierBadge" class="badge">0% back</div>
-      <p id="levelProgressText"></p>
-      <div class="gauge"><div id="gaugeFill" style="width:0%"></div></div>
-      <div id="progressPct" class="note" style="text-align:right;margin-top:6px">0%</div>
-      <small id="downgradeSticky" class="note" style="display:block;margin-top:10px">If no booking for 60 days, demotion by 1 level (auto).</small>
-    </section>
+const LEVELS = [
+  { name:'Bronze',   minUSD:0 },
+  { name:'Silver',   minUSD:300 },
+  { name:'Gold',     minUSD:800 },
+  { name:'Platinum', minUSD:1500 },
+  { name:'Diamond',  minUSD:3000 },
+  { name:'Elite',    minUSD:6000 },
+];
 
-    <!-- 이번 달 남은 혜택 -->
-    <section class="card" id="perksLeftCard" style="margin-top:14px">
-      <h3 id="lbl_perksLeft">This month remaining</h3>
-      <div class="benefit"><i>•</i><div><span id="lbl_boostLeft">Points boost left:</span> <b id="uiBoostLeft">—</b></div></div>
-      <div class="benefit"><i>•</i><div><span id="lbl_discountLeft">Instant discount:</span> <b id="uiDiscountPerBooking">—</b> × <b id="uiDiscountRemaining">0</b> <span id="lbl_bookings">bookings</span></div></div>
-      <div class="benefit"><i>•</i><div><span id="lbl_ticketsEligible">Tickets:</span> <b id="uiTicketsEligible">—</b></div></div>
-      <small class="note" id="inheritNote">Higher tiers include all lower-level benefits.</small>
-    </section>
+const MONTHLY_PRICES_USD = { plus: 9.99, black: 24.99 };
 
-    <!-- 다음 레벨 진행 -->
-    <section class="card" id="nextLevelCard" style="margin-top:14px">
-      <h3 id="lbl_nextLevel">Next level</h3>
-      <p id="nextLevelLine" class="note"></p>
-      <div class="gauge"><div id="nextLevelGaugeFill" style="width:0%"></div></div>
-      <div class="note" style="text-align:right;margin-top:6px" id="nextLevelPct">0%</div>
-    </section>
+// ===== I18N — 10 languages =====
+const I18N = {
+  en:{monthLeft:'This month remaining',boostLeft:'Points boost left',instLeft:'Instant discount',perBooking:'per booking',bookings:'bookings',tickets:'Tickets',eligible:'Eligible now',notYet:'Not yet',nextLevel:'Next level',inherit:'Higher tiers include all lower-level benefits.',toGo:'{next} — {amount} left',maxLevel:'Top level reached',noBooking:'No booking for 60 days → auto demotion by 1 level (notification sent).',title:'Membership + Levels (Stacked Benefits)',subtitle:'Membership gives instant perks; levels reward long-term activity. Use both for maximum value.',plans:'Membership Plans',monthlyBtn:'Monthly',yearlyBtn:'Yearly (save {pct}%)'},
+  ko:{monthLeft:'이번 달 남은 혜택',boostLeft:'포인트 부스트 잔여',instLeft:'즉시할인 잔여',perBooking:'예약당',bookings:'회',tickets:'티켓',eligible:'지급 가능',notYet:'아직 조건 미달',nextLevel:'다음 레벨',inherit:'상위 레벨은 하위 레벨 혜택을 모두 포함합니다.',toGo:'{next} — {amount} 남음',maxLevel:'최상위 레벨입니다',noBooking:'60일 동안 예약이 없으면 1단계 자동 강등 (알림 발송).',title:'멤버십 + 레벨 (혜택 누적)',subtitle:'멤버십은 즉시 혜택을 제공하고, 레벨은 장기 활동을 보상합니다. 두 가지를 모두 활용하세요.',plans:'멤버십 요금제',monthlyBtn:'월간',yearlyBtn:'연간 (약 {pct}% 할인)'},
+  ja:{monthLeft:'今月の残り特典',boostLeft:'ポイントブースト残高',instLeft:'即時割引残高',perBooking:'予約ごと',bookings:'回',tickets:'チケット',eligible:'受取可能',notYet:'まだ条件未達',nextLevel:'次のレベル',inherit:'上位レベルは下位の特典をすべて含みます。',toGo:'{next} — 残り {amount}',maxLevel:'最上位レベルです',noBooking:'60日間予約がない場合、1レベル自動降格（通知あり）。',title:'メンバーシップ + レベル（特典スタック）',subtitle:'メンバーシップは即時特典、レベルは長期の活動を評価します。',plans:'メンバーシッププラン',monthlyBtn:'月額',yearlyBtn:'年額（約{pct}%割引）'},
+  es:{monthLeft:'Beneficios restantes este mes',boostLeft:'Impulso de puntos restante',instLeft:'Descuento instantáneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegible ahora',notYet:'Aún no',nextLevel:'Siguiente nivel',inherit:'Los niveles superiores incluyen los beneficios de los inferiores.',toGo:'{next} — faltan {amount}',maxLevel:'Nivel máximo alcanzado',noBooking:'Sin reservas durante 60 días → degradación automática de 1 nivel (con aviso).',title:'Membresía + Niveles (beneficios acumulados)',subtitle:'La membresía da beneficios instantáneos; los niveles premian la actividad a largo plazo.',plans:'Planes de membresía',monthlyBtn:'Mensual',yearlyBtn:'Anual (ahorro {pct}%)'},
+  fr:{monthLeft:'Avantages restants ce mois-ci',boostLeft:'Bonus de points restant',instLeft:'Remise immédiate',perBooking:'par réservation',bookings:'réservations',tickets:'Tickets',eligible:'Éligible',notYet:'Pas encore',nextLevel:'Niveau suivant',inherit:'Les niveaux supérieurs incluent les avantages des niveaux inférieurs.',toGo:'{next} — reste {amount}',maxLevel:'Niveau maximal atteint',noBooking:'Aucune réservation pendant 60 jours → rétrogradation automatique d’un niveau (notification).',title:'Adhésion + Niveaux (avantages cumulés)',subtitle:'L’adhésion offre des avantages immédiats ; les niveaux récompensent la fidélité.',plans:'Forfaits d’adhésion',monthlyBtn:'Mensuel',yearlyBtn:'Annuel (économisez {pct}%)'},
+  de:{monthLeft:'Verbleibende Vorteile diesen Monat',boostLeft:'Punkte-Boost verbleibend',instLeft:'Sofortrabatt',perBooking:'pro Buchung',bookings:'Buchungen',tickets:'Tickets',eligible:'Jetzt verfügbar',notYet:'Noch nicht',nextLevel:'Nächstes Level',inherit:'Höhere Stufen enthalten alle Vorteile der unteren.',toGo:'{next} — noch {amount}',maxLevel:'Höchste Stufe erreicht',noBooking:'60 Tage keine Buchung → automatische Herabstufung um 1 Stufe (Benachrichtigung).',title:'Mitgliedschaft + Level (gestapelte Vorteile)',subtitle:'Mitgliedschaft = Sofortvorteile; Level belohnen langfristige Aktivität.',plans:'Mitgliedschaftsoptionen',monthlyBtn:'Monatlich',yearlyBtn:'Jährlich (Spare {pct}%)'},
+  pt:{monthLeft:'Benefícios restantes neste mês',boostLeft:'Bônus de pontos restante',instLeft:'Desconto instantâneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegível agora',notYet:'Ainda não',nextLevel:'Próximo nível',inherit:'Níveis superiores incluem os benefícios dos inferiores.',toGo:'{next} — faltam {amount}',maxLevel:'Nível máximo atingido',noBooking:'Sem reservas por 60 dias → rebaixamento automático de 1 nível (com aviso).',title:'Assinatura + Níveis (benefícios acumulados)',subtitle:'A assinatura dá vantagens imediatas; os níveis recompensam a fidelidade.',plans:'Planos de assinatura',monthlyBtn:'Mensal',yearlyBtn:'Anual (economize {pct}%)'},
+  zh:{monthLeft:'本月剩余权益',boostLeft:'积分加成剩余',instLeft:'即时折扣',perBooking:'每次预订',bookings:'次',tickets:'票券',eligible:'可领取',notYet:'暂不可',nextLevel:'下一级',inherit:'高等级包含所有低等级权益。',toGo:'{next} — 还差 {amount}',maxLevel:'已达最高等级',noBooking:'60天未预订 → 自动降级一级（会发送通知）。',title:'会员 + 等级（权益叠加）',subtitle:'会员提供即时权益；等级奖励长期活跃。两者结合使用收益最大。',plans:'会员方案',monthlyBtn:'按月',yearlyBtn:'按年（省{pct}%）'},
+  ru:{monthLeft:'Оставшиеся привилегии в этом месяце',boostLeft:'Остаток бонусных баллов',instLeft:'Мгновенная скидка',perBooking:'за бронирование',bookings:'раз',tickets:'Тикеты',eligible:'Доступно',notYet:'Пока нет',nextLevel:'Следующий уровень',inherit:'Высшие уровни включают привилегии нижних.',toGo:'{next} — осталось {amount}',maxLevel:'Достигнут максимальный уровень',noBooking:'Нет бронирований 60 дней → автопонижение на 1 уровень (с уведомлением).',title:'Подписка + уровни (накопление привилегий)',subtitle:'Подписка даёт мгновенные бонусы; уровни — за долгосрочную активность.',plans:'Планы подписки',monthlyBtn:'Ежемесячно',yearlyBtn:'Ежегодно (экономия {pct}%)'},
+  ar:{monthLeft:'المتبقي هذا الشهر',boostLeft:'رصيد تعزيز النقاط',instLeft:'خصم فوري',perBooking:'لكل حجز',bookings:'حجوزات',tickets:'تذاكر',eligible:'متاح الآن',notYet:'ليس بعد',nextLevel:'المستوى التالي',inherit:'المستويات الأعلى تتضمن مزايا الأدنى.',toGo:'{next} — متبقٍ {amount}',maxLevel:'تم بلوغ أعلى مستوى',noBooking:'لا حجوزات لمدة 60 يوماً → خفض تلقائي بمستوى واحد (مع إشعار).',title:'العضوية + المستويات (مزايا متراكمة)',subtitle:'العضوية تمنح مزايا فورية؛ المستويات تكافئ النشاط طويل الأمد.',plans:'خطط العضوية',monthlyBtn:'شهري',yearlyBtn:'سنوي (وفر {pct}%)'}
+};
 
-    <!-- 레벨 혜택 카드 -->
-    <section id="tiersGrid" class="tier-grid" style="margin-top:16px">
-      <article class="tier-card" data-tier="Bronze">
-        <h3>🥉 <span id="lbl_bronze">Bronze</span></h3>
-        <div class="benefits">
-          <div class="benefit"><i>•</i><div>—</div></div>
-          <div class="benefit"><i>•</i><div>Member-only offers</div></div>
-        </div>
-      </article>
-      <article class="tier-card" data-tier="Silver">
-        <h3>🥈 <span id="lbl_silver">Silver</span></h3>
-        <div class="benefits">
-          <div class="benefit"><i>•</i><div>3% points back</div></div>
-          <div class="benefit"><i>•</i><div>Priority support</div></div>
-          <div class="benefit"><i>•</i><div>Waitlist priority</div></div>
-        </div>
-      </article>
-      <article class="tier-card" data-tier="Gold">
-        <h3>🥇 <span id="lbl_gold">Gold</span></h3>
-        <div class="benefits">
-          <div class="benefit"><i>•</i><div>5% points back</div></div>
-          <div class="benefit"><i>•</i><div>Priority support</div></div>
-          <div class="benefit"><i>•</i><div>Early check-in / Late check-out (host-provided)</div></div>
-          <div class="benefit"><i>•</i><div>Flexible cancellation (24h, where allowed)</div></div>
-        </div>
-      </article>
-      <article class="tier-card" data-tier="Platinum">
-        <h3>💎 <span id="lbl_platinum">Platinum</span></h3>
-        <div class="benefits">
-          <div class="benefit"><i>•</i><div>7% points back</div></div>
-          <div class="benefit"><i>•</i><div>Room upgrade when available</div></div>
-          <div class="benefit"><i>•</i><div>Secret Deals+ (host-funded)</div></div>
-          <div class="benefit"><i>•</i><div>Dedicated support channel</div></div>
-          <div class="benefit"><i>•</i><div>Birthday month ×2 points</div></div>
-        </div>
-      </article>
-      <article class="tier-card" data-tier="Diamond">
-        <h3>🔷 <span id="lbl_diamond">Diamond</span></h3>
-        <div class="benefits">
-          <div class="benefit"><i>•</i><div>10% points back</div></div>
-          <div class="benefit"><i>•</i><div>Room upgrade when available</div></div>
-          <div class="benefit"><i>•</i><div>Secret Deals+ (host-funded)</div></div>
-          <div class="benefit"><i>•</i><div>Airport lounge (partners)</div></div>
-          <div class="benefit"><i>•</i><div>Airport pickup (partners)</div></div>
-          <div class="benefit"><i>•</i><div>Overbooking protection</div></div>
-        </div>
-      </article>
-      <article class="tier-card" data-tier="Elite">
-        <h3>👑 <span id="lbl_elite">Elite</span></h3>
-        <div class="benefits">
-          <div class="benefit"><i>•</i><div>15% points back</div></div>
-          <div class="benefit"><i>•</i><div>VIP concierge (AI+staff, 3 sessions/mo)</div></div>
-          <div class="benefit"><i>•</i><div>Status match (invite-only)</div></div>
-          <div class="benefit"><i>•</i><div>Invite-only Secret Deals++</div></div>
-        </div>
-      </article>
-    </section>
+const BENEFIT_I18N = {
+  en:{dash:'—',member_offers:'Member-only offers',points3:'3% points back',points5:'5% points back',points7:'7% points back',points10:'10% points back',points15:'15% points back',priority_support:'Priority support',waitlist_priority:'Waitlist priority',early_late:'Early check-in / Late check-out (host-provided)',flexible_24h:'Flexible cancellation (24h, where allowed)',upgrade_avail:'Room upgrade when available',secret_deals:'Secret Deals+ (host-funded)',birthday_2x:'Birthday month ×2 points',lounge_partner:'Airport lounge (partners)',pickup_partner:'Airport pickup (partners)',overbooking_protect:'Overbooking protection',concierge_vip:'VIP concierge (AI+staff, 3 sessions/mo)',dedicated_channel:'Dedicated support channel',status_match:'Status match (invite-only)',secret_deals_plus:'Invite-only Secret Deals++'},
+  ko:{dash:'—',member_offers:'멤버 전용 오퍼',points3:'3% 포인트 백',points5:'5% 포인트 백',points7:'7% 포인트 백',points10:'10% 포인트 백',points15:'15% 포인트 백',priority_support:'우선 상담',waitlist_priority:'대기자 우선',early_late:'얼리 체크인 / 레이트 체크아웃 (호스트 제공)',flexible_24h:'유연 취소 (24시간, 정책 허용 시)',upgrade_avail:'객실 업그레이드 (가능 시)',secret_deals:'시크릿 딜+ (호스트 부담)',birthday_2x:'생일 달 포인트 2배',lounge_partner:'공항 라운지 (제휴)',pickup_partner:'공항 픽업 (제휴)',overbooking_protect:'오버부킹 보호',concierge_vip:'VIP 컨시어지 (AI+스태프, 월 3회)',dedicated_channel:'전용 지원 채널',status_match:'상태 매칭 (초대 한정)',secret_deals_plus:'인바이트 전용 시크릿 딜++'}
+};
 
-    <!-- 멤버십 요금제 -->
-    <section class="card" style="margin-top:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <h2 id="plansHeader" style="margin:0">Membership Plans</h2>
+// ===== helpers =====
+function t(key){ const pack = I18N[state.lang] || I18N.en; return pack[key] ?? I18N.en[key] ?? key; }
+function bt(key){ const lang=(state.lang||'en').toLowerCase(); const pack=BENEFIT_I18N[lang]||BENEFIT_I18N.en; return pack[key]||BENEFIT_I18N.en[key]||key; }
 
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <!-- ✅ 통화 드롭다운 (10개) -->
-          <select id="currencySelect" aria-label="Currency">
-            <option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option><option>KRW</option>
-            <option>CNY</option><option>MXN</option><option>BRL</option><option>RUB</option><option>AUD</option>
-          </select>
+// Currency (10)
+const SUPPORTED_CUR = new Set(['USD','EUR','GBP','JPY','KRW','CNY','MXN','BRL','RUB','AUD']);
+const FX = { USD:1, EUR:0.92, GBP:0.78, JPY:155, KRW:1350, CNY:7.3, MXN:18, BRL:5.3, RUB:90, AUD:1.5 };
+const ZERO_DEC = new Set(['JPY','KRW']);
 
-          <!-- 월간/연간 토글 -->
-          <div style="display:flex;border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden">
-            <button id="billMonthly" class="bill-btn" style="padding:8px 12px;background:#182033;color:#fff;border:0">Monthly</button>
-            <button id="billYearly" class="bill-btn" style="padding:8px 12px;background:transparent;color:#cfe;border:0">Yearly</button>
-          </div>
-        </div>
-      </div>
+function regionCurrency10(region){
+  switch(region){
+    case 'US': return 'USD'; case 'GB': return 'GBP'; case 'AU': return 'AUD';
+    case 'JP': return 'JPY'; case 'KR': return 'KRW'; case 'CN': return 'CNY';
+    case 'MX': return 'MXN'; case 'BR': return 'BRL'; case 'RU': return 'RUB';
+    case 'FR': case 'DE': case 'ES': case 'IT': case 'NL': case 'BE': case 'AT':
+    case 'IE': case 'PT': case 'FI': case 'GR': case 'SK': case 'SI': case 'HR': return 'EUR';
+    default: return null;
+  }
+}
+function langCurrency10(lang){
+  switch(lang){
+    case 'ko': return 'KRW'; case 'ja': return 'JPY'; case 'zh': return 'CNY';
+    case 'es': return 'MXN'; case 'fr': case 'de': return 'EUR';
+    case 'pt': return 'BRL'; case 'ru': return 'RUB'; case 'en': return 'USD';
+    case 'ar': return 'USD'; default: return 'USD';
+  }
+}
+function detectRegionTag(){
+  const tag = document.documentElement.getAttribute('lang') || navigator.language || 'en-US';
+  const parts = tag.split('-'); for (let i=parts.length-1;i>=0;i--){ const s=parts[i]; if (s.length===2) return s.toUpperCase(); }
+  return 'US';
+}
 
-      <div class="tier-grid" style="margin-top:12px">
-        <!-- BASIC -->
-        <article class="tier-card tier-muted">
-          <h3>Basic (Free)</h3>
-          <div class="benefit"><i>•</i><div>Booking, Reviews, Points</div></div>
-          <div class="benefit"><i>•</i><div>Loyalty Levels (Bronze→Elite)</div></div>
-          <button class="btn-basic">Keep Basic</button>
-        </article>
+// ===== STATE =====
+const params = new URLSearchParams(location.search);
+const OVERRIDE_LANG = params.get('lang');
+const OVERRIDE_CURR = params.get('currency');
+const state = {
+  lang:(OVERRIDE_LANG || (document.documentElement.getAttribute('lang')||navigator.language||'en')).split('-')[0],
+  currency:'USD',
+  userPickedCurrency:false,
+  billing:'monthly',
+  profile:null, membership:null, usage:null
+};
 
-        <!-- PLUS -->
-        <article class="tier-card" id="planPlus">
-          <h3>PLUS <small id="pricePlus" style="opacity:.8">$9.99 / mo</small></h3>
-          <div class="benefit"><i>•</i><div><b>+2% points boost</b> <small class="note">cap: up to $400 spend/mo (max $8)</small></div></div>
-          <div class="benefit"><i>•</i><div><b>0% booking fee / instant discount</b> <small class="note">cap: $10/booking × 3 per month</small></div></div>
-          <div class="benefit"><i>•</i><div>Early check-in / Late check-out <small class="note">(host-provided)</small></div></div>
-          <div class="benefit"><i>•</i><div>Secret Deals <small class="note">(host-funded)</small></div></div>
-          <div class="benefit"><i>•</i><div><b>Ticket</b> (delayed): 1× free-night after <b>2 months + $500</b></div></div>
-          <button id="btnPlusCheckout" class="btn-buy">Start PLUS</button>
-        </article>
+function pickCurrency10(){
+  if (OVERRIDE_CURR && SUPPORTED_CUR.has(OVERRIDE_CURR.toUpperCase())) return OVERRIDE_CURR.toUpperCase();
+  const region = regionCurrency10(detectRegionTag()); if (region && SUPPORTED_CUR.has(region)) return region;
+  const byLang = langCurrency10(state.lang); if (SUPPORTED_CUR.has(byLang)) return byLang;
+  return 'USD';
+}
+state.currency = pickCurrency10();
 
-        <!-- BLACK -->
-        <article class="tier-card" id="planBlack">
-          <h3>BLACK <small id="priceBlack" style="opacity:.8">$24.99 / mo</small></h3>
-          <div class="benefit"><i>•</i><div><b>+4% points boost</b> <small class="note">cap: up to $600 spend/mo (max $24)</small></div></div>
-          <div class="benefit"><i>•</i><div><b>0% booking fee / instant discount</b> <small class="note">cap: $20/booking × 5 per month</small></div></div>
-          <div class="benefit"><i>•</i><div>VIP concierge (AI+staff) <small class="note">3 sessions/mo (extra paid)</small></div></div>
-          <div class="benefit"><i>•</i><div>Airport lounge & pickup <small class="note">(partners)</small></div></div>
-          <div class="benefit"><i>•</i><div><b>Tickets</b> (delayed): 2× free-night after <b>3 months + $1200</b></div></div>
-          <button id="btnBlackCheckout" class="btn-buy">Upgrade to BLACK</button>
-        </article>
-      </div>
+function moneyUSDtoLocal(usd){
+  const code = state.currency, rate = FX[code] || 1;
+  const v = usd * rate * SAFETY_MARGIN;
+  const localeGuess =
+    (state.lang==='ko')?'ko-KR':(state.lang==='ja')?'ja-JP':(state.lang==='es')?'es-ES':
+    (state.lang==='fr')?'fr-FR':(state.lang==='de')?'de-DE':(state.lang==='pt')?'pt-PT':
+    (state.lang==='zh')?'zh-CN':(state.lang==='ru')?'ru-RU':(state.lang==='ar')?'ar-SA':'en-US';
+  return new Intl.NumberFormat(localeGuess, { style:'currency', currency:code, maximumFractionDigits: ZERO_DEC.has(code)?0:2 }).format(v);
+}
 
-      <small class="note" style="display:block;margin-top:10px">
-        * All benefits have monthly caps. Early check-in/upgrade/secret deals are host-funded → our cost = 0. Higher tiers include all lower-level benefits.
-      </small>
-    </section>
-  </main>
+// ===== DOM helpers =====
+const $=id=>document.getElementById(id);
+const setText=(id,txt)=>{const el=$(id); if(el) el.textContent=txt;};
+const setGauge=(id,pct)=>{const el=$(id); if(el) el.style.width=`${Math.max(0,Math.min(100,pct))}%`;};
 
-  <!-- 스크립트: 순서 중요 (lang.js 후 membership.js) -->
-  <script src="/scripts/header.js" defer></script>
-  <script src="/lang.js" defer></script>
-  <script type="module" src="/membership.js?v=final6"></script>
-  <script src="/assets/login-modal.js"></script>
-</body>
-</html>
+// ===== Levels =====
+function levelFromSpend(usd12m){ let idx=0; for(let i=0;i<LEVELS.length;i++){ if(usd12m>=LEVELS[i].minUSD) idx=i; } return {index:idx,name:LEVELS[idx].name}; }
+function nextLevelProgress(usd12m){
+  const cur=levelFromSpend(usd12m), curMin=LEVELS[cur.index].minUSD, next=LEVELS[cur.index+1];
+  if(!next) return {next:null,pct:100,leftUSD:0};
+  const span=next.minUSD-curMin, done=Math.max(0,usd12m-curMin);
+  return {next:next.name,pct:Math.max(0,Math.min(100,(done/span)*100)),leftUSD:Math.max(0,next.minUSD-usd12m)};
+}
+
+// ===== Stacked Benefits =====
+function getMergedBenefits(){
+  const LEVEL_BENEFIT_KEYS={
+    Bronze:['dash','member_offers'],
+    Silver:['points3','priority_support','waitlist_priority'],
+    Gold:['points5','priority_support','early_late','flexible_24h'],
+    Platinum:['points7','upgrade_avail','secret_deals','dedicated_channel','birthday_2x'],
+    Diamond:['points10','upgrade_avail','secret_deals','lounge_partner','pickup_partner','overbooking_protect'],
+    Elite:['points15','concierge_vip','status_match','secret_deals_plus']
+  };
+  const order=['Bronze','Silver','Gold','Platinum','Diamond','Elite'];
+  const merged={}, acc=[]; let bestPointsKey=null;
+  const rank=k=>{const m=/^points(\d+)$/.exec(k); return m?parseInt(m[1],10):-1;};
+
+  for(const name of order){
+    for(const k of LEVEL_BENEFIT_KEYS[name]){
+      if(k.startsWith('points')){
+        if(!bestPointsKey || rank(k)>rank(bestPointsKey)){
+          if(bestPointsKey){ const idx=acc.findIndex(x=>x===bt(bestPointsKey)); if(idx>=0) acc.splice(idx,1); }
+          bestPointsKey=k; acc.push(bt(k));
+        }
+      }else{
+        const label=bt(k); if(!acc.includes(label)) acc.push(label);
+      }
+    }
+    merged[name]=acc.slice();
+  }
+  return merged;
+}
+function renderBenefits(){
+  const merged=getMergedBenefits();
+  document.querySelectorAll('.tier-card[data-tier]').forEach(card=>{
+    const tier=card.getAttribute('data-tier'); const box=card.querySelector('.benefits');
+    if(!box||!merged[tier]) return;
+    box.innerHTML = merged[tier].map(v=>`<div class="benefit"><i>•</i><div>${v}</div></div>`).join('');
+  });
+  setText('inheritNote', t('inherit'));
+}
+function guardBenefits(){
+  const target=$('tiersGrid'); if(!target) return; let timer=null;
+  const mo=new MutationObserver(()=>{clearTimeout(timer); timer=setTimeout(renderBenefits,40);});
+  mo.observe(target,{subtree:true,childList:true,characterData:true}); renderBenefits();
+}
+
+// ===== Pricing =====
+function yearlyUSD(monthlyUSD){ return ROUND_UP_TO_0_01(monthlyUSD * 12 * YEARLY_DISCOUNT_RATE); }
+function renderPrices(){
+  const billing = state.billing;
+  const p = (billing==='yearly')
+    ? { plus: yearlyUSD(MONTHLY_PRICES_USD.plus), black: yearlyUSD(MONTHLY_PRICES_USD.black) }
+    : { plus: MONTHLY_PRICES_USD.plus,            black: MONTHLY_PRICES_USD.black };
+
+  setText('pricePlus',  moneyUSDtoLocal(p.plus)  + (billing==='yearly'?' / yr':' / mo'));
+  setText('priceBlack', moneyUSDtoLocal(p.black) + (billing==='yearly'?' / yr':' / mo'));
+
+  const m=$('billMonthly'), y=$('billYearly');
+  if(m) m.textContent = t('monthlyBtn');
+  if(y){ const pct=Math.round((1-YEARLY_DISCOUNT_RATE)*100); y.textContent = t('yearlyBtn').replace('{pct}', `${pct}`); }
+}
+
+// ===== Usage left =====
+function renderUsageLeft(){
+  const m=state.membership; if(!m||!m.plan||!PLAN_CAPS[m.plan]) return;
+  const caps=PLAN_CAPS[m.plan]; const u=state.usage||{boostUSDGranted:0,discountBookingsUsed:0};
+  const boostLeftUSD=Math.max(0, caps.boostMaxUSD - (u.boostUSDGranted||0));
+  const bookingsLeft=Math.max(0, (caps.bookingsPerMonth||0) - (u.discountBookingsUsed||0));
+
+  setText('lbl_perksLeft',t('monthLeft'));
+  setText('lbl_boostLeft',t('boostLeft')+':');
+  setText('lbl_discountLeft',t('instLeft')+':');
+  setText('lbl_bookings',t('bookings'));
+  setText('uiBoostLeft', moneyUSDtoLocal(boostLeftUSD));
+  setText('uiDiscountPerBooking', moneyUSDtoLocal(caps.discountPerBookingUSD));
+  setText('uiDiscountRemaining', `${bookingsLeft}`);
+
+  const eligible = (m.plan==='black' && (state.profile?.monthsActive||0)>=3 && (state.profile?.lifetimeSpend||0)>=1200) ||
+                   (m.plan==='plus'  && (state.profile?.monthsActive||0)>=2 && (state.profile?.lifetimeSpend||0)>=500);
+  setText('lbl_ticketsEligible', t('tickets')+':');
+  setText('uiTicketsEligible', eligible ? t('eligible') : t('notYet'));
+}
+
+// ===== Next level =====
+function renderNextLevel(){
+  const spend12m = state.profile?.spend12mUSD ?? state.profile?.lifetimeSpend ?? 0;
+  const cur=levelFromSpend(spend12m), nx=nextLevelProgress(spend12m);
+  setText('levelTitle', `Your Level: ${cur.name}`);
+  setText('lbl_nextLevel', t('nextLevel'));
+
+  const badgeMap={Bronze:'0%',Silver:'3%',Gold:'5%',Platinum:'7%',Diamond:'10%',Elite:'15%'};
+  const badge=$('#tierBadge'); if(badge) badge.textContent=`${badgeMap[cur.name]||'0%'} back`;
+
+  if(nx.next){
+    setText('nextLevelLine', t('toGo').replace('{next}',nx.next).replace('{amount}', moneyUSDtoLocal(nx.leftUSD)));
+    setGauge('nextLevelGaugeFill', nx.pct); setText('nextLevelPct', `${Math.round(nx.pct)}%`);
+  }else{
+    setText('nextLevelLine', t('maxLevel')); setGauge('nextLevelGaugeFill',100); setText('nextLevelPct','100%');
+  }
+  setGauge('gaugeFill', nx.pct); setText('progressPct', `${Math.round(nx.pct)}%`);
+}
+
+// ===== Billing toggle =====
+function wireBilling(){
+  const m=$('billMonthly'), y=$('billYearly');
+  if(m) m.addEventListener('click', ()=>{ state.billing='monthly'; renderPrices(); });
+  if(y) y.addEventListener('click', ()=>{ state.billing='yearly';  renderPrices(); });
+}
+
+// ===== Language / Currency wiring =====
+function setCurrency(code){
+  code = (code||'').toUpperCase();
+  if (!SUPPORTED_CUR.has(code)) return;
+  state.currency = code;
+  state.userPickedCurrency = true; // user manually changed
+  renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits();
+}
+function setLanguage(lang){
+  if (!lang) return;
+  state.lang = lang.split('-')[0];
+
+  // auto currency by language unless user picked manually
+  if (!state.userPickedCurrency) {
+    state.currency = langCurrency10(state.lang) || state.currency;
+    const sel = $('currencySelect'); if (sel && SUPPORTED_CUR.has(state.currency)) sel.value = state.currency;
+  }
+
+  applyStaticTexts();
+  renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits();
+}
+window.addEventListener('lang-change', (e)=> setLanguage(e.detail?.lang));
+
+function observeHtmlLang(){
+  let last = (document.documentElement.getAttribute('lang') || '').split('-')[0] || 'en';
+  try{
+    const mo = new MutationObserver(()=>{
+      const cur = (document.documentElement.getAttribute('lang') || '').split('-')[0] || 'en';
+      if (cur !== last){ last = cur; setLanguage(cur); }
+    });
+    mo.observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });
+  }catch(e){}
+}
+
+function wireCurrencySelector(){
+  const sel = $('currencySelect'); if (!sel) return;
+  if (SUPPORTED_CUR.has(state.currency)) sel.value = state.currency;
+  sel.addEventListener('change', ()=> setCurrency(sel.value));
+}
+
+// ===== Static texts =====
+function applyStaticTexts(){
+  setText('dwTop', t('noBooking'));
+  setText('mb_title', t('title'));
+  setText('mb_subtitle', t('subtitle'));
+  const header = document.getElementById('plansHeader') || document.querySelector('section.card h2');
+  if (header) header.textContent = t('plans');
+}
+
+// ===== Demo data (replace with Firebase) =====
+async function fetchProfileAndUsage(){
+  state.profile    = { spend12mUSD: 920, lifetimeSpend: 1800, monthsActive: 4 };
+  state.membership = { plan:'plus', billing: state.billing, active:true };
+  state.usage      = { boostUSDGranted: 3.5, discountBookingsUsed: 1 };
+}
+
+// ===== Init =====
+async function start(){
+  await fetchProfileAndUsage();
+  guardBenefits();
+  applyStaticTexts();
+  renderPrices();
+  renderUsageLeft();
+  renderNextLevel();
+  wireBilling();
+  wireCurrencySelector();
+  observeHtmlLang();      // watch <html lang>
+  setLanguage(state.lang); // ensure initial language render
+}
+if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start);
+else start();
