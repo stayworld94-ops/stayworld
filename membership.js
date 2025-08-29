@@ -1,14 +1,8 @@
-// membership.js — FINAL4 (Live FX 통합)
-// - lang-change 실시간 반영
-// - 통화 선택 드롭다운(10개) 즉시 반영
-// - 실시간 환율: ExchangeRate-API 키 08df811def76a1ffa0c97f4a
-// - 연간 소폭 할인(손해방지 올림)
-// - 상위 레벨 = 하위 혜택 누적 (포인트 %는 최고치만 표시)
-// - ✅ t(), bt() 함수 수정 → state.lang만 참조 (번역 즉시 반영)
+// membership.js — FINAL6 (10 langs + currency auto + stacked benefits + yearly discount)
 
 // ===== CONFIG =====
-const SAFETY_MARGIN = 1.07;          // 표시가에 7% 마진
-const YEARLY_DISCOUNT_RATE = 0.92;   // 연간 약 8% 할인
+const SAFETY_MARGIN = 1.07;          // price display safety margin
+const YEARLY_DISCOUNT_RATE = 0.92;   // ~8% off yearly
 const ROUND_UP_TO_0_01 = v => Math.ceil(v * 100) / 100;
 
 const PLAN_CAPS = {
@@ -25,63 +19,37 @@ const LEVELS = [
   { name:'Elite',    minUSD:6000 },
 ];
 
-// 월 정가(USD)
+// monthly base prices (USD)
 const MONTHLY_PRICES_USD = { plus: 9.99, black: 24.99 };
 
-// ===== I18N (UI 라벨) =====
+// ===== I18N — 10 languages =====
 const I18N = {
-  en:{monthLeft:'This month remaining',boostLeft:'Points boost left',instLeft:'Instant discount',perBooking:'per booking',bookings:'bookings',tickets:'Tickets',eligible:'Eligible now',notYet:'Not yet',nextLevel:'Next level',inherit:'Higher tiers include all lower-level benefits.',toGo:'{next} — {amount} left',maxLevel:'Top level reached'},
-  ko:{monthLeft:'이번 달 남은 혜택',boostLeft:'포인트 부스트 잔여',instLeft:'즉시할인 잔여',perBooking:'예약당',bookings:'회',tickets:'티켓',eligible:'지급 가능',notYet:'아직 조건 미달',nextLevel:'다음 레벨',inherit:'상위 레벨은 하위 레벨 혜택을 모두 포함합니다.',toGo:'{next} — {amount} 남음',maxLevel:'최상위 레벨입니다'},
-  ja:{monthLeft:'今月の残り特典',boostLeft:'ポイントブースト残高',instLeft:'即時割引残高',perBooking:'予約ごと',bookings:'回',tickets:'チケット',eligible:'受取可能',notYet:'まだ条件未達',nextLevel:'次のレベル',inherit:'上位レベルは下位の特典をすべて含みます。',toGo:'{next} — 残り {amount}',maxLevel:'最上位レベルです'},
-  es:{monthLeft:'Beneficios restantes este mes',boostLeft:'Impulso de puntos restante',instLeft:'Descuento instantáneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegible ahora',notYet:'Aún no',nextLevel:'Siguiente nivel',inherit:'Los niveles superiores incluyen los beneficios de los inferiores.',toGo:'{next} — faltan {amount}',maxLevel:'Nivel máximo alcanzado'},
-  fr:{monthLeft:'Avantages restants ce mois-ci',boostLeft:'Bonus de points restant',instLeft:'Remise immédiate',perBooking:'par réservation',bookings:'réservations',tickets:'Tickets',eligible:'Éligible',notYet:'Pas encore',nextLevel:'Niveau suivant',inherit:'Les niveaux supérieurs incluent les avantages des niveaux inférieurs.',toGo:'{next} — reste {amount}',maxLevel:'Niveau maximal atteint'},
-  de:{monthLeft:'Verbleibende Vorteile diesen Monat',boostLeft:'Punkte-Boost verbleibend',instLeft:'Sofortrabatt',perBooking:'pro Buchung',bookings:'Buchungen',tickets:'Tickets',eligible:'Jetzt verfügbar',notYet:'Noch nicht',nextLevel:'Nächstes Level',inherit:'Höhere Stufen enthalten alle Vorteile der unteren.',toGo:'{next} — noch {amount}',maxLevel:'Höchste Stufe erreicht'},
-  pt:{monthLeft:'Benefícios restantes neste mês',boostLeft:'Bônus de pontos restante',instLeft:'Desconto instantâneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegível agora',notYet:'Ainda não',nextLevel:'Próximo nível',inherit:'Níveis superiores incluem os benefícios dos inferiores.',toGo:'{next} — faltam {amount}',maxLevel:'Nível máximo atingido'},
-  zh:{monthLeft:'本月剩余权益',boostLeft:'积分加成剩余',instLeft:'即时折扣',perBooking:'每次预订',bookings:'次',tickets:'票券',eligible:'可领取',notYet:'暂不可',nextLevel:'下一级',inherit:'高等级包含所有低等级权益。',toGo:'{next} — 还差 {amount}',maxLevel:'已达最高等级'},
-  ru:{monthLeft:'Оставшиеся привилегии в этом месяце',boostLeft:'Остаток бонусных баллов',instLeft:'Мгновенная скидка',perBooking:'за бронирование',bookings:'раз',tickets:'Тикеты',eligible:'Доступно',notYet:'Пока нет',nextLevel:'Следующий уровень',inherit:'Высшие уровни включают все привилегии нижних.',toGo:'{next} — осталось {amount}',maxLevel:'Достигнут максимальный уровень'},
-  ar:{monthLeft:'المتبقي هذا الشهر',boostLeft:'رصيد تعزيز النقاط',instLeft:'خصم فوري',perBooking:'لكل حجز',bookings:'حجوزات',tickets:'تذاكر',eligible:'متاح الآن',notYet:'ليس بعد',nextLevel:'المستوى التالي',inherit:'المستويات الأعلى تتضمن مزايا المستويات الأدنى.',toGo:'{next} — متبقٍ {amount}',maxLevel:'أعلى مستوى'}
+  en:{monthLeft:'This month remaining',boostLeft:'Points boost left',instLeft:'Instant discount',perBooking:'per booking',bookings:'bookings',tickets:'Tickets',eligible:'Eligible now',notYet:'Not yet',nextLevel:'Next level',inherit:'Higher tiers include all lower-level benefits.',toGo:'{next} — {amount} left',maxLevel:'Top level reached',noBooking:'No booking for 60 days → auto demotion by 1 level (notification sent).',title:'Membership + Levels (Stacked Benefits)',subtitle:'Membership gives instant perks; levels reward long-term activity. Use both for maximum value.',plans:'Membership Plans',monthlyBtn:'Monthly',yearlyBtn:'Yearly (save {pct}%)'},
+  ko:{monthLeft:'이번 달 남은 혜택',boostLeft:'포인트 부스트 잔여',instLeft:'즉시할인 잔여',perBooking:'예약당',bookings:'회',tickets:'티켓',eligible:'지급 가능',notYet:'아직 조건 미달',nextLevel:'다음 레벨',inherit:'상위 레벨은 하위 레벨 혜택을 모두 포함합니다.',toGo:'{next} — {amount} 남음',maxLevel:'최상위 레벨입니다',noBooking:'60일 동안 예약이 없으면 1단계 자동 강등 (알림 발송).',title:'멤버십 + 레벨 (혜택 누적)',subtitle:'멤버십은 즉시 혜택을 제공하고, 레벨은 장기 활동을 보상합니다. 두 가지를 모두 활용하세요.',plans:'멤버십 요금제',monthlyBtn:'월간',yearlyBtn:'연간 (약 {pct}% 할인)'},
+  ja:{monthLeft:'今月の残り特典',boostLeft:'ポイントブースト残高',instLeft:'即時割引残高',perBooking:'予約ごと',bookings:'回',tickets:'チケット',eligible:'受取可能',notYet:'まだ条件未達',nextLevel:'次のレベル',inherit:'上位レベルは下位の特典をすべて含みます。',toGo:'{next} — 残り {amount}',maxLevel:'最上位レベルです',noBooking:'60日間予約がない場合、1レベル自動降格（通知あり）。',title:'メンバーシップ + レベル（特典スタック）',subtitle:'メンバーシップは即時特典、レベルは長期の活動を評価します。',plans:'メンバーシッププラン',monthlyBtn:'月額',yearlyBtn:'年額（約{pct}%割引）'},
+  es:{monthLeft:'Beneficios restantes este mes',boostLeft:'Impulso de puntos restante',instLeft:'Descuento instantáneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegible ahora',notYet:'Aún no',nextLevel:'Siguiente nivel',inherit:'Los niveles superiores incluyen los beneficios de los inferiores.',toGo:'{next} — faltan {amount}',maxLevel:'Nivel máximo alcanzado',noBooking:'Sin reservas durante 60 días → degradación automática de 1 nivel (con aviso).',title:'Membresía + Niveles (beneficios acumulados)',subtitle:'La membresía da beneficios instantáneos; los niveles premian la actividad a largo plazo.',plans:'Planes de membresía',monthlyBtn:'Mensual',yearlyBtn:'Anual (ahorro {pct}%)'},
+  fr:{monthLeft:'Avantages restants ce mois-ci',boostLeft:'Bonus de points restant',instLeft:'Remise immédiate',perBooking:'par réservation',bookings:'réservations',tickets:'Tickets',eligible:'Éligible',notYet:'Pas encore',nextLevel:'Niveau suivant',inherit:'Les niveaux supérieurs incluent les avantages des niveaux inférieurs.',toGo:'{next} — reste {amount}',maxLevel:'Niveau maximal atteint',noBooking:'Aucune réservation pendant 60 jours → rétrogradation automatique d’un niveau (notification).',title:'Adhésion + Niveaux (avantages cumulés)',subtitle:'L’adhésion offre des avantages immédiats ; les niveaux récompensent la fidélité.',plans:'Forfaits d’adhésion',monthlyBtn:'Mensuel',yearlyBtn:'Annuel (économisez {pct}%)'},
+  de:{monthLeft:'Verbleibende Vorteile diesen Monat',boostLeft:'Punkte-Boost verbleibend',instLeft:'Sofortrabatt',perBooking:'pro Buchung',bookings:'Buchungen',tickets:'Tickets',eligible:'Jetzt verfügbar',notYet:'Noch nicht',nextLevel:'Nächstes Level',inherit:'Höhere Stufen enthalten alle Vorteile der unteren.',toGo:'{next} — noch {amount}',maxLevel:'Höchste Stufe erreicht',noBooking:'60 Tage keine Buchung → automatische Herabstufung um 1 Stufe (Benachrichtigung).',title:'Mitgliedschaft + Level (gestapelte Vorteile)',subtitle:'Mitgliedschaft = Sofortvorteile; Level belohnen langfristige Aktivität.',plans:'Mitgliedschaftsoptionen',monthlyBtn:'Monatlich',yearlyBtn:'Jährlich (Spare {pct}%)'},
+  pt:{monthLeft:'Benefícios restantes neste mês',boostLeft:'Bônus de pontos restante',instLeft:'Desconto instantâneo',perBooking:'por reserva',bookings:'reservas',tickets:'Tickets',eligible:'Elegível agora',notYet:'Ainda não',nextLevel:'Próximo nível',inherit:'Níveis superiores incluem os benefícios dos inferiores.',toGo:'{next} — faltam {amount}',maxLevel:'Nível máximo atingido',noBooking:'Sem reservas por 60 dias → rebaixamento automático de 1 nível (com aviso).',title:'Assinatura + Níveis (benefícios acumulados)',subtitle:'A assinatura dá vantagens imediatas; os níveis recompensam a fidelidade.',plans:'Planos de assinatura',monthlyBtn:'Mensal',yearlyBtn:'Anual (economize {pct}%)'},
+  zh:{monthLeft:'本月剩余权益',boostLeft:'积分加成剩余',instLeft:'即时折扣',perBooking:'每次预订',bookings:'次',tickets:'票券',eligible:'可领取',notYet:'暂不可',nextLevel:'下一级',inherit:'高等级包含所有低等级权益。',toGo:'{next} — 还差 {amount}',maxLevel:'已达最高等级',noBooking:'60天未预订 → 自动降级一级（会发送通知）。',title:'会员 + 等级（权益叠加）',subtitle:'会员提供即时权益；等级奖励长期活跃。两者结合使用收益最大。',plans:'会员方案',monthlyBtn:'按月',yearlyBtn:'按年（省{pct}%）'},
+  ru:{monthLeft:'Оставшиеся привилегии в этом месяце',boostLeft:'Остаток бонусных баллов',instLeft:'Мгновенная скидка',perBooking:'за бронирование',bookings:'раз',tickets:'Тикеты',eligible:'Доступно',notYet:'Пока нет',nextLevel:'Следующий уровень',inherit:'Высшие уровни включают привилегии нижних.',toGo:'{next} — осталось {amount}',maxLevel:'Достигнут максимальный уровень',noBooking:'Нет бронирований 60 дней → автопонижение на 1 уровень (с уведомлением).',title:'Подписка + уровни (накопление привилегий)',subtitle:'Подписка даёт мгновенные бонусы; уровни — за долгосрочную активность.',plans:'Планы подписки',monthlyBtn:'Ежемесячно',yearlyBtn:'Ежегодно (экономия {pct}%)'},
+  ar:{monthLeft:'المتبقي هذا الشهر',boostLeft:'رصيد تعزيز النقاط',instLeft:'خصم فوري',perBooking:'لكل حجز',bookings:'حجوزات',tickets:'تذاكر',eligible:'متاح الآن',notYet:'ليس بعد',nextLevel:'المستوى التالي',inherit:'المستويات الأعلى تتضمن مزايا الأدنى.',toGo:'{next} — متبقٍ {amount}',maxLevel:'تم بلوغ أعلى مستوى',noBooking:'لا حجوزات لمدة 60 يوماً → خفض تلقائي بمستوى واحد (مع إشعار).',title:'العضوية + المستويات (مزايا متراكمة)',subtitle:'العضوية تمنح مزايا فورية؛ المستويات تكافئ النشاط طويل الأمد.',plans:'خطط العضوية',monthlyBtn:'شهري',yearlyBtn:'سنوي (وفر {pct}%)'}
 };
 
-// 혜택 문구 I18N
+// Benefit copy
 const BENEFIT_I18N = {
   en:{dash:'—',member_offers:'Member-only offers',points3:'3% points back',points5:'5% points back',points7:'7% points back',points10:'10% points back',points15:'15% points back',priority_support:'Priority support',waitlist_priority:'Waitlist priority',early_late:'Early check-in / Late check-out (host-provided)',flexible_24h:'Flexible cancellation (24h, where allowed)',upgrade_avail:'Room upgrade when available',secret_deals:'Secret Deals+ (host-funded)',birthday_2x:'Birthday month ×2 points',lounge_partner:'Airport lounge (partners)',pickup_partner:'Airport pickup (partners)',overbooking_protect:'Overbooking protection',concierge_vip:'VIP concierge (AI+staff, 3 sessions/mo)',dedicated_channel:'Dedicated support channel',status_match:'Status match (invite-only)',secret_deals_plus:'Invite-only Secret Deals++'},
   ko:{dash:'—',member_offers:'멤버 전용 오퍼',points3:'3% 포인트 백',points5:'5% 포인트 백',points7:'7% 포인트 백',points10:'10% 포인트 백',points15:'15% 포인트 백',priority_support:'우선 상담',waitlist_priority:'대기자 우선',early_late:'얼리 체크인 / 레이트 체크아웃 (호스트 제공)',flexible_24h:'유연 취소 (24시간, 정책 허용 시)',upgrade_avail:'객실 업그레이드 (가능 시)',secret_deals:'시크릿 딜+ (호스트 부담)',birthday_2x:'생일 달 포인트 2배',lounge_partner:'공항 라운지 (제휴)',pickup_partner:'공항 픽업 (제휴)',overbooking_protect:'오버부킹 보호',concierge_vip:'VIP 컨시어지 (AI+스태프, 월 3회)',dedicated_channel:'전용 지원 채널',status_match:'상태 매칭 (초대 한정)',secret_deals_plus:'인바이트 전용 시크릿 딜++'}
 };
 
-// ===== UTIL =====
-const $ = id => document.getElementById(id);
-const setText = (id,txt)=>{ const el=$(id); if(el) el.textContent=txt; };
-const setGauge = (id,pct)=>{ const el=$(id); if(el) el.style.width=`${Math.max(0,Math.min(100,pct))}%`; };
+// ===== helpers =====
+function t(key){ const pack = I18N[state.lang] || I18N.en; return pack[key] ?? I18N.en[key] ?? key; }
+function bt(key){ const lang=(state.lang||'en').toLowerCase(); const pack=BENEFIT_I18N[lang]||BENEFIT_I18N.en; return pack[key]||BENEFIT_I18N.en[key]||key; }
 
-// ===== CURRENCY (10종) =====
+// Currency (10)
 const SUPPORTED_CUR = new Set(['USD','EUR','GBP','JPY','KRW','CNY','MXN','BRL','RUB','AUD']);
+const FX = { USD:1, EUR:0.92, GBP:0.78, JPY:155, KRW:1350, CNY:7.3, MXN:18, BRL:5.3, RUB:90, AUD:1.5 };
 const ZERO_DEC = new Set(['JPY','KRW']);
-
-// 실시간 환율 (USD 기준). 초기값은 USD=1만 두고 API로 채움
-let FX = { USD:1 };
-
-async function fetchLiveRates(base='USD'){
-  try{
-    const r = await fetch(`https://v6.exchangerate-api.com/v6/08df811def76a1ffa0c97f4a/latest/${base}`);
-    const data = await r.json();
-    if(data.result === 'success' && data.conversion_rates){
-      // 필요한 10종만 뽑아 저장
-      const cr = data.conversion_rates;
-      const next = {};
-      SUPPORTED_CUR.forEach(cc => { if(cr[cc] != null) next[cc] = cr[cc]; });
-      next.USD = 1; // 보정
-      FX = next;
-      // 환율 반영
-      renderPrices();
-      renderUsageLeft();
-      console.log('[membership] FX updated', FX);
-    }else{
-      console.warn('[membership] FX API error', data);
-    }
-  }catch(e){
-    console.error('[membership] FX fetch failed', e);
-  }
-}
 
 function regionCurrency10(region){
   switch(region){
@@ -114,10 +82,9 @@ const OVERRIDE_CURR = params.get('currency');
 const state = {
   lang:(OVERRIDE_LANG || (document.documentElement.getAttribute('lang')||navigator.language||'en')).split('-')[0],
   currency:'USD',
+  userPickedCurrency:false,
   billing:'monthly',
-  profile:null,   // { monthsActive, lifetimeUSD } 등 외부 주입 가능
-  membership:null,// { plan:'plus'|'black' }
-  usage:null      // { boostUSDGranted, discountBookingsUsed }
+  profile:null, membership:null, usage:null
 };
 
 function pickCurrency10(){
@@ -128,18 +95,6 @@ function pickCurrency10(){
 }
 state.currency = pickCurrency10();
 
-// ===== I18N helpers =====
-function t(key){
-  const pack = I18N[state.lang] || I18N.en;
-  return pack[key] ?? I18N.en[key] ?? key;
-}
-function bt(key){
-  const lang = (state.lang || 'en').toLowerCase();
-  const pack = BENEFIT_I18N[lang] || BENEFIT_I18N.en;
-  return pack[key] || BENEFIT_I18N.en[key] || key;
-}
-
-// ===== MONEY =====
 function moneyUSDtoLocal(usd){
   const code = state.currency, rate = FX[code] || 1;
   const v = usd * rate * SAFETY_MARGIN;
@@ -150,6 +105,11 @@ function moneyUSDtoLocal(usd){
   return new Intl.NumberFormat(localeGuess, { style:'currency', currency:code, maximumFractionDigits: ZERO_DEC.has(code)?0:2 }).format(v);
 }
 
+// ===== DOM helpers =====
+const $=id=>document.getElementById(id);
+const setText=(id,txt)=>{const el=$(id); if(el) el.textContent=txt;};
+const setGauge=(id,pct)=>{const el=$(id); if(el) el.style.width=`${Math.max(0,Math.min(100,pct))}%`;};
+
 // ===== Levels =====
 function levelFromSpend(usd12m){ let idx=0; for(let i=0;i<LEVELS.length;i++){ if(usd12m>=LEVELS[i].minUSD) idx=i; } return {index:idx,name:LEVELS[idx].name}; }
 function nextLevelProgress(usd12m){
@@ -159,7 +119,7 @@ function nextLevelProgress(usd12m){
   return {next:next.name,pct:Math.max(0,Math.min(100,(done/span)*100)),leftUSD:Math.max(0,next.minUSD-usd12m)};
 }
 
-// ===== Stacked Benefits (상위=하위 포함, 포인트는 최고 %만) =====
+// ===== Stacked Benefits (higher includes lower; show best points %) =====
 function getMergedBenefits(){
   const LEVEL_BENEFIT_KEYS={
     Bronze:['dash','member_offers'],
@@ -177,9 +137,7 @@ function getMergedBenefits(){
     for(const k of LEVEL_BENEFIT_KEYS[name]){
       if(k.startsWith('points')){
         if(!bestPointsKey || rank(k)>rank(bestPointsKey)){
-          if(bestPointsKey){
-            const idx=acc.findIndex(x=>x===bt(bestPointsKey)); if(idx>=0) acc.splice(idx,1);
-          }
+          if(bestPointsKey){ const idx=acc.findIndex(x=>x===bt(bestPointsKey)); if(idx>=0) acc.splice(idx,1); }
           bestPointsKey=k; acc.push(bt(k));
         }
       }else{
@@ -217,11 +175,11 @@ function renderPrices(){
   setText('priceBlack', moneyUSDtoLocal(p.black) + (billing==='yearly'?' / yr':' / mo'));
 
   const m=$('billMonthly'), y=$('billYearly');
-  if(m) m.textContent='Monthly';
-  if(y) y.textContent=`Yearly (save ${Math.round((1-YEARLY_DISCOUNT_RATE)*100)}%)`;
+  if(m) m.textContent = t('monthlyBtn');
+  if(y){ const pct=Math.round((1-YEARLY_DISCOUNT_RATE)*100); y.textContent = t('yearlyBtn').replace('{pct}', `${pct}`); }
 }
 
-// ===== Usage left / Eligibility =====
+// ===== Usage left =====
 function renderUsageLeft(){
   const m=state.membership; if(!m||!m.plan||!PLAN_CAPS[m.plan]) return;
   const caps=PLAN_CAPS[m.plan]; const u=state.usage||{boostUSDGranted:0,discountBookingsUsed:0};
@@ -229,81 +187,113 @@ function renderUsageLeft(){
   const bookingsLeft=Math.max(0, (caps.bookingsPerMonth||0) - (u.discountBookingsUsed||0));
 
   setText('lbl_perksLeft',t('monthLeft'));
-  setText('lbl_boostLeft',t('boostLeft')+':'); setText('lbl_discountLeft',t('instLeft')+':'); setText('lbl_bookings',t('bookings'));
+  setText('lbl_boostLeft',t('boostLeft')+':');
+  setText('lbl_discountLeft',t('instLeft')+':');
+  setText('lbl_bookings',t('bookings'));
   setText('uiBoostLeft', moneyUSDtoLocal(boostLeftUSD));
   setText('uiDiscountPerBooking', moneyUSDtoLocal(caps.discountPerBookingUSD));
   setText('uiDiscountRemaining', `${bookingsLeft}`);
 
-  // 간단한 자격 예시 로직 (필요시 교체)
-  const monthsActive = state.profile?.monthsActive ?? 0;
-  const lifetimeUSD  = state.profile?.lifetimeUSD  ?? 0;
-  const eligible = (m.plan==='black' && monthsActive>=3 && lifetimeUSD>=300);
-  setText('uiEligible', eligible ? t('eligible') : t('notYet'));
+  const eligible = (m.plan==='black' && (state.profile?.monthsActive||0)>=3 && (state.profile?.lifetimeSpend||0)>=1200) ||
+                   (m.plan==='plus'  && (state.profile?.monthsActive||0)>=2 && (state.profile?.lifetimeSpend||0)>=500);
+  setText('lbl_ticketsEligible', t('tickets')+':');
+  setText('uiTicketsEligible', eligible ? t('eligible') : t('notYet'));
 }
 
-// ===== Level progress =====
-function renderProgress(){
-  const spentUSD = state.profile?.spent12mUSD ?? 0;
-  const cur = levelFromSpend(spentUSD);
-  const prog = nextLevelProgress(spentUSD);
-  setText('curLevel', cur.name);
-  if(prog.next){
-    setText('nextLevel', t('nextLevel'));
-    const leftStr = moneyUSDtoLocal(prog.leftUSD);
-    setText('nextLevelHint', t('toGo').replace('{next}', prog.next).replace('{amount}', leftStr));
+// ===== Next level =====
+function renderNextLevel(){
+  const spend12m = state.profile?.spend12mUSD ?? state.profile?.lifetimeSpend ?? 0;
+  const cur=levelFromSpend(spend12m), nx=nextLevelProgress(spend12m);
+  setText('levelTitle', `Your Level: ${cur.name}`);
+  setText('lbl_nextLevel', t('nextLevel'));
+
+  const badgeMap={Bronze:'0%',Silver:'3%',Gold:'5%',Platinum:'7%',Diamond:'10%',Elite:'15%'};
+  const badge=$('#tierBadge'); if(badge) badge.textContent=`${badgeMap[cur.name]||'0%'} back`;
+
+  if(nx.next){
+    setText('nextLevelLine', t('toGo').replace('{next}',nx.next).replace('{amount}', moneyUSDtoLocal(nx.leftUSD)));
+    setGauge('nextLevelGaugeFill', nx.pct); setText('nextLevelPct', `${Math.round(nx.pct)}%`);
   }else{
-    setText('nextLevel', t('maxLevel'));
-    setText('nextLevelHint','');
+    setText('nextLevelLine', t('maxLevel')); setGauge('nextLevelGaugeFill',100); setText('nextLevelPct','100%');
   }
-  setGauge('levelGauge', prog.pct);
+  setGauge('gaugeFill', nx.pct); setText('progressPct', `${Math.round(nx.pct)}%`);
 }
 
-// ===== Wiring (언어/통화/빌링 토글) =====
-function wireControls(){
-  const langSel = $('langSelect');
-  if(langSel){
-    langSel.value = state.lang;
-    langSel.addEventListener('change', ()=>{
-      state.lang = langSel.value.split('-')[0];
-      // 언어 바뀌면 통화도 합리적으로 재선택
-      state.currency = pickCurrency10();
-      renderBenefits(); renderPrices(); renderUsageLeft(); renderProgress();
-    });
+// ===== Billing toggle =====
+function wireBilling(){
+  const m=$('billMonthly'), y=$('billYearly');
+  if(m) m.addEventListener('click', ()=>{ state.billing='monthly'; renderPrices(); });
+  if(y) y.addEventListener('click', ()=>{ state.billing='yearly';  renderPrices(); });
+}
+
+// ===== Language / Currency wiring =====
+function setCurrency(code){
+  code = (code||'').toUpperCase();
+  if (!SUPPORTED_CUR.has(code)) return;
+  state.currency = code;
+  state.userPickedCurrency = true; // user manually changed
+  renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits();
+}
+function setLanguage(lang){
+  if (!lang) return;
+  state.lang = lang.split('-')[0];
+
+  // auto currency by language unless user picked manually
+  if (!state.userPickedCurrency) {
+    state.currency = langCurrency10(state.lang) || state.currency;
+    const sel = $('currencySelect'); if (sel && SUPPORTED_CUR.has(state.currency)) sel.value = state.currency;
   }
 
-  const curSel = $('currencySelect');
-  if(curSel){
-    // 10개 통화 옵션 채우기(이미 있으면 유지)
-    if(curSel.options.length < 10){
-      const codes = Array.from(SUPPORTED_CUR);
-      curSel.innerHTML = codes.map(c=>`<option value="${c}">${c}</option>`).join('');
-    }
-    curSel.value = state.currency;
-    curSel.addEventListener('change', ()=>{
-      state.currency = curSel.value;
-      renderPrices(); renderUsageLeft(); renderProgress();
-    });
-  }
+  applyStaticTexts();
+  renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits();
+}
+window.addEventListener('lang-change', (e)=> setLanguage(e.detail?.lang));
 
-  const billMonthly = $('billMonthlyBtn'), billYearly = $('billYearlyBtn');
-  billMonthly?.addEventListener('click', ()=>{ state.billing='monthly'; renderPrices(); });
-  billYearly?.addEventListener('click',  ()=>{ state.billing='yearly';  renderPrices(); });
+function observeHtmlLang(){
+  let last = (document.documentElement.getAttribute('lang') || '').split('-')[0] || 'en';
+  try{
+    const mo = new MutationObserver(()=>{
+      const cur = (document.documentElement.getAttribute('lang') || '').split('-')[0] || 'en';
+      if (cur !== last){ last = cur; setLanguage(cur); }
+    });
+    mo.observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });
+  }catch(e){}
+}
+
+function wireCurrencySelector(){
+  const sel = $('currencySelect'); if (!sel) return;
+  if (SUPPORTED_CUR.has(state.currency)) sel.value = state.currency;
+  sel.addEventListener('change', ()=> setCurrency(sel.value));
+}
+
+// ===== Static texts applied by language =====
+function applyStaticTexts(){
+  setText('dwTop', t('noBooking'));
+  setText('mb_title', t('title'));
+  setText('mb_subtitle', t('subtitle'));
+  const header = document.getElementById('plansHeader') || document.querySelector('section.card h2');
+  if (header) header.textContent = t('plans');
+}
+
+// ===== Demo data (replace with Firebase) =====
+async function fetchProfileAndUsage(){
+  state.profile    = { spend12mUSD: 920, lifetimeSpend: 1800, monthsActive: 4 };
+  state.membership = { plan:'plus', billing: state.billing, active:true };
+  state.usage      = { boostUSDGranted: 3.5, discountBookingsUsed: 1 };
 }
 
 // ===== Init =====
-function initMembership(){
+async function start(){
+  await fetchProfileAndUsage();
   guardBenefits();
-  wireControls();
-  renderBenefits();
+  applyStaticTexts();
   renderPrices();
   renderUsageLeft();
-  renderProgress();
-  // 실시간 환율 로드
-  fetchLiveRates('USD');
+  renderNextLevel();
+  wireBilling();
+  wireCurrencySelector();
+  observeHtmlLang();      // watch <html lang>
+  setLanguage(state.lang); // ensure initial language render
 }
-
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded', initMembership);
-}else{
-  initMembership();
-}
+if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start);
+else start();
