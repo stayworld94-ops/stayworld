@@ -1,9 +1,9 @@
-// membership.js — FINAL
-// 10 languages, 10 currencies, stacked benefits (with rich per-level additions),
-// monthly usage-left, next-level progress, locale overrides, safety margin FX.
+// membership.js — FINAL (no-loss yearly, stacked benefits, 10 langs/10 currencies)
 
-// ===== CONFIG (caps/prices/levels) =====
-const SAFETY_MARGIN = 1.07; // 7% margin to avoid loss
+// ===== CONFIG =====
+const SAFETY_MARGIN = 1.07;          // 표시 환율 안전마진
+const YEARLY_DISCOUNT_RATE = 0.92;   // 연간가 소폭 할인 = 8% (조절 가능)
+const ROUND_UP_TO_0_01 = v => Math.ceil(v*100)/100; // 손해 방지: 항상 올림
 
 const PLAN_CAPS = {
   plus:  { boostRate:0.02, boostMaxUSD:  8, discountPerBookingUSD:10, bookingsPerMonth:3 },
@@ -19,12 +19,10 @@ const LEVELS = [
   { name:'Elite',    minUSD:6000 },
 ];
 
-const PRICES_USD = {
-  monthly:{ plus: 9.99,  black: 24.99 },
-  yearly: { plus: 99.00, black: 249.00 }
-};
+// 월 정가 (원화/표시 변환은 아래 포맷터가 처리)
+const MONTHLY_PRICES_USD = { plus: 9.99, black: 24.99 };
 
-// ===== I18N (labels) =====
+// ===== I18N (UI 라벨) =====
 const I18N = {
   en:{monthLeft:'This month remaining',boostLeft:'Points boost left',instLeft:'Instant discount',perBooking:'per booking',bookings:'bookings',tickets:'Tickets',eligible:'Eligible now',notYet:'Not yet',nextLevel:'Next level',inherit:'Higher tiers include all lower-level benefits.',toGo:'{next} — {amount} left',maxLevel:'Top level reached'},
   ko:{monthLeft:'이번 달 남은 혜택',boostLeft:'포인트 부스트 잔여',instLeft:'즉시할인 잔여',perBooking:'예약당',bookings:'회',tickets:'티켓',eligible:'지급 가능',notYet:'아직 조건 미달',nextLevel:'다음 레벨',inherit:'상위 레벨은 하위 레벨 혜택을 모두 포함합니다.',toGo:'{next} — {amount} 남음',maxLevel:'최상위 레벨입니다'},
@@ -38,54 +36,10 @@ const I18N = {
   ar:{monthLeft:'المتبقي هذا الشهر',boostLeft:'رصيد تعزيز النقاط',instLeft:'خصم فوري',perBooking:'لكل حجز',bookings:'حجوزات',tickets:'تذاكر',eligible:'متاح الآن',notYet:'ليس بعد',nextLevel:'المستوى التالي',inherit:'المستويات الأعلى تتضمن مزايا المستويات الأدنى.',toGo:'{next} — متبقٍ {amount}',maxLevel:'أعلى مستوى'}
 };
 
-// 혜택 문구 i18n (영/한 제공, 그 외 언어는 en fallback)
+// 혜택 문구 (다국어)
 const BENEFIT_I18N = {
-  en: {
-    dash:'—',
-    member_offers:'Member-only offers',
-    points3:'3% points back',
-    points5:'5% points back',
-    points7:'7% points back',
-    points10:'10% points back',
-    points15:'15% points back',
-    priority_support:'Priority support',
-    waitlist_priority:'Waitlist priority',
-    early_late:'Early check-in / Late check-out (host-provided)',
-    flexible_24h:'Flexible cancellation (24h, where allowed)',
-    upgrade_avail:'Room upgrade when available',
-    secret_deals:'Secret Deals+ (host-funded)',
-    birthday_2x:'Birthday month ×2 points',
-    lounge_partner:'Airport lounge (partners)',
-    pickup_partner:'Airport pickup (partners)',
-    overbooking_protect:'Overbooking protection',
-    concierge_vip:'VIP concierge (AI+staff, 3 sessions/mo)',
-    dedicated_channel:'Dedicated support channel',
-    status_match:'Status match (invite-only)',
-    secret_deals_plus:'Invite-only Secret Deals++'
-  },
-  ko: {
-    dash:'—',
-    member_offers:'멤버 전용 오퍼',
-    points3:'3% 포인트 백',
-    points5:'5% 포인트 백',
-    points7:'7% 포인트 백',
-    points10:'10% 포인트 백',
-    points15:'15% 포인트 백',
-    priority_support:'우선 상담',
-    waitlist_priority:'대기자 우선',
-    early_late:'얼리 체크인 / 레이트 체크아웃 (호스트 제공)',
-    flexible_24h:'유연 취소 (24시간, 정책 허용 시)',
-    upgrade_avail:'객실 업그레이드 (가능 시)',
-    secret_deals:'시크릿 딜+ (호스트 부담)',
-    birthday_2x:'생일 달 포인트 2배',
-    lounge_partner:'공항 라운지 (제휴)',
-    pickup_partner:'공항 픽업 (제휴)',
-    overbooking_protect:'오버부킹 보호',
-    concierge_vip:'VIP 컨시어지 (AI+스태프, 월 3회)',
-    dedicated_channel:'전용 지원 채널',
-    status_match:'상태 매칭 (초대 한정)',
-    secret_deals_plus:'인바이트 전용 시크릿 딜++'
-  }
+  en:{dash:'—',member_offers:'Member-only offers',points3:'3% points back',points5:'5% points back',points7:'7% points back',points10:'10% points back',points15:'15% points back',priority_support:'Priority support',waitlist_priority:'Waitlist priority',early_late:'Early check-in / Late check-out (host-provided)',flexible_24h:'Flexible cancellation (24h, where allowed)',upgrade_avail:'Room upgrade when available',secret_deals:'Secret Deals+ (host-funded)',birthday_2x:'Birthday month ×2 points',lounge_partner:'Airport lounge (partners)',pickup_partner:'Airport pickup (partners)',overbooking_protect:'Overbooking protection',concierge_vip:'VIP concierge (AI+staff, 3 sessions/mo)',dedicated_channel:'Dedicated support channel',status_match:'Status match (invite-only)',secret_deals_plus:'Invite-only Secret Deals++'},
+  ko:{dash:'—',member_offers:'멤버 전용 오퍼',points3:'3% 포인트 백',points5:'5% 포인트 백',points7:'7% 포인트 백',points10:'10% 포인트 백',points15:'15% 포인트 백',priority_support:'우선 상담',waitlist_priority:'대기자 우선',early_late:'얼리 체크인 / 레이트 체크아웃 (호스트 제공)',flexible_24h:'유연 취소 (24시간, 정책 허용 시)',upgrade_avail:'객실 업그레이드 (가능 시)',secret_deals:'시크릿 딜+ (호스트 부담)',birthday_2x:'생일 달 포인트 2배',lounge_partner:'공항 라운지 (제휴)',pickup_partner:'공항 픽업 (제휴)',overbooking_protect:'오버부킹 보호',concierge_vip:'VIP 컨시어지 (AI+스태프, 월 3회)',dedicated_channel:'전용 지원 채널',status_match:'상태 매칭 (초대 한정)',secret_deals_plus:'인바이트 전용 시크릿 딜++'}
 };
 function bt(key){
   const lang = (new URLSearchParams(location.search).get('lang') || (document.documentElement.getAttribute('lang')||'').split('-')[0] || navigator.language.split('-')[0] || 'en').toLowerCase();
@@ -93,51 +47,32 @@ function bt(key){
   return pack[key] || BENEFIT_I18N.en[key] || key;
 }
 
-// ===== CURRENCY (10 only) =====
+// ===== CURRENCY (10종) =====
 const SUPPORTED_CUR = new Set(['USD','EUR','GBP','JPY','KRW','CNY','MXN','BRL','RUB','AUD']);
 const FX = { USD:1, EUR:0.92, GBP:0.78, JPY:155, KRW:1350, CNY:7.3, MXN:18, BRL:5.3, RUB:90, AUD:1.5 };
 const ZERO_DEC = new Set(['JPY','KRW']);
 
-// Region -> one of 10
 function regionCurrency10(region){
   switch(region){
-    case 'US': return 'USD';
-    case 'GB': return 'GBP';
-    case 'AU': return 'AUD';
-    case 'JP': return 'JPY';
-    case 'KR': return 'KRW';
-    case 'CN': return 'CNY';
-    case 'MX': return 'MXN';
-    case 'BR': return 'BRL';
-    case 'RU': return 'RUB';
-    // EU → EUR
+    case 'US': return 'USD'; case 'GB': return 'GBP'; case 'AU': return 'AUD';
+    case 'JP': return 'JPY'; case 'KR': return 'KRW'; case 'CN': return 'CNY';
+    case 'MX': return 'MXN'; case 'BR': return 'BRL'; case 'RU': return 'RUB';
     case 'FR': case 'DE': case 'ES': case 'IT': case 'NL': case 'BE': case 'AT':
-    case 'IE': case 'PT': case 'FI': case 'GR': case 'SK': case 'SI': case 'HR':
-      return 'EUR';
+    case 'IE': case 'PT': case 'FI': case 'GR': case 'SK': case 'SI': case 'HR': return 'EUR';
     default: return null;
   }
 }
 function langCurrency10(lang){
   switch(lang){
-    case 'ko': return 'KRW';
-    case 'ja': return 'JPY';
-    case 'zh': return 'CNY';
-    case 'es': return 'MXN';
-    case 'fr': case 'de': return 'EUR';
-    case 'pt': return 'BRL';
-    case 'ru': return 'RUB';
-    case 'en': return 'USD';
-    case 'ar': return 'USD'; // 10통화 제한 내에서 USD로 통일
-    default: return 'USD';
+    case 'ko': return 'KRW'; case 'ja': return 'JPY'; case 'zh': return 'CNY';
+    case 'es': return 'MXN'; case 'fr': case 'de': return 'EUR';
+    case 'pt': return 'BRL'; case 'ru': return 'RUB'; case 'en': return 'USD';
+    case 'ar': return 'USD'; default: return 'USD';
   }
 }
 function detectRegionTag(){
   const tag = document.documentElement.getAttribute('lang') || navigator.language || 'en-US';
-  const parts = tag.split('-');
-  for (let i=parts.length-1;i>=0;i--){
-    const s = parts[i];
-    if (s.length===2) return s.toUpperCase();
-  }
+  const parts = tag.split('-'); for (let i=parts.length-1;i>=0;i--){ const s=parts[i]; if (s.length===2) return s.toUpperCase(); }
   return 'US';
 }
 
@@ -145,183 +80,152 @@ function detectRegionTag(){
 const params = new URLSearchParams(location.search);
 const OVERRIDE_LANG = params.get('lang');     // ko, en, ...
 const OVERRIDE_CURR = params.get('currency'); // KRW, USD, ...
-const state = {
-  lang: (OVERRIDE_LANG || (document.documentElement.getAttribute('lang') || navigator.language || 'en')).split('-')[0],
-  currency: 'USD',
-  billing:'monthly',
-  profile:null, membership:null, usage:null
-};
+const state = { lang:(OVERRIDE_LANG || (document.documentElement.getAttribute('lang')||navigator.language||'en')).split('-')[0], currency:'USD', billing:'monthly', profile:null, membership:null, usage:null };
+
 function pickCurrency10(){
   if (OVERRIDE_CURR && SUPPORTED_CUR.has(OVERRIDE_CURR.toUpperCase())) return OVERRIDE_CURR.toUpperCase();
-  const region = regionCurrency10(detectRegionTag());
-  if (region && SUPPORTED_CUR.has(region)) return region;
-  const byLang = langCurrency10(state.lang);
-  if (SUPPORTED_CUR.has(byLang)) return byLang;
+  const region = regionCurrency10(detectRegionTag()); if (region && SUPPORTED_CUR.has(region)) return region;
+  const byLang = langCurrency10(state.lang); if (SUPPORTED_CUR.has(byLang)) return byLang;
   return 'USD';
 }
 state.currency = pickCurrency10();
 
-function t(key){
-  const pack = I18N[OVERRIDE_LANG || state.lang] || I18N.en;
-  return pack[key] ?? I18N.en[key] ?? key;
-}
+function t(key){ const pack = I18N[OVERRIDE_LANG || state.lang] || I18N.en; return pack[key] ?? I18N.en[key] ?? key; }
 function moneyUSDtoLocal(usd){
-  const code = state.currency;
-  const rate = FX[code] || 1;
+  const code = state.currency, rate = FX[code] || 1;
   const v = usd * rate * SAFETY_MARGIN;
   const localeGuess =
-    (state.lang==='ko')?'ko-KR':
-    (state.lang==='ja')?'ja-JP':
-    (state.lang==='es')?'es-ES':
-    (state.lang==='fr')?'fr-FR':
-    (state.lang==='de')?'de-DE':
-    (state.lang==='pt')?'pt-PT':
-    (state.lang==='zh')?'zh-CN':
-    (state.lang==='ru')?'ru-RU':
-    (state.lang==='ar')?'ar-SA':'en-US';
-  return new Intl.NumberFormat(localeGuess, {
-    style:'currency',
-    currency: code,
-    maximumFractionDigits: ZERO_DEC.has(code)?0:2
-  }).format(v);
+    (state.lang==='ko')?'ko-KR':(state.lang==='ja')?'ja-JP':(state.lang==='es')?'es-ES':
+    (state.lang==='fr')?'fr-FR':(state.lang==='de')?'de-DE':(state.lang==='pt')?'pt-PT':
+    (state.lang==='zh')?'zh-CN':(state.lang==='ru')?'ru-RU':(state.lang==='ar')?'ar-SA':'en-US';
+  return new Intl.NumberFormat(localeGuess, { style:'currency', currency:code, maximumFractionDigits: ZERO_DEC.has(code)?0:2 }).format(v);
 }
 
 // ===== DOM helpers =====
-const $ = id => document.getElementById(id);
-const setText = (id, text) => { const el=$(id); if (el) el.textContent=text; };
-const setGauge = (id, pct) => { const el=$(id); if (el) el.style.width = `${Math.max(0,Math.min(100,pct))}%`; };
+const $=id=>document.getElementById(id);
+const setText=(id,txt)=>{const el=$(id); if(el) el.textContent=txt;};
+const setGauge=(id,pct)=>{const el=$(id); if(el) el.style.width=`${Math.max(0,Math.min(100,pct))}%`;};
 
 // ===== Level logic =====
-function levelFromSpend(usd12m){
-  let idx=0; for (let i=0;i<LEVELS.length;i++){ if (usd12m>=LEVELS[i].minUSD) idx=i; }
-  return { index:idx, name:LEVELS[idx].name };
-}
+function levelFromSpend(usd12m){ let idx=0; for(let i=0;i<LEVELS.length;i++){ if(usd12m>=LEVELS[i].minUSD) idx=i; } return {index:idx,name:LEVELS[idx].name}; }
 function nextLevelProgress(usd12m){
-  const cur = levelFromSpend(usd12m);
-  const curMin = LEVELS[cur.index].minUSD;
-  const next = LEVELS[cur.index+1];
-  if (!next) return { next:null, pct:100, leftUSD:0 };
-  const span = next.minUSD - curMin;
-  const done = Math.max(0, usd12m - curMin);
-  return { next: next.name, pct: Math.max(0,Math.min(100,(done/span)*100)), leftUSD: Math.max(0,next.minUSD-usd12m) };
+  const cur=levelFromSpend(usd12m), curMin=LEVELS[cur.index].minUSD, next=LEVELS[cur.index+1];
+  if(!next) return {next:null,pct:100,leftUSD:0};
+  const span=next.minUSD-curMin, done=Math.max(0,usd12m-curMin);
+  return {next:next.name,pct:Math.max(0,Math.min(100,(done/span)*100)),leftUSD:Math.max(0,next.minUSD-usd12m)};
 }
 
-// ===== Stacked Benefits (expanded) =====
+// ===== Stacked Benefits (상위=하위 포함, 포인트는 최상위 %만 표시) =====
 function getMergedBenefits(){
-  // 레벨별 "추가" 혜택 (상위로 갈수록 더해짐)
-  const LEVEL_BENEFIT_KEYS = {
-    Bronze:   ['dash','member_offers'],
-    Silver:   ['points3','priority_support','waitlist_priority'],
-    Gold:     ['points5','priority_support','early_late','flexible_24h'],
-    Platinum: ['points7','upgrade_avail','secret_deals','dedicated_channel','birthday_2x'],
-    Diamond:  ['points10','upgrade_avail','secret_deals','lounge_partner','pickup_partner','overbooking_protect'],
-    Elite:    ['points15','concierge_vip','status_match','secret_deals_plus']
+  const LEVEL_BENEFIT_KEYS={
+    Bronze:['dash','member_offers'],
+    Silver:['points3','priority_support','waitlist_priority'],
+    Gold:['points5','priority_support','early_late','flexible_24h'],
+    Platinum:['points7','upgrade_avail','secret_deals','dedicated_channel','birthday_2x'],
+    Diamond:['points10','upgrade_avail','secret_deals','lounge_partner','pickup_partner','overbooking_protect'],
+    Elite:['points15','concierge_vip','status_match','secret_deals_plus']
   };
   const order=['Bronze','Silver','Gold','Platinum','Diamond','Elite'];
-  const merged={}, acc=[];
-  for (const name of order){
-    const add = LEVEL_BENEFIT_KEYS[name].map(bt);
-    acc.push(...add);
-    merged[name] = Array.from(new Set(acc)); // 누적 + 중복 제거
+  const merged={}, acc=[]; let bestPointsKey=null;
+  const rank=k=>{const m=/^points(\d+)$/.exec(k); return m?parseInt(m[1],10):-1;};
+
+  for(const name of order){
+    for(const k of LEVEL_BENEFIT_KEYS[name]){
+      if(k.startsWith('points')){
+        if(!bestPointsKey || rank(k)>rank(bestPointsKey)){
+          if(bestPointsKey){
+            const idx=acc.findIndex(x=>x===bt(bestPointsKey)); if(idx>=0) acc.splice(idx,1);
+          }
+          bestPointsKey=k; acc.push(bt(k));
+        }
+      }else{
+        const label=bt(k); if(!acc.includes(label)) acc.push(label);
+      }
+    }
+    merged[name]=acc.slice();
   }
   return merged;
 }
 function renderBenefits(){
-  const merged = getMergedBenefits();
+  const merged=getMergedBenefits();
   document.querySelectorAll('.tier-card[data-tier]').forEach(card=>{
-    const tier = card.getAttribute('data-tier');
-    const box  = card.querySelector('.benefits');
-    if (!box || !merged[tier]) return;
+    const tier=card.getAttribute('data-tier'); const box=card.querySelector('.benefits');
+    if(!box||!merged[tier]) return;
     box.innerHTML = merged[tier].map(v=>`<div class="benefit"><i>•</i><div>${v}</div></div>`).join('');
   });
   setText('inheritNote', t('inherit'));
 }
-// lang.js 등이 DOM을 바꿔도 복구
 function guardBenefits(){
-  const target = $('#tiersGrid'); if (!target) return;
-  let timer=null;
-  const mo=new MutationObserver(()=>{ clearTimeout(timer); timer=setTimeout(renderBenefits, 40); });
-  mo.observe(target,{subtree:true,childList:true,characterData:true});
-  renderBenefits();
+  const target=$('tiersGrid'); if(!target) return; let timer=null;
+  const mo=new MutationObserver(()=>{clearTimeout(timer); timer=setTimeout(renderBenefits,40);});
+  mo.observe(target,{subtree:true,childList:true,characterData:true}); renderBenefits();
 }
 
-// ===== Prices =====
+// ===== Pricing (연간 = 월×12×할인, 손해방지: 올림, 라벨 업데이트) =====
+function yearlyUSD(monthlyUSD){
+  return ROUND_UP_TO_0_01(monthlyUSD * 12 * YEARLY_DISCOUNT_RATE);
+}
 function renderPrices(){
-  const p = PRICES_USD[state.billing];
-  setText('pricePlus',  moneyUSDtoLocal(p.plus)  + (state.billing==='yearly'?' / yr':' / mo'));
-  setText('priceBlack', moneyUSDtoLocal(p.black) + (state.billing==='yearly'?' / yr':' / mo'));
+  const billing = state.billing;
+  const p = (billing==='yearly')
+    ? { plus: yearlyUSD(MONTHLY_PRICES_USD.plus), black: yearlyUSD(MONTHLY_PRICES_USD.black) }
+    : { plus: MONTHLY_PRICES_USD.plus,            black: MONTHLY_PRICES_USD.black };
+
+  setText('pricePlus',  moneyUSDtoLocal(p.plus)  + (billing==='yearly'?' / yr':' / mo'));
+  setText('priceBlack', moneyUSDtoLocal(p.black) + (billing==='yearly'?' / yr':' / mo'));
+
+  const m=$('billMonthly'), y=$('billYearly');
+  if(m) m.textContent='Monthly';
+  if(y) y.textContent=`Yearly (save ${Math.round((1-YEARLY_DISCOUNT_RATE)*100)}%)`;
 }
 
 // ===== Monthly usage-left =====
 function renderUsageLeft(){
-  const m = state.membership;
-  if (!m || !m.plan || !PLAN_CAPS[m.plan]) return;
-  const caps = PLAN_CAPS[m.plan];
-  const u = state.usage || { boostUSDGranted:0, discountBookingsUsed:0 };
+  const m=state.membership; if(!m||!m.plan||!PLAN_CAPS[m.plan]) return;
+  const caps=PLAN_CAPS[m.plan]; const u=state.usage||{boostUSDGranted:0,discountBookingsUsed:0};
+  const boostLeftUSD=Math.max(0, caps.boostMaxUSD - (u.boostUSDGranted||0));
+  const bookingsLeft=Math.max(0, (caps.bookingsPerMonth||0) - (u.discountBookingsUsed||0));
 
-  const boostLeftUSD = Math.max(0, caps.boostMaxUSD - (u.boostUSDGranted||0));
-  const bookingsLeft = Math.max(0, (caps.bookingsPerMonth||0) - (u.discountBookingsUsed||0));
-
-  setText('lbl_perksLeft', t('monthLeft'));
-  setText('lbl_boostLeft', t('boostLeft') + ':');
-  setText('lbl_discountLeft', t('instLeft') + ':');
-  setText('lbl_bookings', t('bookings'));
+  setText('lbl_perksLeft',t('monthLeft'));
+  setText('lbl_boostLeft',t('boostLeft')+':'); setText('lbl_discountLeft',t('instLeft')+':'); setText('lbl_bookings',t('bookings'));
   setText('uiBoostLeft', moneyUSDtoLocal(boostLeftUSD));
   setText('uiDiscountPerBooking', moneyUSDtoLocal(caps.discountPerBookingUSD));
   setText('uiDiscountRemaining', `${bookingsLeft}`);
 
-  const eligible =
-    (m.plan==='black' && (state.profile?.monthsActive||0) >= 3 && (state.profile?.lifetimeSpend||0) >= 1200) ||
-    (m.plan==='plus'  && (state.profile?.monthsActive||0) >= 2 && (state.profile?.lifetimeSpend||0) >= 500);
-  setText('lbl_ticketsEligible', t('tickets') + ':');
+  const eligible = (m.plan==='black' && (state.profile?.monthsActive||0)>=3 && (state.profile?.lifetimeSpend||0)>=1200) ||
+                   (m.plan==='plus'  && (state.profile?.monthsActive||0)>=2 && (state.profile?.lifetimeSpend||0)>=500);
+  setText('lbl_ticketsEligible', t('tickets')+':');
   setText('uiTicketsEligible', eligible ? t('eligible') : t('notYet'));
 }
 
 // ===== Next level =====
 function renderNextLevel(){
   const spend12m = state.profile?.spend12mUSD ?? state.profile?.lifetimeSpend ?? 0;
-  const cur = levelFromSpend(spend12m);
-  const nx  = nextLevelProgress(spend12m);
-
+  const cur=levelFromSpend(spend12m), nx=nextLevelProgress(spend12m);
   setText('levelTitle', `Your Level: ${cur.name}`);
   setText('lbl_nextLevel', t('nextLevel'));
 
-  const badgeMap = { Bronze:'0%', Silver:'3%', Gold:'5%', Platinum:'7%', Diamond:'10%', Elite:'15%' };
-  const badge = $('#tierBadge'); if (badge) badge.textContent = `${badgeMap[cur.name]||'0%'} back`;
+  const badgeMap={Bronze:'0%',Silver:'3%',Gold:'5%',Platinum:'7%',Diamond:'10%',Elite:'15%'};
+  const badge=$('#tierBadge'); if(badge) badge.textContent=`${badgeMap[cur.name]||'0%'} back`;
 
-  if (nx.next){
-    setText('nextLevelLine', t('toGo').replace('{next}', nx.next).replace('{amount}', moneyUSDtoLocal(nx.leftUSD)));
-    setGauge('nextLevelGaugeFill', nx.pct);
-    setText('nextLevelPct', `${Math.round(nx.pct)}%`);
-  } else {
-    setText('nextLevelLine', t('maxLevel'));
-    setGauge('nextLevelGaugeFill', 100);
-    setText('nextLevelPct', '100%');
+  if(nx.next){
+    setText('nextLevelLine', t('toGo').replace('{next}',nx.next).replace('{amount}', moneyUSDtoLocal(nx.leftUSD)));
+    setGauge('nextLevelGaugeFill', nx.pct); setText('nextLevelPct', `${Math.round(nx.pct)}%`);
+  }else{
+    setText('nextLevelLine', t('maxLevel')); setGauge('nextLevelGaugeFill',100); setText('nextLevelPct','100%');
   }
-  setGauge('gaugeFill', nx.pct);
-  setText('progressPct', `${Math.round(nx.pct)}%`);
+  setGauge('gaugeFill', nx.pct); setText('progressPct', `${Math.round(nx.pct)}%`);
 }
 
 // ===== Billing toggle =====
 function wireBilling(){
   const m=$('billMonthly'), y=$('billYearly');
-  if (m) m.addEventListener('click', ()=>{ state.billing='monthly'; renderPrices(); });
-  if (y) y.addEventListener('click', ()=>{ state.billing='yearly';  renderPrices(); });
+  if(m) m.addEventListener('click', ()=>{ state.billing='monthly'; renderPrices(); });
+  if(y) y.addEventListener('click', ()=>{ state.billing='yearly';  renderPrices(); });
 }
 
-// ===== Data (demo → replace with Firebase reads) =====
+// ===== Demo data (Firebase 연결 전 임시) =====
 async function fetchProfileAndUsage(){
-  // Example Firebase:
-  // import { getAuth } from 'firebase/auth';
-  // import { getFirestore, doc, getDoc } from 'firebase/firestore';
-  // const uid = getAuth().currentUser?.uid;
-  // const db  = getFirestore();
-  // state.profile    = (await getDoc(doc(db,'users',uid))).data();
-  // const yyyymm = new Date().toISOString().slice(0,7).replace('-','');
-  // state.usage      = (await getDoc(doc(db,'usage',`${uid}_${yyyymm}`))).data();
-  // state.membership = (await getDoc(doc(db,'memberships',uid))).data();
-
-  // Demo defaults (non-empty UI)
   state.profile    = { spend12mUSD: 920, lifetimeSpend: 1800, monthsActive: 4 };
   state.membership = { plan:'plus', billing: state.billing, active:true };
   state.usage      = { boostUSDGranted: 3.5, discountBookingsUsed: 1 };
@@ -341,5 +245,4 @@ async function start(){
   renderNextLevel();
   wireBilling();
 }
-if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start);
-else start();
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
