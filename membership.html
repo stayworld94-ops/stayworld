@@ -116,12 +116,25 @@
       </article>
     </section>
 
+    <!-- Membership plans header: 버튼 + 통화 선택 드롭다운 -->
     <section class="card" style="margin-top:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
         <h2 style="margin:0">Membership Plans</h2>
-        <div style="display:flex;border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden">
-          <button id="billMonthly" class="bill-btn" style="padding:8px 12px;background:#182033;color:#fff;border:0">Monthly</button>
-          <button id="billYearly" class="bill-btn" style="padding:8px 12px;background:transparent;color:#cfe;border:0">Yearly (save 8%)</button>
+
+        <!-- ✅ 한 줄에 배치 (버튼 + 통화 선택) -->
+        <div style="display:flex;align-items:center;gap:10px;">
+          <!-- 결제 주기 버튼 -->
+          <div style="display:flex;border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden">
+            <button id="billMonthly" class="bill-btn" style="padding:8px 12px;background:#182033;color:#fff;border:0">Monthly</button>
+            <button id="billYearly" class="bill-btn" style="padding:8px 12px;background:transparent;color:#cfe;border:0">Yearly (save 8%)</button>
+          </div>
+
+          <!-- ✅ 통화 선택 (10개) -->
+          <select id="currencySelect"
+            style="padding:8px 10px;background:#121a2a;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:10px">
+            <option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option><option>KRW</option>
+            <option>CNY</option><option>MXN</option><option>BRL</option><option>RUB</option><option>AUD</option>
+          </select>
         </div>
       </div>
 
@@ -160,9 +173,10 @@
     </section>
   </main>
 
+  <!-- 스크립트 순서 중요: lang.js → membership.js -->
   <script src="/scripts/header.js" defer></script>
   <script src="/lang.js" defer></script>
-  <script type="module" src="/membership.js?v=final"></script>
+  <script type="module" src="/membership.js?v=final2"></script>
   <script src="/assets/login-modal.js"></script>
 </body>
 </html>
