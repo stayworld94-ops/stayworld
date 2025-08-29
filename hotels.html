@@ -35,6 +35,11 @@
     .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;text-decoration:none;border:1px solid var(--line);color:var(--text);cursor:pointer}
     .btn.gold{background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#121212;border:none;font-weight:800}
     .btn.ghost:hover{background:var(--chip)}
+    .btn.yellow{
+      background:linear-gradient(180deg,#f4d78c,#c9a35b);
+      color:#111;border:none;font-weight:800;
+    }
+    .btn.yellow:hover{filter:brightness(.95)}
     @media(max-width:880px){.sw-nav,.sw-cta{display:none}}
 
     /* Top controls */
@@ -70,8 +75,9 @@
 
     /* Map (inline) */
     #map{height:520px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
-    /* 필터보다 아래 */
+    /* 지도/필터 z-index 충돌 방지 */
     #map,.leaflet-container,.leaflet-pane,.leaflet-control-container{z-index:0!important}
+    #filterPanel,.filter-panel,.filter-backdrop{z-index:1100}
 
     /* Footer */
     footer.sw-footer{margin-top:24px;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(16,16,24,.7),rgba(16,16,24,0));padding:24px 16px}
@@ -82,8 +88,8 @@
     .sw-copy{max-width:1200px;margin:6px auto 0 auto;color:var(--muted);font-size:12px}
 
     /* Filter drawer (기존) */
-    .filter-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);display:none;z-index:120}
-    .filter-panel{position:fixed;right:0;top:0;bottom:0;width:380px;max-width:92vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(0,0,0,.4);z-index:130;transform:translateX(100%);transition:transform .25s ease}
+    .filter-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);display:none}
+    .filter-panel{position:fixed;right:0;top:0;bottom:0;width:380px;max-width:92vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(0,0,0,.4);transform:translateX(100%);transition:transform .25s ease}
     .filter-open .filter-panel{transform:translateX(0)}
     .filter-open .filter-backdrop{display:block}
     .filter-head{display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid var(--line)}
@@ -97,10 +103,8 @@
     .btn.reset{background:transparent;color:var(--muted)}
     .checks{display:flex;flex-wrap:wrap;gap:8px}
     .checks label{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border:1px solid var(--line);padding:6px 8px;border-radius:10px}
-    /* 필터가 항상 위 */
-    #filterPanel,.filter-panel,.filter-backdrop{z-index:1100}
 
-    /* ===== Map Drawer (새로 추가) ===== */
+    /* ===== Map Drawer ===== */
     .map-drawer{position:fixed;top:var(--header-h);right:0;height:calc(100vh - var(--header-h));width:min(520px,92vw);background:#0d0f15;border-left:1px solid var(--line);transform:translateX(110%);transition:transform .25s ease;z-index:1200;display:grid;grid-template-rows:auto 1fr;box-shadow:-14px 0 28px rgba(0,0,0,.35)}
     .map-drawer.open{transform:translateX(0)}
     .map-drawer__head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:rgba(255,255,255,.04);border-bottom:1px solid var(--line)}
@@ -112,7 +116,10 @@
     .hotel-marker .wrap{display:inline-flex;align-items:center;gap:6px;background:rgba(17,19,25,.9);border:1px solid rgba(255,255,255,.15);padding:4px 8px;border-radius:14px;backdrop-filter:blur(6px);box-shadow:0 6px 14px rgba(0,0,0,.35);font-weight:700;font-size:13px;color:#fff;white-space:nowrap}
     .hotel-marker .emoji{font-size:16px}
     .hotel-marker .price{background:var(--gold1);color:#111;border-radius:10px;padding:2px 6px;font-weight:800;font-size:12px}
-    .dim #content{filter:brightness(.9);pointer-events:none}
+
+    /* 드로어 열릴 때 클릭 잠금: 리스트/인라인맵만 */
+    .dim .wrap{filter:brightness(.9);pointer-events:none}
+    .dim .controls,.dim .sw-header,.dim #mapDrawer{pointer-events:auto;filter:none}
   </style>
 </head>
 <body>
@@ -139,7 +146,7 @@
     <div class="chip" id="btnSort">⇅ <span data-i18n="controls.sort">Sort</span></div>
     <div class="chip" id="btnFilter">☰ <span data-i18n="controls.filter">Filter</span></div>
     <div class="chip" id="btnMapList">🗺️ <span data-i18n="controls.map">Map</span></div>
-    <button class="chip" id="openMapDrawer">🗺️ 지도 열기</button>
+    <button class="btn yellow" id="openMapDrawer">🗺️ 지도 열기</button>
     <select class="select" id="lang" aria-label="Language"></select>
     <select class="select" id="currency" aria-label="Currency"></select>
     <span class="hint" id="rateHint" data-i18n="controls.rateHint">* Demo rates. Connect a live FX API.</span>
@@ -153,7 +160,6 @@
       <button class="btn small reset" id="btnCloseFilter">✕</button>
     </div>
     <div class="filter-body">
-      <!-- (기존 필터들 그대로) -->
       <div class="filter-row">
         <label data-i18n="filters.maxPrice">Max price (converted)</label>
         <div class="range"><input type="range" id="fPrice" min="50" max="1000" step="10" value="1000"/><span id="fPriceVal">—</span></div>
@@ -168,7 +174,7 @@
       </div>
       <div class="filter-row"><label><input type="checkbox" id="fFreeCancel"> <span data-i18n="filters.freeCancel">Free cancellation only</span></label></div>
 
-      <!-- …이하 옵션들 그대로 유지… -->
+      <!-- 예시: 타입 그룹만 남기고 나머지는 기존과 동일하게 더 추가 가능 -->
       <div class="filter-row">
         <label data-i18n="filters.type">Stay type</label>
         <div class="checks" id="fType">
@@ -182,7 +188,6 @@
           <label><input type="checkbox" value="B&B"><span data-i18n="type.bnb">B&B</span></label>
         </div>
       </div>
-      <!-- (나머지 필터 그룹들도 동일) -->
     </div>
     <div class="filter-actions">
       <button class="btn small reset" id="btnResetFilters" data-i18n="filters.reset">Reset</button>
@@ -196,11 +201,11 @@
     <div><div id="map"></div></div>
   </div>
 
-  <!-- Map Drawer (새로 추가) -->
+  <!-- Map Drawer -->
   <aside class="map-drawer" id="mapDrawer" aria-hidden="true">
     <div class="map-drawer__head">
       <strong>호텔 위치 지도</strong>
-      <button id="closeMapDrawer" class="btn">✕ 지도 닫기</button>
+      <button id="closeMapDrawer" class="btn yellow">✕ 지도 닫기</button>
     </div>
     <div id="drawerMap" class="map-drawer__body"></div>
   </aside>
@@ -227,9 +232,37 @@
 
   <!-- ========= i18n ========= -->
   <script>
-    const I18N={ /* (네가 준 딕셔너리 그대로) */ };
-    function t(key){ const L=I18N[state.lang]||I18N.en; return L[key]||I18N.en?.[key]||key; }
-    function applyLang(){ document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n"); const txt=t(k); if(txt) el.textContent=txt;}); }
+    const I18N = {
+      en:{
+        "nav.home":"Home","nav.hotels":"Hotels","nav.membership":"Membership","nav.search":"Search","nav.becomeHost":"Become a Host",
+        "nav.login":"Log in","nav.signup":"Sign up",
+        "controls.sort":"Sort","controls.filter":"Filter","controls.map":"Map","controls.rateHint":"* Demo rates. Connect a live FX API.",
+        "filters.title":"Filters","filters.maxPrice":"Max price (converted)","filters.minRating":"Minimum rating","filters.maxDistance":"Max distance from center (km)","filters.freeCancel":"Free cancellation only",
+        "filters.type":"Stay type","filters.reset":"Reset","filters.apply":"Apply",
+        "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Guesthouse","type.bnb":"B&B",
+        "labels.perNight":"/ night","buttons.book":"Book"
+      },
+      ko:{
+        "nav.home":"홈","nav.hotels":"숙소","nav.membership":"멤버십","nav.search":"검색","nav.becomeHost":"호스트 되기",
+        "nav.login":"로그인","nav.signup":"가입하기",
+        "controls.sort":"정렬","controls.filter":"필터","controls.map":"지도","controls.rateHint":"* 데모 환율입니다. 운영 시 환율 API를 연결하세요.",
+        "filters.title":"필터","filters.maxPrice":"최대 가격(환산)","filters.minRating":"최소 평점","filters.maxDistance":"도심까지 최대 거리(km)","filters.freeCancel":"무료 취소만",
+        "filters.type":"숙소 유형","filters.reset":"초기화","filters.apply":"적용",
+        "type.hotel":"호텔","type.motel":"모텔","type.hostel":"호스텔","type.apartment":"아파트","type.villa":"빌라","type.ryokan":"료칸","type.guesthouse":"게스트하우스","type.bnb":"B&B",
+        "labels.perNight":"/ 1박","buttons.book":"예약하기"
+      },
+      de:{
+        "nav.home":"Start","nav.hotels":"Unterkünfte","nav.membership":"Mitgliedschaft","nav.search":"Suche","nav.becomeHost":"Gastgeber werden",
+        "nav.login":"Anmelden","nav.signup":"Registrieren",
+        "controls.sort":"Sortieren","controls.filter":"Filter","controls.map":"Karte","controls.rateHint":"* Demo-Kurse. Verbinden Sie eine Live-FX-API.",
+        "filters.title":"Filter","filters.maxPrice":"Maximalpreis (umgerechnet)","filters.minRating":"Mindestbewertung","filters.maxDistance":"Max. Entfernung vom Zentrum (km)","filters.freeCancel":"Nur kostenlose Stornierung",
+        "filters.type":"Unterkunftstyp","filters.reset":"Zurücksetzen","filters.apply":"Anwenden",
+        "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Pension","type.bnb":"B&B",
+        "labels.perNight":"/ Nacht","buttons.book":"Buchen"
+      }
+    };
+    function t(key){ const L = I18N[state?.lang] || I18N.en; return L[key] || I18N.en[key] || key; }
+    function applyLang(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ const k=el.getAttribute("data-i18n"); const txt=t(k); if(txt) el.textContent=txt; }); }
   </script>
 
   <!-- ========= App / Map / Drawer ========= -->
@@ -327,6 +360,12 @@
     on(openMapBtn,'click',()=>{ initDrawerMap(); openDrawer(); renderDrawerMarkers(); });
     on(closeMapBtn,'click',closeDrawer);
     window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
+    // 드로어 밖 클릭 시 닫기
+    document.addEventListener('click',(e)=>{
+      if(!mapDrawer.classList.contains('open')) return;
+      const inside = mapDrawer.contains(e.target) || (e.target.id==='openMapDrawer');
+      if(!inside) closeDrawer();
+    });
 
     function renderDrawerMarkers(){
       initDrawerMap(); drawerLayer.clearLayers();
@@ -403,7 +442,7 @@
         el.textContent=formatPriceFromUsd(usd);
       });
 
-      // 카드의 "지도에서 보기" → 드로어 열고 해당 위치로 이동
+      // "지도에서 보기" → 드로어 열고 이동
       $$('.view-on-map',mount).forEach(btn=>{
         btn.addEventListener('click',e=>{
           const id=e.currentTarget.getAttribute('data-id');
@@ -525,7 +564,7 @@
       wireFilters(); wireHeader(); updateFilterLabels();
 
       state.listings=await loadListings();
-      renderList(); renderMarkers(); // inline
+      renderList(); renderMarkers();
       applyHashParams();
     });
     window.addEventListener('hashchange',applyHashParams);
