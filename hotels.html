@@ -231,39 +231,68 @@
   <script src="/scripts/auth.js"></script>
 
   <!-- ========= i18n ========= -->
-  <script>
-    const I18N = {
-      en:{
-        "nav.home":"Home","nav.hotels":"Hotels","nav.membership":"Membership","nav.search":"Search","nav.becomeHost":"Become a Host",
-        "nav.login":"Log in","nav.signup":"Sign up",
-        "controls.sort":"Sort","controls.filter":"Filter","controls.map":"Map","controls.rateHint":"* Demo rates. Connect a live FX API.",
-        "filters.title":"Filters","filters.maxPrice":"Max price (converted)","filters.minRating":"Minimum rating","filters.maxDistance":"Max distance from center (km)","filters.freeCancel":"Free cancellation only",
-        "filters.type":"Stay type","filters.reset":"Reset","filters.apply":"Apply",
-        "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Guesthouse","type.bnb":"B&B",
-        "labels.perNight":"/ night","buttons.book":"Book"
-      },
-      ko:{
-        "nav.home":"홈","nav.hotels":"숙소","nav.membership":"멤버십","nav.search":"검색","nav.becomeHost":"호스트 되기",
-        "nav.login":"로그인","nav.signup":"가입하기",
-        "controls.sort":"정렬","controls.filter":"필터","controls.map":"지도","controls.rateHint":"* 데모 환율입니다. 운영 시 환율 API를 연결하세요.",
-        "filters.title":"필터","filters.maxPrice":"최대 가격(환산)","filters.minRating":"최소 평점","filters.maxDistance":"도심까지 최대 거리(km)","filters.freeCancel":"무료 취소만",
-        "filters.type":"숙소 유형","filters.reset":"초기화","filters.apply":"적용",
-        "type.hotel":"호텔","type.motel":"모텔","type.hostel":"호스텔","type.apartment":"아파트","type.villa":"빌라","type.ryokan":"료칸","type.guesthouse":"게스트하우스","type.bnb":"B&B",
-        "labels.perNight":"/ 1박","buttons.book":"예약하기"
-      },
-      de:{
-        "nav.home":"Start","nav.hotels":"Unterkünfte","nav.membership":"Mitgliedschaft","nav.search":"Suche","nav.becomeHost":"Gastgeber werden",
-        "nav.login":"Anmelden","nav.signup":"Registrieren",
-        "controls.sort":"Sortieren","controls.filter":"Filter","controls.map":"Karte","controls.rateHint":"* Demo-Kurse. Verbinden Sie eine Live-FX-API.",
-        "filters.title":"Filter","filters.maxPrice":"Maximalpreis (umgerechnet)","filters.minRating":"Mindestbewertung","filters.maxDistance":"Max. Entfernung vom Zentrum (km)","filters.freeCancel":"Nur kostenlose Stornierung",
-        "filters.type":"Unterkunftstyp","filters.reset":"Zurücksetzen","filters.apply":"Anwenden",
-        "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Pension","type.bnb":"B&B",
-        "labels.perNight":"/ Nacht","buttons.book":"Buchen"
-      }
-    };
-    function t(key){ const L = I18N[state?.lang] || I18N.en; return L[key] || I18N.en[key] || key; }
-    function applyLang(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ const k=el.getAttribute("data-i18n"); const txt=t(k); if(txt) el.textContent=txt; }); }
-  </script>
+<script>
+  const I18N = {
+    en:{
+      "nav.home":"Home","nav.hotels":"Hotels","nav.membership":"Membership","nav.search":"Search","nav.becomeHost":"Become a Host",
+      "nav.login":"Log in","nav.signup":"Sign up",
+      "controls.sort":"Sort","controls.filter":"Filter","controls.map":"Map","controls.rateHint":"* Demo rates. Connect a live FX API.",
+      "filters.title":"Filters","filters.maxPrice":"Max price (converted)","filters.minRating":"Minimum rating","filters.maxDistance":"Max distance from center (km)","filters.freeCancel":"Free cancellation only",
+      "filters.type":"Stay type","filters.reset":"Reset","filters.apply":"Apply",
+      "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Guesthouse","type.bnb":"B&B",
+      "labels.perNight":"/ night","buttons.book":"Book"
+    },
+    ko:{
+      "nav.home":"홈","nav.hotels":"숙소","nav.membership":"멤버십","nav.search":"검색","nav.becomeHost":"호스트 되기",
+      "nav.login":"로그인","nav.signup":"가입하기",
+      "controls.sort":"정렬","controls.filter":"필터","controls.map":"지도","controls.rateHint":"* 데모 환율입니다. 운영 시 환율 API를 연결하세요.",
+      "filters.title":"필터","filters.maxPrice":"최대 가격(환산)","filters.minRating":"최소 평점","filters.maxDistance":"도심까지 최대 거리(km)","filters.freeCancel":"무료 취소만",
+      "filters.type":"숙소 유형","filters.reset":"초기화","filters.apply":"적용",
+      "type.hotel":"호텔","type.motel":"모텔","type.hostel":"호스텔","type.apartment":"아파트","type.villa":"빌라","type.ryokan":"료칸","type.guesthouse":"게스트하우스","type.bnb":"B&B",
+      "labels.perNight":"/ 1박","buttons.book":"예약하기"
+    },
+    de:{
+      "nav.home":"Start","nav.hotels":"Unterkünfte","nav.membership":"Mitgliedschaft","nav.search":"Suche","nav.becomeHost":"Gastgeber werden",
+      "nav.login":"Anmelden","nav.signup":"Registrieren",
+      "controls.sort":"Sortieren","controls.filter":"Filter","controls.map":"Karte","controls.rateHint":"* Demo-Kurse. Verbinden Sie eine Live-FX-API.",
+      "filters.title":"Filter","filters.maxPrice":"Maximalpreis (umgerechnet)","filters.minRating":"Mindestbewertung","filters.maxDistance":"Max. Entfernung vom Zentrum (km)","filters.freeCancel":"Nur kostenlose Stornierung",
+      "filters.type":"Unterkunftstyp","filters.reset":"Zurücksetzen","filters.apply":"Anwenden",
+      "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Pension","type.bnb":"B&B",
+      "labels.perNight":"/ Nacht","buttons.book":"Buchen"
+    },
+    ja:{
+      "nav.home":"ホーム","nav.hotels":"宿泊先","nav.membership":"メンバーシップ","nav.search":"検索","nav.becomeHost":"ホストになる",
+      "nav.login":"ログイン","nav.signup":"登録",
+      "controls.sort":"並び替え","controls.filter":"フィルター","controls.map":"地図","controls.rateHint":"＊デモ為替です。実運用ではFX APIを接続してください。",
+      "filters.title":"フィルター","filters.maxPrice":"最大価格（換算）","filters.minRating":"最低評価","filters.maxDistance":"中心部からの最大距離（km）","filters.freeCancel":"キャンセル無料のみ",
+      "filters.type":"宿泊タイプ","filters.reset":"リセット","filters.apply":"適用",
+      "type.hotel":"ホテル","type.motel":"モーテル","type.hostel":"ホステル","type.apartment":"アパート","type.villa":"ヴィラ","type.ryokan":"旅館","type.guesthouse":"ゲストハウス","type.bnb":"B&B",
+      "labels.perNight":"/ 泊","buttons.book":"予約する"
+    },
+    tr:{
+      "nav.home":"Ana sayfa","nav.hotels":"Konaklama","nav.membership":"Üyelik","nav.search":"Arama","nav.becomeHost":"Ev sahibi olun",
+      "nav.login":"Giriş","nav.signup":"Kaydol",
+      "controls.sort":"Sırala","controls.filter":"Filtre","controls.map":"Harita","controls.rateHint":"* Demo kur. Canlı kur API’si bağlayın.",
+      "filters.title":"Filtreler","filters.maxPrice":"Azami fiyat (çevrilmiş)","filters.minRating":"Asgari puan","filters.maxDistance":"Merkeze azami mesafe (km)","filters.freeCancel":"Yalnızca ücretsiz iptal",
+      "filters.type":"Konaklama türü","filters.reset":"Sıfırla","filters.apply":"Uygula",
+      "type.hotel":"Otel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Daire","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Pansiyon","type.bnb":"B&B",
+      "labels.perNight":"/ gece","buttons.book":"Rezervasyon"
+    }
+  };
+
+  function t(key){
+    const L = I18N[state?.lang] || I18N.en;
+    return L[key] || I18N.en[key] || key;
+  }
+  function applyLang(){
+    document.querySelectorAll("[data-i18n]").forEach(el=>{
+      const k = el.getAttribute("data-i18n");
+      const txt = t(k);
+      if (txt != null) el.textContent = txt;
+    });
+  }
+</script>
+
 
   <!-- ========= App / Map / Drawer ========= -->
   <script>
