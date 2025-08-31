@@ -324,21 +324,41 @@
 
     // ===== Select builders =====
     function buildSelects(){
-      const langSel=$('#lang'), curSel=$('#currency');
-      langSel.innerHTML=Object.keys(LANGS).map(k=>`<option value="${k}">${LANGS[k]}</option>`).join('');
-      curSel.innerHTML=Object.keys(CURRENCIES).map(k=>`<option value="${k}">${k}</option>`).join('');
-      langSel.value=state.lang; curSel.value=state.currency;
+  const langSel = $('#lang'), curSel = $('#currency');
 
-      on(langSel,'change',()=>{
-        state.lang=langSel.value; localStorage.setItem('sw_lang',state.lang);
-        if(!CURRENCIES[state.currency]) state.currency=LANG_TO_DEFAULT_CURRENCY[state.lang]||'USD';
-        state.nf=new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency});
-        $('#currency').value=state.currency; applyLang(); updateFilterLabels(); renderList(); renderMarkers(); renderDrawerMarkers();
-      });
-      on(curSel,'change',()=>{
-        state.currency=curSel.value; state.nf=new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency});
-        updateFilterLabels(); renderList(); renderMarkers(); renderDrawerMarkers();
-      });
+  // ✅ I18N에 실제 존재하는 언어만 노출
+  const availableLangs = Object.keys(I18N);
+  langSel.innerHTML = availableLangs
+    .map(k => `<option value="${k}">${LANGS[k] || k}</option>`).join('');
+
+  curSel.innerHTML = Object.keys(CURRENCIES)
+    .map(k => `<option value="${k}">${k}</option>`).join('');
+
+  // ✅ 저장된 언어가 지원되지 않으면 ko → en 순으로 폴백
+  if (!I18N[state.lang]) state.lang = I18N.ko ? 'ko' : 'en';
+
+  langSel.value = state.lang;
+  curSel.value  = state.currency;
+
+  on(langSel,'change', ()=>{
+    state.lang = langSel.value;
+    localStorage.setItem('sw_lang', state.lang);
+    if (!CURRENCIES[state.currency]) state.currency = LANG_TO_DEFAULT_CURRENCY[state.lang] || 'USD';
+    state.nf = new Intl.NumberFormat(state.lang, { style:'currency', currency: state.currency });
+    $('#currency').value = state.currency;
+    applyLang();
+    updateFilterLabels();
+    renderList(); renderMarkers(); renderDrawerMarkers();
+  });
+
+  on(curSel,'change', ()=>{
+    state.currency = curSel.value;
+    state.nf = new Intl.NumberFormat(state.lang, { style:'currency', currency: state.currency });
+    updateFilterLabels();
+    renderList(); renderMarkers(); renderDrawerMarkers();
+  });
+}
+
     }
 
     // ===== Inline Map =====
