@@ -69,23 +69,36 @@
       el.classList.remove('hidden');
     }
 
-    document.getElementById('loginForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      try{
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        await redirectAfter(cred.user);
-      }catch(err){ showError(err); }
-    });
+ <script>
+(function () {
+  const user = JSON.parse(localStorage.getItem('sw_user') || 'null');
+  const show = (sel) => document.querySelectorAll(sel).forEach(el => el.style.display = '');
+  const hide = (sel) => document.querySelectorAll(sel).forEach(el => el.style.display = 'none');
 
-    document.getElementById('googleBtn').addEventListener('click', async ()=>{
-      try{
-        const provider = new GoogleAuthProvider();
-        const cred = await signInWithPopup(auth, provider);
-        await redirectAfter(cred.user);
-      }catch(err){ showError(err); }
+  if (user) {
+    hide('a[href="/login.html"], a[href="/signup.html"], [data-auth="guest"]');
+    show('[data-auth="user"]');
+    document.querySelectorAll('#welcomeUser').forEach(el => {
+      el.textContent = `Welcome, ${user.name || 'User'} 🎉`;
+      el.style.display='';
     });
+  } else {
+    show('a[href="/login.html"], a[href="/signup.html"], [data-auth="guest"]');
+    hide('[data-auth="user"], #welcomeUser');
+  }
+
+  document.querySelectorAll('#logoutBtn, [data-logout]').forEach(btn => {
+    if (btn.__bound) return;
+    btn.__bound = true;
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      localStorage.removeItem('sw_user');
+      location.href = '/index.html';
+    });
+  });
+})();
+</script>
+
   </script>
 
   <!-- 공통 UI 스크립트 -->
