@@ -120,6 +120,43 @@
   <script type="module" src="/js/bookings.js"></script>
 </body>
 </html>
+<script>
+/**
+ * 로그인 시 localStorage.sw_user 를 기준으로
+ * - 게스트용 버튼/링크(Login, Sign up, data-auth="guest") 숨김
+ * - 유저용 UI(My Page, Logout, data-auth="user") 표시
+ * - Logout 클릭 동작 연결
+ */
+(function () {
+  const user = JSON.parse(localStorage.getItem('sw_user') || 'null');
+
+  const show = (sel) => document.querySelectorAll(sel).forEach(el => el.style.display = '');
+  const hide = (sel) => document.querySelectorAll(sel).forEach(el => el.style.display = 'none');
+
+  if (user) {
+    // 로그인 상태: 게스트용 숨기고 유저용 보여주기
+    hide('a[href="/login.html"], a[href="/signup.html"], [data-auth="guest"]');
+    show('[data-auth="user"]');
+
+    // 환영 문구 갱신(있을 때만)
+    const welcomeEl = document.getElementById('welcomeUser');
+    if (welcomeEl) welcomeEl.textContent = `Welcome, ${user.name} 🎉`;
+  } else {
+    // 비로그인: 게스트용 보이고 유저용 숨기기
+    show('a[href="/login.html"], a[href="/signup.html"], [data-auth="guest"]');
+    hide('[data-auth="user"]');
+  }
+
+  // 로그아웃 버튼 동작(여러 아이디/속성 지원)
+  document.querySelectorAll('#logoutBtn, [data-logout]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('sw_user');
+      location.href = '/index.html';
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
