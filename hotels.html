@@ -14,11 +14,8 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 
   <style>
-    :root{
-      --bg:#0b0f16;--panel:#101018;--panel-2:#0f131c;--text:#e7e9ee;--muted:#aeb6c8;--line:rgba(255,255,255,.08);
-      --chip:#121a26;--gold1:#f4d78c;--gold2:#c9a35b;--accent:#1e5bd8;--green:#2ecc71;--danger:#ff5a5f;
-      --header-h:64px;
-    }
+    :root{ --bg:#0b0f16;--panel:#101018;--panel-2:#0f131c;--text:#e7e9ee;--muted:#aeb6c8;--line:rgba(255,255,255,.08);
+      --chip:#121a26;--gold1:#f4d78c;--gold2:#c9a35b;--accent:#1e5bd8;--green:#2ecc71;--danger:#ff5a5f; --header-h:64px; }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 
@@ -106,13 +103,13 @@
     .map-drawer__body{width:100%;height:100%}
     #drawerMap{width:100%;height:100%}
 
-    /* 가격 마커 */
+    /* Marker */
     .hotel-marker{transform:translateY(-8px)}
     .hotel-marker .wrap{display:inline-flex;align-items:center;gap:6px;background:rgba(17,19,25,.9);border:1px solid rgba(255,255,255,.15);padding:4px 8px;border-radius:14px;backdrop-filter:blur(6px);box-shadow:0 6px 14px rgba(0,0,0,.35);font-weight:700;font-size:13px;color:#fff;white-space:nowrap}
     .hotel-marker .emoji{font-size:16px}
     .hotel-marker .price{background:var(--gold1);color:#111;border-radius:10px;padding:2px 6px;font-weight:800;font-size:12px}
 
-    /* 드로어 열릴 때: 리스트/인라인맵만 클릭 차단 */
+    /* Dim while drawer open */
     .dim .wrap{filter:brightness(.9);pointer-events:none}
     .dim .controls,.dim .sw-header,.dim #mapDrawer{pointer-events:auto;filter:none}
   </style>
@@ -138,10 +135,12 @@
 
   <!-- Controls -->
   <div class="controls">
-    <div class="chip" id="btnSort">⇅ <span data-i18n="controls.sort">Sort</span></div>
+    <div class="chip" id="btnSort">⇅ <span id="sortLabel" data-i18n="controls.sort">Sort</span></div>
     <div class="chip" id="btnFilter">☰ <span data-i18n="controls.filter">Filter</span></div>
     <div class="chip" id="btnMapList">🗺️ <span data-i18n="controls.map">Map</span></div>
-    <button class="btn yellow" id="openMapDrawer">🗺️ 지도 열기</button>
+
+    <button class="btn yellow" id="openMapDrawer">🗺️ <span data-i18n="buttons.mapOpen">Open map</span></button>
+
     <select class="select" id="lang" aria-label="Language"></select>
     <select class="select" id="currency" aria-label="Currency"></select>
     <span class="hint" id="rateHint" data-i18n="controls.rateHint">* Demo rates. Connect a live FX API.</span>
@@ -169,7 +168,7 @@
       </div>
       <div class="filter-row"><label><input type="checkbox" id="fFreeCancel"> <span data-i18n="filters.freeCancel">Free cancellation only</span></label></div>
 
-      <!-- 예시 그룹 -->
+      <!-- Stay type -->
       <div class="filter-row">
         <label data-i18n="filters.type">Stay type</label>
         <div class="checks" id="fType">
@@ -183,7 +182,156 @@
           <label><input type="checkbox" value="B&B"><span data-i18n="type.bnb">B&B</span></label>
         </div>
       </div>
+
+      <!-- 20+ categories -->
+      <div class="filter-row">
+        <label data-i18n="filters.amen">Amenities</label>
+        <div class="checks" id="fAmen">
+          <label><input type="checkbox" value="Wi-Fi"><span data-i18n="amen.wifi">Wi-Fi</span></label>
+          <label><input type="checkbox" value="Kitchen"><span data-i18n="amen.kitchen">Kitchen</span></label>
+          <label><input type="checkbox" value="Parking"><span data-i18n="amen.parking">Parking</span></label>
+          <label><input type="checkbox" value="Pool"><span data-i18n="amen.pool">Pool</span></label>
+          <label><input type="checkbox" value="Air conditioning"><span data-i18n="amen.ac">Air conditioning</span></label>
+          <label><input type="checkbox" value="Gym"><span data-i18n="amen.gym">Gym</span></label>
+          <label><input type="checkbox" value="Workspace"><span data-i18n="amen.workspace">Workspace</span></label>
+          <label><input type="checkbox" value="Washer"><span data-i18n="amen.washer">Washer</span></label>
+          <label><input type="checkbox" value="Dryer"><span data-i18n="amen.dryer">Dryer</span></label>
+          <label><input type="checkbox" value="Breakfast"><span data-i18n="amen.breakfast">Breakfast</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.booking">Booking</label>
+        <div class="checks" id="fBooking">
+          <label><input type="checkbox" value="Instant"><span data-i18n="book.instant">Instant book</span></label>
+          <label><input type="checkbox" value="Request"><span data-i18n="book.request">Request to book</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.verify">Verification</label>
+        <div class="checks" id="fVerify">
+          <label><input type="checkbox" value="Verified listings"><span data-i18n="verify.listings">Verified listings only</span></label>
+          <label><input type="checkbox" value="Verified reviews"><span data-i18n="verify.reviews">Verified reviews</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.long">Long-stay</label>
+        <div class="checks" id="fLong">
+          <label><input type="checkbox" value="Long deals"><span data-i18n="long.deals">Show long-stay deals</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.biz">Business</label>
+        <div class="checks" id="fBiz">
+          <label><input type="checkbox" value="B2B"><span data-i18n="biz.b2b">B2B-ready</span></label>
+          <label><input type="checkbox" value="Invoice"><span data-i18n="biz.invoice">Invoice available</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.acc">Accessibility</label>
+        <div class="checks" id="fAcc">
+          <label><input type="checkbox" value="Step-free"><span data-i18n="acc.stepfree">Step-free access</span></label>
+          <label><input type="checkbox" value="Elevator"><span data-i18n="acc.elevator">Elevator</span></label>
+          <label><input type="checkbox" value="Wide doorway"><span data-i18n="acc.doorway">Wide doorway</span></label>
+          <label><input type="checkbox" value="Accessible bathroom"><span data-i18n="acc.bathroom">Accessible bathroom</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.view">View</label>
+        <div class="checks" id="fView">
+          <label><input type="checkbox" value="Sea view"><span data-i18n="view.sea">Sea view</span></label>
+          <label><input type="checkbox" value="City view"><span data-i18n="view.city">City view</span></label>
+          <label><input type="checkbox" value="Mountain view"><span data-i18n="view.mountain">Mountain view</span></label>
+          <label><input type="checkbox" value="Garden"><span data-i18n="view.garden">Garden</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.safe">Safety</label>
+        <div class="checks" id="fSafe">
+          <label><input type="checkbox" value="CO alarm"><span data-i18n="safe.co">Carbon monoxide alarm</span></label>
+          <label><input type="checkbox" value="Smoke alarm"><span data-i18n="safe.smoke">Smoke alarm</span></label>
+          <label><input type="checkbox" value="First aid kit"><span data-i18n="safe.aid">First aid kit</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.family">Family</label>
+        <div class="checks" id="fFamily">
+          <label><input type="checkbox" value="Crib"><span data-i18n="family.crib">Crib</span></label>
+          <label><input type="checkbox" value="High chair"><span data-i18n="family.chair">High chair</span></label>
+          <label><input type="checkbox" value="Stroller friendly"><span data-i18n="family.stroller">Stroller friendly</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.ent">Entertainment</label>
+        <div class="checks" id="fEnt">
+          <label><input type="checkbox" value="TV"><span data-i18n="ent.tv">TV</span></label>
+          <label><input type="checkbox" value="Netflix"><span data-i18n="ent.netflix">Netflix</span></label>
+          <label><input type="checkbox" value="Game console"><span data-i18n="ent.console">Game console</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.out">Outdoor</label>
+        <div class="checks" id="fOut">
+          <label><input type="checkbox" value="BBQ"><span data-i18n="out.bbq">BBQ grill</span></label>
+          <label><input type="checkbox" value="Patio"><span data-i18n="out.patio">Patio</span></label>
+          <label><input type="checkbox" value="Private garden"><span data-i18n="out.garden">Private garden</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.park">Parking</label>
+        <div class="checks" id="fPark">
+          <label><input type="checkbox" value="On-site"><span data-i18n="park.onsite">On-site</span></label>
+          <label><input type="checkbox" value="Street"><span data-i18n="park.street">Street</span></label>
+          <label><input type="checkbox" value="Garage"><span data-i18n="park.garage">Paid garage</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.pets">Pets</label>
+        <div class="checks" id="fPets">
+          <label><input type="checkbox" value="Pet allowed"><span data-i18n="pets.allowed">Allowed</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.checkin">Check-in</label>
+        <div class="checks" id="fCheckin">
+          <label><input type="checkbox" value="Self"><span data-i18n="checkin.self">Self check-in</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.exp">Experiences</label>
+        <div class="checks" id="fExp">
+          <label><input type="checkbox" value="Nature"><span data-i18n="exp.nature">Nature</span></label>
+          <label><input type="checkbox" value="Camping"><span data-i18n="exp.camping">Camping</span></label>
+          <label><input type="checkbox" value="Traditional"><span data-i18n="exp.traditional">Traditional</span></label>
+          <label><input type="checkbox" value="Ski"><span data-i18n="exp.ski">Ski-in/out</span></label>
+          <label><input type="checkbox" value="Wine"><span data-i18n="exp.wine">Wine country</span></label>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <label data-i18n="filters.loc">Location</label>
+        <div class="checks" id="fLoc">
+          <label><input type="checkbox" value="Near airport"><span data-i18n="loc.airport">Near airport</span></label>
+          <label><input type="checkbox" value="Near station"><span data-i18n="loc.station">Near station</span></label>
+          <label><input type="checkbox" value="Near beach"><span data-i18n="loc.beach">Near beach</span></label>
+          <label><input type="checkbox" value="City center"><span data-i18n="loc.center">City center</span></label>
+        </div>
+      </div>
     </div>
+
     <div class="filter-actions">
       <button class="btn small reset" id="btnResetFilters" data-i18n="filters.reset">Reset</button>
       <button class="btn small gold" id="btnApplyFilters" data-i18n="filters.apply">Apply</button>
@@ -199,8 +347,8 @@
   <!-- Map Drawer -->
   <aside class="map-drawer" id="mapDrawer" aria-hidden="true">
     <div class="map-drawer__head">
-      <strong>호텔 위치 지도</strong>
-      <button id="closeMapDrawer" class="btn yellow">✕ 지도 닫기</button>
+      <strong data-i18n="map.title">Hotel map</strong>
+      <button id="closeMapDrawer" class="btn yellow">✕ <span data-i18n="buttons.mapClose">Close map</span></button>
     </div>
     <div id="drawerMap" class="map-drawer__body"></div>
   </aside>
@@ -215,40 +363,69 @@
     <div class="sw-copy">© 2025 STAYWORLD. All rights reserved.</div>
   </footer>
 
-  <!-- ========= i18n (state에 의존 X) ========= -->
+  <!-- i18n -->
   <script>
     const I18N = {
       en:{ "nav.home":"Home","nav.hotels":"Hotels","nav.membership":"Membership","nav.search":"Search","nav.becomeHost":"Become a Host",
-        "nav.login":"Log in","nav.signup":"Sign up","controls.sort":"Sort","controls.filter":"Filter","controls.map":"Map",
-        "controls.rateHint":"* Demo rates. Connect a live FX API.","filters.title":"Filters","filters.maxPrice":"Max price (converted)",
-        "filters.minRating":"Minimum rating","filters.maxDistance":"Max distance from center (km)","filters.freeCancel":"Free cancellation only",
-        "filters.type":"Stay type","filters.reset":"Reset","filters.apply":"Apply",
+        "nav.login":"Log in","nav.signup":"Sign up",
+        "controls.sort":"Sort","controls.filter":"Filter","controls.map":"Map","controls.rateHint":"* Demo rates. Connect a live FX API.",
+        "map.title":"Hotel map",
+        "buttons.mapOpen":"Open map","buttons.mapClose":"Close map","buttons.book":"Book",
+        "filters.title":"Filters","filters.maxPrice":"Max price (converted)","filters.minRating":"Minimum rating","filters.maxDistance":"Max distance from center (km)","filters.freeCancel":"Free cancellation only","filters.reset":"Reset","filters.apply":"Apply",
+        "filters.type":"Stay type","filters.amen":"Amenities","filters.booking":"Booking","filters.verify":"Verification","filters.long":"Long-stay","filters.biz":"Business","filters.acc":"Accessibility","filters.view":"View","filters.safe":"Safety","filters.family":"Family","filters.ent":"Entertainment","filters.out":"Outdoor","filters.park":"Parking","filters.pets":"Pets","filters.checkin":"Check-in","filters.exp":"Experiences","filters.loc":"Location",
         "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Guesthouse","type.bnb":"B&B",
-        "labels.perNight":"/ night","buttons.book":"Book" },
+        "amen.wifi":"Wi-Fi","amen.kitchen":"Kitchen","amen.parking":"Parking","amen.pool":"Pool","amen.ac":"Air conditioning","amen.gym":"Gym","amen.workspace":"Workspace","amen.washer":"Washer","amen.dryer":"Dryer","amen.breakfast":"Breakfast",
+        "book.instant":"Instant book","book.request":"Request to book",
+        "verify.listings":"Verified listings only","verify.reviews":"Verified reviews",
+        "long.deals":"Show long-stay deals",
+        "biz.b2b":"B2B-ready","biz.invoice":"Invoice available",
+        "acc.stepfree":"Step-free access","acc.elevator":"Elevator","acc.doorway":"Wide doorway","acc.bathroom":"Accessible bathroom",
+        "view.sea":"Sea view","view.city":"City view","view.mountain":"Mountain view","view.garden":"Garden",
+        "safe.co":"Carbon monoxide alarm","safe.smoke":"Smoke alarm","safe.aid":"First aid kit",
+        "family.crib":"Crib","family.chair":"High chair","family.stroller":"Stroller friendly",
+        "ent.tv":"TV","ent.netflix":"Netflix","ent.console":"Game console",
+        "out.bbq":"BBQ grill","out.patio":"Patio","out.garden":"Private garden",
+        "park.onsite":"On-site","park.street":"Street","park.garage":"Paid garage",
+        "pets.allowed":"Allowed",
+        "checkin.self":"Self check-in",
+        "exp.nature":"Nature","exp.camping":"Camping","exp.traditional":"Traditional","exp.ski":"Ski-in/out","exp.wine":"Wine country",
+        "loc.airport":"Near airport","loc.station":"Near station","loc.beach":"Near beach","loc.center":"City center",
+        "labels.perNight":"/ night",
+        "sort.priceAsc":"price↑","sort.priceDesc":"price↓","sort.ratingDesc":"rating","sort.distanceAsc":"distance"
+      },
       ko:{ "nav.home":"홈","nav.hotels":"숙소","nav.membership":"멤버십","nav.search":"검색","nav.becomeHost":"호스트 되기",
-        "nav.login":"로그인","nav.signup":"가입하기","controls.sort":"정렬","controls.filter":"필터","controls.map":"지도",
-        "controls.rateHint":"* 데모 환율입니다. 운영 시 환율 API를 연결하세요.","filters.title":"필터","filters.maxPrice":"최대 가격(환산)",
-        "filters.minRating":"최소 평점","filters.maxDistance":"도심까지 최대 거리(km)","filters.freeCancel":"무료 취소만",
-        "filters.type":"숙소 유형","filters.reset":"초기화","filters.apply":"적용",
+        "nav.login":"로그인","nav.signup":"가입하기",
+        "controls.sort":"정렬","controls.filter":"필터","controls.map":"지도","controls.rateHint":"* 데모 환율입니다. 운영 시 환율 API를 연결하세요.",
+        "map.title":"호텔 위치 지도",
+        "buttons.mapOpen":"지도 열기","buttons.mapClose":"지도 닫기","buttons.book":"예약하기",
+        "filters.title":"필터","filters.maxPrice":"최대 가격(환산)","filters.minRating":"최소 평점","filters.maxDistance":"도심까지 최대 거리(km)","filters.freeCancel":"무료 취소만","filters.reset":"초기화","filters.apply":"적용",
+        "filters.type":"숙소 유형","filters.amen":"편의시설","filters.booking":"예약 방식","filters.verify":"검증","filters.long":"장기 숙박","filters.biz":"비즈니스","filters.acc":"접근성","filters.view":"전망","filters.safe":"안전","filters.family":"가족","filters.ent":"엔터테인먼트","filters.out":"아웃도어","filters.park":"주차","filters.pets":"반려동물","filters.checkin":"체크인","filters.exp":"경험","filters.loc":"위치",
         "type.hotel":"호텔","type.motel":"모텔","type.hostel":"호스텔","type.apartment":"아파트","type.villa":"빌라","type.ryokan":"료칸","type.guesthouse":"게스트하우스","type.bnb":"B&B",
-        "labels.perNight":"/ 1박","buttons.book":"예약하기" },
-      de:{ "nav.home":"Start","nav.hotels":"Unterkünfte","nav.membership":"Mitgliedschaft","nav.search":"Suche","nav.becomeHost":"Gastgeber werden",
-        "nav.login":"Anmelden","nav.signup":"Registrieren","controls.sort":"Sortieren","controls.filter":"Filter","controls.map":"Karte",
-        "controls.rateHint":"* Demo-Kurse. Verbinden Sie eine Live-FX-API.","filters.title":"Filter","filters.maxPrice":"Maximalpreis (umgerechnet)",
-        "filters.minRating":"Mindestbewertung","filters.maxDistance":"Max. Entfernung vom Zentrum (km)","filters.freeCancel":"Nur kostenlose Stornierung",
-        "filters.type":"Unterkunftstyp","filters.reset":"Zurücksetzen","filters.apply":"Anwenden",
-        "type.hotel":"Hotel","type.motel":"Motel","type.hostel":"Hostel","type.apartment":"Apartment","type.villa":"Villa","type.ryokan":"Ryokan","type.guesthouse":"Pension","type.bnb":"B&B",
-        "labels.perNight":"/ Nacht","buttons.book":"Buchen" },
-      ja:{ "nav.home":"ホーム","nav.hotels":"宿泊先","nav.membership":"メンバーシップ","nav.search":"検索","nav.becomeHost":"ホストになる",
-        "nav.login":"ログイン","nav.signup":"登録","controls.sort":"並び替え","controls.filter":"フィルター","controls.map":"地図",
-        "controls.rateHint":"＊デモ為替です。実運用ではFX APIを接続してください。","filters.title":"フィルター","filters.maxPrice":"最大価格（換算）",
-        "filters.minRating":"最低評価","filters.maxDistance":"中心部からの最大距離（km）","filters.freeCancel":"キャンセル無料のみ",
-        "filters.type":"宿泊タイプ","filters.reset":"リセット","filters.apply":"適用",
-        "type.hotel":"ホテル","type.motel":"モーテル","type.hostel":"ホステル","type.apartment":"アパート","type.villa":"ヴィラ","type.ryokan":"旅館","type.guesthouse":"ゲストハウス","type.bnb":"B&B",
-        "labels.perNight":"/ 泊","buttons.book":"予約する" }
+        "amen.wifi":"와이파이","amen.kitchen":"주방","amen.parking":"주차","amen.pool":"수영장","amen.ac":"에어컨","amen.gym":"피트니스","amen.workspace":"업무 공간","amen.washer":"세탁기","amen.dryer":"건조기","amen.breakfast":"조식",
+        "book.instant":"즉시 예약","book.request":"예약 요청",
+        "verify.listings":"검증된 숙소만","verify.reviews":"검증된 리뷰",
+        "long.deals":"장기 숙박 특가만 보기",
+        "biz.b2b":"B2B 지원","biz.invoice":"인보이스 제공",
+        "acc.stepfree":"무단차 출입","acc.elevator":"엘리베이터","acc.doorway":"넓은 출입문","acc.bathroom":"장애인 화장실",
+        "view.sea":"바다 전망","view.city":"도시 전망","view.mountain":"산 전망","view.garden":"정원",
+        "safe.co":"일산화탄소 감지기","safe.smoke":"연기 감지기","safe.aid":"구급상자",
+        "family.crib":"아기 침대","family.chair":"아기의자","family.stroller":"유모차 가능",
+        "ent.tv":"TV","ent.netflix":"넷플릭스","ent.console":"게임 콘솔",
+        "out.bbq":"바비큐 그릴","out.patio":"파티오","out.garden":"전용 정원",
+        "park.onsite":"현장 주차","park.street":"노상 주차","park.garage":"유료 차고",
+        "pets.allowed":"가능",
+        "checkin.self":"셀프 체크인",
+        "exp.nature":"자연","exp.camping":"캠핑","exp.traditional":"전통","exp.ski":"스키 인/아웃","exp.wine":"와인",
+        "loc.airport":"공항 인근","loc.station":"역 인근","loc.beach":"해변 인근","loc.center":"도심",
+        "labels.perNight":"/ 1박",
+        "sort.priceAsc":"가격↑","sort.priceDesc":"가격↓","sort.ratingDesc":"평점","sort.distanceAsc":"거리"
+      },
+      de:{ "controls.sort":"Sortieren","buttons.mapOpen":"Karte öffnen","buttons.mapClose":"Karte schließen","labels.perNight":"/ Nacht",
+           "sort.priceAsc":"Preis↑","sort.priceDesc":"Preis↓","sort.ratingDesc":"Bewertung","sort.distanceAsc":"Entfernung" },
+      ja:{ "controls.sort":"並び替え","buttons.mapOpen":"地図を開く","buttons.mapClose":"地図を閉じる","labels.perNight":"/ 泊",
+           "sort.priceAsc":"料金↑","sort.priceDesc":"料金↓","sort.ratingDesc":"評価","sort.distanceAsc":"距離" }
     };
 
-    // state 없이도 동작하는 현재 언어 관리
     function detectLang(){
       try{
         const saved = localStorage.getItem('sw_lang') || '';
@@ -260,28 +437,35 @@
     let CURRENT_LANG = detectLang();
     function setLang(l){ CURRENT_LANG = I18N[l] ? l : 'en'; }
     function t(key){ const L = I18N[CURRENT_LANG] || I18N.en; return L[key] || I18N.en[key] || key; }
-    function applyLang(){ document.querySelectorAll("[data-i18n]").forEach(el=>{ const k=el.getAttribute("data-i18n"); const txt=t(k); if(txt!=null) el.textContent=txt; }); }
+    function applyLang(){
+      document.querySelectorAll("[data-i18n]").forEach(el=>{
+        const k=el.getAttribute("data-i18n"); const txt=t(k); if(txt!=null) el.textContent=txt;
+      });
+      const sortMap = { 'price-asc':'sort.priceAsc','price-desc':'sort.priceDesc','rating-desc':'sort.ratingDesc','distance-asc':'sort.distanceAsc' };
+      const key = sortMap[state.sort] || 'sort.priceAsc';
+      document.getElementById('sortLabel').textContent = `${t('controls.sort')}: ${t(key)}`;
+    }
   </script>
 
-  <!-- ========= App / Map / Drawer ========= -->
+  <!-- App -->
   <script>
-    // ===== App State / Currency =====
-    const LANGS={en:'English',ko:'한국어',ja:'日本語',de:'Deutsch'}; // UI 표시용
+    const LANGS={en:'English',ko:'한국어',ja:'日本語',de:'Deutsch'};
     const CURRENCIES={USD:'USD',KRW:'KRW',TRY:'TRY',EUR:'EUR',JPY:'JPY',CNY:'CNY',RUB:'RUB'};
     const LANG_TO_DEFAULT_CURRENCY={en:'USD',ko:'KRW',ja:'JPY',de:'EUR'};
-    const RATES={USD:1,KRW:1350,TRY:33,EUR:0.92,JPY:156,RUB:90,CNY:7.2}; // demo
+    const RATES={USD:1,KRW:1350,TRY:33,EUR:0.92,JPY:156,RUB:90,CNY:7.2};
 
     let CITY_CENTER={name:'Istanbul',lat:41.0082,lng:28.9784};
     let map, markersLayer, drawerMap, drawerLayer;
 
-    const state={
-      lang: CURRENT_LANG,
-      currency: 'USD',
-      sort:'price-asc',
-      filters:{priceMax:1000,ratingMin:0,distanceMax:30,freeCancel:false,type:new Set()},
-      listings:[],
-      nf:null
-    };
+    const state={ lang: CURRENT_LANG, currency:'USD', sort:'price-asc',
+      filters:{
+        priceMax:1000,ratingMin:0,distanceMax:30,freeCancel:false,
+        type:new Set(), amen:new Set(), booking:new Set(), verify:new Set(),
+        long:new Set(), biz:new Set(), acc:new Set(), view:new Set(),
+        safe:new Set(), family:new Set(), ent:new Set(), out:new Set(),
+        park:new Set(), pets:new Set(), checkin:new Set(), exp:new Set(), loc:new Set()
+      },
+      listings:[], nf:null };
     state.currency=LANG_TO_DEFAULT_CURRENCY[state.lang]||'USD';
     state.nf=new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency});
 
@@ -291,60 +475,49 @@
     const usdToDisplay=usd=> usd*(RATES[state.currency]||1);
     const formatPriceFromUsd=usd=> state.nf.format(usdToDisplay(usd));
 
-    // ===== Select builders =====
     function buildSelects(){
       const langSel=$('#lang'), curSel=$('#currency');
-
-      // I18N에 존재하는 언어만 노출
       const availableLangs=Object.keys(I18N);
       langSel.innerHTML = availableLangs.map(k=>`<option value="${k}">${LANGS[k]||k}</option>`).join('');
-
       curSel.innerHTML = Object.keys(CURRENCIES).map(k=>`<option value="${k}">${k}</option>`).join('');
-
-      if(!I18N[state.lang]) state.lang = 'en';
-      langSel.value = state.lang; curSel.value = state.currency;
+      if(!I18N[state.lang]) state.lang='en';
+      langSel.value=state.lang; curSel.value=state.currency;
 
       on(langSel,'change', ()=>{
-        state.lang = langSel.value;
-        setLang(state.lang); // i18n 현재 언어 갱신
-        try{ localStorage.setItem('sw_lang', state.lang); }catch(_){}
-        if(!CURRENCIES[state.currency]) state.currency = LANG_TO_DEFAULT_CURRENCY[state.lang] || 'USD';
-        state.nf = new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency});
-        $('#currency').value = state.currency;
-        applyLang();
-        updateFilterLabels();
-        renderList(); renderMarkers(); renderDrawerMarkers();
+        state.lang=langSel.value; setLang(state.lang);
+        try{ localStorage.setItem('sw_lang', state.lang);}catch(_){}
+        if(!CURRENCIES[state.currency]) state.currency=LANG_TO_DEFAULT_CURRENCY[state.lang]||'USD';
+        state.nf=new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency});
+        $('#currency').value=state.currency;
+        applyLang(); updateFilterLabels(); renderList(); renderMarkers(); renderDrawerMarkers();
       });
-
       on(curSel,'change', ()=>{
-        state.currency = curSel.value;
-        state.nf = new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency});
+        state.currency=curSel.value; state.nf=new Intl.NumberFormat(state.lang,{style:'currency',currency:state.currency});
         updateFilterLabels(); renderList(); renderMarkers(); renderDrawerMarkers();
       });
     }
 
-    // ===== Inline Map =====
+    /* Inline Map */
     function initMap(){
       if(map) return;
       map=L.map('map',{scrollWheelZoom:true}).setView([CITY_CENTER.lat,CITY_CENTER.lng],11);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
       markersLayer=L.layerGroup().addTo(map);
     }
-
     function makeIcon(h){
       const price=formatPriceFromUsd(h.price_usd||0);
       const emoji=h.emoji||'🏨';
-      return L.divIcon({ className:'hotel-marker', html:`<div class="wrap"><span class="emoji">${emoji}</span><span>${h.title}</span><span class="price">${price}</span></div>`, iconSize:[10,10], iconAnchor:[10,10] });
+      return L.divIcon({ className:'hotel-marker',
+        html:`<div class="wrap"><span class="emoji">${emoji}</span><span>${h.title}</span><span class="price">${price}</span></div>`,
+        iconSize:[10,10], iconAnchor:[10,10] });
     }
-
     function renderMarkers(){
       initMap(); markersLayer.clearLayers();
-      const items=getFilteredSorted(state.listings);
-      const pts=[];
+      const items=getFilteredSorted(state.listings); const pts=[];
       items.forEach(it=>{
         if(typeof it.lat!=='number'||typeof it.lng!=='number') return;
         const mk=L.marker([it.lat,it.lng],{icon:makeIcon(it)}).addTo(markersLayer)
-          .bindPopup(`<b>${it.title}</b><br>${it.city}, ${it.country}<br>${formatPriceFromUsd(it.price_usd||0)}/night`);
+          .bindPopup(`<b>${it.title}</b><br>${it.city}, ${it.country}<br>${formatPriceFromUsd(it.price_usd||0)}${t('labels.perNight')}`);
         pts.push([it.lat,it.lng]); it._mk=mk;
       });
       if(pts.length){
@@ -353,7 +526,7 @@
       }
     }
 
-    // ===== Drawer Map =====
+    /* Drawer Map */
     const mapDrawer=$('#mapDrawer'), openMapBtn=$('#openMapDrawer'), closeMapBtn=$('#closeMapDrawer');
     function initDrawerMap(){
       if(drawerMap) return;
@@ -370,12 +543,11 @@
 
     function renderDrawerMarkers(){
       initDrawerMap(); drawerLayer.clearLayers();
-      const items=getFilteredSorted(state.listings);
-      const pts=[];
+      const items=getFilteredSorted(state.listings); const pts=[];
       items.forEach(h=>{
         if(typeof h.lat!=='number'||typeof h.lng!=='number') return;
         const mk=L.marker([h.lat,h.lng],{icon:makeIcon(h)}).addTo(drawerLayer)
-          .bindPopup(`<b>${h.title}</b><br>${h.city}, ${h.country}<br>${formatPriceFromUsd(h.price_usd||0)}/night`);
+          .bindPopup(`<b>${h.title}</b><br>${h.city}, ${h.country}<br>${formatPriceFromUsd(h.price_usd||0)}${t('labels.perNight')}`);
         pts.push([h.lat,h.lng]); h._dmk=mk;
       });
       if(pts.length){
@@ -384,22 +556,17 @@
       }
     }
 
-    // ===== List =====
+    /* List */
     function card(it){
       const img=(it.images&&it.images[0])?it.images[0]:'https://picsum.photos/800/500?blur=0.2&random='+(it.id||Math.random());
       const rating=it.rating?Number(it.rating).toFixed(1):'—';
       const dist=(typeof it.distance_km==='number')?`${it.distance_km} km`:'—';
       const stayTypeKey='type.'+(it.stayType||'').toLowerCase();
       const typeText=t(stayTypeKey) || it.stayType || '';
-
       return `
       <article class="card hotel-card"
-        data-id="${it.id||''}"
-        data-price-usd="${it.price_usd||0}"
-        data-rating="${it.rating||0}"
-        data-distance="${it.distance_km||999}"
-        data-free="${!!it.free_cancel}"
-        data-type="${it.stayType||''}">
+        data-id="${it.id||''}" data-price-usd="${it.price_usd||0}" data-rating="${it.rating||0}"
+        data-distance="${it.distance_km||999}" data-free="${!!it.free_cancel}" data-type="${it.stayType||''}">
         <div class="card-media">
           <img src="${img}" alt="${it.title}">
           <div class="badge-row">
@@ -410,7 +577,6 @@
             <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
           </button>
         </div>
-
         <div class="card-body">
           <div>
             <div class="title">${it.title}</div>
@@ -420,7 +586,7 @@
               <span class="tax" data-i18n="labels.perNight">/ night</span>
             </div>
             <div class="cancel">${it.free_cancel ? t('filters.freeCancel').replace(' only','') : ' '}</div>
-            <div class="meta"><button class="btn ghost view-on-map" data-id="${it.id||''}">🗺️ 지도에서 보기</button></div>
+            <div class="meta"><button class="btn ghost view-on-map" data-id="${it.id||''}">🗺️ ${t('buttons.mapOpen')}</button></div>
             <a href="/booking.html?id=${encodeURIComponent(it.id||'')}" class="btn gold book" data-i18n="buttons.book">Book</a>
           </div>
           <div class="rating">${rating}</div>
@@ -429,40 +595,61 @@
     }
 
     function renderList(){
-      const mount=$('#list');
-      const items=getFilteredSorted(state.listings);
+      const mount=$('#list'); const items=getFilteredSorted(state.listings);
       mount.innerHTML=items.map(card).join('')||`<div class="hint">No listings yet.</div>`;
       applyLang();
-
-      // 가격 포맷 갱신
       mount.querySelectorAll('[data-price-usd]').forEach(el=>{
         const usd=parseFloat(el.getAttribute('data-price-usd')||'0'); el.textContent=formatPriceFromUsd(usd);
       });
-
-      // 지도에서 보기
       $$('.view-on-map',mount).forEach(btn=>{
         btn.addEventListener('click',e=>{
           const id=e.currentTarget.getAttribute('data-id');
-          const h=state.listings.find(x=>x.id===id);
-          if(!h) return;
+          const h=state.listings.find(x=>x.id===id); if(!h) return;
           initDrawerMap(); openDrawer(); renderDrawerMarkers();
-          drawerMap.flyTo([h.lat,h.lng],15,{duration:.6});
-          setTimeout(()=>{ if(h._dmk) h._dmk.openPopup(); },620);
+          drawerMap.flyTo([h.lat,h.lng],15,{duration:.6}); setTimeout(()=>{ if(h._dmk) h._dmk.openPopup(); },620);
         });
       });
     }
 
-    // ===== Sort/Filter =====
+    /* Sort & Filter */
+    function setHasAll(set, arr){ // arr에 set의 모든 값이 포함되어야 true (AND)
+      if(!set || set.size===0) return true;
+      if(!Array.isArray(arr)) return false;
+      for(const v of set){ if(!arr.includes(v)) return false; }
+      return true;
+    }
+
     function getFilteredSorted(list){
-      const maxUsd=Number((state.filters.priceMax/(RATES[state.currency]||1)).toFixed(2));
+      const f=state.filters;
+      const maxUsd=Number((f.priceMax/(RATES[state.currency]||1)).toFixed(2));
+
       const filtered=list.filter(x=>{
         if((x.price_usd||0)>maxUsd) return false;
-        if((x.rating||0)<state.filters.ratingMin) return false;
-        if(typeof x.distance_km==='number'&&x.distance_km>state.filters.distanceMax) return false;
-        if(state.filters.freeCancel && !x.free_cancel) return false;
-        if(state.filters.type.size && !state.filters.type.has(x.stayType)) return false;
+        if((x.rating||0)<f.ratingMin) return false;
+        if(typeof x.distance_km==='number'&&x.distance_km>f.distanceMax) return false;
+        if(f.freeCancel && !x.free_cancel) return false;
+
+        if(f.type.size && !f.type.has(x.stayType)) return false;
+        if(!setHasAll(f.amen, x.amenities)) return false;
+        if(!setHasAll(f.booking, x.booking)) return false;
+        if(!setHasAll(f.verify, x.verify)) return false;
+        if(!setHasAll(f.long, x.longstay)) return false;
+        if(!setHasAll(f.biz, x.business)) return false;
+        if(!setHasAll(f.acc, x.access)) return false;
+        if(!setHasAll(f.view, x.view)) return false;
+        if(!setHasAll(f.safe, x.safety)) return false;
+        if(!setHasAll(f.family, x.family)) return false;
+        if(!setHasAll(f.ent, x.entertain)) return false;
+        if(!setHasAll(f.out, x.outdoor)) return false;
+        if(!setHasAll(f.park, x.parking)) return false;
+        if(!setHasAll(f.pets, x.pets)) return false;
+        if(!setHasAll(f.checkin, x.checkin)) return false;
+        if(!setHasAll(f.exp, x.experiences)) return false;
+        if(!setHasAll(f.loc, x.location_tags)) return false;
+
         return true;
       });
+
       return filtered.sort((a,b)=>{
         if(state.sort==='price-asc')   return (a.price_usd||0)-(b.price_usd||0);
         if(state.sort==='price-desc')  return (b.price_usd||0)-(a.price_usd||0);
@@ -472,33 +659,73 @@
       });
     }
 
-    // ===== Filters UI =====
     function openFilters(){ document.body.classList.add('filter-open'); }
     function closeFilters(){ document.body.classList.remove('filter-open'); }
-    function updateFilterLabels(){ $('#fPriceVal').textContent=state.nf.format(state.filters.priceMax); $('#fRatingVal').textContent=state.filters.ratingMin.toFixed(1); $('#fDistanceVal').textContent=`${state.filters.distanceMax} km`; }
+    function updateFilterLabels(){
+      $('#fPriceVal').textContent=state.nf.format(state.filters.priceMax);
+      $('#fRatingVal').textContent=state.filters.ratingMin.toFixed(1);
+      $('#fDistanceVal').textContent=`${state.filters.distanceMax} km`;
+      applyLang();
+    }
     function readChecks(id,set){ set.clear(); $$('#'+id+' input[type=checkbox]:checked').forEach(i=>set.add(i.value)); }
     function resetAllFilters(){
-      state.filters.priceMax=1000; state.filters.ratingMin=0; state.filters.distanceMax=30; state.filters.freeCancel=false;
-      state.filters.type.clear();
+      const f=state.filters;
+      f.priceMax=1000; f.ratingMin=0; f.distanceMax=30; f.freeCancel=false;
+      Object.keys(f).forEach(k=>{ if(f[k] instanceof Set) f[k].clear(); });
       $('#fPrice').value=1000; $('#fRating').value=0; $('#fDistance').value=30; $('#fFreeCancel').checked=false;
       $$('aside .checks input[type=checkbox]').forEach(i=>i.checked=false);
       updateFilterLabels();
     }
 
-    // ===== Data =====
+    /* Data with attributes to support filters */
     async function loadListings(){
-      try{
-        // 데모 데이터
-        return [
-          {id:'ist-001', title:'Bosphorus View Suite', city:'Istanbul', country:'Türkiye', stayType:'Apartment', price_usd:120, rating:4.6, distance_km:1.2, free_cancel:true, lat:41.038, lng:29.01, emoji:'🏨'},
-          {id:'par-002', title:'Paris Luxury Stay', city:'Paris', country:'France', stayType:'Hotel', price_usd:210, rating:4.9, distance_km:0.5, free_cancel:false, lat:48.8566, lng:2.3522, emoji:'🏨'},
-          {id:'sel-003', title:'Seoul Riverside Motel', city:'Seoul', country:'Korea', stayType:'Motel', price_usd:75, rating:4.2, distance_km:3.5, free_cancel:true, lat:37.5665, lng:126.9780, emoji:'🏨'},
-          {id:'tok-004', title:'Tokyo Premium Ryokan', city:'Tokyo', country:'Japan', stayType:'Ryokan', price_usd:320, rating:5.0, distance_km:0.8, free_cancel:true, lat:35.6762, lng:139.6503, emoji:'🏨'}
-        ];
-      }catch(e){ console.warn(e); return []; }
+      return [
+        {
+          id:'ist-001', title:'Bosphorus View Suite', city:'Istanbul', country:'Türkiye',
+          stayType:'Apartment', price_usd:120, rating:4.6, distance_km:1.2, free_cancel:true,
+          lat:41.038, lng:29.01, emoji:'🏨',
+          amenities:['Wi-Fi','Kitchen','Washer','Air conditioning','Workspace'],
+          booking:['Instant'], verify:['Verified listings'], longstay:['Long deals'],
+          business:['Invoice'], access:['Elevator','Wide doorway'], view:['Sea view','City view'],
+          safety:['Smoke alarm','First aid kit'], family:['Crib'], entertain:['TV','Netflix'],
+          outdoor:['Patio'], parking:['On-site'], pets:['Pet allowed'], checkin:['Self'],
+          experiences:['Traditional','Wine'], location_tags:['City center','Near station']
+        },
+        {
+          id:'par-002', title:'Paris Luxury Stay', city:'Paris', country:'France',
+          stayType:'Hotel', price_usd:210, rating:4.9, distance_km:0.5, free_cancel:false,
+          lat:48.8566, lng:2.3522, emoji:'🏨',
+          amenities:['Wi-Fi','Pool','Gym','Breakfast','Air conditioning'],
+          booking:['Request'], verify:['Verified reviews'], longstay:[],
+          business:['B2B'], access:['Elevator','Accessible bathroom'], view:['City view','Garden'],
+          safety:['CO alarm','Smoke alarm'], family:['High chair'], entertain:['TV'],
+          outdoor:['Private garden'], parking:['Garage'], pets:[], checkin:[],
+          experiences:['Nature'], location_tags:['City center','Near station']
+        },
+        {
+          id:'sel-003', title:'Seoul Riverside Motel', city:'Seoul', country:'Korea',
+          stayType:'Motel', price_usd:75, rating:4.2, distance_km:3.5, free_cancel:true,
+          lat:37.5665, lng:126.9780, emoji:'🏨',
+          amenities:['Wi-Fi','Parking','Air conditioning'], booking:['Instant'], verify:[],
+          longstay:['Long deals'], business:[], access:['Step-free'], view:['City view'],
+          safety:['Smoke alarm'], family:['Stroller friendly'], entertain:['TV','Game console'],
+          outdoor:['BBQ'], parking:['Street'], pets:['Pet allowed'], checkin:['Self'],
+          experiences:['Camping'], location_tags:['Near station']
+        },
+        {
+          id:'tok-004', title:'Tokyo Premium Ryokan', city:'Tokyo', country:'Japan',
+          stayType:'Ryokan', price_usd:320, rating:5.0, distance_km:0.8, free_cancel:true,
+          lat:35.6762, lng:139.6503, emoji:'🏨',
+          amenities:['Wi-Fi','Kitchen','Washer','Dryer'], booking:['Request'], verify:['Verified reviews'],
+          longstay:[], business:['B2B','Invoice'], access:['Step-free','Elevator'], view:['Mountain view','Garden'],
+          safety:['CO alarm','First aid kit'], family:['Crib','High chair'], entertain:['TV','Netflix'],
+          outdoor:['Private garden','Patio'], parking:['On-site'], pets:[], checkin:['Self'],
+          experiences:['Ski','Traditional'], location_tags:['Near station','City center']
+        }
+      ];
     }
 
-    // ===== Hash deeplink =====
+    /* Hash */
     function parseHashParams(){ const h=(location.hash||'').replace(/^#/,''); const parts=h?h.split('&'):[]; const p={}; for(const x of parts){ if(!x) continue; const [k,vRaw]=x.split('='); const k2=decodeURIComponent(k||'').trim().toLowerCase(); const v=decodeURIComponent((vRaw??'').trim()); p[k2]=v===''?true:v; } return p; }
     function applyHashParams(){
       const q=parseHashParams(); let rer=false, remap=false;
@@ -516,7 +743,7 @@
       updateFilterLabels(); if(rer){ renderList(); renderMarkers(); renderDrawerMarkers(); } else if(remap){ renderMarkers(); renderDrawerMarkers(); }
     }
 
-    // ===== Wires & Boot =====
+    /* Wires */
     function wireFilters(){
       on($('#btnFilter'),'click',openFilters);
       on($('#btnCloseFilter'),'click',closeFilters);
@@ -524,14 +751,28 @@
       on($('#fPrice'),'input',e=>{ state.filters.priceMax=+e.target.value; updateFilterLabels(); });
       on($('#fRating'),'input',e=>{ state.filters.ratingMin=+e.target.value; updateFilterLabels(); });
       on($('#fDistance'),'input',e=>{ state.filters.distanceMax=+e.target.value; updateFilterLabels(); });
+
       on($('#btnResetFilters'),'click',()=>{ resetAllFilters(); renderList(); renderMarkers(); renderDrawerMarkers(); });
-      on($('#btnApplyFilters'),'click',()=>{ readChecks('fType',state.filters.type); state.filters.freeCancel=$('#fFreeCancel').checked; closeFilters(); renderList(); renderMarkers(); renderDrawerMarkers(); });
+
+      on($('#btnApplyFilters'),'click',()=>{
+        const f=state.filters;
+        readChecks('fType',f.type);
+        f.freeCancel=$('#fFreeCancel').checked;
+
+        readChecks('fAmen',f.amen); readChecks('fBooking',f.booking); readChecks('fVerify',f.verify);
+        readChecks('fLong',f.long); readChecks('fBiz',f.biz); readChecks('fAcc',f.acc);
+        readChecks('fView',f.view); readChecks('fSafe',f.safe); readChecks('fFamily',f.family);
+        readChecks('fEnt',f.ent); readChecks('fOut',f.out); readChecks('fPark',f.park);
+        readChecks('fPets',f.pets); readChecks('fCheckin',f.checkin); readChecks('fExp',f.exp);
+        readChecks('fLoc',f.loc);
+
+        closeFilters(); renderList(); renderMarkers(); renderDrawerMarkers();
+      });
     }
     function wireHeader(){
       on($('#btnSort'),'click',()=>{
         const next={'price-asc':'price-desc','price-desc':'rating-desc','rating-desc':'distance-asc','distance-asc':'price-asc'}[state.sort]||'price-asc';
-        state.sort=next; renderList(); renderMarkers(); renderDrawerMarkers();
-        $('#btnSort').querySelector('span').textContent=t('controls.sort')+': '+next;
+        state.sort=next; renderList(); renderMarkers(); renderDrawerMarkers(); applyLang();
       });
       on($('#btnMapList'),'click',()=>{ const s=$('#map').style; s.display=(s.display==='none')?'':'none'; });
     }
