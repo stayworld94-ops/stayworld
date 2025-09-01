@@ -1,8 +1,9 @@
-// membership.js — FINAL6 (10 langs + currency auto + stacked benefits + yearly discount)
+// membership.js — FINAL8 (10 langs + auto currency + stacked benefits + yearly discount + 안전성 보강)
+window.__membershipVer = 'FINAL8';
 
-// ===== CONFIG =====
-const SAFETY_MARGIN = 1.07;          // price display safety margin
-const YEARLY_DISCOUNT_RATE = 0.92;   // ~8% off yearly
+/* ===== CONFIG ===== */
+const SAFETY_MARGIN = 1.07;           // 요금 표시 완충치
+const YEARLY_DISCOUNT_RATE = 0.92;    // 연간 약 8% 할인
 const ROUND_UP_TO_0_01 = v => Math.ceil(v * 100) / 100;
 
 const PLAN_CAPS = {
@@ -19,10 +20,9 @@ const LEVELS = [
   { name:'Elite',    minUSD:6000 },
 ];
 
-// monthly base prices (USD)
 const MONTHLY_PRICES_USD = { plus: 9.99, black: 24.99 };
 
-// ===== I18N — 10 languages =====
+/* ===== I18N (10) ===== */
 const I18N = {
   en:{monthLeft:'This month remaining',boostLeft:'Points boost left',instLeft:'Instant discount',perBooking:'per booking',bookings:'bookings',tickets:'Tickets',eligible:'Eligible now',notYet:'Not yet',nextLevel:'Next level',inherit:'Higher tiers include all lower-level benefits.',toGo:'{next} — {amount} left',maxLevel:'Top level reached',noBooking:'No booking for 60 days → auto demotion by 1 level (notification sent).',title:'Membership + Levels (Stacked Benefits)',subtitle:'Membership gives instant perks; levels reward long-term activity. Use both for maximum value.',plans:'Membership Plans',monthlyBtn:'Monthly',yearlyBtn:'Yearly (save {pct}%)'},
   ko:{monthLeft:'이번 달 남은 혜택',boostLeft:'포인트 부스트 잔여',instLeft:'즉시할인 잔여',perBooking:'예약당',bookings:'회',tickets:'티켓',eligible:'지급 가능',notYet:'아직 조건 미달',nextLevel:'다음 레벨',inherit:'상위 레벨은 하위 레벨 혜택을 모두 포함합니다.',toGo:'{next} — {amount} 남음',maxLevel:'최상위 레벨입니다',noBooking:'60일 동안 예약이 없으면 1단계 자동 강등 (알림 발송).',title:'멤버십 + 레벨 (혜택 누적)',subtitle:'멤버십은 즉시 혜택을 제공하고, 레벨은 장기 활동을 보상합니다. 두 가지를 모두 활용하세요.',plans:'멤버십 요금제',monthlyBtn:'월간',yearlyBtn:'연간 (약 {pct}% 할인)'},
@@ -36,17 +36,21 @@ const I18N = {
   ar:{monthLeft:'المتبقي هذا الشهر',boostLeft:'رصيد تعزيز النقاط',instLeft:'خصم فوري',perBooking:'لكل حجز',bookings:'حجوزات',tickets:'تذاكر',eligible:'متاح الآن',notYet:'ليس بعد',nextLevel:'المستوى التالي',inherit:'المستويات الأعلى تتضمن مزايا الأدنى.',toGo:'{next} — متبقٍ {amount}',maxLevel:'تم بلوغ أعلى مستوى',noBooking:'لا حجوزات لمدة 60 يوماً → خفض تلقائي بمستوى واحد (مع إشعار).',title:'العضوية + المستويات (مزايا متراكمة)',subtitle:'العضوية تمنح مزايا فورية؛ المستويات تكافئ النشاط طويل الأمد.',plans:'خطط العضوية',monthlyBtn:'شهري',yearlyBtn:'سنوي (وفر {pct}%)'}
 };
 
-// Benefit copy
 const BENEFIT_I18N = {
   en:{dash:'—',member_offers:'Member-only offers',points3:'3% points back',points5:'5% points back',points7:'7% points back',points10:'10% points back',points15:'15% points back',priority_support:'Priority support',waitlist_priority:'Waitlist priority',early_late:'Early check-in / Late check-out (host-provided)',flexible_24h:'Flexible cancellation (24h, where allowed)',upgrade_avail:'Room upgrade when available',secret_deals:'Secret Deals+ (host-funded)',birthday_2x:'Birthday month ×2 points',lounge_partner:'Airport lounge (partners)',pickup_partner:'Airport pickup (partners)',overbooking_protect:'Overbooking protection',concierge_vip:'VIP concierge (AI+staff, 3 sessions/mo)',dedicated_channel:'Dedicated support channel',status_match:'Status match (invite-only)',secret_deals_plus:'Invite-only Secret Deals++'},
   ko:{dash:'—',member_offers:'멤버 전용 오퍼',points3:'3% 포인트 백',points5:'5% 포인트 백',points7:'7% 포인트 백',points10:'10% 포인트 백',points15:'15% 포인트 백',priority_support:'우선 상담',waitlist_priority:'대기자 우선',early_late:'얼리 체크인 / 레이트 체크아웃 (호스트 제공)',flexible_24h:'유연 취소 (24시간, 정책 허용 시)',upgrade_avail:'객실 업그레이드 (가능 시)',secret_deals:'시크릿 딜+ (호스트 부담)',birthday_2x:'생일 달 포인트 2배',lounge_partner:'공항 라운지 (제휴)',pickup_partner:'공항 픽업 (제휴)',overbooking_protect:'오버부킹 보호',concierge_vip:'VIP 컨시어지 (AI+스태프, 월 3회)',dedicated_channel:'전용 지원 채널',status_match:'상태 매칭 (초대 한정)',secret_deals_plus:'인바이트 전용 시크릿 딜++'}
 };
 
-// ===== helpers =====
-function t(key){ const pack = I18N[state.lang] || I18N.en; return pack[key] ?? I18N.en[key] ?? key; }
-function bt(key){ const lang=(state.lang||'en').toLowerCase(); const pack=BENEFIT_I18N[lang]||BENEFIT_I18N.en; return pack[key]||BENEFIT_I18N.en[key]||key; }
+/* ===== helpers ===== */
+const safeNum = v => Number.isFinite(v) ? v : 0;
+function t(key){ const pack = I18N[state.lang] || I18N.en; return (pack && key in pack) ? pack[key] : (I18N.en[key] ?? key); }
+function bt(key){
+  const lang=(state.lang||'en').toLowerCase();
+  const pack=BENEFIT_I18N[lang]||BENEFIT_I18N.en;
+  return (pack && pack[key]) ? pack[key] : (BENEFIT_I18N.en[key] || key);
+}
 
-// Currency (10)
+/* Currency (10) */
 const SUPPORTED_CUR = new Set(['USD','EUR','GBP','JPY','KRW','CNY','MXN','BRL','RUB','AUD']);
 const FX = { USD:1, EUR:0.92, GBP:0.78, JPY:155, KRW:1350, CNY:7.3, MXN:18, BRL:5.3, RUB:90, AUD:1.5 };
 const ZERO_DEC = new Set(['JPY','KRW']);
@@ -75,10 +79,11 @@ function detectRegionTag(){
   return 'US';
 }
 
-// ===== STATE =====
+/* ===== STATE ===== */
 const params = new URLSearchParams(location.search);
 const OVERRIDE_LANG = params.get('lang');
 const OVERRIDE_CURR = params.get('currency');
+
 const state = {
   lang:(OVERRIDE_LANG || (document.documentElement.getAttribute('lang')||navigator.language||'en')).split('-')[0],
   currency:'USD',
@@ -97,29 +102,35 @@ state.currency = pickCurrency10();
 
 function moneyUSDtoLocal(usd){
   const code = state.currency, rate = FX[code] || 1;
-  const v = usd * rate * SAFETY_MARGIN;
+  const v = safeNum(usd) * rate * SAFETY_MARGIN;
   const localeGuess =
     (state.lang==='ko')?'ko-KR':(state.lang==='ja')?'ja-JP':(state.lang==='es')?'es-ES':
     (state.lang==='fr')?'fr-FR':(state.lang==='de')?'de-DE':(state.lang==='pt')?'pt-PT':
     (state.lang==='zh')?'zh-CN':(state.lang==='ru')?'ru-RU':(state.lang==='ar')?'ar-SA':'en-US';
-  return new Intl.NumberFormat(localeGuess, { style:'currency', currency:code, maximumFractionDigits: ZERO_DEC.has(code)?0:2 }).format(v);
+  return new Intl.NumberFormat(localeGuess, {
+    style:'currency', currency:code,
+    maximumFractionDigits: ZERO_DEC.has(code)?0:2
+  }).format(v);
 }
 
-// ===== DOM helpers =====
+/* ===== DOM helpers ===== */
 const $=id=>document.getElementById(id);
 const setText=(id,txt)=>{const el=$(id); if(el) el.textContent=txt;};
-const setGauge=(id,pct)=>{const el=$(id); if(el) el.style.width=`${Math.max(0,Math.min(100,pct))}%`;};
+const setGauge=(id,pct)=>{const el=$(id); if(el) el.style.width=`${Math.max(0,Math.min(100, safeNum(pct)))}%`;};
 
-// ===== Levels =====
-function levelFromSpend(usd12m){ let idx=0; for(let i=0;i<LEVELS.length;i++){ if(usd12m>=LEVELS[i].minUSD) idx=i; } return {index:idx,name:LEVELS[idx].name}; }
+/* ===== Levels ===== */
+function levelFromSpend(usd12m){
+  let idx=0; for(let i=0;i<LEVELS.length;i++){ if(safeNum(usd12m)>=LEVELS[i].minUSD) idx=i; }
+  return {index:idx,name:LEVELS[idx].name};
+}
 function nextLevelProgress(usd12m){
   const cur=levelFromSpend(usd12m), curMin=LEVELS[cur.index].minUSD, next=LEVELS[cur.index+1];
   if(!next) return {next:null,pct:100,leftUSD:0};
-  const span=next.minUSD-curMin, done=Math.max(0,usd12m-curMin);
-  return {next:next.name,pct:Math.max(0,Math.min(100,(done/span)*100)),leftUSD:Math.max(0,next.minUSD-usd12m)};
+  const span=next.minUSD-curMin, done=Math.max(0,safeNum(usd12m)-curMin);
+  return {next:next.name,pct:span>0?Math.max(0,Math.min(100,(done/span)*100)):100,leftUSD:Math.max(0,next.minUSD-safeNum(usd12m))};
 }
 
-// ===== Stacked Benefits (higher includes lower; show best points %) =====
+/* ===== Stacked Benefits ===== */
 function getMergedBenefits(){
   const LEVEL_BENEFIT_KEYS={
     Bronze:['dash','member_offers'],
@@ -163,8 +174,8 @@ function guardBenefits(){
   mo.observe(target,{subtree:true,childList:true,characterData:true}); renderBenefits();
 }
 
-// ===== Pricing =====
-function yearlyUSD(monthlyUSD){ return ROUND_UP_TO_0_01(monthlyUSD * 12 * YEARLY_DISCOUNT_RATE); }
+/* ===== Pricing ===== */
+function yearlyUSD(monthlyUSD){ return ROUND_UP_TO_0_01(safeNum(monthlyUSD) * 12 * YEARLY_DISCOUNT_RATE); }
 function renderPrices(){
   const billing = state.billing;
   const p = (billing==='yearly')
@@ -176,15 +187,15 @@ function renderPrices(){
 
   const m=$('billMonthly'), y=$('billYearly');
   if(m) m.textContent = t('monthlyBtn');
-  if(y){ const pct=Math.round((1-YEARLY_DISCOUNT_RATE)*100); y.textContent = t('yearlyBtn').replace('{pct}', `${pct}`); }
+  if(y){ const pct=Math.max(0, Math.round((1-YEARLY_DISCOUNT_RATE)*100)); y.textContent = t('yearlyBtn').replace('{pct}', `${pct}`); }
 }
 
-// ===== Usage left =====
+/* ===== Usage left ===== */
 function renderUsageLeft(){
   const m=state.membership; if(!m||!m.plan||!PLAN_CAPS[m.plan]) return;
   const caps=PLAN_CAPS[m.plan]; const u=state.usage||{boostUSDGranted:0,discountBookingsUsed:0};
-  const boostLeftUSD=Math.max(0, caps.boostMaxUSD - (u.boostUSDGranted||0));
-  const bookingsLeft=Math.max(0, (caps.bookingsPerMonth||0) - (u.discountBookingsUsed||0));
+  const boostLeftUSD=Math.max(0, safeNum(caps.boostMaxUSD) - safeNum(u.boostUSDGranted));
+  const bookingsLeft=Math.max(0, safeNum(caps.bookingsPerMonth) - safeNum(u.discountBookingsUsed));
 
   setText('lbl_perksLeft',t('monthLeft'));
   setText('lbl_boostLeft',t('boostLeft')+':');
@@ -194,15 +205,15 @@ function renderUsageLeft(){
   setText('uiDiscountPerBooking', moneyUSDtoLocal(caps.discountPerBookingUSD));
   setText('uiDiscountRemaining', `${bookingsLeft}`);
 
-  const eligible = (m.plan==='black' && (state.profile?.monthsActive||0)>=3 && (state.profile?.lifetimeSpend||0)>=1200) ||
-                   (m.plan==='plus'  && (state.profile?.monthsActive||0)>=2 && (state.profile?.lifetimeSpend||0)>=500);
+  const eligible = (m.plan==='black' && safeNum(state.profile?.monthsActive)>=3 && safeNum(state.profile?.lifetimeSpend)>=1200) ||
+                   (m.plan==='plus'  && safeNum(state.profile?.monthsActive)>=2 && safeNum(state.profile?.lifetimeSpend)>=500);
   setText('lbl_ticketsEligible', t('tickets')+':');
   setText('uiTicketsEligible', eligible ? t('eligible') : t('notYet'));
 }
 
-// ===== Next level =====
+/* ===== Next level ===== */
 function renderNextLevel(){
-  const spend12m = state.profile?.spend12mUSD ?? state.profile?.lifetimeSpend ?? 0;
+  const spend12m = safeNum(state.profile?.spend12mUSD ?? state.profile?.lifetimeSpend ?? 0);
   const cur=levelFromSpend(spend12m), nx=nextLevelProgress(spend12m);
   setText('levelTitle', `Your Level: ${cur.name}`);
   setText('lbl_nextLevel', t('nextLevel'));
@@ -219,29 +230,32 @@ function renderNextLevel(){
   setGauge('gaugeFill', nx.pct); setText('progressPct', `${Math.round(nx.pct)}%`);
 }
 
-// ===== Billing toggle =====
+/* ===== Billing toggle ===== */
 function wireBilling(){
   const m=$('billMonthly'), y=$('billYearly');
   if(m) m.addEventListener('click', ()=>{ state.billing='monthly'; renderPrices(); });
   if(y) y.addEventListener('click', ()=>{ state.billing='yearly';  renderPrices(); });
 }
 
-// ===== Language / Currency wiring =====
+/* ===== Language / Currency wiring ===== */
 function setCurrency(code){
   code = (code||'').toUpperCase();
   if (!SUPPORTED_CUR.has(code)) return;
   state.currency = code;
-  state.userPickedCurrency = true; // user manually changed
+  state.userPickedCurrency = true;
   renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits();
 }
 function setLanguage(lang){
   if (!lang) return;
-  state.lang = lang.split('-')[0];
+  state.lang = (lang.split('-')[0] || 'en');
 
-  // auto currency by language unless user picked manually
+  // 사용자가 직접 바꾸지 않았다면 언어에 맞춰 통화 자동 변경
   if (!state.userPickedCurrency) {
-    state.currency = langCurrency10(state.lang) || state.currency;
-    const sel = $('currencySelect'); if (sel && SUPPORTED_CUR.has(state.currency)) sel.value = state.currency;
+    const auto = langCurrency10(state.lang) || state.currency;
+    if (SUPPORTED_CUR.has(auto)) {
+      state.currency = auto;
+      const sel = $('currencySelect'); if (sel) sel.value = state.currency;
+    }
   }
 
   applyStaticTexts();
@@ -266,7 +280,7 @@ function wireCurrencySelector(){
   sel.addEventListener('change', ()=> setCurrency(sel.value));
 }
 
-// ===== Static texts applied by language =====
+/* ===== Static texts ===== */
 function applyStaticTexts(){
   setText('dwTop', t('noBooking'));
   setText('mb_title', t('title'));
@@ -275,14 +289,15 @@ function applyStaticTexts(){
   if (header) header.textContent = t('plans');
 }
 
-// ===== Demo data (replace with Firebase) =====
+/* ===== Demo data (replace with Firebase later) ===== */
 async function fetchProfileAndUsage(){
+  // TODO: 실제 데이터 연동 시 교체
   state.profile    = { spend12mUSD: 920, lifetimeSpend: 1800, monthsActive: 4 };
   state.membership = { plan:'plus', billing: state.billing, active:true };
   state.usage      = { boostUSDGranted: 3.5, discountBookingsUsed: 1 };
 }
 
-// ===== Init =====
+/* ===== Init ===== */
 async function start(){
   await fetchProfileAndUsage();
   guardBenefits();
@@ -292,8 +307,15 @@ async function start(){
   renderNextLevel();
   wireBilling();
   wireCurrencySelector();
-  observeHtmlLang();      // watch <html lang>
-  setLanguage(state.lang); // ensure initial language render
+  observeHtmlLang();        // watch <html lang>
+  setLanguage(state.lang);  // initial render
 }
+
+// 외부에서 강제 리프레시 가능하도록 export
+window.StayWorldMembership = {
+  refresh: ()=>{ renderPrices(); renderUsageLeft(); renderNextLevel(); renderBenefits(); },
+  setCurrency, setLanguage
+};
+
 if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start);
 else start();
