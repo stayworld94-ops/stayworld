@@ -121,55 +121,54 @@
 
 <body>
   <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-row">
-      <a href="/" class="brand">
-        <img src="/stayworld-logo.png" alt="StayWorld" class="brand-logo" />
-        <span class="brand-text">STAYWORLD</span>
-      </a>
-
-      <nav class="main-nav" aria-label="Primary">
-        <button class="btn btn-gold" id="btnMyPage">My Page</button>
-
-        <!-- Host 메뉴 -->
-        <div class="nav-item dropdown" id="hostMenu">
-          <button class="nav-link dropdown-toggle" data-i18n="nav_host">Host</button>
-          <div class="dropdown-panel">
-            <!-- 비로그인 상태 -->
-            <a href="host-login.html"  class="dropdown-item" data-host-visible="signedOut" data-i18n="host_login">Host Login</a>
-            <a href="host-register.html" class="dropdown-item" data-host-visible="signedOut" data-i18n="host_signup">Host Sign Up</a>
-            <div class="dropdown-divider" data-host-visible="signedOut"></div>
-            <!-- 로그인 상태 -->
-            <a href="host-property-new.html" class="dropdown-item" data-host-visible="signedIn" data-i18n="host_register_property">Register Property</a>
-            <a href="host-dashboard.html" class="dropdown-item" data-host-visible="signedIn" data-i18n="host_my_listings">My Listings</a>
-            <button class="dropdown-item" data-host-visible="signedIn" id="hostLogoutBtn" type="button" data-i18n="host_logout">Logout</button>
-          </div>
-        </div>
-
-        <!-- 멤버십 메뉴(추가) -->
-        <a href="membership.html" data-i18n="nav_membership">Membership</a>
-
-        <a href="login.html" id="navAuthLink" data-i18n="nav_login">Login</a>
-      </nav>
-
-      <div class="header-cta">
-        <label for="lang" class="lang-label" data-i18n="language">Language</label>
-        <select id="lang" class="lang-select">
-          <option value="EN" selected>EN</option>
-          <option value="KO">KO</option>
-          <option value="JA">JA</option>
-          <option value="ZH">ZH</option>
-          <option value="FR">FR</option>
-          <option value="ES">ES</option>
-          <option value="DE">DE</option>
-          <option value="TR">TR</option>
-          <option value="AR">AR</option>
-          <option value="RU">RU</option>
-        </select>
-        <a href="signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign Up</a>
-       <div id="authArea"></div>
+ <header class="site-header">
+  <div class="container flex-between">
+    <!-- 로고 -->
+    <div class="logo">
+      <a href="/"><img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo" /></a>
     </div>
-  </header>
+
+    <!-- 내비게이션 -->
+    <nav class="main-nav">
+      <a href="/" id="t_nav_home" data-i18n="nav.home">Home</a>
+      <a href="/membership" id="t_nav_membership" data-i18n="nav.membership">Membership</a>
+    </nav>
+
+    <!-- 언어 선택 -->
+    <div class="lang-select">
+      <select id="langSelect">
+        <option value="en">EN</option>
+        <option value="ko">KO</option>
+        <option value="fr">FR</option>
+        <option value="ja">JA</option>
+        <option value="de">DE</option>
+        <option value="es">ES</option>
+        <option value="it">IT</option>
+        <option value="tr">TR</option>
+        <option value="zh">ZH</option>
+        <option value="ru">RU</option>
+      </select>
+    </div>
+
+    <!-- 인증 영역 -->
+    <div class="auth-area">
+      <!-- 로그인 전만 보임 -->
+      <a href="/login" class="btn" data-auth="login-btn">Login</a>
+
+      <!-- 로그인 후만 보임 -->
+      <button class="btn" data-auth="logout-btn" style="display:none">Logout</button>
+
+      <!-- 로그인 후 사용자 표시 -->
+      <span class="user-info" data-auth="user-only" style="display:none">
+        <span class="avatar" data-auth="avatar-initial"></span>
+        <b data-auth="profile-name"></b>
+      </span>
+
+      <!-- 게스트 전용 메시지 -->
+      <span class="guest-msg" data-auth="guest-only">Welcome, Guest</span>
+    </div>
+  </div>
+</header>
   <!-- Hero 섹션 위나 아래 원하는 위치 -->
 <div id="welcomeBanner" class="hidden banner bg-white/10 text-white p-4 rounded-xl mb-4">
   <span data-i18n="welcome_prefix">Welcome</span>, 
