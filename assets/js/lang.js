@@ -1,444 +1,611 @@
-/* ===== StayWorld i18n — 10 languages (EN/KO/TR/FR/JA/DE/ES/IT/ZH/RU) ===== */
+/* assets/js/lang.js — StayWorld i18n (10 languages)
+   EN / KO / FR / TR / JA / DE / ES / IT / ZH-CN / RU
+   - data-i18n="key" 로 표시되는 모든 엘리먼트 자동 번역
+   - window.STAY_I18N.{setLang, t, applyI18n, current} 제공
+*/
 (function () {
-  // 1) 기본 딕셔너리 (홈 상단/카드/배너 등)
+  /* ---------- Dictionaries ---------- */
   const LANGS = {
+    /* ===== English ===== */
     en: {
-      nav: { home: "Home", membership: "Membership", login: "Login", signup: "Sign Up" },
-      h1: "Luxury stays.<br><span class='gold'>Global reach.</span>",
-      pay: "Cards, bank transfer & crypto (BTC · ETH · USDT).",
-      filters: "Filters", search: "Search", placeholder: "Paris, Tokyo, Istanbul…",
-      card1: "Verified stays", card1sub: "Top picks near you.",
-      card2: "StayWorld+ Rewards", card2sub: "Earn points on every booking.",
-      card3: "Secure payments", card3sub: "Visa, Mastercard, Amex & Crypto.",
-      // 🔶 배너/섹션 추가 키
-      banner_discount: "10% discount on your first booking",
-      banner_cta: "Join now",
-      recommended_title: "Recommended stays",
+      /* common nav (optional) */
+      nav_home: "Home",
+      nav_membership: "Membership",
+      nav_login: "Login",
+      nav_signup: "Sign Up",
 
-      membership: {} // membership 병합으로 채워짐
+      /* UI */
+      ui_membership: "Membership",
+      ui_login: "Login",
+      ui_title: "Membership + Levels",
+      ui_subtitle: "Choose a plan. Perks and level progress update automatically.",
+      ui_plans: "Membership Plans",
+      ui_monthly: "Monthly",
+      ui_yearly: "Yearly",
+      ui_plus_desc: "Instant perks + monthly boosts",
+      ui_black_desc: "More boosts + priority + extras",
+      ui_start_plus: "Start Plus",
+      ui_start_black: "Start Black",
+      ui_your_membership: "Your Membership",
+      ui_this_month: "This month remaining",
+      ui_points_boost: "Points boost",
+      ui_instant_discount: "Instant discount",
+      ui_per_booking: "per booking",
+      ui_tickets: "Tickets",
+      ui_your_level: "Your Level",
+      ui_next_level: "Next level",
+      ui_overall_progress: "Overall progress",
+      ui_levels: "Levels",
+      ui_inherit_note: "Higher tiers include all lower-level benefits.",
+      ui_checkout: "Checkout",
+      ui_pay_crypto: "Pay with Crypto",
+      ui_paypal: "Pay with PayPal",
+      ui_top_level: "Top level reached",
+
+      /* % back labels */
+      back_0: "0% back",
+      back_3: "3% back",
+      back_5: "5% back",
+      back_7: "7% back",
+      back_10: "10% back",
+      back_15: "15% back",
+
+      /* Benefits */
+      benefit_basic: "Basic usage (auto-assigned on sign-up)",
+      benefit_silver_3: "3% points on first booking",
+      benefit_gold_5: "5% points on every booking",
+      benefit_priority: "Priority customer support",
+      benefit_platinum_7: "7% points back",
+      benefit_platinum_season: "Seasonal discount applied",
+      benefit_diamond_10: "10% points back",
+      benefit_diamond_coupon: "Exclusive coupons",
+      benefit_diamond_support: "Priority support center",
+      benefit_elite_private: "Private deals access",
+      benefit_elite_emergency: "Emergency priority support",
     },
+
+    /* ===== Korean ===== */
     ko: {
-      nav: { home: "홈", membership: "멤버십", login: "로그인", signup: "가입" },
-      h1: "럭셔리 스테이.<br><span class='gold'>글로벌 리치.</span>",
-      pay: "카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
-      filters: "필터", search: "검색", placeholder: "파리, 도쿄, 이스탄불…",
-      card1: "인증 숙소", card1sub: "가까운 베스트 픽.",
-      card2: "StayWorld+ 리워드", card2sub: "매 예약마다 포인트 적립.",
-      card3: "안전한 결제", card3sub: "Visa, Mastercard, Amex & 크립토.",
-      banner_discount: "신규 회원 첫 예약 10% 할인",
-      banner_cta: "지금 가입하기",
-      recommended_title: "추천 숙소",
+      nav_home: "홈",
+      nav_membership: "Membership",
+      nav_login: "Login",
+      nav_signup: "가입",
 
-      membership: {}
+      ui_membership: "Membership",
+      ui_login: "Login",
+      ui_title: "Membership + Levels",
+      ui_subtitle: "플랜을 선택하세요. 혜택과 레벨 진행률이 자동으로 반영됩니다.",
+      ui_plans: "멤버십 플랜",
+      ui_monthly: "월간",
+      ui_yearly: "연간",
+      ui_plus_desc: "즉시 혜택 + 월간 부스트",
+      ui_black_desc: "더 많은 부스트 + 우선 응대 + 추가 혜택",
+      ui_start_plus: "플러스 시작",
+      ui_start_black: "블랙 시작",
+      ui_your_membership: "내 멤버십",
+      ui_this_month: "이 달 남은 혜택",
+      ui_points_boost: "포인트 부스트",
+      ui_instant_discount: "즉시 할인",
+      ui_per_booking: "예약당",
+      ui_tickets: "티켓",
+      ui_your_level: "현재 레벨",
+      ui_next_level: "다음 레벨",
+      ui_overall_progress: "전체 진행률",
+      ui_levels: "레벨",
+      ui_inherit_note: "상위 레벨은 하위 레벨의 모든 혜택을 포함합니다.",
+      ui_checkout: "결제",
+      ui_pay_crypto: "크립토로 결제",
+      ui_paypal: "페이팔로 결제",
+      ui_top_level: "최고 레벨입니다",
+
+      back_0: "0% 적립",
+      back_3: "3% 적립",
+      back_5: "5% 적립",
+      back_7: "7% 적립",
+      back_10: "10% 적립",
+      back_15: "15% 적립",
+
+      benefit_basic: "기본 이용 가능 (회원가입 시 자동 부여)",
+      benefit_silver_3: "첫 예약 시 3% 포인트 적립",
+      benefit_gold_5: "매 예약 시 5% 포인트 적립",
+      benefit_priority: "우선 고객 응대",
+      benefit_platinum_7: "7% 포인트 적립",
+      benefit_platinum_season: "시즌 할인 자동 적용",
+      benefit_diamond_10: "10% 포인트 적립",
+      benefit_diamond_coupon: "전용 쿠폰",
+      benefit_diamond_support: "고객센터 우선권",
+      benefit_elite_private: "프라이빗 딜 접근",
+      benefit_elite_emergency: "긴급 지원 우선 처리",
     },
+
+    /* ===== French ===== */
     fr: {
-      nav: { home: "Accueil", membership: "Adhésion", login: "Connexion", signup: "S’inscrire" },
-      h1: "Séjours de luxe.<br><span class='gold'>Portée mondiale.</span>",
-      pay: "Cartes, virement & crypto (BTC · ETH · USDT).",
-      filters: "Filtres", search: "Rechercher", placeholder: "Paris, Tokyo, Istanbul…",
-      card1: "Séjours vérifiés", card1sub: "Meilleures options près de chez vous.",
-      card2: "Récompenses StayWorld+", card2sub: "Des points à chaque réservation.",
-      card3: "Paiements sécurisés", card3sub: "Visa, Mastercard, Amex & Crypto.",
-      banner_discount: "10% de réduction sur votre première réservation",
-      banner_cta: "Rejoindre",
-      recommended_title: "Séjours recommandés",
+      nav_home: "Accueil",
+      nav_membership: "Adhésion",
+      nav_login: "Connexion",
+      nav_signup: "S’inscrire",
 
-      membership: {}
-    },
-    ja: {
-      nav: { home: "ホーム", membership: "メンバーシップ", login: "ログイン", signup: "登録" },
-      h1: "ラグジュアリーな滞在。<br><span class='gold'>グローバルに。</span>",
-      pay: "カード・振込・暗号資産 (BTC · ETH · USDT)。",
-      filters: "フィルター", search: "検索", placeholder: "パリ、東京、イスタンブール…",
-      card1: "認証済みステイ", card1sub: "近くのおすすめ。",
-      card2: "StayWorld+ リワード", card2sub: "予約ごとにポイント獲得。",
-      card3: "安全な支払い", card3sub: "Visa・Mastercard・Amex・暗号資産。",
-      banner_discount: "初回予約10%割引",
-      banner_cta: "今すぐ参加",
-      recommended_title: "おすすめの滞在",
+      ui_membership: "Adhésion",
+      ui_login: "Connexion",
+      ui_title: "Adhésion + Niveaux",
+      ui_subtitle: "Choisissez un plan. Les avantages et la progression se mettent à jour automatiquement.",
+      ui_plans: "Formules d’adhésion",
+      ui_monthly: "Mensuel",
+      ui_yearly: "Annuel",
+      ui_plus_desc: "Avantages instantanés + boosts mensuels",
+      ui_black_desc: "Plus de boosts + support prioritaire + extras",
+      ui_start_plus: "Commencer Plus",
+      ui_start_black: "Commencer Black",
+      ui_your_membership: "Votre adhésion",
+      ui_this_month: "Reste ce mois-ci",
+      ui_points_boost: "Boost de points",
+      ui_instant_discount: "Remise immédiate",
+      ui_per_booking: "par réservation",
+      ui_tickets: "Tickets",
+      ui_your_level: "Votre niveau",
+      ui_next_level: "Niveau suivant",
+      ui_overall_progress: "Progression globale",
+      ui_levels: "Niveaux",
+      ui_inherit_note: "Les niveaux supérieurs incluent tous les avantages des niveaux inférieurs.",
+      ui_checkout: "Paiement",
+      ui_pay_crypto: "Payer en crypto",
+      ui_paypal: "Payer avec PayPal",
+      ui_top_level: "Niveau maximal atteint",
 
-      membership: {}
-    },
-    de: {
-      nav: { home: "Start", membership: "Mitgliedschaft", login: "Anmelden", signup: "Registrieren" },
-      h1: "Luxuriöse Aufenthalte.<br><span class='gold'>Weltweite Reichweite.</span>",
-      pay: "Karten, Überweisung & Krypto (BTC · ETH · USDT).",
-      filters: "Filter", search: "Suchen", placeholder: "Paris, Tokio, Istanbul…",
-      card1: "Verifizierte Unterkünfte", card1sub: "Top-Empfehlungen in deiner Nähe.",
-      card2: "StayWorld+ Prämien", card2sub: "Punkte bei jeder Buchung.",
-      card3: "Sichere Zahlungen", card3sub: "Visa, Mastercard, Amex & Krypto.",
-      banner_discount: "10% Rabatt auf Ihre erste Buchung",
-      banner_cta: "Jetzt beitreten",
-      recommended_title: "Empfohlene Unterkünfte",
+      back_0: "0% de retour",
+      back_3: "3% de retour",
+      back_5: "5% de retour",
+      back_7: "7% de retour",
+      back_10: "10% de retour",
+      back_15: "15% de retour",
 
-      membership: {}
+      benefit_basic: "Utilisation de base (attribuée automatiquement à l’inscription)",
+      benefit_silver_3: "3% de points sur la première réservation",
+      benefit_gold_5: "5% de points sur chaque réservation",
+      benefit_priority: "Support client prioritaire",
+      benefit_platinum_7: "7% de points",
+      benefit_platinum_season: "Remises saisonnières appliquées",
+      benefit_diamond_10: "10% de points",
+      benefit_diamond_coupon: "Coupons exclusifs",
+      benefit_diamond_support: "Accès prioritaire au support",
+      benefit_elite_private: "Accès aux offres privées",
+      benefit_elite_emergency: "Support d’urgence prioritaire",
     },
-    es: {
-      nav: { home: "Inicio", membership: "Membresía", login: "Entrar", signup: "Registrarse" },
-      h1: "Estancias de lujo.<br><span class='gold'>Alcance global.</span>",
-      pay: "Tarjetas, transferencia y cripto (BTC · ETH · USDT).",
-      filters: "Filtros", search: "Buscar", placeholder: "París, Tokio, Estambul…",
-      card1: "Alojamientos verificados", card1sub: "Las mejores opciones cerca de ti.",
-      card2: "Recompensas StayWorld+", card2sub: "Puntos en cada reserva.",
-      card3: "Pagos seguros", card3sub: "Visa, Mastercard, Amex y Cripto.",
-      banner_discount: "10% de descuento en tu primera reserva",
-      banner_cta: "Únete ahora",
-      recommended_title: "Alojamientos recomendados",
 
-      membership: {}
-    },
-    it: {
-      nav: { home: "Home", membership: "Abbonamento", login: "Accedi", signup: "Registrati" },
-      h1: "Soggiorni di lusso.<br><span class='gold'>Portata globale.</span>",
-      pay: "Carte, bonifico e crypto (BTC · ETH · USDT).",
-      filters: "Filtri", search: "Cerca", placeholder: "Parigi, Tokyo, Istanbul…",
-      card1: "Alloggi verificati", card1sub: "Le migliori scelte vicino a te.",
-      card2: "Premi StayWorld+", card2sub: "Punti per ogni prenotazione.",
-      card3: "Pagamenti sicuri", card3sub: "Visa, Mastercard, Amex e Crypto.",
-      banner_discount: "Sconto del 10% sulla prima prenotazione",
-      banner_cta: "Iscriviti ora",
-      recommended_title: "Soggiorni consigliati",
-
-      membership: {}
-    },
+    /* ===== Turkish ===== */
     tr: {
-      nav: { home: "Ana Sayfa", membership: "Üyelik", login: "Giriş", signup: "Kayıt Ol" },
-      h1: "Lüks konaklamalar.<br><span class='gold'>Küresel erişim.</span>",
-      pay: "Kart, havale ve kripto (BTC · ETH · USDT).",
-      filters: "Filtreler", search: "Ara", placeholder: "Paris, Tokyo, İstanbul…",
-      card1: "Doğrulanmış konaklamalar", card1sub: "Size yakın en iyi seçenekler.",
-      card2: "StayWorld+ Ödülleri", card2sub: "Her rezervasyonda puan kazanın.",
-      card3: "Güvenli ödemeler", card3sub: "Visa, Mastercard, Amex ve Kripto.",
-      banner_discount: "İlk rezervasyonda %10 indirim",
-      banner_cta: "Hemen katıl",
-      recommended_title: "Önerilen konaklamalar",
+      nav_home: "Ana sayfa",
+      nav_membership: "Üyelik",
+      nav_login: "Giriş",
+      nav_signup: "Kaydol",
 
-      membership: {}
-    },
-    zh: {
-      nav: { home: "首页", membership: "会员", login: "登录", signup: "注册" },
-      h1: "奢华住宿。<br><span class='gold'>全球触达。</span>",
-      pay: "支持银行卡、转账与加密货币 (BTC · ETH · USDT)。",
-      filters: "筛选", search: "搜索", placeholder: "巴黎、东京、伊斯坦布尔…",
-      card1: "认证住宿", card1sub: "你附近的优选。",
-      card2: "StayWorld+ 奖励", card2sub: "每次预订都能赚积分。",
-      card3: "安全支付", card3sub: "Visa、Mastercard、Amex 与加密货币。",
-      banner_discount: "首次预订立减 10%",
-      banner_cta: "立即加入",
-      recommended_title: "推荐住宿",
+      ui_membership: "Üyelik",
+      ui_login: "Giriş",
+      ui_title: "Üyelik + Seviyeler",
+      ui_subtitle: "Bir plan seçin. İmkanlar ve seviye ilerlemesi otomatik güncellenir.",
+      ui_plans: "Üyelik Planları",
+      ui_monthly: "Aylık",
+      ui_yearly: "Yıllık",
+      ui_plus_desc: "Anında ayrıcalıklar + aylık güçlendirmeler",
+      ui_black_desc: "Daha fazla güçlendirme + öncelikli destek + ekstralar",
+      ui_start_plus: "Plus’a Başla",
+      ui_start_black: "Black’e Başla",
+      ui_your_membership: "Üyeliğiniz",
+      ui_this_month: "Bu ay kalan",
+      ui_points_boost: "Puan arttırma",
+      ui_instant_discount: "Anında indirim",
+      ui_per_booking: "rezervasyon başına",
+      ui_tickets: "Biletler",
+      ui_your_level: "Seviyeniz",
+      ui_next_level: "Sonraki seviye",
+      ui_overall_progress: "Genel ilerleme",
+      ui_levels: "Seviyeler",
+      ui_inherit_note: "Üst seviyeler, alt seviyelerin tüm ayrıcalıklarını içerir.",
+      ui_checkout: "Ödeme",
+      ui_pay_crypto: "Kripto ile öde",
+      ui_paypal: "PayPal ile öde",
+      ui_top_level: "En üst seviye",
 
-      membership: {}
+      back_0: "%0 iade",
+      back_3: "%3 iade",
+      back_5: "%5 iade",
+      back_7: "%7 iade",
+      back_10: "%10 iade",
+      back_15: "%15 iade",
+
+      benefit_basic: "Temel kullanım (kayıtta otomatik atanır)",
+      benefit_silver_3: "İlk rezervasyonda %3 puan",
+      benefit_gold_5: "Her rezervasyonda %5 puan",
+      benefit_priority: "Öncelikli müşteri desteği",
+      benefit_platinum_7: "%7 puan iadesi",
+      benefit_platinum_season: "Sezon indirimi otomatik uygulanır",
+      benefit_diamond_10: "%10 puan iadesi",
+      benefit_diamond_coupon: "Özel kuponlar",
+      benefit_diamond_support: "Öncelikli destek merkezi",
+      benefit_elite_private: "Özel fırsatlara erişim",
+      benefit_elite_emergency: "Acil öncelikli destek",
     },
+
+    /* ===== Japanese ===== */
+    ja: {
+      nav_home: "ホーム",
+      nav_membership: "メンバーシップ",
+      nav_login: "ログイン",
+      nav_signup: "登録",
+
+      ui_membership: "メンバーシップ",
+      ui_login: "ログイン",
+      ui_title: "メンバーシップ + レベル",
+      ui_subtitle: "プランを選択すると、特典とレベル進捗が自動更新されます。",
+      ui_plans: "メンバーシッププラン",
+      ui_monthly: "月額",
+      ui_yearly: "年額",
+      ui_plus_desc: "即時特典 + 月次ブースト",
+      ui_black_desc: "さらなるブースト + 優先サポート + 特典",
+      ui_start_plus: "Plus を開始",
+      ui_start_black: "Black を開始",
+      ui_your_membership: "あなたのメンバーシップ",
+      ui_this_month: "今月の残り",
+      ui_points_boost: "ポイントブースト",
+      ui_instant_discount: "即時割引",
+      ui_per_booking: "予約ごと",
+      ui_tickets: "チケット",
+      ui_your_level: "現在のレベル",
+      ui_next_level: "次のレベル",
+      ui_overall_progress: "全体の進捗",
+      ui_levels: "レベル",
+      ui_inherit_note: "上位レベルは下位レベルの特典をすべて含みます。",
+      ui_checkout: "チェックアウト",
+      ui_pay_crypto: "暗号資産で支払う",
+      ui_paypal: "PayPal で支払う",
+      ui_top_level: "最上位です",
+
+      back_0: "還元 0%",
+      back_3: "還元 3%",
+      back_5: "還元 5%",
+      back_7: "還元 7%",
+      back_10: "還元 10%",
+      back_15: "還元 15%",
+
+      benefit_basic: "基本利用（登録時に自動付与）",
+      benefit_silver_3: "初回予約で 3% ポイント",
+      benefit_gold_5: "毎回の予約で 5% ポイント",
+      benefit_priority: "優先カスタマーサポート",
+      benefit_platinum_7: "7% ポイント還元",
+      benefit_platinum_season: "シーズン割引自動適用",
+      benefit_diamond_10: "10% ポイント還元",
+      benefit_diamond_coupon: "限定クーポン",
+      benefit_diamond_support: "サポート優先権",
+      benefit_elite_private: "プライベートディールへのアクセス",
+      benefit_elite_emergency: "緊急時の優先サポート",
+    },
+
+    /* ===== German ===== */
+    de: {
+      nav_home: "Start",
+      nav_membership: "Mitgliedschaft",
+      nav_login: "Anmelden",
+      nav_signup: "Registrieren",
+
+      ui_membership: "Mitgliedschaft",
+      ui_login: "Anmelden",
+      ui_title: "Mitgliedschaft + Stufen",
+      ui_subtitle: "Wähle einen Plan. Vorteile und Fortschritt aktualisieren sich automatisch.",
+      ui_plans: "Mitgliedschaftspläne",
+      ui_monthly: "Monatlich",
+      ui_yearly: "Jährlich",
+      ui_plus_desc: "Sofortige Vorteile + monatliche Boosts",
+      ui_black_desc: "Mehr Boosts + priorisierter Support + Extras",
+      ui_start_plus: "Plus starten",
+      ui_start_black: "Black starten",
+      ui_your_membership: "Deine Mitgliedschaft",
+      ui_this_month: "Diesen Monat verbleibend",
+      ui_points_boost: "Punkte-Boost",
+      ui_instant_discount: "Sofortrabatt",
+      ui_per_booking: "pro Buchung",
+      ui_tickets: "Tickets",
+      ui_your_level: "Dein Level",
+      ui_next_level: "Nächstes Level",
+      ui_overall_progress: "Gesamtfortschritt",
+      ui_levels: "Level",
+      ui_inherit_note: "Höhere Level beinhalten alle Vorteile niedrigerer Level.",
+      ui_checkout: "Bezahlen",
+      ui_pay_crypto: "Mit Krypto zahlen",
+      ui_paypal: "Mit PayPal zahlen",
+      ui_top_level: "Höchstes Level erreicht",
+
+      back_0: "0% zurück",
+      back_3: "3% zurück",
+      back_5: "5% zurück",
+      back_7: "7% zurück",
+      back_10: "10% zurück",
+      back_15: "15% zurück",
+
+      benefit_basic: "Grundnutzung (bei Registrierung automatisch)",
+      benefit_silver_3: "3% Punkte bei der ersten Buchung",
+      benefit_gold_5: "5% Punkte bei jeder Buchung",
+      benefit_priority: "Priorisierter Kundensupport",
+      benefit_platinum_7: "7% Punkte",
+      benefit_platinum_season: "Saisonrabatt automatisch",
+      benefit_diamond_10: "10% Punkte",
+      benefit_diamond_coupon: "Exklusive Gutscheine",
+      benefit_diamond_support: "Support mit Priorität",
+      benefit_elite_private: "Zugang zu privaten Angeboten",
+      benefit_elite_emergency: "Priorisierter Notfallsupport",
+    },
+
+    /* ===== Spanish ===== */
+    es: {
+      nav_home: "Inicio",
+      nav_membership: "Membresía",
+      nav_login: "Iniciar sesión",
+      nav_signup: "Registrarse",
+
+      ui_membership: "Membresía",
+      ui_login: "Iniciar sesión",
+      ui_title: "Membresía + Niveles",
+      ui_subtitle: "Elige un plan. Los beneficios y el progreso se actualizan automáticamente.",
+      ui_plans: "Planes de membresía",
+      ui_monthly: "Mensual",
+      ui_yearly: "Anual",
+      ui_plus_desc: "Beneficios instantáneos + impulsos mensuales",
+      ui_black_desc: "Más impulsos + prioridad + extras",
+      ui_start_plus: "Empezar Plus",
+      ui_start_black: "Empezar Black",
+      ui_your_membership: "Tu membresía",
+      ui_this_month: "Restante este mes",
+      ui_points_boost: "Impulso de puntos",
+      ui_instant_discount: "Descuento inmediato",
+      ui_per_booking: "por reserva",
+      ui_tickets: "Tickets",
+      ui_your_level: "Tu nivel",
+      ui_next_level: "Siguiente nivel",
+      ui_overall_progress: "Progreso total",
+      ui_levels: "Niveles",
+      ui_inherit_note: "Los niveles superiores incluyen todos los beneficios de los inferiores.",
+      ui_checkout: "Pago",
+      ui_pay_crypto: "Pagar con cripto",
+      ui_paypal: "Pagar con PayPal",
+      ui_top_level: "Nivel máximo alcanzado",
+
+      back_0: "0% de retorno",
+      back_3: "3% de retorno",
+      back_5: "5% de retorno",
+      back_7: "7% de retorno",
+      back_10: "10% de retorno",
+      back_15: "15% de retorno",
+
+      benefit_basic: "Uso básico (asignado automáticamente al registrarse)",
+      benefit_silver_3: "3% de puntos en la primera reserva",
+      benefit_gold_5: "5% de puntos en cada reserva",
+      benefit_priority: "Soporte prioritario",
+      benefit_platinum_7: "7% de puntos",
+      benefit_platinum_season: "Descuento de temporada aplicado",
+      benefit_diamond_10: "10% de puntos",
+      benefit_diamond_coupon: "Cupones exclusivos",
+      benefit_diamond_support: "Soporte con prioridad",
+      benefit_elite_private: "Acceso a ofertas privadas",
+      benefit_elite_emergency: "Soporte de emergencia prioritario",
+    },
+
+    /* ===== Italian ===== */
+    it: {
+      nav_home: "Home",
+      nav_membership: "Abbonamento",
+      nav_login: "Accedi",
+      nav_signup: "Registrati",
+
+      ui_membership: "Abbonamento",
+      ui_login: "Accedi",
+      ui_title: "Abbonamento + Livelli",
+      ui_subtitle: "Scegli un piano. Vantaggi e progresso si aggiornano automaticamente.",
+      ui_plans: "Piani di abbonamento",
+      ui_monthly: "Mensile",
+      ui_yearly: "Annuale",
+      ui_plus_desc: "Vantaggi immediati + boost mensili",
+      ui_black_desc: "Più boost + supporto prioritario + extra",
+      ui_start_plus: "Avvia Plus",
+      ui_start_black: "Avvia Black",
+      ui_your_membership: "Il tuo abbonamento",
+      ui_this_month: "Rimanente questo mese",
+      ui_points_boost: "Boost punti",
+      ui_instant_discount: "Sconto immediato",
+      ui_per_booking: "per prenotazione",
+      ui_tickets: "Ticket",
+      ui_your_level: "Il tuo livello",
+      ui_next_level: "Livello successivo",
+      ui_overall_progress: "Progresso complessivo",
+      ui_levels: "Livelli",
+      ui_inherit_note: "I livelli superiori includono tutti i vantaggi dei livelli inferiori.",
+      ui_checkout: "Pagamento",
+      ui_pay_crypto: "Paga in cripto",
+      ui_paypal: "Paga con PayPal",
+      ui_top_level: "Livello massimo raggiunto",
+
+      back_0: "0% di ritorno",
+      back_3: "3% di ritorno",
+      back_5: "5% di ritorno",
+      back_7: "7% di ritorno",
+      back_10: "10% di ritorno",
+      back_15: "15% di ritorno",
+
+      benefit_basic: "Uso di base (assegnato automaticamente alla registrazione)",
+      benefit_silver_3: "3% di punti alla prima prenotazione",
+      benefit_gold_5: "5% di punti a ogni prenotazione",
+      benefit_priority: "Supporto clienti prioritario",
+      benefit_platinum_7: "7% di punti",
+      benefit_platinum_season: "Sconto stagionale applicato",
+      benefit_diamond_10: "10% di punti",
+      benefit_diamond_coupon: "Coupon esclusivi",
+      benefit_diamond_support: "Supporto prioritario",
+      benefit_elite_private: "Accesso a offerte private",
+      benefit_elite_emergency: "Supporto di emergenza prioritario",
+    },
+
+    /* ===== Chinese (Simplified) ===== */
+    "zh-CN": {
+      nav_home: "首页",
+      nav_membership: "会员",
+      nav_login: "登录",
+      nav_signup: "注册",
+
+      ui_membership: "会员",
+      ui_login: "登录",
+      ui_title: "会员 + 等级",
+      ui_subtitle: "选择一个方案。权益和等级进度将自动更新。",
+      ui_plans: "会员方案",
+      ui_monthly: "月付",
+      ui_yearly: "年付",
+      ui_plus_desc: "即时权益 + 每月加成",
+      ui_black_desc: "更多加成 + 优先客服 + 额外福利",
+      ui_start_plus: "开通 Plus",
+      ui_start_black: "开通 Black",
+      ui_your_membership: "你的会员",
+      ui_this_month: "本月剩余",
+      ui_points_boost: "积分加成",
+      ui_instant_discount: "立减优惠",
+      ui_per_booking: "每次预订",
+      ui_tickets: "票券",
+      ui_your_level: "你的等级",
+      ui_next_level: "下一级",
+      ui_overall_progress: "总体进度",
+      ui_levels: "等级",
+      ui_inherit_note: "高等级包含所有低等级权益。",
+      ui_checkout: "结算",
+      ui_pay_crypto: "加密货币支付",
+      ui_paypal: "PayPal 支付",
+      ui_top_level: "已达最高等级",
+
+      back_0: "返利 0%",
+      back_3: "返利 3%",
+      back_5: "返利 5%",
+      back_7: "返利 7%",
+      back_10: "返利 10%",
+      back_15: "返利 15%",
+
+      benefit_basic: "基础使用（注册自动获得）",
+      benefit_silver_3: "首单积分 3%",
+      benefit_gold_5: "每单积分 5%",
+      benefit_priority: "优先客服",
+      benefit_platinum_7: "积分返利 7%",
+      benefit_platinum_season: "自动应用季节性折扣",
+      benefit_diamond_10: "积分返利 10%",
+      benefit_diamond_coupon: "专属优惠券",
+      benefit_diamond_support: "客服优先权",
+      benefit_elite_private: "私享优惠通道",
+      benefit_elite_emergency: "紧急优先支持",
+    },
+
+    /* ===== Russian ===== */
     ru: {
-      nav: { home: "Главная", membership: "Членство", login: "Войти", signup: "Регистрация" },
-      h1: "Роскошное проживание.<br><span class='gold'>Глобальный охват.</span>",
-      pay: "Карты, банковский перевод и крипто (BTC · ETH · USDT).",
-      filters: "Фильтры", search: "Поиск", placeholder: "Париж, Токио, Стамбул…",
-      card1: "Проверенные варианты", card1sub: "Лучшие предложения рядом.",
-      card2: "Награды StayWorld+", card2sub: "Баллы за каждое бронирование.",
-      card3: "Безопасные платежи", card3sub: "Visa, Mastercard, Amex и Крипто.",
-      banner_discount: "Скидка 10% на первое бронирование",
-      banner_cta: "Присоединиться",
-      recommended_title: "Рекомендованные варианты",
+      nav_home: "Главная",
+      nav_membership: "Подписка",
+      nav_login: "Войти",
+      nav_signup: "Регистрация",
 
-      membership: {}
-    }
+      ui_membership: "Подписка",
+      ui_login: "Войти",
+      ui_title: "Подписка + Уровни",
+      ui_subtitle: "Выберите план. Привилегии и прогресс уровня обновляются автоматически.",
+      ui_plans: "Планы подписки",
+      ui_monthly: "Ежемесячно",
+      ui_yearly: "Ежегодно",
+      ui_plus_desc: "Мгновенные привилегии + ежемесячные бусты",
+      ui_black_desc: "Больше бустов + приоритетная поддержка + бонусы",
+      ui_start_plus: "Начать Plus",
+      ui_start_black: "Начать Black",
+      ui_your_membership: "Ваша подписка",
+      ui_this_month: "Остаток в этом месяце",
+      ui_points_boost: "Буст баллов",
+      ui_instant_discount: "Мгновенная скидка",
+      ui_per_booking: "за бронирование",
+      ui_tickets: "Тикеты",
+      ui_your_level: "Ваш уровень",
+      ui_next_level: "Следующий уровень",
+      ui_overall_progress: "Общий прогресс",
+      ui_levels: "Уровни",
+      ui_inherit_note: "Старшие уровни включают привилегии младших.",
+      ui_checkout: "Оплата",
+      ui_pay_crypto: "Оплатить криптой",
+      ui_paypal: "Оплатить через PayPal",
+      ui_top_level: "Достигнут максимальный уровень",
+
+      back_0: "0% возврат",
+      back_3: "3% возврат",
+      back_5: "5% возврат",
+      back_7: "7% возврат",
+      back_10: "10% возврат",
+      back_15: "15% возврат",
+
+      benefit_basic: "Базовое использование (автоматически при регистрации)",
+      benefit_silver_3: "3% баллов за первое бронирование",
+      benefit_gold_5: "5% баллов за каждое бронирование",
+      benefit_priority: "Приоритетная поддержка",
+      benefit_platinum_7: "7% возврат баллов",
+      benefit_platinum_season: "Сезонная скидка применяется автоматически",
+      benefit_diamond_10: "10% возврат баллов",
+      benefit_diamond_coupon: "Эксклюзивные купоны",
+      benefit_diamond_support: "Приоритет в поддержке",
+      benefit_elite_private: "Доступ к приватным предложениям",
+      benefit_elite_emergency: "Приоритетная экстренная поддержка",
+    },
   };
 
-  // 2) 헬퍼 (ID 바인딩 + data-i18n 바인딩 모두 지원)
-  const byId = (id) => document.getElementById(id);
-  const setHTML = (id, html) => { const el = byId(id); if (el) el.innerHTML = html; };
-  const setText = (id, txt) => { const el = byId(id); if (el) el.textContent = txt; };
-  const setPH   = (id, ph)  => { const el = byId(id); if (el && 'placeholder' in el) el.placeholder = ph; };
+  /* ---------- Helpers / Engine ---------- */
+  function canonical(lang) {
+    if (!lang) return "en";
+    const lower = lang.toString().trim();
+    if (LANGS[lower]) return lower;
+    const base = lower.split("-")[0];
+    return LANGS[base] ? base : "en";
+  }
 
-  function applyToDataI18n(dict) {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      const parts = key.split('.');
-      // 딥키 지원 (예: nav.home)
-      let cur = dict;
-      for (const p of parts) {
-        if (!cur || typeof cur !== 'object') { cur = null; break; }
-        cur = cur[p];
-      }
-      const val = (typeof cur === 'string') ? cur : null;
-      if (val != null) el.textContent = val;
+  const DEFAULT = canonical(localStorage.getItem("sw_lang") || navigator.language || "en");
+  let current = DEFAULT;
+
+  function applyI18n(lang) {
+    const code = canonical(lang);
+    current = code;
+    localStorage.setItem("sw_lang", code);
+    const dict = LANGS[code] || LANGS.en;
+
+    // textContent for data-i18n
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      const val = dict[key];
+      if (typeof val === "string") el.textContent = val;
+    });
+
+    // placeholder translation: data-i18n-ph="key"
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+      const key = el.getAttribute("data-i18n-ph");
+      const val = dict[key];
+      if (typeof val === "string") el.setAttribute("placeholder", val);
+    });
+
+    // title attribute: data-i18n-title="key"
+    document.querySelectorAll("[data-i18n-title]").forEach(el => {
+      const key = el.getAttribute("data-i18n-title");
+      const val = dict[key];
+      if (typeof val === "string") el.setAttribute("title", val);
     });
   }
 
-  // 3) Membership i18n 병합 (네가 보낸 블록을 LANGS 구조로 통합)
-  const MB_EN = {
-    title: "StayWorld Membership",
-    inherit_note: "Upper tiers include all benefits of lower tiers.",
-    your_tier: "Your Tier",
-    to_next_msg: (amt) => `${amt} to next tier. Auto-downgrade after 60 days of no bookings.`,
-    to_next_badge: "to next badge",
-    dw_always: "If there is no booking for 60 days, your tier will auto-downgrade by 1 level.",
-    bronze: "Bronze", silver: "Silver", gold: "Gold", platinum: "Platinum", diamond: "Diamond", elite: "Elite",
-    b_member_prices: "Member prices",
-    b_basic_support: "Basic support",
-    b_secure_pay: "Secure card/crypto payments",
-    b_points_3: "Earn 3% points",
-    b_points_5: "Earn 5% points",
-    b_points_7: "Earn 7% points",
-    b_free_cancel_window: "Free cancellation window when available",
-    b_priority_email: "Priority email (24h)",
-    b_priority_chat: "Priority chat support",
-    b_late_checkout: "Late checkout when available",
-    b_upgrade_when_available: "Room upgrade when available",
-    b_b2b_invoice: "B2B invoice available",
-    b_elite_concierge: "Elite concierge & perks"
+  function t(key) {
+    const dict = LANGS[current] || LANGS.en;
+    return dict[key] || (LANGS.en[key] || key);
+  }
+  function setLang(lang) { applyI18n(lang); }
+  function getCurrent() { return current; }
+
+  // expose to global
+  window.STAY_I18N = {
+    LANGS,
+    setLang,
+    applyI18n,
+    t,
+    current: getCurrent,
   };
 
-  const MB_OVERRIDES = {
-    ko: {
-      title:"StayWorld 멤버십",
-      inherit_note:"상위 등급은 하위 등급의 혜택을 모두 포함합니다.",
-      your_tier:"현재 등급",
-      to_next_msg:(amt)=>`다음 등급까지 ${amt} 남았습니다. 60일 예약이 없으면 자동으로 1단계 강등됩니다.`,
-      to_next_badge:"다음 배지까지",
-      dw_always:"60일 이상 예약이 없으면 등급이 자동으로 1단계 강등됩니다.",
-      b_member_prices:"멤버 전용 요금",
-      b_basic_support:"기본 고객지원",
-      b_secure_pay:"안전한 카드/암호화폐 결제",
-      b_points_3:"숙박 3% 포인트 적립",
-      b_points_5:"숙박 5% 포인트 적립",
-      b_points_7:"숙박 7% 포인트 적립",
-      b_free_cancel_window:"가능 시 무료 취소 기간",
-      b_priority_email:"우선 이메일 응대(24시간)",
-      b_priority_chat:"우선 채팅 지원",
-      b_late_checkout:"가능 시 레이트 체크아웃 무료",
-      b_upgrade_when_available:"가능 시 객실 업그레이드",
-      b_b2b_invoice:"B2B 세금계산서 발행",
-      b_elite_concierge:"엘리트 컨시어지 & 특전"
-    },
-    ja: {
-      title:"StayWorld メンバーシップ",
-      inherit_note:"上位ティアは下位ティアの特典をすべて含みます。",
-      your_tier:"現在のティア",
-      to_next_msg:(amt)=>`次のティアまで ${amt}。60日予約がない場合は自動で1段階降格します。`,
-      to_next_badge:"次のバッジまで",
-      dw_always:"60日以上予約がない場合、ティアは自動的に1段階降格されます。",
-      b_member_prices:"会員価格",
-      b_basic_support:"基本サポート",
-      b_secure_pay:"安全なカード/暗号資産決済",
-      b_points_3:"3%ポイント還元",
-      b_points_5:"5%ポイント還元",
-      b_points_7:"7%ポイント還元",
-      b_free_cancel_window:"可能な場合の無料キャンセル期間",
-      b_priority_email:"優先メール対応(24h)",
-      b_priority_chat:"優先チャットサポート",
-      b_late_checkout:"可能な場合のレイトチェックアウト無料",
-      b_upgrade_when_available:"可能な場合の客室アップグレード",
-      b_b2b_invoice:"B2B 請求書発行",
-      b_elite_concierge:"エリート・コンシェルジュ特典"
-    },
-    zh: {
-      title:"StayWorld 会员",
-      inherit_note:"高等级包含低等级的所有权益。",
-      your_tier:"当前等级",
-      to_next_msg:(amt)=>`距离下一级还差 ${amt}。若60天无预订，将自动降级1级。`,
-      to_next_badge:"距离下一个徽章",
-      dw_always:"如60天无预订，等级将自动降1级。",
-      b_member_prices:"会员专享价",
-      b_basic_support:"基础客服",
-      b_secure_pay:"安全的银行卡/加密货币支付",
-      b_points_3:"3%积分", b_points_5:"5%积分", b_points_7:"7%积分",
-      b_free_cancel_window:"可用时免费取消期",
-      b_priority_email:"优先邮件(24h)",
-      b_priority_chat:"优先聊天支持",
-      b_late_checkout:"可用时延迟退房免费",
-      b_upgrade_when_available:"可用时房型升级",
-      b_b2b_invoice:"可开具B2B发票",
-      b_elite_concierge:"精英礼宾服务"
-    },
-    fr: {
-      title:"Adhésion StayWorld",
-      inherit_note:"Les niveaux supérieurs incluent tous les avantages des niveaux inférieurs.",
-      your_tier:"Votre niveau",
-      to_next_msg:(amt)=>`${amt} avant le prochain niveau. Rétrogradation auto après 60 jours sans réservation.`,
-      to_next_badge:"avant le prochain badge",
-      dw_always:"Si aucune réservation pendant 60 jours, rétrogradation d’un niveau.",
-      b_member_prices:"Tarifs membres",
-      b_basic_support:"Support de base",
-      b_secure_pay:"Paiements carte/crypto sécurisés",
-      b_points_3:"3% de points", b_points_5:"5% de points", b_points_7:"7% de points",
-      b_free_cancel_window:"Fenêtre d’annulation gratuite si dispo",
-      b_priority_email:"Email prioritaire (24h)",
-      b_priority_chat:"Support chat prioritaire",
-      b_late_checkout:"Late checkout si dispo",
-      b_upgrade_when_available:"Surclassement si dispo",
-      b_b2b_invoice:"Facture B2B",
-      b_elite_concierge:"Concierge Élite"
-    },
-    de: {
-      title:"StayWorld Mitgliedschaft",
-      inherit_note:"Höhere Stufen enthalten alle Vorteile der niedrigeren.",
-      your_tier:"Ihre Stufe",
-      to_next_msg:(amt)=>`${amt} bis zur nächsten Stufe. Automatische Herabstufung nach 60 Tagen ohne Buchung.`,
-      to_next_badge:"bis zum nächsten Abzeichen",
-      dw_always:"Ohne Buchung für 60 Tage erfolgt eine Herabstufung um 1 Stufe.",
-      b_member_prices:"Mitgliederpreise",
-      b_basic_support:"Basissupport",
-      b_secure_pay:"Sichere Karten-/Krypto-Zahlungen",
-      b_points_3:"3% Punkte", b_points_5:"5% Punkte", b_points_7:"7% Punkte",
-      b_free_cancel_window:"Kostenlose Stornofrist falls verfügbar",
-      b_priority_email:"Priorisierte E-Mail (24h)",
-      b_priority_chat:"Priorisierter Chat",
-      b_late_checkout:"Später Checkout falls verfügbar",
-      b_upgrade_when_available:"Upgrade falls verfügbar",
-      b_b2b_invoice:"B2B-Rechnung",
-      b_elite_concierge:"Elite-Concierge"
-    },
-    es: {
-      title:"Membresía StayWorld",
-      inherit_note:"Los niveles superiores incluyen los beneficios de los inferiores.",
-      your_tier:"Tu nivel",
-      to_next_msg:(amt)=>`${amt} para el siguiente nivel. Degradación automática tras 60 días sin reservas.`,
-      to_next_badge:"para la siguiente insignia",
-      dw_always:"Si no hay reservas durante 60 días, bajarás un nivel automáticamente.",
-      b_member_prices:"Precios para miembros",
-      b_basic_support:"Soporte básico",
-      b_secure_pay:"Pagos seguros con tarjeta/cripto",
-      b_points_3:"3% de puntos", b_points_5:"5% de puntos", b_points_7:"7% de puntos",
-      b_free_cancel_window:"Ventana de cancelación gratis si hay",
-      b_priority_email:"Email prioritario (24h)",
-      b_priority_chat:"Soporte de chat prioritario",
-      b_late_checkout:"Salida tardía si hay",
-      b_upgrade_when_available:"Upgrade si hay",
-      b_b2b_invoice:"Factura B2B",
-      b_elite_concierge:"Conserje Elite"
-    },
-    it: {
-      title:"Abbonamento StayWorld",
-      inherit_note:"I livelli superiori includono tutti i vantaggi di quelli inferiori.",
-      your_tier:"Il tuo livello",
-      to_next_msg:(amt)=>`${amt} al prossimo livello. Retrocessione automatica dopo 60 giorni senza prenotazioni.`,
-      to_next_badge:"al prossimo badge",
-      dw_always:"Senza prenotazioni per 60 giorni, retrocedi di 1 livello.",
-      b_member_prices:"Prezzi membri",
-      b_basic_support:"Supporto base",
-      b_secure_pay:"Pagamenti sicuri carta/crypto",
-      b_points_3:"3% punti", b_points_5:"5% punti", b_points_7:"7% punti",
-      b_free_cancel_window:"Finestra di cancellazione gratuita se disponibile",
-      b_priority_email:"Email prioritaria (24h)",
-      b_priority_chat:"Chat prioritaria",
-      b_late_checkout:"Late checkout se disponibile",
-      b_upgrade_when_available:"Upgrade se disponibile",
-      b_b2b_invoice:"Fattura B2B",
-      b_elite_concierge:"Concierge Élite"
-    },
-    tr: {
-      title:"StayWorld Üyelik",
-      inherit_note:"Üst seviyeler alt seviyelerin tüm avantajlarını içerir.",
-      your_tier:"Seviyen",
-      to_next_msg:(amt)=>`Sonraki seviyeye ${amt}. 60 gün rezervasyon yoksa otomatik 1 seviye düşüş.`,
-      to_next_badge:"sonraki rozet",
-      dw_always:"60 gün rezervasyon olmazsa 1 seviye otomatik düşer.",
-      b_member_prices:"Üye fiyatları",
-      b_basic_support:"Temel destek",
-      b_secure_pay:"Güvenli kart/kripto ödemeleri",
-      b_points_3:"%3 puan", b_points_5:"%5 puan", b_points_7:"%7 puan",
-      b_free_cancel_window:"Mümkünse ücretsiz iptal süresi",
-      b_priority_email:"Öncelikli e-posta (24s)",
-      b_priority_chat:"Öncelikli sohbet desteği",
-      b_late_checkout:"Mümkünse geç çıkış",
-      b_upgrade_when_available:"Mümkünse oda yükseltme",
-      b_b2b_invoice:"B2B fatura",
-      b_elite_concierge:"Elit konsiyerj"
-    },
-    ru: {
-      title:"Подписка StayWorld",
-      inherit_note:"Верхние уровни включают все преимущества нижних.",
-      your_tier:"Ваш уровень",
-      to_next_msg:(amt)=>`${amt} до следующего уровня. Автопонижение через 60 дней без бронирований.`,
-      to_next_badge:"до следующего бейджа",
-      dw_always:"Если нет бронирований 60 дней, уровень снизится на 1.",
-      b_member_prices:"Цены для участников",
-      b_basic_support:"Базовая поддержка",
-      b_secure_pay:"Безопасные платежи картой/крипто",
-      b_points_3:"3% баллов", b_points_5:"5% баллов", b_points_7:"7% баллов",
-      b_free_cancel_window:"Бесплатная отмена при наличии",
-      b_priority_email:"Приоритетная почта (24ч)",
-      b_priority_chat:"Приоритетный чат",
-      b_late_checkout:"Поздний выезд при наличии",
-      b_upgrade_when_available:"Апгрейд номера при наличии",
-      b_b2b_invoice:"B2B счет",
-      b_elite_concierge:"Элит-консьерж"
-    }
-  };
-
-  // 각 언어 membership 채우기 (EN 기본 -> override)
-  Object.keys(LANGS).forEach(code => {
-    LANGS[code].membership = Object.assign({}, MB_EN, (MB_OVERRIDES[code] || {}));
-  });
-
-  // 4) 적용 함수
-  function applyLang(code) {
-    const dict = LANGS[code] || LANGS.en;
-
-    // (A) ID 기반 바인딩 (기존 구조 호환)
-    setText("t_nav_home", dict.nav.home);
-    setText("t_nav_membership", dict.nav.membership);
-    setText("t_nav_login", dict.nav.login);
-    setText("t_nav_signup", dict.nav.signup);
-
-    setHTML("t_h1", dict.h1);
-    setText("t_pay", dict.pay);
-
-    setText("t_filters", dict.filters);
-    setText("t_search", dict.search);
-    setPH("searchInput", dict.placeholder);
-
-    setText("t_card1", dict.card1);
-    setText("t_card1sub", dict.card1sub);
-    setText("t_card2", dict.card2);
-    setText("t_card2sub", dict.card2sub);
-    setText("t_card3", dict.card3);
-    setText("t_card3sub", dict.card3sub);
-
-    // 🔶 배너/섹션 ID 바인딩(있으면 반영)
-    setText("t_banner_discount", dict.banner_discount);
-    setText("t_banner_cta", dict.banner_cta);
-    setText("t_recommended_title", dict.recommended_title);
-
-    // (B) data-i18n 바인딩 (nav.home, banner_discount 등)
-    applyToDataI18n(dict);
-
-    // html lang 속성 & 이벤트
-    const htmlLang = code === 'ko' ? 'ko-KR'
-                   : code === 'ja' ? 'ja-JP'
-                   : code === 'zh' ? 'zh-CN'
-                   : code;
-    document.documentElement.setAttribute('lang', htmlLang);
-
-    // 변경 이벤트 (양쪽 모두 지원)
-    window.dispatchEvent(new Event("sw:languageChanged"));
-    window.dispatchEvent(new CustomEvent('lang-change', { detail: { lang: code } }));
-  }
-
-  function getInitialLang() {
-    const saved = (localStorage.getItem("sw_lang") || (navigator.language || "en")).slice(0,2).toLowerCase();
-    return LANGS[saved] ? saved : "en";
-  }
-
-  function init() {
-    const sel = document.getElementById("langSelect");
-    const initial = getInitialLang();
-    if (sel) {
-      sel.value = initial;
-      sel.addEventListener("change", (e) => {
-        const v = e.target.value;
-        localStorage.setItem("sw_lang", v);
-        applyLang(v);
-      });
-    }
-    applyLang(initial);
-
-    // 외부에서 호출 가능
-    window.LANGS = LANGS;
-    window.StayWorldI18n = { applyLang, getInitialLang };
-  }
-
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", () => applyI18n(current));
 })();
