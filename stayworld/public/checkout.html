@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StayWorld Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:24px;background:#0b0b0e;color:#f2f3f5}
+    .card{max-width:720px;margin:0 auto;border:1px solid #1f2330;border-radius:18px;padding:24px;box-shadow:0 10px 28px rgba(0,0,0,.35);background:#11131a}
+    h2{font-weight:700;margin:0 0 8px}
+    .muted{opacity:.7;margin:0 0 16px}
+    .row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+    button{padding:12px 16px;border-radius:12px;border:0;cursor:pointer;font-weight:600}
+    .btn{background:#1e222f}
+    .btn:hover{filter:brightness(1.1)}
+    .btn-gold{background:#c9a35b}
+    .msg{margin-top:16px;min-height:24px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+    .field{background:#0d0f15;border:1px solid #1b2030;border-radius:12px;padding:10px}
+    .field label{display:block;font-size:12px;opacity:.7;margin-bottom:6px}
+    .field input{width:100%;background:transparent;border:0;color:#f2f3f5;outline:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 id="title"></h2>
+    <p class="muted" id="subtitle"></p>
+
+    <!-- 간단한 데모 입력 (실서비스에서는 이전 페이지/상세 페이지 값 주입) -->
+    <div class="grid">
+      <div class="field"><label>Listing ID</label><input id="listingId" value="LISTING_123"></div>
+      <div class="field"><label>User ID</label><input id="userId" value="USER_abc"></div>
+      <div class="field"><label>Check-in (YYYY-MM-DD)</label><input id="checkIn" value="2025-09-10"></div>
+      <div class="field"><label>Check-out (YYYY-MM-DD)</label><input id="checkOut" value="2025-09-12"></div>
+      <div class="field"><label>Guests</label><input id="guests" type="number" value="2"></div>
+      <div class="field"><label>Currency (ISO)</label><input id="currency" value="USD"></div>
+      <div class="field"><label>Total Price</label><input id="totalPrice" type="number" value="199"></div>
+      <div class="field"><label>Pay Currency (BTC/ETH/USDT)</label><input id="payCurrency" value="USDT"></div>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-gold" onclick="pay('nowpayments')" id="btnCrypto">Crypto (NOWPayments)</button>
+      <button class="btn" onclick="pay('paypal')" id="btnPaypal">PayPal</button>
+    </div>
+
+    <p class="msg" id="msg"></p>
+  </div>
+
+  <script src="/js/i18n-payment.js"></script>
+  <script src="/js/booking.js"></script>
+  <script>
+    // 다국어 제목/메시지 바인딩
+    document.getElementById('title').textContent = t('payment:title');
+    document.getElementById('subtitle').textContent = t('payment:subtitle') || '';
+    document.getElementById('btnCrypto').textContent = t('payment:crypto');
+    document.getElementById('btnPaypal').textContent = 'PayPal';
+
+    // ?status 파라미터로 성공/실패 메시지
+    const q = new URLSearchParams(location.search);
+    const status = q.get('status');
+    if (status === 'success') {
+      document.getElementById('msg').textContent = t('payment:success');
+    } else if (status === 'cancel') {
+      document.getElementById('msg').textContent = t('payment:failed');
+    }
+
+    // 결제 호출
+    async function pay(gateway){
+      const payload = {
+        listingId: document.getElementById('listingId').value.trim(),
+        userId: document.getElementById('userId').value.trim(),
+        checkIn: document.getElementById('checkIn').value.trim(),
+        checkOut: document.getElementById('checkOut').value.trim(),
+        guests: Number(document.getElementById('guests').value || 1),
+        currency: document.getElementById('currency').value.trim() || 'USD',
+        totalPrice: Number(document.getElementById('totalPrice').value || 0),
+        lang: window.CUR_LANG || 'en',
+        gateway,
+        payCurrency: document.getElementById('payCurrency').value.trim() || undefined,
+      };
+      try {
+        await startCheckout(payload);
+      } catch(e){
+        alert(e.message || 'Error');
+      }
+    }
+  </script>
+</body>
+</html>
