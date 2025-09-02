@@ -74,8 +74,8 @@
     <div class="container header-row">
       <a class="brand" href="/"><img class="brand-logo" src="/stayworld-logo.png" alt="StayWorld"><span>STAYWORLD</span></a>
       <div class="row">
-        <a href="/membership.html" class="badge">Membership</a>
-        <a href="/login.html" class="badge">Login</a>
+        <a href="/membership.html" class="badge" data-i18n="ui_membership">Membership</a>
+        <a href="/login.html" class="badge" data-i18n="ui_login">Login</a>
       </div>
     </div>
   </header>
@@ -83,20 +83,20 @@
   <main class="container">
     <!-- Title -->
     <section class="hero">
-      <div class="badge" id="dwTop">Membership</div>
-      <h1 id="mb_title">Membership + Levels</h1>
-      <div class="sub" id="mb_subtitle">Choose a plan. Perks and level progress update automatically.</div>
+      <div class="badge" id="dwTop" data-i18n="ui_membership">Membership</div>
+      <h1 id="mb_title" data-i18n="ui_title">Membership + Levels</h1>
+      <div class="sub" id="mb_subtitle" data-i18n="ui_subtitle">Choose a plan. Perks and level progress update automatically.</div>
     </section>
 
     <div class="grid">
       <!-- LEFT: Plans / Prices -->
       <section class="card">
         <div class="plans-head">
-          <h2 id="plansHeader">Membership Plans</h2>
+          <h2 id="plansHeader" data-i18n="ui_plans">Membership Plans</h2>
           <div class="row">
             <div class="pill">
-              <button id="billMonthly" class="active">Monthly</button>
-              <button id="billYearly">Yearly</button>
+              <button id="billMonthly" class="active" data-i18n="ui_monthly">Monthly</button>
+              <button id="billYearly" data-i18n="ui_yearly">Yearly</button>
             </div>
             <select id="currencySelect" title="Currency">
               <option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option><option>KRW</option>
@@ -110,40 +110,40 @@
           <div class="plan" id="planPlus">
             <div class="badge">StayWorld+ (Plus)</div>
             <div class="price" id="pricePlus">$9.99 / mo</div>
-            <div class="small muted" data-i18n="plus_desc">Instant perks + monthly boosts</div>
-            <div style="margin-top:10px"><button class="cta" data-plan="plus">Start Plus</button></div>
+            <div class="small muted" data-i18n="ui_plus_desc">Instant perks + monthly boosts</div>
+            <div style="margin-top:10px"><button class="cta" data-plan="plus" data-i18n="ui_start_plus">Start Plus</button></div>
           </div>
 
           <div class="plan" id="planBlack">
             <div class="badge" style="background:#2a1f09;color:#f3c04b;border:1px solid #3b2a0a">StayWorld Black</div>
             <div class="price" id="priceBlack">$24.99 / mo</div>
-            <div class="small muted" data-i18n="black_desc">More boosts + priority + extras</div>
-            <div style="margin-top:10px"><button class="cta" data-plan="black">Start Black</button></div>
+            <div class="small muted" data-i18n="ui_black_desc">More boosts + priority + extras</div>
+            <div style="margin-top:10px"><button class="cta" data-plan="black" data-i18n="ui_start_black">Start Black</button></div>
           </div>
         </div>
       </section>
 
       <!-- RIGHT: Your benefits / progress -->
       <section class="card usage">
-        <h2>Your Membership</h2>
+        <h2 data-i18n="ui_your_membership">Your Membership</h2>
 
-        <div class="kv"><div id="lbl_perksLeft">This month remaining</div><div id="uiPerksLeft">—</div></div>
-        <div class="kv"><div id="lbl_boostLeft">Points boost</div><div id="uiBoostLeft">—</div></div>
+        <div class="kv"><div id="lbl_perksLeft" data-i18n="ui_this_month">This month remaining</div><div id="uiPerksLeft">—</div></div>
+        <div class="kv"><div id="lbl_boostLeft" data-i18n="ui_points_boost">Points boost</div><div id="uiBoostLeft">—</div></div>
 
         <div class="kv">
-          <div id="lbl_discountLeft">Instant discount</div>
-          <div><span id="uiDiscountPerBooking">—</span> <span class="muted" id="lbl_bookings">per booking</span></div>
+          <div id="lbl_discountLeft" data-i18n="ui_instant_discount">Instant discount</div>
+          <div><span id="uiDiscountPerBooking">—</span> <span class="muted" id="lbl_bookings" data-i18n="ui_per_booking">per booking</span></div>
         </div>
 
-        <div class="kv"><div id="lbl_ticketsEligible">Tickets</div><div id="uiTicketsEligible" class="ok">—</div></div>
+        <div class="kv"><div id="lbl_ticketsEligible" data-i18n="ui_tickets">Tickets</div><div id="uiTicketsEligible" class="ok">—</div></div>
 
         <div style="margin-top:14px">
-          <div class="row"><div id="levelTitle">Your Level: Bronze</div><div class="badge" id="tierBadge">0% back</div></div>
-          <div class="small muted" id="lbl_nextLevel" style="margin-top:6px">Next level</div>
+          <div class="row"><div id="levelTitle" data-i18n="ui_your_level">Your Level</div><div class="badge" id="tierBadge">0% back</div></div>
+          <div class="small muted" id="lbl_nextLevel" data-i18n="ui_next_level" style="margin-top:6px">Next level</div>
           <div class="gauge" style="margin:8px 0 4px"><i id="nextLevelGaugeFill"></i></div>
-          <div class="row small"><span id="nextLevelLine">Silver in —</span><span class="badge" id="nextLevelPct">0%</span></div>
+          <div class="row small"><span id="nextLevelLine">—</span><span class="badge" id="nextLevelPct">0%</span></div>
 
-          <div class="small muted" style="margin-top:12px">Overall progress</div>
+          <div class="small muted" style="margin-top:12px" data-i18n="ui_overall_progress">Overall progress</div>
           <div class="gauge" style="margin:8px 0 4px"><i id="gaugeFill"></i></div>
           <div class="row small"><span id="progressPct">0%</span></div>
         </div>
@@ -153,7 +153,10 @@
     <!-- Tier benefits (stacked) -->
     <section class="card" style="margin-top:16px">
       <div class="row" style="justify-content:space-between">
-        <h2 class="row" style="gap:8px">Levels <span class="badge" id="inheritNote">Higher tiers include all lower-level benefits.</span></h2>
+        <h2 class="row" style="gap:8px">
+          <span data-i18n="ui_levels">Levels</span>
+          <span class="badge" id="inheritNote" data-i18n="ui_inherit_note">Higher tiers include all lower-level benefits.</span>
+        </h2>
       </div>
 
       <div id="tiersGrid">
@@ -170,7 +173,7 @@
   <!-- Checkout Modal -->
   <div class="modal" id="checkoutModal" aria-hidden="true">
     <div class="sheet">
-      <h3 id="co_title">Checkout</h3>
+      <h3 id="co_title" data-i18n="ui_checkout">Checkout</h3>
       <div class="small muted" id="co_planLine">—</div>
 
       <div style="margin-top:12px">
@@ -179,7 +182,7 @@
       </div>
 
       <div class="row" style="margin-top:10px">
-        <button class="btn" id="btnCrypto">Pay with Crypto</button>
+        <button class="btn" id="btnCrypto" data-i18n="ui_pay_crypto">Pay with Crypto</button>
         <div id="paypal-container"></div>
       </div>
       <p id="payMsg" class="small muted" style="margin-top:8px"></p>
@@ -190,8 +193,8 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <!-- (선택) 자체 다국어 스크립트 사용 시: <script src="/assets/lang.js"></script> -->
+  <!-- i18n: 반드시 결제 스크립트보다 먼저 로드 -->
+  <script src="/assets/js/lang.js"></script>
 
   <!-- PayPal SDK: 실제 CLIENT_ID 로 교체 -->
   <script src="https://www.paypal.com/sdk/js?client-id=REPLACE_WITH_CLIENT_ID"></script>
@@ -222,14 +225,14 @@
     elite: 15000000
   };
 
-  // 레벨 혜택 (상위레벨은 하위 전부 포함)
-  const BENEFITS = {
-    bronze: ["기본 이용 가능 (회원가입 시 자동 부여)"],
-    silver: ["첫 예약 시 3% 포인트 적립"],
-    gold: ["매 예약 시 5% 포인트 적립", "우선 고객 응대"],
-    platinum: ["7% 포인트 적립", "시즌 할인 자동 적용"],
-    diamond: ["10% 포인트 적립", "전용 쿠폰", "고객센터 우선권"],
-    elite: ["15% 포인트 적립", "프라이빗 딜 접근", "긴급 지원 우선 처리"]
+  // 혜택 키 (문구는 lang.js가 관리)
+  const BENEFIT_KEYS = {
+    bronze:   ["benefit_basic"],
+    silver:   ["benefit_silver_3"],
+    gold:     ["benefit_gold_5", "benefit_priority"],
+    platinum: ["benefit_platinum_7", "benefit_platinum_season"],
+    diamond:  ["benefit_diamond_10", "benefit_diamond_coupon", "benefit_diamond_support"],
+    elite:    ["benefit_elite_private", "benefit_elite_emergency"]
   };
 
   const $$ = s => document.querySelector(s);
@@ -291,6 +294,15 @@
     return "bronze";
   }
 
+  function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+  // % back i18n
+  function percentBack(level){
+    const map = { bronze:"back_0", silver:"back_3", gold:"back_5",
+                  platinum:"back_7", diamond:"back_10", elite:"back_15" };
+    return window.STAY_I18N.t(map[level] || "back_0");
+  }
+
   function renderProgress(){
     const cur = currencySel.value;
     const levelOrder = ["bronze","silver","gold","platinum","diamond","elite"];
@@ -298,19 +310,20 @@
     const curIdx   = levelOrder.indexOf(curLevel);
     const nextLv   = levelOrder[curIdx+1] || null;
 
-    levelTitle.textContent = "Your Level: " + cap(curLevel);
+    levelTitle.textContent = window.STAY_I18N.t('ui_your_level') + ": " + cap(curLevel);
     tierBadge.textContent  = percentBack(curLevel);
 
     if(nextLv){
       const needKRW = LEVELS_KRW[nextLv] - userSpentKRW;
       const needConv = Math.max(0, krwTo(needKRW, cur));
-      nextLine.textContent = `${cap(nextLv)} in ${fmtCurrency(needConv, cur)} left`;
+      // 텍스트는 간결하게(언어 독립)
+      nextLine.textContent = `${cap(nextLv)} • ${fmtCurrency(needConv, cur)}`;
       const span = LEVELS_KRW[nextLv] - LEVELS_KRW[curLevel];
       const done = Math.min(1, (userSpentKRW - LEVELS_KRW[curLevel]) / span);
       nextFill.style.width = (done*100).toFixed(1) + "%";
       nextPct.textContent = Math.round(done*100) + "%";
     }else{
-      nextLine.textContent = "Top level reached";
+      nextLine.textContent = window.STAY_I18N.t('ui_top_level');
       nextFill.style.width = "100%";
       nextPct.textContent = "100%";
     }
@@ -321,30 +334,28 @@
     progressPct.textContent = Math.round(overall*100) + "%";
   }
 
-  function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
-  function percentBack(level){
-    return ({
-      bronze:"0% back", silver:"3% back", gold:"5% back",
-      platinum:"7% back", diamond:"10% back", elite:"15% back"
-    })[level] || "0% back";
-  }
-
   // 혜택 렌더 (상위=하위 포함)
   function renderBenefits(){
     const order = ["bronze","silver","gold","platinum","diamond","elite"];
     const acc = [];
     for (const lv of order){
-      acc.push(...(BENEFITS[lv]||[]));
+      acc.push(...(BENEFIT_KEYS[lv]||[]));
       const card = [...tiersGrid.children].find(n => n.dataset.tier.toLowerCase()===lv);
       const wrap = card.querySelector('.benefits');
       wrap.innerHTML = "";
-      [...new Set(acc)].forEach(b => {
+      [...new Set(acc)].forEach(key => {
         const div = document.createElement('div');
         div.className = "benefit";
-        div.innerHTML = `<i>✓</i><span>${b}</span>`;
+        const span = document.createElement('span');
+        span.setAttribute('data-i18n', key);
+        span.textContent = window.STAY_I18N.t(key); // fallback
+        div.innerHTML = `<i>✓</i>`;
+        div.appendChild(span);
         wrap.appendChild(div);
       });
     }
+    // 새로 만든 요소에도 번역 적용
+    window.STAY_I18N.applyI18n(window.STAY_I18N.current());
   }
 
   // 가격 렌더
@@ -369,7 +380,7 @@
     const cur = currencySel.value;
     const usd = PRICING[plan][billCycle];
     const amt = usdTo(usd, cur);
-    co_title.textContent = "Checkout";
+    co_title.textContent = window.STAY_I18N.t('ui_checkout');
     co_planLine.textContent = `${plan==='plus'?'StayWorld+':'StayWorld Black'} — ${billCycle}`;
     co_amount.textContent = fmtCurrency(amt, cur);
     modal.style.display = "flex";
@@ -382,9 +393,7 @@
 
   // 플랜 버튼
   $$$('.cta').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      openCheckout(btn.dataset.plan);
-    });
+    btn.addEventListener('click', ()=>{ openCheckout(btn.dataset.plan); });
   });
 
   // NOWPayments (Crypto)
@@ -447,6 +456,8 @@
   renderPrices();
   renderBenefits();
   renderProgress();
+  // DOM 생성 후 번역 1회 더 적용
+  window.STAY_I18N.applyI18n(window.STAY_I18N.current());
   </script>
 </body>
 </html>
