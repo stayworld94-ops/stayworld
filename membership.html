@@ -194,7 +194,7 @@
   </div>
 
   <!-- i18n: 반드시 결제 스크립트보다 먼저 로드 -->
-  <script src="/assets/js/lang.js"></script>
+  <script src="/assets/js/lang.js?v=20250902"></script>
 
   <!-- PayPal SDK: 실제 CLIENT_ID 로 교체 -->
   <script src="https://www.paypal.com/sdk/js?client-id=REPLACE_WITH_CLIENT_ID"></script>
@@ -316,7 +316,6 @@
     if(nextLv){
       const needKRW = LEVELS_KRW[nextLv] - userSpentKRW;
       const needConv = Math.max(0, krwTo(needKRW, cur));
-      // 텍스트는 간결하게(언어 독립)
       nextLine.textContent = `${cap(nextLv)} • ${fmtCurrency(needConv, cur)}`;
       const span = LEVELS_KRW[nextLv] - LEVELS_KRW[curLevel];
       const done = Math.min(1, (userSpentKRW - LEVELS_KRW[curLevel]) / span);
