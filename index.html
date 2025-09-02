@@ -723,11 +723,99 @@
   document.getElementById('btnSearch').addEventListener('click',runSearch,{capture:true});
   ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
   </script>
+<!-- Explore 섹션 추가 -->
+<section class="sw-explore">
+  ... (추천 숙소 / 도시 카드 코드) ...
+</section>
+<!-- /Explore 섹션 끝 -->
+<!-- Explore 섹션 추가 -->
+<section class="sw-explore">
+  <div class="sw-wrap">
+    <!-- 제목 -->
+    <header class="sw-explore-head">
+      <h2 data-i18n="explore.unique_title">한 번쯤 묵어보고 싶은 숙소</h2>
+      <p data-i18n="explore.unique_sub">캐빈, 빌라, 샬레 등 특별한 숙소를 찾아보세요</p>
+    </header>
+
+    <!-- 유니크 스테이 (가로 스크롤 카드) -->
+    <div class="sw-row">
+      <button class="sw-nav prev" aria-label="prev">‹</button>
+      <div class="sw-track" data-track="unique">
+        <!-- 카드 1 -->
+        <article class="sw-card">
+          <div class="sw-card-media" style="background-image:url('/assets/unique/cabin.jpg')">
+            <button class="sw-like" aria-label="favorite">♡</button>
+            <span class="sw-badge">9.6</span>
+          </div>
+          <div class="sw-card-body">
+            <h3>Forest Cabin</h3>
+            <p class="sw-meta">폴란드, 자코파네 • <span data-i18n="explore.exceptional">평점 훌륭함</span></p>
+          </div>
+        </article>
+
+        <!-- 카드 2 -->
+        <article class="sw-card">
+          <div class="sw-card-media" style="background-image:url('/assets/unique/chalet.jpg')">
+            <button class="sw-like" aria-label="favorite">♡</button>
+            <span class="sw-badge">9.5</span>
+          </div>
+          <div class="sw-card-body">
+            <h3>Alpine Chalet</h3>
+            <p class="sw-meta">독일, 트리어 • <span data-i18n="explore.exceptional">평점 훌륭함</span></p>
+          </div>
+        </article>
+
+        <!-- 카드 3 -->
+        <article class="sw-card">
+          <div class="sw-card-media" style="background-image:url('/assets/unique/tinyhouse.jpg')">
+            <button class="sw-like" aria-label="favorite">♡</button>
+            <span class="sw-badge">9.4</span>
+          </div>
+          <div class="sw-card-body">
+            <h3>Tiny House</h3>
+            <p class="sw-meta">폴란드, 키스크보 • <span data-i18n="explore.exceptional">평점 훌륭함</span></p>
+          </div>
+        </article>
+      </div>
+      <button class="sw-nav next" aria-label="next">›</button>
+    </div>
+
+    <!-- 인기 목적지 -->
+    <div class="sw-tabs">
+      <button class="is-active" data-filter="city" data-i18n="explore.tab_city">도시</button>
+      <button data-filter="beach" data-i18n="explore.tab_beach">바다</button>
+      <button data-filter="outdoor" data-i18n="explore.tab_outdoor">자연</button>
+      <button data-filter="romance" data-i18n="explore.tab_romance">로맨스</button>
+      <button data-filter="food" data-i18n="explore.tab_food">맛집</button>
+    </div>
+
+    <div class="sw-grid" data-grid="destinations">
+      <a class="sw-spot" data-type="city" style="background-image:url('/assets/dest/athens.jpg')">
+        <span class="sw-spot-title">Athens 🇬🇷</span>
+      </a>
+      <a class="sw-spot" data-type="city" style="background-image:url('/assets/dest/dubai.jpg')">
+        <span class="sw-spot-title">Dubai 🇦🇪</span>
+      </a>
+      <a class="sw-spot" data-type="city" style="background-image:url('/assets/dest/amsterdam.jpg')">
+        <span class="sw-spot-title">Amsterdam 🇳🇱</span>
+      </a>
+      <a class="sw-spot" data-type="beach" style="background-image:url('/assets/dest/antalya.jpg')">
+        <span class="sw-spot-title">Antalya 🏖️</span>
+      </a>
+      <a class="sw-spot" data-type="outdoor" style="background-image:url('/assets/dest/cappadocia.jpg')">
+        <span class="sw-spot-title">Cappadocia ⛰️</span>
+      </a>
+    </div>
+  </div>
+</section>
+<!-- /Explore 섹션 끝 -->
 
   <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container"><small data-i18n="footer_copy">© StayWorld — stayworldbooking.com</small></div>
-  </footer>
+<footer class="site-footer">
+  <div class="container">
+    <small data-i18n="footer_copy">© StayWorld - stayworldbooking.com</small>
+  </div>
+</footer>
 
   <!-- AUTH UI: 네비의 Login/Logout 전환 -->
   <script>
