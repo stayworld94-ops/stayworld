@@ -58,11 +58,18 @@
     .benefit i{opacity:.6}
     @media (max-width:900px){ .grid,.plan-grid{grid-template-columns:1fr} #tiersGrid{grid-template-columns:1fr 1fr} }
     @media (max-width:600px){ #tiersGrid{grid-template-columns:1fr} }
+
+    /* Checkout modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+    .modal .sheet{background:var(--card);border:1px solid #233047;border-radius:14px;max-width:520px;width:100%;padding:18px}
+    .modal .row-end{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+    .btn{padding:10px 14px;border-radius:10px;border:1px solid #2b3850;background:#182132;color:#e7ecf3;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
   </style>
 </head>
 <body>
 
-  <!-- Header (간단 버전: 원하면 사이트 공통 헤더로 교체 가능) -->
+  <!-- Header -->
   <header class="site-header">
     <div class="container header-row">
       <a class="brand" href="/"><img class="brand-logo" src="/stayworld-logo.png" alt="StayWorld"><span>STAYWORLD</span></a>
@@ -76,9 +83,9 @@
   <main class="container">
     <!-- Title -->
     <section class="hero">
-      <div class="badge" id="dwTop">…</div>
+      <div class="badge" id="dwTop">Membership</div>
       <h1 id="mb_title">Membership + Levels</h1>
-      <div class="sub" id="mb_subtitle">…</div>
+      <div class="sub" id="mb_subtitle">Choose a plan. Perks and level progress update automatically.</div>
     </section>
 
     <div class="grid">
@@ -93,7 +100,8 @@
             </div>
             <select id="currencySelect" title="Currency">
               <option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option><option>KRW</option>
-              <option>CNY</option><option>MXN</option><option>BRL</option><option>RUB</option><option>AUD</option>
+              <option>TRY</option><option>CNY</option><option>MXN</option><option>BRL</option><option>RUB</option>
+              <option>AUD</option><option>CAD</option>
             </select>
           </div>
         </div>
@@ -102,15 +110,15 @@
           <div class="plan" id="planPlus">
             <div class="badge">StayWorld+ (Plus)</div>
             <div class="price" id="pricePlus">$9.99 / mo</div>
-            <div class="small muted">Instant perks + monthly boosts</div>
-            <div style="margin-top:10px"><button class="cta">Start Plus</button></div>
+            <div class="small muted" data-i18n="plus_desc">Instant perks + monthly boosts</div>
+            <div style="margin-top:10px"><button class="cta" data-plan="plus">Start Plus</button></div>
           </div>
 
           <div class="plan" id="planBlack">
             <div class="badge" style="background:#2a1f09;color:#f3c04b;border:1px solid #3b2a0a">StayWorld Black</div>
             <div class="price" id="priceBlack">$24.99 / mo</div>
-            <div class="small muted">More boosts + priority + extras</div>
-            <div style="margin-top:10px"><button class="cta">Start Black</button></div>
+            <div class="small muted" data-i18n="black_desc">More boosts + priority + extras</div>
+            <div style="margin-top:10px"><button class="cta" data-plan="black">Start Black</button></div>
           </div>
         </div>
       </section>
@@ -119,21 +127,21 @@
       <section class="card usage">
         <h2>Your Membership</h2>
 
-        <div class="kv"><div id="lbl_perksLeft">This month remaining</div><div></div></div>
+        <div class="kv"><div id="lbl_perksLeft">This month remaining</div><div id="uiPerksLeft">—</div></div>
+        <div class="kv"><div id="lbl_boostLeft">Points boost</div><div id="uiBoostLeft">—</div></div>
 
-        <div class="kv"><div id="lbl_boostLeft">Points boost left:</div><div id="uiBoostLeft">…</div></div>
         <div class="kv">
-          <div id="lbl_discountLeft">Instant discount:</div>
-          <div><span id="uiDiscountPerBooking">…</span> <span class="muted" id="lbl_bookings">bookings</span> × <span id="uiDiscountRemaining">…</span></div>
+          <div id="lbl_discountLeft">Instant discount</div>
+          <div><span id="uiDiscountPerBooking">—</span> <span class="muted" id="lbl_bookings">per booking</span></div>
         </div>
 
-        <div class="kv"><div id="lbl_ticketsEligible">Tickets:</div><div id="uiTicketsEligible" class="ok">…</div></div>
+        <div class="kv"><div id="lbl_ticketsEligible">Tickets</div><div id="uiTicketsEligible" class="ok">—</div></div>
 
         <div style="margin-top:14px">
-          <div class="row"><div id="levelTitle">Your Level: —</div><div class="badge" id="tierBadge">0% back</div></div>
+          <div class="row"><div id="levelTitle">Your Level: Bronze</div><div class="badge" id="tierBadge">0% back</div></div>
           <div class="small muted" id="lbl_nextLevel" style="margin-top:6px">Next level</div>
           <div class="gauge" style="margin:8px 0 4px"><i id="nextLevelGaugeFill"></i></div>
-          <div class="row small"><span id="nextLevelLine">…</span><span class="badge" id="nextLevelPct">0%</span></div>
+          <div class="row small"><span id="nextLevelLine">Silver in —</span><span class="badge" id="nextLevelPct">0%</span></div>
 
           <div class="small muted" style="margin-top:12px">Overall progress</div>
           <div class="gauge" style="margin:8px 0 4px"><i id="gaugeFill"></i></div>
@@ -149,37 +157,296 @@
       </div>
 
       <div id="tiersGrid">
-        <div class="tier-card" data-tier="Bronze">
-          <h3>Bronze</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Silver">
-          <h3>Silver</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Gold">
-          <h3>Gold</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Platinum">
-          <h3>Platinum</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Diamond">
-          <h3>Diamond</h3>
-          <div class="benefits"></div>
-        </div>
-        <div class="tier-card" data-tier="Elite">
-          <h3>Elite</h3>
-          <div class="benefits"></div>
-        </div>
+        <div class="tier-card" data-tier="Bronze"><h3>Bronze</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Silver"><h3>Silver</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Gold"><h3>Gold</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Platinum"><h3>Platinum</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Diamond"><h3>Diamond</h3><div class="benefits"></div></div>
+        <div class="tier-card" data-tier="Elite"><h3>Elite</h3><div class="benefits"></div></div>
       </div>
     </section>
   </main>
 
-  <!-- Scripts (언어/인증/멤버십) -->
-  <script src="/assets/lang.js"></script>
-  <script type="module" src="/assets/auth.js"></script>
-  <script src="/assets/membership.js"></script>
+  <!-- Checkout Modal -->
+  <div class="modal" id="checkoutModal" aria-hidden="true">
+    <div class="sheet">
+      <h3 id="co_title">Checkout</h3>
+      <div class="small muted" id="co_planLine">—</div>
+
+      <div style="margin-top:12px">
+        <label class="small muted">Amount</label>
+        <div id="co_amount" style="font-weight:700;font-size:18px;margin-top:4px">—</div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnCrypto">Pay with Crypto</button>
+        <div id="paypal-container"></div>
+      </div>
+      <p id="payMsg" class="small muted" style="margin-top:8px"></p>
+
+      <div class="row-end">
+        <button class="btn" id="btnClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <!-- (선택) 자체 다국어 스크립트 사용 시: <script src="/assets/lang.js"></script> -->
+
+  <!-- PayPal SDK: 실제 CLIENT_ID 로 교체 -->
+  <script src="https://www.paypal.com/sdk/js?client-id=REPLACE_WITH_CLIENT_ID"></script>
+
+  <script>
+  /***** CONFIG *****/
+  const SUCCESS_URL = "https://stayworldbooking.com/payment-success.html";
+  const CANCEL_URL  = "https://stayworldbooking.com/payment-cancel.html";
+
+  // 표시용 단순 환율 (운영 시 주기적 업데이트 권장, 기준통화: USD)
+  const FX_RATES = {
+    USD: 1, EUR: 0.92, GBP: 0.78, JPY: 149, KRW: 1370, TRY: 34, CNY: 7.1, MXN: 19, BRL: 5.5, RUB: 90, AUD: 1.5, CAD: 1.36
+  };
+
+  // 멤버십 가격(USD 기준)
+  const PRICING = {
+    plus:   { monthly: 9.99,  yearly: 99.00 },
+    black:  { monthly: 24.99, yearly: 249.00 }
+  };
+
+  // 레벨 임계값(기준: KRW 총 누적 결제액)
+  const LEVELS_KRW = {
+    bronze: 0,
+    silver: 500000,
+    gold: 2000000,
+    platinum: 4000000,
+    diamond: 7500000,
+    elite: 15000000
+  };
+
+  // 레벨 혜택 (상위레벨은 하위 전부 포함)
+  const BENEFITS = {
+    bronze: ["기본 이용 가능 (회원가입 시 자동 부여)"],
+    silver: ["첫 예약 시 3% 포인트 적립"],
+    gold: ["매 예약 시 5% 포인트 적립", "우선 고객 응대"],
+    platinum: ["7% 포인트 적립", "시즌 할인 자동 적용"],
+    diamond: ["10% 포인트 적립", "전용 쿠폰", "고객센터 우선권"],
+    elite: ["15% 포인트 적립", "프라이빗 딜 접근", "긴급 지원 우선 처리"]
+  };
+
+  const $$ = s => document.querySelector(s);
+  const $$$ = s => document.querySelectorAll(s);
+
+  const currencySel = $("#currencySelect");
+  const billMonthly = $("#billMonthly");
+  const billYearly  = $("#billYearly");
+  const pricePlus   = $("#pricePlus");
+  const priceBlack  = $("#priceBlack");
+
+  const levelTitle  = $("#levelTitle");
+  const tierBadge   = $("#tierBadge");
+  const nextFill    = $("#nextLevelGaugeFill");
+  const nextLine    = $("#nextLevelLine");
+  const nextPct     = $("#nextLevelPct");
+  const gaugeFill   = $("#gaugeFill");
+  const progressPct = $("#progressPct");
+
+  const tiersGrid   = $("#tiersGrid");
+
+  // Checkout modal els
+  const modal       = $("#checkoutModal");
+  const co_title    = $("#co_title");
+  const co_planLine = $("#co_planLine");
+  const co_amount   = $("#co_amount");
+  const btnCrypto   = $("#btnCrypto");
+  const payMsg      = $("#payMsg");
+  const btnClose    = $("#btnClose");
+
+  // 유틸
+  function $(id){ return document.getElementById(id.replace('#','')); }
+  function fmtCurrency(amount, cur){
+    const locale = cur === 'KRW' ? 'ko-KR'
+                 : cur === 'JPY' ? 'ja-JP'
+                 : cur === 'TRY' ? 'tr-TR'
+                 : cur === 'EUR' ? 'fr-FR'
+                 : 'en-US';
+    return new Intl.NumberFormat(locale, { style:'currency', currency:cur }).format(amount);
+  }
+  function usdTo(amountUSD, cur){
+    const r = FX_RATES[cur] || 1;
+    return amountUSD * r;
+  }
+  function krwTo(amountKRW, cur){
+    // KRW → USD → target
+    const usd = amountKRW / FX_RATES.KRW;
+    return usdTo(usd, cur);
+  }
+
+  // 가짜 사용자 누적 결제액(데모) — 운영 시 서버/DB 값으로 채우세요.
+  let userSpentKRW = 0;
+
+  function currentLevelByKRW(spent){
+    const order = ["elite","diamond","platinum","gold","silver","bronze"];
+    for (const lv of order){
+      if (spent >= LEVELS_KRW[lv]) return lv;
+    }
+    return "bronze";
+  }
+
+  function renderProgress(){
+    const cur = currencySel.value;
+    const levelOrder = ["bronze","silver","gold","platinum","diamond","elite"];
+    const curLevel = currentLevelByKRW(userSpentKRW);
+    const curIdx   = levelOrder.indexOf(curLevel);
+    const nextLv   = levelOrder[curIdx+1] || null;
+
+    levelTitle.textContent = "Your Level: " + cap(curLevel);
+    tierBadge.textContent  = percentBack(curLevel);
+
+    if(nextLv){
+      const needKRW = LEVELS_KRW[nextLv] - userSpentKRW;
+      const needConv = Math.max(0, krwTo(needKRW, cur));
+      nextLine.textContent = `${cap(nextLv)} in ${fmtCurrency(needConv, cur)} left`;
+      const span = LEVELS_KRW[nextLv] - LEVELS_KRW[curLevel];
+      const done = Math.min(1, (userSpentKRW - LEVELS_KRW[curLevel]) / span);
+      nextFill.style.width = (done*100).toFixed(1) + "%";
+      nextPct.textContent = Math.round(done*100) + "%";
+    }else{
+      nextLine.textContent = "Top level reached";
+      nextFill.style.width = "100%";
+      nextPct.textContent = "100%";
+    }
+
+    // Overall (elite max 기준)
+    const overall = Math.min(1, userSpentKRW / LEVELS_KRW.elite);
+    gaugeFill.style.width = (overall*100).toFixed(1) + "%";
+    progressPct.textContent = Math.round(overall*100) + "%";
+  }
+
+  function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+  function percentBack(level){
+    return ({
+      bronze:"0% back", silver:"3% back", gold:"5% back",
+      platinum:"7% back", diamond:"10% back", elite:"15% back"
+    })[level] || "0% back";
+  }
+
+  // 혜택 렌더 (상위=하위 포함)
+  function renderBenefits(){
+    const order = ["bronze","silver","gold","platinum","diamond","elite"];
+    const acc = [];
+    for (const lv of order){
+      acc.push(...(BENEFITS[lv]||[]));
+      const card = [...tiersGrid.children].find(n => n.dataset.tier.toLowerCase()===lv);
+      const wrap = card.querySelector('.benefits');
+      wrap.innerHTML = "";
+      [...new Set(acc)].forEach(b => {
+        const div = document.createElement('div');
+        div.className = "benefit";
+        div.innerHTML = `<i>✓</i><span>${b}</span>`;
+        wrap.appendChild(div);
+      });
+    }
+  }
+
+  // 가격 렌더
+  let billCycle = "monthly";
+  function renderPrices(){
+    const cur = currencySel.value;
+    const pPlusUSD = PRICING.plus[billCycle];
+    const pBlkUSD  = PRICING.black[billCycle];
+    pricePlus.textContent = `${fmtCurrency(usdTo(pPlusUSD, cur), cur)} / ${billCycle==='monthly'?'mo':'yr'}`;
+    priceBlack.textContent= `${fmtCurrency(usdTo(pBlkUSD, cur),  cur)} / ${billCycle==='monthly'?'mo':'yr'}`;
+  }
+
+  // 청구주기 토글
+  billMonthly.onclick = () => { billCycle="monthly"; billMonthly.classList.add('active'); billYearly.classList.remove('active'); renderPrices(); };
+  billYearly.onclick  = () => { billCycle="yearly";  billYearly.classList.add('active');  billMonthly.classList.remove('active'); renderPrices(); };
+  currencySel.onchange = () => { renderPrices(); renderProgress(); };
+
+  // 체크아웃 모달
+  let checkoutPlan = null;
+  function openCheckout(plan){
+    checkoutPlan = plan;
+    const cur = currencySel.value;
+    const usd = PRICING[plan][billCycle];
+    const amt = usdTo(usd, cur);
+    co_title.textContent = "Checkout";
+    co_planLine.textContent = `${plan==='plus'?'StayWorld+':'StayWorld Black'} — ${billCycle}`;
+    co_amount.textContent = fmtCurrency(amt, cur);
+    modal.style.display = "flex";
+    payMsg.textContent = "";
+    mountPayPalButton(amt, cur);
+  }
+  function closeCheckout(){ modal.style.display="none"; $("#paypal-container").innerHTML=""; }
+  btnClose.onclick = closeCheckout;
+  window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeCheckout(); });
+
+  // 플랜 버튼
+  $$$('.cta').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      openCheckout(btn.dataset.plan);
+    });
+  });
+
+  // NOWPayments (Crypto)
+  btnCrypto.addEventListener('click', async ()=>{
+    try{
+      payMsg.textContent = "Creating crypto invoice...";
+      const cur = currencySel.value;
+      const usd = PRICING[checkoutPlan][billCycle];
+      const amt = usdTo(usd, cur);
+
+      const res = await fetch('/.netlify/functions/createNowInvoice', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          amount: Number(amt.toFixed(2)),
+          currency: cur,
+          orderId: `SW-${checkoutPlan}-${billCycle}-${Date.now()}`,
+          successUrl: SUCCESS_URL,
+          cancelUrl: CANCEL_URL
+        })
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'NOWPayments error');
+      window.location.href = data.invoice_url;
+    }catch(e){
+      payMsg.textContent = "Crypto error: " + e.message;
+    }
+  });
+
+  // PayPal
+  function mountPayPalButton(amount, currency){
+    $("#paypal-container").innerHTML = "";
+    paypal.Buttons({
+      createOrder: async () => {
+        const res = await fetch('/.netlify/functions/paypalCreateOrder', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ amount: Number(amount.toFixed(2)), currency })
+        });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Failed to create PayPal order');
+        return data.id;
+      },
+      onApprove: async (data) => {
+        const res = await fetch('/.netlify/functions/paypalCaptureOrder', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ orderID: data.orderID })
+        });
+        const capture = await res.json();
+        if(!res.ok) throw new Error(capture.error || 'Capture failed');
+        window.location.href = SUCCESS_URL + "?order=" + encodeURIComponent(data.orderID);
+      },
+      onCancel: () => { window.location.href = CANCEL_URL; },
+      onError: (err) => { payMsg.textContent = "PayPal error: " + err; }
+    }).render('#paypal-container');
+  }
+
+  // 초기 렌더
+  renderPrices();
+  renderBenefits();
+  renderProgress();
+  </script>
 </body>
 </html>
