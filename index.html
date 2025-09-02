@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>STAYWORLD — Luxury Global Reach</title>
-
-  <!-- Leaflet (지도) -->
+  
+  <!-- Leaflet (Map) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 
@@ -21,7 +21,6 @@
     .site-header{position:sticky;top:0;z-index:1000;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
     .header-row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
     .logo img{width:36px;height:36px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
-    .brand{font-weight:800;letter-spacing:.6px}
     .main-nav{display:flex;gap:20px;align-items:center}
     .main-nav a{padding:8px 10px;border-radius:10px}
     .main-nav a:hover{background:rgba(255,255,255,.06)}
@@ -29,6 +28,28 @@
     .btn-ghost{background:transparent;color:#cfcfcf;border:1px solid var(--line)}
     .btn-gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#170f04;font-weight:700;border-radius:14px;padding:12px 18px;box-shadow:0 8px 26px rgba(201,163,91,.35)}
     .lang-select{appearance:none;background:#101826;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:8px 32px 8px 10px}
+
+    /* Welcome bar */
+    .welcome-bar{position:sticky;top:72px;z-index:900;background:#121724;border-bottom:1px solid var(--line)}
+    .welcome-wrap{max-width:1120px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:10px}
+    .notif-btn{position:relative;border:1px solid var(--line);background:#0e141e;color:#e5edff;width:36px;height:36px;border-radius:999px;cursor:pointer}
+    .notif-badge{position:absolute;right:-4px;top:-4px;background:#f44;color:#fff;border-radius:999px;font-size:11px;padding:1px 5px}
+    .notif-panel{position:absolute;left:16px;top:64px;width:min(380px,92vw);background:#0f1520;border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+    .notif-header,.notif-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--line)}
+    .notif-footer{border:0;border-top:1px solid var(--line)}
+    .notif-list{list-style:none;margin:0;padding:0;max-height:320px;overflow:auto}
+    .notif-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:8px;border-radius:10px}
+    .notif-item:hover{background:#111928}
+    .notif-dot{width:8px;height:8px;border-radius:999px;background:#ffd36e;margin-top:8px}
+
+    /* Host dropdown */
+    .nav-item.dropdown{position:relative}
+    .nav-link.dropdown-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;font-weight:600;opacity:.95}
+    .dropdown-panel{position:absolute;top:100%;left:50%;transform:translate(-50%,8px);min-width:230px;background:#0f1520;border:1px solid var(--line);border-radius:12px;padding:8px;z-index:30;box-shadow:0 16px 40px rgba(0,0,0,.45);visibility:hidden;opacity:0;pointer-events:none;transition:opacity .12s ease,transform .12s ease,visibility .12s}
+    .nav-item.dropdown:hover .dropdown-panel,.nav-item.dropdown.open .dropdown-panel{visibility:visible;opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+    .dropdown-item{display:block;padding:10px 12px;border-radius:8px;color:#e7e9ee}
+    .dropdown-item:hover{background:#121a26}
+    .dropdown-divider{height:1px;background:var(--line);margin:6px 0}
 
     /* Hero */
     .hero{padding:48px 0 24px;background:radial-gradient(1200px 500px at 20% -10%,rgba(244,215,140,.12),transparent),radial-gradient(1200px 600px at 100% 0,rgba(78,94,130,.18),transparent)}
@@ -38,7 +59,7 @@
     .search-bar{display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;gap:10px;align-items:center}
     .input{background:#0f1621;border:1px solid var(--line);color:var(--text);padding:12px 14px;border-radius:12px}
     .input::placeholder{color:#a7b0bf}
-    .search-status{margin-top:8px;color:#cfd6e6;opacity:0;transition:opacity .3s}
+    .search-status{margin-top:8px;color:var(--muted);opacity:0;transition:opacity .3s}
     .btn.loading{opacity:.65;pointer-events:none}
 
     /* Cards */
@@ -50,15 +71,33 @@
     #map{height:420px;border-radius:16px;border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
     .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:10 !important}
 
-    /* Footer */
-    .site-footer{padding:28px 0;border-top:1px solid var(--line);opacity:.85}
+    /* Filters Drawer */
+    #filterDrawer{position:fixed;inset:0;display:none;z-index:2147483637;align-items:stretch;justify-content:flex-end}
+    #filterDrawer[aria-hidden="false"]{display:flex}
+    #filterDrawer .back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+    #filterDrawer .panel{position:relative;margin-left:auto;width:min(780px,92vw);max-height:92vh;overflow:auto;background:var(--panel);border-left:1px solid var(--line);border-top-left-radius:16px;border-bottom-left-radius:16px;display:flex;flex-direction:column}
+    #filterDrawer .head,#filterDrawer .foot{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+    #filterDrawer .foot{border-bottom:0;border-top:1px solid var(--line)}
+    #filterGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px}
+    #filterDrawer .box{background:#0f1420;border:1px solid var(--line);border-radius:12px;padding:12px}
+    #filterDrawer h4{margin:0 0 8px;font-size:14px}
+    .sw-badge{position:absolute;top:-8px;right:-8px;background:#ffd36e;color:#1a1205;border-radius:999px;font-size:11px;padding:2px 6px}
 
-    /* ===== StayWorld Explore Section ===== */
+    /* Chatbot */
+    #chatFab{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;z-index:2147483639;background:linear-gradient(180deg,var(--gold1),var(--gold2));box-shadow:0 14px 30px rgba(201,163,91,.35);font-size:22px}
+    #botPanel{position:fixed;right:20px;bottom:86px;width:min(360px,88vw);height:480px;background:#101018;border:1px solid #23232b;border-radius:16px;z-index:2147483638;display:none;box-shadow:0 20px 60px rgba(0,0,0,.5);color:var(--text)}
+    #botPanel .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
+    #botPanel .body{height:360px;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+    #botPanel .row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+    #botInput{flex:1;background:#0f1621;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px}
+    #botSend{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(180deg,var(--gold1),var(--gold2));color:#1a1205;font-weight:700}
+    .msg{max-width:80%;padding:10px 12px;border-radius:12px}.me{align-self:flex-end;background:#132132}.ai{align-self:flex-start;background:#121820}
+
+    /* Explore */
     .sw-explore{background:linear-gradient(180deg,rgba(8,10,14,.0),rgba(8,10,14,.6));padding:40px 0;border-top:1px solid var(--line)}
     .sw-wrap{max-width:1120px;margin:0 auto;padding:0 16px}
     .sw-explore-head h2{margin:0 0 6px;font-size:26px;font-weight:800}
     .sw-explore-head p{margin:0 0 18px;opacity:.8}
-
     .sw-row{position:relative;display:flex;align-items:center;gap:12px}
     .sw-track{display:flex;gap:16px;overflow:hidden;scroll-behavior:smooth;padding:6px}
     .sw-card{min-width:260px;background:#0f1420;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 26px rgba(0,0,0,.25);transition:transform .18s}
@@ -70,10 +109,8 @@
     .sw-card-body{padding:12px 14px 14px}
     .sw-card h3{margin:0 0 6px;font-size:16px}
     .sw-meta{margin:0;opacity:.75;font-size:13px}
-
     .sw-nav{border:1px solid var(--line);background:#0c121b;color:#e5edff;width:34px;height:34px;border-radius:999px;cursor:pointer}
     .sw-nav:active{transform:scale(.98)}
-
     .sw-tabs{display:flex;gap:8px;margin:20px 0 14px}
     .sw-tabs button{background:#0e141e;border:1px solid var(--line);border-radius:999px;padding:8px 14px;color:#cbd6e6;cursor:pointer;font-size:13px}
     .sw-tabs button.is-active,.sw-tabs button:hover{border-color:var(--gold2);color:#fff}
@@ -81,20 +118,37 @@
     .sw-spot{grid-column:span 4;position:relative;display:block;aspect-ratio:16/10;border-radius:16px;background-size:cover;background-position:center;overflow:hidden;border:1px solid var(--line);box-shadow:0 6px 24px rgba(0,0,0,.25)}
     .sw-spot-title{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);padding:8px 10px;border-radius:12px;color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.2)}
 
-    @media (max-width:1024px){.sw-spot{grid-column:span 6}}
-    @media (max-width:640px){.sw-card{min-width:220px}.sw-spot{grid-column:span 12}.hero-title{font-size:36px}.features{grid-template-columns:1fr}.search-bar{grid-template-columns:1fr 1fr 1fr auto}}
+    /* Footer */
+    .site-footer{padding:28px 0;border-top:1px solid var(--line);opacity:.85}
+
+    /* Responsive */
+    @media (max-width:920px){.main-nav{display:none}.hero-title{font-size:40px}.search-bar{grid-template-columns:1fr 1fr 1fr auto}}
+    @media (max-width:640px){.hero-title{font-size:34px}.features{grid-template-columns:1fr}.sw-card{min-width:220px}.sw-spot{grid-column:span 12}}
   </style>
 </head>
+
 <body>
   <!-- HEADER -->
   <header class="site-header">
     <div class="container header-row">
       <div class="logo"><a href="/"><img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo"></a></div>
+
       <nav class="main-nav">
         <a href="/" data-i18n="nav_home">Home</a>
         <a href="/membership.html" data-i18n="nav_membership">Membership</a>
-        <a href="/host-login.html" id="hostLink" data-i18n="host_login">Host Login</a>
+        <div id="hostMenu" class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" data-i18n="nav_host">Host ▾</a>
+          <div class="dropdown-panel">
+            <a class="dropdown-item" href="/host-login.html" data-host-visible="signedOut" data-i18n="host_login">Host Login</a>
+            <a class="dropdown-item" href="/host-signup.html" data-host-visible="signedOut" data-i18n="host_signup">Host Sign Up</a>
+            <div class="dropdown-divider" data-host-visible="signedOut"></div>
+            <a class="dropdown-item" href="/host-register.html" data-host-visible="signedIn" data-i18n="host_register_property">Register Property</a>
+            <a class="dropdown-item" href="/host-my-listings.html" data-host-visible="signedIn" data-i18n="host_my_listings">My Listings</a>
+            <a class="dropdown-item" href="#" id="hostLogoutBtn" data-host-visible="signedIn" data-i18n="host_logout">Logout</a>
+          </div>
+        </div>
       </nav>
+
       <div style="display:flex;align-items:center;gap:10px">
         <label for="langSel" style="font-size:12px;opacity:.7" data-i18n="language">Language</label>
         <select id="langSel" class="lang-select">
@@ -107,6 +161,19 @@
       </div>
     </div>
   </header>
+
+  <!-- WELCOME BAR + NOTIFS -->
+  <div class="welcome-bar">
+    <div class="welcome-wrap">
+      <div class="welcome-text" id="welcomeUser">Welcome, Guest 🎉</div>
+      <button class="notif-btn" id="notifBtn" aria-label="Notifications">🔔<span class="notif-badge" id="notifBadge" hidden>0</span></button>
+      <div class="notif-panel" id="notifPanel" hidden>
+        <div class="notif-header"><span>Notifications</span><button id="markAllReadBtn" class="btn btn-ghost" style="padding:6px 10px">Mark all read</button></div>
+        <ul id="notifList" class="notif-list"></ul>
+        <div class="notif-footer"><a href="/notifications.html">View all</a></div>
+      </div>
+    </div>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -136,7 +203,15 @@
     <div class="container"><div id="map"></div></div>
   </section>
 
-  <!-- EXPLORE (푸터 바로 위) -->
+  <!-- PROMO -->
+  <section class="container" style="margin-top:-24px; margin-bottom:12px">
+    <div style="border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(90deg,#ffd36e22,#ffd36e11)">
+      <strong>🎉 <span data-i18n="promo_title">신규 회원 첫 예약 10% 할인</span></strong>
+      <div style="opacity:.85" data-i18n="promo_sub">멤버십 가입하면 포인트 적립 + 독점 혜택</div>
+    </div>
+  </section>
+
+  <!-- EXPLORE (푸터 위) -->
   <section class="sw-explore">
     <div class="sw-wrap">
       <header class="sw-explore-head">
@@ -205,10 +280,13 @@
   </footer>
 
   <script>
+  // ===== Build marker to verify latest deploy =====
+  window.SW_BUILD = 'index-full-2025-09-02b';
+
   /* ========================= I18N (10 languages) ========================= */
   const I18N = {
-    EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"Logout",language:"Language",
-        host_login:"Host Login",
+    EN:{nav_home:"Home",nav_membership:"Membership",nav_login:"Login",nav_logout:"Logout",language:"Language",nav_host:"Host",
+        host_login:"Host Login",host_signup:"Host Sign Up",host_register_property:"Register Property",host_my_listings:"My Listings",host_logout:"Logout",
         hero_luxury:"Luxury stays.",hero_reach:"Global reach.",hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",
         placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filters",search:"Search",
         feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",
@@ -217,9 +295,10 @@
         explore_unique_title:"Stays you'll love",explore_unique_sub:"Cabins, villas, chalets and more",
         explore_exceptional:"Exceptional",
         explore_tab_city:"City",explore_tab_beach:"Beach",explore_tab_outdoor:"Outdoor",explore_tab_romance:"Romance",explore_tab_food:"Food",
+        promo_title:"New members get 10% off",promo_sub:"Join to earn points and unlock perks.",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    KO:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",nav_logout:"로그아웃",language:"언어",
-        host_login:"호스트 로그인",
+    KO:{nav_home:"홈",nav_membership:"멤버십",nav_login:"로그인",nav_logout:"로그아웃",language:"언어",nav_host:"호스트",
+        host_login:"호스트 로그인",host_signup:"호스트 가입",host_register_property:"숙소 등록",host_my_listings:"호스트 등록목록",host_logout:"로그아웃",
         hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",
         placeholder_city:"파리, 도쿄, 이스탄불…",filters:"필터",search:"검색",
         feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",
@@ -228,9 +307,10 @@
         explore_unique_title:"한 번쯤 묵어보고 싶은 숙소",explore_unique_sub:"캐빈, 빌라, 샬레 등 특별한 숙소",
         explore_exceptional:"평점 훌륭함",
         explore_tab_city:"도시",explore_tab_beach:"바다",explore_tab_outdoor:"자연",explore_tab_romance:"로맨스",explore_tab_food:"맛집",
+        promo_title:"신규 회원 첫 예약 10% 할인",promo_sub:"멤버십 가입하면 포인트 적립 + 독점 혜택",
         footer_copy:"© 스테이월드 — stayworldbooking.com"},
-    JA:{nav_home:"ホーム",nav_membership:"メンバーシップ",nav_login:"ログイン",nav_logout:"ログアウト",language:"言語",
-        host_login:"ホストログイン",
+    JA:{nav_home:"ホーム",nav_membership:"メンバーシップ",nav_login:"ログイン",nav_logout:"ログアウト",language:"言語",nav_host:"ホスト",
+        host_login:"ホストログイン",host_signup:"ホスト登録",host_register_property:"物件を登録",host_my_listings:"マイリスティング",host_logout:"ログアウト",
         hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",
         placeholder_city:"パリ、東京、イスタンブール…",filters:"フィルター",search:"検索",
         feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",
@@ -239,9 +319,10 @@
         explore_unique_title:"気に入る宿",explore_unique_sub:"キャビン、ヴィラ、シャレーなど",
         explore_exceptional:"素晴らしい",
         explore_tab_city:"都市",explore_tab_beach:"ビーチ",explore_tab_outdoor:"アウトドア",explore_tab_romance:"ロマンス",explore_tab_food:"グルメ",
+        promo_title:"新規会員10%OFF",promo_sub:"入会でポイント&特典",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_logout:"退出登录",language:"语言",
-        host_login:"房东登录",
+    ZH:{nav_home:"首页",nav_membership:"会员",nav_login:"登录",nav_logout:"退出登录",language:"语言",nav_host:"房东",
+        host_login:"房东登录",host_signup:"房东注册",host_register_property:"登记房源",host_my_listings:"我的房源",host_logout:"退出登录",
         hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",
         placeholder_city:"巴黎、东京、伊斯坦布尔…",filters:"筛选",search:"搜索",
         feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",
@@ -250,9 +331,10 @@
         explore_unique_title:"你会喜欢的住宿",explore_unique_sub:"小木屋、别墅、木屋等",
         explore_exceptional:"极好",
         explore_tab_city:"城市",explore_tab_beach:"海滩",explore_tab_outdoor:"户外",explore_tab_romance:"浪漫",explore_tab_food:"美食",
+        promo_title:"新会员首单9折",promo_sub:"加入会员赚积分享特权",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_logout:"Déconnexion",language:"Langue",
-        host_login:"Connexion hôte",
+    FR:{nav_home:"Accueil",nav_membership:"Adhésion",nav_login:"Connexion",nav_logout:"Déconnexion",language:"Langue",nav_host:"Hôte",
+        host_login:"Connexion hôte",host_signup:"Inscription hôte",host_register_property:"Enregistrer un logement",host_my_listings:"Mes annonces",host_logout:"Déconnexion",
         hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",
         placeholder_city:"Paris, Tokyo, Istanbul…",filters:"Filtres",search:"Rechercher",
         feat_verified:"Logements vérifiés",feat_verified_sub:"Meilleurs choix près de chez vous.",
@@ -261,9 +343,10 @@
         explore_unique_title:"Séjours à découvrir",explore_unique_sub:"Cabanes, villas, chalets et plus",
         explore_exceptional:"Exceptionnel",
         explore_tab_city:"Ville",explore_tab_beach:"Plage",explore_tab_outdoor:"Plein air",explore_tab_romance:"Romance",explore_tab_food:"Gastronomie",
+        promo_title:"-10% pour les nouveaux membres",promo_sub:"Rejoignez-nous pour des points & avantages",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_logout:"Cerrar sesión",language:"Idioma",
-        host_login:"Inicio de sesión de anfitrión",
+    ES:{nav_home:"Inicio",nav_membership:"Membresía",nav_login:"Ingresar",nav_logout:"Cerrar sesión",language:"Idioma",nav_host:"Anfitrión",
+        host_login:"Inicio de sesión de anfitrión",host_signup:"Registro de anfitrión",host_register_property:"Registrar propiedad",host_my_listings:"Mis anuncios",host_logout:"Cerrar sesión",
         hero_luxury:"Estancias de lujo.",hero_reach:"Alcance global.",hero_sub:"Tarjetas, transferencia bancaria y cripto (BTC · ETH · USDT).",
         placeholder_city:"París, Tokio, Estambul…",filters:"Filtros",search:"Buscar",
         feat_verified:"Alojamientos verificados",feat_verified_sub:"Mejores opciones cerca de ti.",
@@ -272,9 +355,10 @@
         explore_unique_title:"Alojamientos que te encantarán",explore_unique_sub:"Cabañas, villas, chalets y más",
         explore_exceptional:"Fantástico",
         explore_tab_city:"Ciudad",explore_tab_beach:"Playa",explore_tab_outdoor:"Aire libre",explore_tab_romance:"Romance",explore_tab_food:"Comida",
+        promo_title:"10% de descuento para nuevos miembros",promo_sub:"Únete para ganar puntos y beneficios",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_logout:"Abmelden",language:"Sprache",
-        host_login:"Gastgeber-Login",
+    DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",nav_login:"Login",nav_logout:"Abmelden",language:"Sprache",nav_host:"Gastgeber",
+        host_login:"Gastgeber-Login",host_signup:"Gastgeber-Registrierung",host_register_property:"Unterkunft registrieren",host_my_listings:"Meine Inserate",host_logout:"Abmelden",
         hero_luxury:"Luxuriöse Aufenthalte.",hero_reach:"Globale Reichweite.",hero_sub:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",
         placeholder_city:"Paris, Tokio, Istanbul…",filters:"Filter",search:"Suchen",
         feat_verified:"Verifizierte Unterkünfte",feat_verified_sub:"Top-Auswahl in deiner Nähe.",
@@ -283,9 +367,10 @@
         explore_unique_title:"Unterkünfte, die begeistern",explore_unique_sub:"Hütten, Villen, Chalets u.v.m.",
         explore_exceptional:"Hervorragend",
         explore_tab_city:"Stadt",explore_tab_beach:"Strand",explore_tab_outdoor:"Draußen",explore_tab_romance:"Romantik",explore_tab_food:"Essen",
+        promo_title:"10% für neue Mitglieder",promo_sub:"Mitglied werden, Punkte sammeln",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_logout:"Çıkış",language:"Dil",
-        host_login:"Ev Sahibi Girişi",
+    TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",nav_login:"Giriş",nav_logout:"Çıkış",language:"Dil",nav_host:"Ev Sahibi",
+        host_login:"Ev Sahibi Girişi",host_signup:"Ev Sahibi Kaydı",host_register_property:"İlan Oluştur",host_my_listings:"İlanlarım",host_logout:"Çıkış",
         hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",
         placeholder_city:"Paris, Tokyo, İstanbul…",filters:"Filtreler",search:"Ara",
         feat_verified:"Doğrulanmış konaklamalar",feat_verified_sub:"Yakınınızdaki en iyi seçenekler.",
@@ -294,9 +379,10 @@
         explore_unique_title:"Bayılacağınız konaklamalar",explore_unique_sub:"Kulübeler, villalar, dağ evleri ve daha fazlası",
         explore_exceptional:"Harika",
         explore_tab_city:"Şehir",explore_tab_beach:"Plaj",explore_tab_outdoor:"Açık hava",explore_tab_romance:"Romantik",explore_tab_food:"Yemek",
+        promo_title:"Yeni üyelere %10 indirim",promo_sub:"Puan ve ayrıcalıklar için katılın",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_logout:"تسجيل الخروج",language:"اللغة",
-        host_login:"تسجيل دخول المضيف",
+    AR:{nav_home:"الرئيسية",nav_membership:"العضوية",nav_login:"تسجيل الدخول",nav_logout:"تسجيل الخروج",language:"اللغة",nav_host:"المضيف",
+        host_login:"تسجيل دخول المضيف",host_signup:"تسجيل المضيف",host_register_property:"تسجيل عقار",host_my_listings:"قوائمي",host_logout:"تسجيل الخروج",
         hero_luxury:"إقامات فاخرة.",hero_reach:"انتشار عالمي.",hero_sub:"بطاقات، تحويل بنكي وعملات مشفرة (BTC · ETH · USDT).",
         placeholder_city:"باريس، طوكيو، إسطنبول…",filters:"الفلاتر",search:"بحث",
         feat_verified:"إقامات موثوقة",feat_verified_sub:"أفضل الخيارات بالقرب منك.",
@@ -305,9 +391,10 @@
         explore_unique_title:"إقامات ستعجبك",explore_unique_sub:"أكواخ وفيلات وشاليهات وأكثر",
         explore_exceptional:"رائع",
         explore_tab_city:"مدينة",explore_tab_beach:"شاطئ",explore_tab_outdoor:"خارجي",explore_tab_romance:"رومانسي",explore_tab_food:"طعام",
+        promo_title:"خصم 10% للأعضاء الجدد",promo_sub:"انضم لتحصل على النقاط والمزايا",
         footer_copy:"© StayWorld — stayworldbooking.com"},
-    RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_logout:"Выйти",language:"Язык",
-        host_login:"Вход хоста",
+    RU:{nav_home:"Главная",nav_membership:"Подписка",nav_login:"Войти",nav_logout:"Выйти",language:"Язык",nav_host:"Хост",
+        host_login:"Вход хоста",host_signup:"Регистрация хоста",host_register_property:"Добавить объект",host_my_listings:"Мои объявления",host_logout:"Выйти",
         hero_luxury:"Роскошное проживание.",hero_reach:"Глобальный охват.",hero_sub:"Карты, перевод и крипто (BTC · ETH · USDT).",
         placeholder_city:"Париж, Токио, Стамбул…",filters:"Фильтры",search:"Поиск",
         feat_verified:"Проверенные варианты",feat_verified_sub:"Лучшие места рядом с вами.",
@@ -316,7 +403,14 @@
         explore_unique_title:"Гостиницы, которые вам понравятся",explore_unique_sub:"Домики, виллы, шале и др.",
         explore_exceptional:"Отлично",
         explore_tab_city:"Город",explore_tab_beach:"Пляж",explore_tab_outdoor:"Природа",explore_tab_romance:"Романтика",explore_tab_food:"Еда",
+        promo_title:"-10% для новых участников",promo_sub:"Вступайте, чтобы получать баллы и привилегии",
         footer_copy:"© StayWorld — stayworldbooking.com"}
+  };
+
+  // Words dictionary (amenities etc.) — kept short; expand as needed
+  const WORDS = {
+    EN:{"Wi-Fi":"Wi-Fi","Pool":"Pool","Parking":"Parking","Breakfast":"Breakfast","Any":"Any","beds":"beds","baths":"baths","4.5+":"4.5+","4.0+":"4.0+"},
+    KO:{"Wi-Fi":"와이파이","Pool":"수영장","Parking":"주차","Breakfast":"조식","Any":"무관","beds":"침대","baths":"욕실","4.5+":"4.5+","4.0+":"4.0+"}
   };
 
   const CURRENCIES = {
@@ -329,150 +423,98 @@
   const LANG_TO_CUR = { EN:'USD', KO:'KRW', JA:'JPY', ZH:'CNY', FR:'EUR', ES:'EUR', DE:'EUR', TR:'TRY', AR:'AED', RU:'RUB' };
 
   function t(k){ const lang = localStorage.getItem('sw_lang') || 'EN'; const dict = I18N[lang]||I18N.EN; return dict[k] || (I18N.EN[k]||k); }
+  function w(k){ const lang=localStorage.getItem('sw_lang')||'EN'; return (WORDS[lang]||WORDS.EN||{})[k]||k; }
   function applyI18N(){
     const lang = localStorage.getItem('sw_lang') || 'EN';
-    document.getElementById('langSel').value = lang;
+    const sel=document.getElementById('langSel'); if(sel) sel.value=lang;
     const dict = I18N[lang]||I18N.EN;
     document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if(dict[k]) el.textContent=dict[k];});
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ const k=el.getAttribute('data-i18n-placeholder'); if(dict[k]) el.setAttribute('placeholder', dict[k]);});
+    // Welcome text
+    const user = JSON.parse(localStorage.getItem('sw_user')||'null');
+    const wel = document.getElementById('welcomeUser'); if(wel) wel.textContent = user?`Welcome, ${user.name} 🎉`:'Welcome, Guest 🎉';
   }
 
   document.getElementById('langSel').addEventListener('change', (e)=>{
-    localStorage.setItem('sw_lang', e.target.value);
-    setCurrencyByLang(e.target.value);
-    applyI18N();
+    const lang=e.target.value; localStorage.setItem('sw_lang', lang); setCurrencyByLang(lang); applyI18N();
   });
 
   function setCurrencyByLang(lang){ localStorage.setItem('sw_cur', LANG_TO_CUR[lang]||'USD'); }
   function fmtMoneyUSDToLocal(usd){ const code = localStorage.getItem('sw_cur')||'USD'; const cur=CURRENCIES[code]||CURRENCIES.USD; const val=usd*cur.rate; return new Intl.NumberFormat(cur.locale,{style:'currency',currency:cur.name,maximumFractionDigits:0}).format(val); }
 
-  /* ========================= Auth (robust stubs) ========================= */
+  /* ========================= Auth (user/host/google with fallback) ========================= */
   const Auth = {
     isLogged(){ return localStorage.getItem('sw_logged')==='1'; },
-    login(type){ // type: user|host|google
-      try{ localStorage.setItem('sw_logged','1'); localStorage.setItem('sw_login_type', type||'user'); }catch(_){ }
-      renderAuth();
-    },
-    logout(){ try{ localStorage.removeItem('sw_logged'); localStorage.removeItem('sw_login_type'); }catch(_){}
-      renderAuth(); }
+    login(type,profile){ try{ localStorage.setItem('sw_logged','1'); localStorage.setItem('sw_login_type', type||'user'); if(profile) localStorage.setItem('sw_user', JSON.stringify(profile)); }catch(_){ } renderAuth(); },
+    logout(){ try{ localStorage.removeItem('sw_logged'); localStorage.removeItem('sw_login_type'); localStorage.removeItem('sw_user'); }catch(_){} renderAuth(); }
   };
+  function renderAuth(){ const logged = Auth.isLogged(); document.getElementById('loginBtn').style.display = logged ? 'none' : ''; document.getElementById('logoutBtn').style.display = logged ? '' : 'none'; const user=JSON.parse(localStorage.getItem('sw_user')||'null'); const wel=document.getElementById('welcomeUser'); if(wel) wel.textContent = user?`Welcome, ${user.name} 🎉`:'Welcome, Guest 🎉'; updateHostMenu(); }
+  window.googleLogin = async function(){ try{ const r=await fetch('/api/auth/google',{method:'POST',credentials:'include'}); if(r.ok){ const u=await r.json().catch(()=>({name:'Google User'})); Auth.login('google', u||{name:'Google User'}); return; } }catch(_){ } Auth.login('google',{name:'Google User'}); };
+  window.userLogin = (name='Member')=> Auth.login('user',{name});
+  window.hostLogin = (name='Host')=> Auth.login('host',{name});
 
-  function renderAuth(){
-    const logged = Auth.isLogged();
-    document.getElementById('loginBtn').style.display = logged ? 'none' : '';
-    document.getElementById('logoutBtn').style.display = logged ? '' : 'none';
-  }
-  document.getElementById('logoutBtn').addEventListener('click', (e)=>{ e.preventDefault(); Auth.logout(); alert('Logged out'); });
+  function updateHostMenu(){ const panel = document.querySelector('#hostMenu .dropdown-panel'); if(!panel) return; const signedIn = Auth.isLogged(); panel.querySelectorAll('[data-host-visible]').forEach(el=>el.style.display='none'); panel.querySelectorAll(`[data-host-visible="${signedIn?'signedIn':'signedOut'}"]`).forEach(el=>el.style.display='block'); }
 
-  // Example: attach these from your login pages
-  window.googleLogin = async function(){
-    try{
-      const r = await fetch('/api/auth/google', {method:'POST',credentials:'include'});
-      if(r.ok){ Auth.login('google'); return; }
-    }catch(_){ /* network fail -> fallback */ }
-    // Fallback (no backend): simulate success
-    Auth.login('google');
-  };
-  window.userLogin = ()=> Auth.login('user');
-  window.hostLogin = ()=> Auth.login('host');
+  document.getElementById('logoutBtn').addEventListener('click',(e)=>{ e.preventDefault(); Auth.logout(); alert('Logged out'); location.href='/'; });
+  // Host dropdown mobile toggle
+  (function(){ const hostMenu = document.getElementById('hostMenu'); if(!hostMenu) return; const toggle=hostMenu.querySelector('.dropdown-toggle'); let hideTimer; toggle?.addEventListener('click',(e)=>{ e.preventDefault(); hostMenu.classList.toggle('open');}); hostMenu.addEventListener('mouseleave',()=>{ hideTimer=setTimeout(()=>hostMenu.classList.remove('open'),180);}); hostMenu.addEventListener('mouseenter',()=> clearTimeout(hideTimer)); })();
+
+  /* ========================= Notifications ========================= */
+  (function(){ const btn=document.getElementById('notifBtn'), panel=document.getElementById('notifPanel'), badge=document.getElementById('notifBadge'), list=document.getElementById('notifList'), markAll=document.getElementById('markAllReadBtn'); if(!btn||!panel) return; let items=[]; function render(){ const unread = items.filter(x=>!x.read).length; if(unread>0){ badge.textContent=unread>99?'99+':String(unread); badge.hidden=false;} else badge.hidden=true; list.innerHTML = items.map(it=>`<li class="notif-item" data-id="${it.id}"><span class="notif-dot" style="opacity:${it.read?.5:1}"></span><div><div style="font-weight:700">${it.title}</div><div style="opacity:.8;font-size:13px">${it.desc||''}</div></div><div style="opacity:.7;font-size:12px">${it.time||''}</div></li>`).join('') || `<li class="notif-item"><div>No notifications</div></li>`; }
+    function fetchIt(){ fetch('/api/notifications',{credentials:'include'}).then(r=>r.json()).then(d=>{items=d; render();}).catch(()=>{ items=[ {id:1,title:'Booking confirmed',desc:'Istanbul • 2–5 Sep',time:'2m ago',read:false}, {id:2,title:'Level progress',desc:'GOLD → 78% reached',time:'1h ago',read:false}, {id:3,title:'Promo',desc:'Autumn deal unlocked',time:'Yesterday',read:true} ]; render(); }); }
+    btn.addEventListener('click',(e)=>{ e.stopPropagation(); const hid=panel.hasAttribute('hidden'); document.querySelectorAll('.notif-panel').forEach(p=>p.setAttribute('hidden','')); if(hid) panel.removeAttribute('hidden'); else panel.setAttribute('hidden',''); });
+    document.addEventListener('click',(e)=>{ if(!panel.contains(e.target) && e.target!==btn) panel.setAttribute('hidden',''); });
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') panel.setAttribute('hidden',''); });
+    markAll?.addEventListener('click',()=>{ fetch('/api/notifications/mark-all-read',{method:'POST',credentials:'include'}).catch(()=>{}).finally(()=>{ items=items.map(x=>({...x,read:true})); render();}); });
+    fetchIt(); setInterval(fetchIt,30000);
+  })();
 
   /* ========================= Map + Search ========================= */
-  let map, marker; 
-  function initMap(){ map=L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map); }
-  function goTo(lat,lon,label){ if(marker) marker.remove(); marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup(); map.setView([lat,lon],13,{animate:true}); document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'}); }
+  let map, marker; function initMap(){ map=L.map('map',{scrollWheelZoom:true}).setView([48.8566,2.3522],12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);} function goTo(lat,lon,label){ if(marker) marker.remove(); marker=L.marker([lat,lon]).addTo(map).bindPopup(label||'').openPopup(); map.setView([lat,lon],13,{animate:true}); document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'}); }
+  const statusEl=document.getElementById('searchStatus'); function setStatus(msg){ statusEl.textContent=msg||''; statusEl.style.opacity=msg?1:0; if(msg){clearTimeout(statusEl._t); statusEl._t=setTimeout(()=>statusEl.style.opacity=0,3000);} } function setLoading(on){ const b=document.getElementById('btnSearch'); b.disabled=on; b.classList.toggle('loading',on); b.textContent=on?'…':t('search'); }
   async function geocodeAny(q){ const prov=[q=>`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,q=>`https://photon.komoot.io/api/?limit=1&q=${encodeURIComponent(q)}`]; for(const make of prov){ try{ const r=await fetch(make(q),{headers:{'Accept':'application/json'}}); if(!r.ok) continue; const data=await r.json(); if(Array.isArray(data)&&data[0]) return {lat:+data[0].lat,lon:+data[0].lon,label:data[0].display_name||q}; if(data?.features?.[0]){const f=data.features[0];return {lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],label:f.properties.name||f.properties.city||f.properties.country||q};} }catch(_){ } } throw new Error('no_results'); }
-  const statusEl=document.getElementById('searchStatus');
-  function setStatus(msg){ statusEl.textContent=msg||''; statusEl.style.opacity=msg?1:0; if(msg){clearTimeout(statusEl._t); statusEl._t=setTimeout(()=>statusEl.style.opacity=0,3000);} }
-  function setLoading(on){ const b=document.getElementById('btnSearch'); b.disabled=on; b.classList.toggle('loading',on); b.textContent=on?'…':t('search'); }
   async function runSearch(){ const q=(document.getElementById('searchDestination').value||'').trim(); if(!q){document.getElementById('searchDestination').focus(); return;} try{ setLoading(true); setStatus('Searching…'); const {lat,lon,label}=await geocodeAny(q); goTo(lat,lon,label); setStatus(`Found: ${label}`);} catch(_){ setStatus('No results. Try another place.'); alert('검색 결과가 없습니다. 다른 도시를 입력해보세요.'); } finally{ setLoading(false); } }
+  document.getElementById('btnSearch').addEventListener('click',runSearch,{capture:true}); ['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
 
-  document.getElementById('btnSearch').addEventListener('click',runSearch,{capture:true});
-  ;['searchDestination','checkIn','checkOut'].forEach(id=>{const el=document.getElementById(id); el&&el.addEventListener('keydown',e=>{if(e.key==='Enter') runSearch();});});
-
-  /* ========================= Filters Drawer (self-contained) ========================= */
+  /* ========================= Filters Drawer (rich) ========================= */
   const GROUPS=[
     {t:'f_price', kind:'price'},
     {t:'f_staytype', checks:['Hotel','Motel','Hostel','Apartment','Villa','Ryokan','Guesthouse','B&B']},
     {t:'f_review', radios:['4.5+','4.0+','Any']},
     {t:'f_beds', inputs:[['number','beds',{min:1,value:1}],['number','baths',{min:1,value:1}]]},
+    {t:'f_pets', checks:['Allowed']},
+    {t:'f_checkin', checks:['Self check-in']},
     {t:'f_amen', checks:['Wi-Fi','Kitchen','Parking','Pool','Air conditioning','Gym','Workspace','Washer','Dryer','Breakfast']},
+    {t:'f_booking', checks:['Instant book','Request to book']},
+    {t:'f_verify', checks:['Verified listings only','Verified reviews']},
+    {t:'f_long', checks:['Show long-stay deals']},
+    {t:'f_biz', checks:['B2B-ready','Invoice available']},
+    {t:'f_loc', checks:['Near airport','Near station','Near beach','City center']},
+    {t:'f_access', checks:['Step-free access','Elevator','Wide doorway','Accessible bathroom']},
+    {t:'f_ex', checks:['Nature','Camping','Traditional','Ski-in/out','Wine country']},
+    {t:'f_view', checks:['Sea view','City view','Mountain view','Garden']},
+    {t:'f_safe', checks:['Carbon monoxide alarm','Smoke alarm','First aid kit']},
+    {t:'f_family', checks:['Crib','High chair','Stroller friendly']},
+    {t:'f_ent', checks:['TV','Netflix','Game console']},
+    {t:'f_out', checks:['BBQ grill','Patio','Private garden']},
+    {t:'f_park', checks:['On-site','Street','Paid garage']},
   ];
 
-  function ensureDrawer(){
-    let d=document.getElementById('filterDrawer'); if(d) return d;
-    d=document.createElement('div'); d.id='filterDrawer'; d.setAttribute('aria-hidden','true'); d.style.cssText='position:fixed;inset:0;display:none;z-index:2147483637';
-    d.innerHTML=`<div class="back" style="position:absolute;inset:0;background:rgba(0,0,0,.45)"></div>
-      <div class="panel" style="position:relative;margin-left:auto;width:min(780px,92vw);max-height:92vh;overflow:auto;background:var(--panel);border-left:1px solid var(--line);border-top-left-radius:16px;border-bottom-left-radius:16px;display:flex;flex-direction:column">
-        <div class="head" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)">
-          <strong id="fTitle">Filters</strong>
-          <div style="display:flex;gap:8px;align-items:center">
-            <label for="currencySelect" id="curLabel" style="font-size:12px;opacity:.8">Currency</label>
-            <select id="currencySelect" class="lang-select" style="padding:6px 10px">
-              ${Object.keys(CURRENCIES).map(k=>`<option value="${k}">${k}</option>`).join('')}
-            </select>
-            <button id="swClose" class="btn btn-ghost">✕</button>
-          </div>
-        </div>
-        <div id="filterGrid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px"></div>
-        <div class="foot" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--line)">
-          <button id="swReset" class="btn btn-ghost">Reset</button>
-          <button id="swApply" class="btn btn-gold">Apply</button>
-        </div>
-      </div>`;
-    document.body.appendChild(d);
-
-    const grid=d.querySelector('#filterGrid');
-    GROUPS.forEach((g,gi)=>{
-      const box=document.createElement('div'); box.className='box'; box.style.cssText='background:#0f1420;border:1px solid var(--line);border-radius:12px;padding:12px';
-      box.innerHTML=`<h4 data-title="${g.t}" style="margin:0 0 8px;font-size:14px">${t(g.t)||g.t}</h4>`;
-      if(g.kind==='price'){
-        const html=`<div style="display:grid;gap:10px">
-            <div style="display:flex;justify-content:space-between;font-size:13px"><span>${t('f_price')||'Price per night'}</span>
-              <span><span id="priceMinVal">–</span> ~ <span id="priceMaxVal">–</span></span></div>
-            <label style="font-size:12px;opacity:.8">Min</label><input type="range" id="priceMin" min="0" max="1000" step="10" value="100">
-            <label style="font-size:12px;opacity:.8">Max</label><input type="range" id="priceMax" min="0" max="5000" step="50" value="800">
-          </div>`; box.insertAdjacentHTML('beforeend', html);
-      }
-      (g.inputs||[]).forEach(([type,id,attrs])=>{ const wrap=document.createElement('div'); wrap.style.margin='6px 0'; wrap.innerHTML=`<label style="font-size:12px">${id}</label><input type="${type}" id="${id}" style="width:100%">`; Object.entries(attrs||{}).forEach(([k,v])=>wrap.querySelector('input').setAttribute(k,v)); box.appendChild(wrap); });
-      (g.radios||[]).forEach((name,ri)=>{ const id=`rg_${gi}_${ri}`; const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0'; lab.innerHTML=`<input type="radio" name="rg_${gi}" id="${id}" ${/Any/i.test(name)?'checked':''}> <span>${name}</span>`; box.appendChild(lab); });
-      (g.checks||[]).forEach((name,ci)=>{ const id=`ck_${gi}_${ci}`; const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0'; lab.innerHTML=`<input type="checkbox" id="${id}"> <span>${name}</span>`; box.appendChild(lab); });
-      grid.appendChild(box);
-    });
-
-    const back=d.querySelector('.back'); const panel=d.querySelector('.panel');
-    function open(){ d.style.display='flex'; setTimeout(()=>d.setAttribute('aria-hidden','false'),0); }
-    function close(){ d.setAttribute('aria-hidden','true'); d.style.display='none'; }
-    back.addEventListener('click', close); d.querySelector('#swClose').addEventListener('click', close); panel.addEventListener('click', e=>e.stopPropagation());
-    d.querySelector('#swReset').addEventListener('click',()=>{ d.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false); d.querySelectorAll('input[type=radio]').forEach(i=>i.checked=/Any/i.test(i.nextSibling?.textContent||'Any')); document.getElementById('priceMin').value=100; document.getElementById('priceMax').value=800; updatePriceLabels(); });
-    d.querySelector('#swApply').addEventListener('click',close);
-    d.querySelector('#currencySelect').addEventListener('change',()=>{ localStorage.setItem('sw_cur', d.querySelector('#currencySelect').value); updatePriceLabels(); });
-    ['priceMin','priceMax'].forEach(id=>{ d.querySelector('#'+id).addEventListener('input',()=>{ const min=+d.querySelector('#priceMin').value; const max=+d.querySelector('#priceMax').value; if(min>max){ d.querySelector('#priceMin').value=max; } updatePriceLabels(); }); });
-
-    setCurrencyByLang(localStorage.getItem('sw_lang')||'EN'); updatePriceLabels();
-    d.open = open; d.close = close; return d;
-  }
-  function updatePriceLabels(){ const d=document.getElementById('filterDrawer'); if(!d) return; const min=+d.querySelector('#priceMin').value||0; const max=+d.querySelector('#priceMax').value||0; d.querySelector('#priceMinVal').textContent = fmtMoneyUSDToLocal(min); d.querySelector('#priceMaxVal').textContent = fmtMoneyUSDToLocal(max); }
+  function ensureDrawer(){ let d=document.getElementById('filterDrawer'); if(d) return d; d=document.createElement('div'); d.id='filterDrawer'; d.setAttribute('aria-hidden','true'); d.innerHTML=`<div class="back"></div><div class="panel"><div class="head"><strong id="fTitle">${t('filters')}</strong><div style="display:flex;gap:8px;align-items:center"><label for="currencySelect" id="curLabel" style="font-size:12px;opacity:.8">Currency</label><select id="currencySelect" class="lang-select" style="padding:6px 10px">${Object.keys(CURRENCIES).map(k=>`<option value="${k}">${k}</option>`).join('')}</select><button id="swClose" class="btn btn-ghost">✕</button></div></div><div id="filterGrid"></div><div class="foot"><button id="swReset" class="btn btn-ghost">Reset</button><button id="swApply" class="btn btn-gold">Apply</button></div></div>`; document.body.appendChild(d); const grid=d.querySelector('#filterGrid'); GROUPS.forEach((g,gi)=>{ const box=document.createElement('div'); box.className='box'; box.innerHTML=`<h4 data-title="${g.t}">${t(g.t)||g.t}</h4>`; if(g.kind==='price'){ const html=`<div style="display:grid;gap:10px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${t('f_price')||'Price per night'}</span><span><span id="priceMinVal">–</span> ~ <span id="priceMaxVal">–</span></span></div><label style="font-size:12px;opacity:.8">Min</label><input type="range" id="priceMin" min="0" max="1000" step="10" value="100"><label style="font-size:12px;opacity:.8">Max</label><input type="range" id="priceMax" min="0" max="5000" step="50" value="800"></div>`; const wrap=document.createElement('div'); wrap.innerHTML=html; box.appendChild(wrap);} (g.inputs||[]).forEach(([type,id,attrs])=>{ const wrap=document.createElement('div'); wrap.style.margin='6px 0'; wrap.innerHTML=`<label style="font-size:12px">${w(id)}</label><input type="${type}" id="${id}" style="width:100%">`; Object.entries(attrs||{}).forEach(([k,v])=>wrap.querySelector('input').setAttribute(k,v)); box.appendChild(wrap); }); (g.radios||[]).forEach((name,ri)=>{ const id=`rg_${gi}_${ri}`; const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0'; lab.innerHTML=`<input type="radio" name="rg_${gi}" id="${id}" ${/Any/i.test(name)?'checked':''}> <span>${w(name)}</span>`; box.appendChild(lab); }); (g.checks||[]).forEach((name,ci)=>{ const id=`ck_${gi}_${ci}`; const lab=document.createElement('label'); lab.style.cssText='display:inline-flex;align-items:center;gap:6px;margin:6px 10px 0 0'; lab.innerHTML=`<input type="checkbox" id="${id}"> <span>${w(name)}</span>`; box.appendChild(lab); }); grid.appendChild(box); }); const back=d.querySelector('.back'); const close=()=>{d.setAttribute('aria-hidden','true'); d.style.display='none';}; back.addEventListener('click',close); d.querySelector('#swClose').addEventListener('click',close); d.querySelector('.panel').addEventListener('click',e=>e.stopPropagation()); d.querySelector('#swReset').addEventListener('click',()=>{ d.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false); d.querySelectorAll('input[type=radio]').forEach(i=>i.checked=/Any/i.test(i.nextSibling?.textContent||'Any')); document.getElementById('priceMin').value=100; document.getElementById('priceMax').value=800; updatePriceLabels(); }); d.querySelector('#swApply').addEventListener('click',close); d.querySelector('#currencySelect').addEventListener('change',()=>{ localStorage.setItem('sw_cur', d.querySelector('#currencySelect').value); updatePriceLabels(); }); ['priceMin','priceMax'].forEach(id=>{ d.querySelector('#'+id).addEventListener('input',()=>{ const min=+d.querySelector('#priceMin').value; const max=+d.querySelector('#priceMax').value; if(min>max){ d.querySelector('#priceMin').value=max; } updatePriceLabels(); }); }); setCurrencyByLang(localStorage.getItem('sw_lang')||'EN'); updatePriceLabels(); d.open=()=>{d.style.display='flex'; requestAnimationFrame(()=>d.setAttribute('aria-hidden','false'));}; return d; }
+  function updatePriceLabels(){ const d=document.getElementById('filterDrawer'); if(!d) return; const min=+d.querySelector('#priceMin').value||0; const max=+d.querySelector('#priceMax').value||0; const minEl=d.querySelector('#priceMinVal'); const maxEl=d.querySelector('#priceMaxVal'); if(minEl) minEl.textContent = fmtMoneyUSDToLocal(min); if(maxEl) maxEl.textContent = fmtMoneyUSDToLocal(max); }
   document.getElementById('btnFilters').addEventListener('click',()=>{ const d=ensureDrawer(); applyI18N(); d.open(); });
 
   /* ========================= Explore interactions ========================= */
-  (function(){
-    const row = document.querySelector('.sw-row'); if(!row) return; const track=row.querySelector('.sw-track'); const prev=row.querySelector('.prev'); const next=row.querySelector('.next');
-    const step = () => Math.min(360, track.clientWidth * 0.85);
-    prev.addEventListener('click', ()=> track.scrollBy({left:-step(), behavior:'smooth'}));
-    next.addEventListener('click', ()=> track.scrollBy({left: step(), behavior:'smooth'}));
-    let isDown=false,startX=0,scrollLeft=0; track.addEventListener('pointerdown',e=>{isDown=true;startX=e.pageX;scrollLeft=track.scrollLeft;track.setPointerCapture(e.pointerId);}); track.addEventListener('pointermove',e=>{if(!isDown)return; const dx=e.pageX-startX; track.scrollLeft=scrollLeft-dx;}); track.addEventListener('pointerup',()=>isDown=false);
-    track.addEventListener('click',e=>{ if(e.target.classList.contains('sw-like')) e.target.classList.toggle('active'); });
-    const tabs = document.querySelector('.sw-tabs'); const spots = document.querySelectorAll('.sw-spot');
-    tabs?.addEventListener('click', (e)=>{ const btn=e.target.closest('button'); if(!btn) return; tabs.querySelectorAll('button').forEach(b=>b.classList.remove('is-active')); btn.classList.add('is-active'); const type=btn.dataset.filter; spots.forEach(s=>{ s.style.display = (!type || s.dataset.type===type)?'block':'none'; }); });
-  })();
+  (function(){ const row=document.querySelector('.sw-row'); if(!row) return; const track=row.querySelector('.sw-track'); const prev=row.querySelector('.prev'); const next=row.querySelector('.next'); const step=()=>Math.min(360, track.clientWidth*0.85); prev.addEventListener('click',()=>track.scrollBy({left:-step(),behavior:'smooth'})); next.addEventListener('click',()=>track.scrollBy({left: step(),behavior:'smooth'})); let isDown=false,startX=0,scrollLeft=0; track.addEventListener('pointerdown',e=>{isDown=true;startX=e.pageX;scrollLeft=track.scrollLeft;track.setPointerCapture(e.pointerId);}); track.addEventListener('pointermove',e=>{if(!isDown)return; const dx=e.pageX-startX; track.scrollLeft=scrollLeft-dx;}); track.addEventListener('pointerup',()=>isDown=false); track.addEventListener('click',e=>{ if(e.target.classList.contains('sw-like')) e.target.classList.toggle('active'); }); const tabs=document.querySelector('.sw-tabs'); const spots=document.querySelectorAll('.sw-spot'); tabs?.addEventListener('click',(e)=>{ const btn=e.target.closest('button'); if(!btn) return; tabs.querySelectorAll('button').forEach(b=>b.classList.remove('is-active')); btn.classList.add('is-active'); const type=btn.dataset.filter; spots.forEach(s=>{ s.style.display = (!type || s.dataset.type===type)?'block':'none'; }); }); })();
+
+  /* ========================= Chatbot ========================= */
+  (function(){ let fab=document.getElementById('chatFab'); if(!fab){ fab=document.createElement('button'); fab.id='chatFab'; fab.textContent='💬'; document.body.appendChild(fab);} let panel=document.getElementById('botPanel'); if(!panel){ panel=document.createElement('div'); panel.id='botPanel'; panel.innerHTML=`<div class="hdr"><strong>AI Concierge</strong><button id="botClose" class="btn btn-ghost">✕</button></div><div id="botBody" class="body"><div class="msg ai">Hello! Ask in any language.</div></div><div class="row"><input id="botInput" placeholder="Type a message…"><button id="botSend">Send</button></div>`; document.body.appendChild(panel);} const open=()=>{panel.style.display='block';}; const close=()=>{panel.style.display='none';}; fab.addEventListener('click',e=>{e.stopPropagation(); open();},{capture:true}); panel.querySelector('#botClose').addEventListener('click',e=>{e.stopPropagation(); close();}); document.addEventListener('click',e=>{ if(panel.style.display!=='block')return; const r=panel.getBoundingClientRect(); const inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom; if(!inside) close(); },{capture:true}); const body=panel.querySelector('#botBody'), input=panel.querySelector('#botInput'), send=panel.querySelector('#botSend'); const msgs=[]; const add=(t,me)=>{const d=document.createElement('div'); d.className=`msg ${me?'me':'ai'}`; d.textContent=t; body.appendChild(d); body.scrollTop=body.scrollHeight;}; async function askAI(message,lang){ for(const ep of ['/api/chat','/.netlify/functions/sw-chat']){ try{ const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[...msgs,{role:'user',content:message}],lang})}); if(r.ok){const d=await r.json(); if(d.reply) return d.reply;} }catch(_){ } } return '(Backend not found. Check your function URL.)'; } async function sendIt(){ const v=(input.value||'').trim(); if(!v) return; input.value=''; add(v,true); msgs.push({role:'user',content:v}); add('…',false); const dots=body.lastChild; try{ const reply=await askAI(v,(localStorage.getItem('sw_lang')||'EN').toLowerCase()); dots.remove(); add(reply,false); msgs.push({role:'assistant',content:reply}); } catch(_){ dots.remove(); add('Assistant is unavailable.',false); } } send.addEventListener('click',sendIt); input.addEventListener('keydown',e=>{if(e.key==='Enter') sendIt();}); })();
+
+  /* ========================= Featured listings (Firebase optional) ========================= */
+  (async function(){ try{ const m=await import('/scripts/firebase.js'); const {db,collection,query,where,orderBy,limit,getDocs}=m; const grid=document.createElement('section'); grid.className='container'; grid.innerHTML='<h2 style="margin:0 0 10px">✨ Featured</h2><div id="recosGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px"></div>'; document.querySelector('.sw-explore').insertAdjacentElement('beforebegin',grid); const listEl=grid.querySelector('#recosGrid'); const qref=query(collection(db,'listings'),where('status','==','Active'),orderBy('createdAt','desc'),limit(6)); const snap=await getDocs(qref); const items=snap.docs.map(d=>({id:d.id,...d.data()})); listEl.innerHTML=items.map(it=>`<a href="/results.html?listing=${it.id}" style="display:block;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0f1420"><img src="${(Array.isArray(it.photos)&&it.photos[0])||'https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop'}" style="width:100%;height:180px;object-fit:cover"><div style="padding:12px 14px"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.title||'Untitled stay'}</strong><span style="white-space:nowrap">${fmtMoneyUSDToLocal(Number(it.price)||0)}</span></div><div style="opacity:.75;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.address||''}</div></div></a>`).join(''); }catch(err){ /* optional; ignore if firebase absent */ } })();
 
   /* ========================= Init ========================= */
-  (function init(){
-    const savedLang = localStorage.getItem('sw_lang') || (navigator.language||'en').slice(0,2).toUpperCase();
-    if(!localStorage.getItem('sw_lang')) localStorage.setItem('sw_lang', I18N[savedLang]?savedLang:'EN');
-    setCurrencyByLang(localStorage.getItem('sw_lang'));
-    applyI18N(); renderAuth(); initMap();
-  })();
+  (function init(){ const savedLang=localStorage.getItem('sw_lang') || (navigator.language||'en').slice(0,2).toUpperCase(); if(!localStorage.getItem('sw_lang')) localStorage.setItem('sw_lang', I18N[savedLang]?savedLang:'EN'); setCurrencyByLang(localStorage.getItem('sw_lang')); applyI18N(); renderAuth(); initMap(); })();
   </script>
 </body>
 </html>
