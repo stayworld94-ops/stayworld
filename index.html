@@ -133,62 +133,56 @@
 
 <body>
   <!-- HEADER -->
-<header class="sw-header">
-  <div class="sw-header-inner">
-    <!-- 로고(상단 왼쪽) -->
-    <a href="/index.html" class="sw-brand" aria-label="StayWorld">
-      <img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo" class="sw-logo">
+<header class="site-header">
+  <div class="container flex-between">
+    <!-- 로고 -->
+    <a href="/" class="logo">
+      <img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo" height="28">
       <strong>STAYWORLD</strong>
     </a>
 
-    <!-- 내비게이션 -->
-    <nav class="sw-nav">
-      <a href="/index.html" data-i18n="nav_home">Home</a>
-      <a href="/membership.html" data-i18n="nav_membership">Membership</a>
-      <a href="/hotels.html" data-i18n="nav_hotels">Hotels</a>
+    <!-- 내비 -->
+    <nav class="main-nav">
+      <a href="/"              id="navHome"  data-i18n="nav_home">Home</a>
+      <a href="/membership"    id="navMem"   data-i18n="nav_membership">Membership</a>
+      <a href="/hotels.html"   id="navHotel" data-i18n="nav_hotels">Hotels</a>
     </nav>
 
-    <!-- 우측 컨트롤: 언어/통화/알림/인증 -->
-    <div class="sw-cta">
-      <label class="sw-ctl">
-        <span data-i18n="language">Language</span>
-        <select id="swLang" aria-label="Language">
-          <option value="EN">EN</option><option value="KO">KO</option><option value="JA">JA</option>
-          <option value="ZH">ZH</option><option value="FR">FR</option><option value="ES">ES</option>
-          <option value="DE">DE</option><option value="IT">IT</option><option value="TR">TR</option>
-          <option value="RU">RU</option>
-        </select>
-      </label>
-
-      <select id="swCur" aria-label="Currency">
-        <option>USD</option><option>KRW</option><option>JPY</option><option>CNY</option>
-        <option>EUR</option><option>GBP</option><option>TRY</option><option>AED</option>
-        <option>CAD</option><option>RUB</option>
+    <!-- 우측 컨트롤 -->
+    <div class="header-ctrls">
+      <span data-i18n-langlabel style="opacity:.7;margin-right:6px">Language</span>
+      <select id="swLang">
+        <option>EN</option><option>KO</option><option>JA</option><option>ZH</option>
+        <option>FR</option><option>ES</option><option>DE</option><option>IT</option>
+        <option>TR</option><option>AR</option><option>RU</option>
       </select>
 
-      <!-- 알림: 로그인 상태에서만 표시됨(data-auth="user") -->
-      <button id="swBell" class="sw-bell" data-auth-visible="user" title="Notifications" aria-label="Notifications">
-        <span class="bell">🔔</span><span id="swBadge" class="sw-badge" hidden>0</span>
-      </button>
+      <select id="swCur" style="margin-left:8px">
+        <option>USD</option><option>KRW</option><option>JPY</option><option>CNY</option>
+        <option>EUR</option><option>TRY</option><option>AED</option><option>GBP</option>
+        <option>RUB</option>
+      </select>
 
-      <!-- 비로그인 전용 -->
-      <a href="/login.html" class="btn ghost" data-auth-visible="guest" id="btnLogin" data-i18n="nav_login">Log in</a>
-      <a href="/signup.html" class="btn gold"  data-auth-visible="guest" id="btnSignup" data-i18n="nav_signup">Sign up</a>
-      <a href="/host-login.html" class="btn ghost" data-auth-visible="guest" id="btnHostLogin" data-i18n="nav_host_login">Host login</a>
+      <!-- 손님 전용 -->
+      <a href="/login.html"  class="btn" data-auth="guest" data-i18n="nav_login">Log in</a>
+      <a href="/signup.html" class="btn" data-auth="guest" data-i18n="nav_signup">Sign up</a>
+      <a href="/host-login.html" class="btn" data-auth="guest" data-i18n="nav_host" data-host="out">Host login</a>
 
       <!-- 로그인 전용 -->
-      <div class="sw-user" data-auth-visible="user" hidden>
-        <span id="swWelcome" class="sw-welcome" data-i18n="welcome_prefix">Welcome</span>,
-        <strong id="swUserName">Guest</strong> 🎉
-        <a href="/mypage.html" class="btn chip" data-i18n="nav_mypage">My Page</a>
-        <button id="btnLogout" class="btn ghost" data-i18n="nav_logout">Logout</button>
-      </div>
+      <span class="user" data-auth="user" style="display:none">
+        <b id="welcomeUser"></b>
+        <a href="#" id="logoutBtn" class="btn">Logout</a>
+      </span>
 
-      <!-- 호스트만 추가로 표시 -->
-      <a href="/host-dashboard.html" class="btn chip" data-auth-role="host" hidden data-i18n="nav_host_dash">Host Dashboard</a>
+      <!-- 알림: 로그인시에만 표시 -->
+      <div id="notifWrap" style="display:none">
+        <button id="notifBtn" aria-label="Notifications">🔔</button>
+        <div id="notifPanel" hidden></div>
+      </div>
     </div>
   </div>
 </header>
+
   <!-- WELCOME BAR + NOTIFS -->
   <div class="welcome-bar">
     <div class="welcome-wrap">
