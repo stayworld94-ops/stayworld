@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>예약 완료 — StayWorld</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>예약이 성공적으로 완료되었습니다 🎉</h1>
+  <p>예약 번호: <span id="bookingId"></span></p>
+
+  <!-- 메시지 버튼 -->
+  <button id="chatBtn">호스트에게 메시지 보내기</button>
+
+  <script>
+    // 서버에서 bookingId 값을 넘겨주거나, URL 파라미터에서 가져오기
+    const bookingId = new URLSearchParams(location.search).get("id") || "SAMPLE123";
+    document.getElementById("bookingId").textContent = bookingId;
+
+    document.getElementById("chatBtn").onclick = () => {
+      location.href = "/chat.html?booking=" + bookingId;
+    };
+  </script>
+</body>
+</html>
