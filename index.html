@@ -516,5 +516,173 @@
   /* ========================= Init ========================= */
   (function init(){ const savedLang=localStorage.getItem('sw_lang') || (navigator.language||'en').slice(0,2).toUpperCase(); if(!localStorage.getItem('sw_lang')) localStorage.setItem('sw_lang', I18N[savedLang]?savedLang:'EN'); setCurrencyByLang(localStorage.getItem('sw_lang')); applyI18N(); renderAuth(); initMap(); })();
   </script>
+  <!-- ===== STAYWORLD HOTFIX (welcome 중복 제거 + i18n 내장 + 추천숙소 무오류 대체 + 필터 버튼) ===== -->
+<script>
+(function () {
+  /* ---------------- 0) 캐시 강제 새로고침 유도 (개발 중) ---------------- */
+  (function bumpBuild() {
+    const v = 'index-hotfix-2025-09-04a';
+    if (window.SW_BUILD !== v) window.SW_BUILD = v;
+  })();
+
+  /* ---------------- 1) 예전 웰컴바/배너 제거(중복) ---------------- */
+  try {
+    document.querySelectorAll('.welcome-bar').forEach(el => el.remove());
+    const wb = document.getElementById('welcomeBanner');
+    if (wb) wb.style.display = 'none';
+  } catch (_) {}
+
+  /* ---------------- 2) i18n(10개국어) — 외부 스크립트 없이 동작 ---------------- */
+  const I18N = {
+    EN:{nav_home:"Home",nav_membership:"Membership",hero_luxury:"Luxury stays.",hero_reach:"Global reach.",
+        hero_sub:"Cards, bank transfer & crypto (BTC · ETH · USDT).",filters:"Filters",search:"Search",
+        feat_verified:"Verified stays",feat_verified_sub:"Top picks near you.",
+        feat_rewards:"StayWorld+ Rewards",feat_rewards_sub:"Earn points on every booking.",
+        feat_payments:"Secure payments",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    KO:{nav_home:"홈",nav_membership:"멤버십",hero_luxury:"럭셔리 스테이.",hero_reach:"글로벌 리치.",
+        hero_sub:"카드, 계좌이체 & 크립토 (BTC · ETH · USDT).",filters:"필터",search:"검색",
+        feat_verified:"검증된 스테이",feat_verified_sub:"가까운 추천 숙소.",
+        feat_rewards:"StayWorld+ 리워드",feat_rewards_sub:"예약마다 포인트 적립.",
+        feat_payments:"안전한 결제",feat_payments_sub:"VISA, 마스터, 아멕스 & 크립토.",
+        footer_copy:"© 스테이월드 — stayworldbooking.com"},
+    JA:{nav_home:"Home",nav_membership:"Membership",hero_luxury:"贅沢な滞在。",hero_reach:"グローバルに。",
+        hero_sub:"カード、銀行振込、暗号資産（BTC・ETH・USDT）。",filters:"フィルター",search:"検索",
+        feat_verified:"検証済みの宿",feat_verified_sub:"近くのおすすめ。",
+        feat_rewards:"StayWorld+ リワード",feat_rewards_sub:"予約毎にポイント。",
+        feat_payments:"安全な支払い",feat_payments_sub:"VISA, Master, Amex & Crypto。",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    ZH:{nav_home:"首页",nav_membership:"会员",hero_luxury:"奢华住宿。",hero_reach:"全球覆盖。",
+        hero_sub:"银行卡、转账与加密货币（BTC · ETH · USDT）。",filters:"筛选",search:"搜索",
+        feat_verified:"已验证住宿",feat_verified_sub:"附近精选。",
+        feat_rewards:"StayWorld+ 奖励",feat_rewards_sub:"每次预订赚积分。",
+        feat_payments:"安全支付",feat_payments_sub:"Visa、Mastercard、Amex 与加密货币。",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    FR:{nav_home:"Accueil",nav_membership:"Adhésion",hero_luxury:"Séjours de luxe.",hero_reach:"Portée mondiale.",
+        hero_sub:"Carte, virement & crypto (BTC · ETH · USDT).",filters:"Filtres",search:"Rechercher",
+        feat_verified:"Logements vérifiés",feat_verified_sub:"Meilleurs choix près de chez vous.",
+        feat_rewards:"Récompenses StayWorld+",feat_rewards_sub:"Des points à chaque réservation.",
+        feat_payments:"Paiements sécurisés",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    ES:{nav_home:"Inicio",nav_membership:"Membresía",hero_luxury:"Estancias de lujo.",hero_reach:"Alcance global.",
+        hero_sub:"Tarjetas, transferencia y cripto (BTC · ETH · USDT).",filters:"Filtros",search:"Buscar",
+        feat_verified:"Alojamientos verificados",feat_verified_sub:"Mejores opciones cerca de ti.",
+        feat_rewards:"Recompensas StayWorld+",feat_rewards_sub:"Puntos en cada reserva.",
+        feat_payments:"Pagos seguros",feat_payments_sub:"Visa, Mastercard, Amex y Cripto.",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    DE:{nav_home:"Start",nav_membership:"Mitgliedschaft",hero_luxury:"Luxuriöse Aufenthalte.",hero_reach:"Globale Reichweite.",
+        hero_sub:"Karten, Überweisung & Krypto (BTC · ETH · USDT).",filters:"Filter",search:"Suchen",
+        feat_verified:"Verifizierte Unterkünfte",feat_verified_sub:"Top-Auswahl in deiner Nähe.",
+        feat_rewards:"StayWorld+ Prämien",feat_rewards_sub:"Punkte bei jeder Buchung.",
+        feat_payments:"Sichere Zahlungen",feat_payments_sub:"Visa, Mastercard, Amex & Krypto.",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    IT:{nav_home:"Home",nav_membership:"Abbonamento",hero_luxury:"Soggiorni di lusso.",hero_reach:"Portata globale.",
+        hero_sub:"Carte, bonifico e cripto (BTC · ETH · USDT).",filters:"Filtri",search:"Cerca",
+        feat_verified:"Soggiorni verificati",feat_verified_sub:"Scelte top vicino a te.",
+        feat_rewards:"StayWorld+ Rewards",feat_rewards_sub:"Punti ad ogni prenotazione.",
+        feat_payments:"Pagamenti sicuri",feat_payments_sub:"Visa, Mastercard, Amex & Crypto.",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    TR:{nav_home:"Ana Sayfa",nav_membership:"Üyelik",hero_luxury:"Lüks konaklamalar.",hero_reach:"Küresel erişim.",
+        hero_sub:"Kart, havale ve kripto (BTC · ETH · USDT).",filters:"Filtreler",search:"Ara",
+        feat_verified:"Doğrulanmış konaklamalar",feat_verified_sub:"Yakınınızdaki öneriler.",
+        feat_rewards:"StayWorld+ Ödülleri",feat_rewards_sub:"Her rezervasyonda puan.",
+        feat_payments:"Güvenli ödemeler",feat_payments_sub:"Visa, Mastercard, Amex & Kripto.",
+        footer_copy:"© StayWorld — stayworldbooking.com"},
+    AR:{nav_home:"الرئيسية",nav_membership:"العضوية",hero_luxury:"إقامات فاخرة.",hero_reach:"انتشار عالمي.",
+        hero_sub:"بطاقات، تحويل وعملات مشفرة (BTC · ETH · USDT).",filters:"الفلاتر",search:"بحث",
+        feat_verified:"إقامات موثوقة",feat_verified_sub:"أفضل الخيارات بالقرب منك.",
+        feat_rewards:"مكافآت StayWorld+",feat_rewards_sub:"نقاط مع كل حجز.",
+        feat_payments:"مدفوعات آمنة",feat_payments_sub:"Visa وMastercard وAmex والعملات المشفرة.",
+        footer_copy:"© ستاي ورلد — stayworldbooking.com"},
+    RU:{nav_home:"Главная",nav_membership:"Подписка",hero_luxury:"Роскошное проживание.",hero_reach:"Глобальный охват.",
+        hero_sub:"Карты, перевод и крипто (BTC · ETH · USDT).",filters:"Фильтры",search:"Поиск",
+        feat_verified:"Проверенные варианты",feat_verified_sub:"Лучшие рядом с вами.",
+        feat_rewards:"Бонусы StayWorld+",feat_rewards_sub:"Баллы за каждое бронирование.",
+        feat_payments:"Безопасные платежи",feat_payments_sub:"Visa, Mastercard, Amex и крипто.",
+        footer_copy:"© StayWorld — stayworldbooking.com"}
+  };
+  const langSel = document.getElementById('langSelect') || document.getElementById('lang');
+  const savedLang = localStorage.getItem('sw_lang') || 'KO';
+  if (langSel && [...langSel.options].some(o=>o.value===savedLang)) langSel.value = savedLang;
+
+  function t(k){const L=(langSel?.value||savedLang); return (I18N[L]&&I18N[L][k])||(I18N.EN&&I18N.EN[k])||k;}
+  function applyI18N(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const k=el.getAttribute('data-i18n'); const v=t(k); if(v) el.textContent=v;
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+      const k=el.getAttribute('data-i18n-placeholder'); const v=t(k); if(v) el.setAttribute('placeholder', v);
+    });
+  }
+  applyI18N();
+  langSel && langSel.addEventListener('change', e=>{
+    localStorage.setItem('sw_lang', e.target.value);
+    applyI18N();
+  });
+
+  /* ---------------- 3) 추천 숙소: 파이어베이스 없어도 에러없이 표시 ---------------- */
+  (async function featuredSafe(){
+    const grid = document.getElementById('recosGrid');
+    const skel = document.getElementById('recosSkeleton');
+    if (!grid) return;
+
+    function cardHTML({img,title,addr,price}){
+      return `<a class="rounded-2xl overflow-hidden border border-white/10 bg-white/5 block">
+        <img src="${img}" alt="${title}" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-semibold line-clamp-1">${title}</h3>
+            <div class="text-right shrink-0">
+              <div class="font-bold">${price}</div>
+              <div class="text-xs text-white/60">/ night</div>
+            </div>
+          </div>
+          <div class="text-sm text-white/60 mt-1 line-clamp-1">${addr}</div>
+        </div>
+      </a>`;
+    }
+    const fallbacks = [
+      {img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1200&auto=format&fit=crop', title:'City Loft', addr:'Amsterdam, NL', price:'$180'},
+      {img:'https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1200&auto=format&fit=crop', title:'Beach Villa', addr:'Antalya, TR', price:'$240'},
+      {img:'https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop', title:'Forest Cabin', addr:'Zakopane, PL', price:'$120'},
+    ];
+
+    try {
+      // 동적 import — /scripts/firebase.js 가 없으면 throw → fallback 사용
+      const mod = await import('/scripts/firebase.js');
+      const { db, collection, query, where, orderBy, limit, getDocs } = mod;
+      const qref = query(collection(db,'listings'), where('status','==','Active'), orderBy('createdAt','desc'), limit(6));
+      const snap = await getDocs(qref);
+      const items = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      if (items.length) {
+        grid.innerHTML = items.map(x => cardHTML({
+          img: (Array.isArray(x.photos)&&x.photos[0]) || fallbacks[0].img,
+          title: x.title || 'Untitled stay',
+          addr: x.address || '',
+          price: (typeof x.price==='number' ? '$'+x.price : '$—')
+        })).join('');
+      } else {
+        grid.innerHTML = fallbacks.map(cardHTML).join('');
+      }
+    } catch (e) {
+      // 파이어베이스 미설치/네트워크 이슈 → 조용히 대체 카드
+      grid.innerHTML = fallbacks.map(cardHTML).join('');
+    } finally {
+      skel && skel.classList.add('hidden');
+      grid.classList.remove('hidden');
+      // 에러문구가 있었다면 제거
+      const err = document.getElementById('recosError'); if (err) err.remove();
+    }
+  })();
+
+  /* ---------------- 4) 필터 버튼은 hotels.html#filters 로 강제 이동 ---------------- */
+  document.getElementById('btnFilters')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    location.href = '/hotels.html#filters';
+  }, {capture:true});
+})();
+</script>
+<!-- ===== /STAYWORLD HOTFIX ===== -->
+
 </body>
 </html>
