@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StayWorld — Chat</title>
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    :root{--bg:#0b0f14;--card:#121822;--muted:#9aa4b4;--text:#e7ecf3;--gold:#f3c04b;--accent:#4da3ff}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,Segoe UI,Arial}
+    .wrap{max-width:920px;margin:0 auto;height:100dvh;display:flex;flex-direction:column}
+    header{padding:12px 16px;border-bottom:1px solid #1f2632;display:flex;gap:8px;align-items:center}
+    header .title{font-weight:700}
+    main{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+    .sys{opacity:.7;text-align:center;font-size:12px}
+    .msg{max-width:70%;padding:10px 12px;border-radius:14px;white-space:pre-wrap;word-break:break-word}
+    .me{align-self:flex-end;background:#1b2533}
+    .you{align-self:flex-start;background:#0f1520}
+    footer{display:flex;gap:8px;padding:12px;border-top:1px solid #1f2632}
+    input[type=text]{flex:1;background:#0f1520;border:1px solid #1f2632;color:var(--text);padding:10px;border-radius:10px}
+    button{background:var(--accent);color:#00111f;border:0;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.5;cursor:not-allowed}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">StayWorld Chat</div>
+      <div id="who" style="opacity:.7;font-size:12px"></div>
+    </header>
+    <main id="log"></main>
+    <footer>
+      <input id="text" type="text" placeholder="Type a message…" maxlength="2000" />
+      <button id="send">Send</button>
+    </footer>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { getDatabase, ref, onChildAdded, push, set, serverTimestamp, get, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+    // Provide your Firebase config
+    const firebaseConfig = window.STAYWORLD_FIREBASE_CONFIG || {
+      apiKey: "YOUR_KEY",
+      authDomain: "YOUR_APP.firebaseapp.com",
+      databaseURL: "https://YOUR_APP-default-rtdb.firebaseio.com",
+      projectId: "YOUR_APP",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const qs = new URLSearchParams(location.search);
+    const bookingId = qs.get('booking');
+    const $log = document.getElementById('log');
+    const $text = document.getElementById('text');
+    const $send = document.getElementById('send');
+    const $who = document.getElementById('who');
+
+    if (!bookingId) { alert('Missing booking id'); throw new Error('No booking id'); }
+
+    function sanitize(str){ return (str||'').replace(/[\u0000-\u001F\u007F]/g,'').trim(); }
+    function addBubble({ text, mine=false, system=false }){
+      const div = document.createElement('div');
+      if(system){ div.className = 'sys'; div.textContent = text; }
+      else{ div.className = `msg ${mine?'me':'you'}`; div.textContent = text; }
+      $log.appendChild(div); $log.scrollTop = $log.scrollHeight;
+    }
+
+    $send.addEventListener('click', async ()=>{
+      const t = sanitize($text.value);
+      if(!t) return;
+      $send.disabled = true; $text.disabled = true;
+      try{
+        const msgRef = push(ref(db, `chats/${bookingId}/messages`));
+        await set(msgRef, { text: t, senderUid: auth.currentUser.uid, ts: serverTimestamp(), system: false });
+        $text.value = '';
+      }catch(e){ alert('Send failed: '+e.message); }
+      finally{ $send.disabled = false; $text.disabled = false; $text.focus(); }
+    });
+
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){
+        alert('로그인이 필요합니다. 로그인 후 다시 시도해주세요.');
+        location.href = '/login.html?next='+encodeURIComponent(location.pathname+location.search);
+        return;
+      }
+      const metaSnap = await get(child(ref(db), `chatMeta/${bookingId}`));
+      if (!metaSnap.exists()) { alert('채팅이 아직 열리지 않았습니다. (결제/승인 대기)'); history.back(); return; }
+      const meta = metaSnap.val();
+      if (!meta.enabled || (user.uid !== meta.guestUid && user.uid !== meta.hostUid)) {
+        alert('접근 권한이 없습니다.'); history.back(); return; }
+
+      $who.textContent = `#${bookingId} • ${(user.uid===meta.hostUid?'Host':'Guest')}`;
+
+      onChildAdded(ref(db, `chats/${bookingId}/messages`), (snap)=>{
+        const m = snap.val();
+        if(m.system) return addBubble({ text: m.text, system:true });
+        addBubble({ text: m.text, mine: m.senderUid===user.uid });
+      });
+
+      $text.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $send.click(); }});
+      $text.focus();
+    });
+  </script>
+</body>
+</html>
