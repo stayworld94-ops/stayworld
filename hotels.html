@@ -113,7 +113,9 @@
     .dim .wrap{filter:brightness(.9);pointer-events:none}
     .dim .controls,.dim .sw-header,.dim #mapDrawer{pointer-events:auto;filter:none}
   </style>
-  <script defer src="/assets/sw-core.js"></script>
+<!-- 공용 UI + i18n/통화 + 권한/알림 컨트롤 -->
+<script defer src="/assets/sw-core.js"></script>
+<script defer src="/assets/sw-auth-ui.js"></script>
 </head>
 <body>
   <!-- Header -->
