@@ -63,11 +63,8 @@
         <a href="membership.html" data-i18n="nav_membership">Membership</a>
         <a href="/login.html" id="loginLink" data-i18n="nav_login">Login</a>
         <button id="logoutBtn" class="btn" style="display:none" data-i18n="logout">Logout</button>
-
-        <!-- ✅ Host / Become a host (역할에 따라 토글됨) -->
         <a id="hostLink" class="btn" href="/host.html" style="display:none" data-i18n="host">Host</a>
         <a id="becomeHostLink" class="btn" href="/host-onboarding.html" style="display:none" data-i18n="become_host">Become a host</a>
-
         <select id="langSelect" class="select" aria-label="Language">
           <option value="en">English</option>
           <option value="ko">한국어</option>
@@ -176,7 +173,7 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // ===== Utils: safe click & once =====
+    // ===== Utils: safe click =====
     function safeClick(btn, handler, {cooldownMs=600}={}){
       if(!btn) return;
       if(btn.dataset.bound) return; // prevent duplicate listeners
@@ -191,7 +188,7 @@
         try{
           await handler(ev, btn);
         }finally{
-          setTimeout(()=>{ // brief cooldown to swallow double taps
+          setTimeout(()=>{
             btn.disabled = false;
             btn.removeAttribute('aria-busy');
             btn.textContent = btn.dataset.restoreText || prev;
@@ -240,12 +237,12 @@
     const bookingsCount = document.getElementById('bookingsCount');
     const locationsCount= document.getElementById('locationsCount');
 
-    // ===== Google Maps single-load (Promise singleton) =====
+    // ===== Google Maps single-load =====
     let _gmapsPromise;
     function getGoogleMaps(){
       if(window.google?.maps) return Promise.resolve();
       if(_gmapsPromise) return _gmapsPromise;
-      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // TODO: AIzaSyDRUf7RDA9P7Iy8qyyDoAkvVtbouEEzwRY
+      const apiKey = 'YOUR_GOOGLE_MAPS_KEY'; // put your real key
       if(!apiKey || apiKey.includes('YOUR_')){
         console.warn('Google Maps API key missing');
         return Promise.resolve();
@@ -351,12 +348,12 @@
         main.appendChild(title); main.appendChild(meta); main.appendChild(meta2);
 
         const actions = document.createElement('div');
+
+        // 취소 버튼
         const cancelBtn = document.createElement('button');
         cancelBtn.className='btn danger';
         cancelBtn.textContent = pack.cancel;
         cancelBtn.disabled = b.status === 'canceled';
-
-        // 중복 취소 가드
         safeClick(cancelBtn, async ()=>{
           if(cancelBtn.dataset.busy==="1") return;
           if(!confirm(pack.cancel+'?')) return;
@@ -374,7 +371,17 @@
           }
         }, {cooldownMs:800});
 
+        // ✅ 메시지 버튼
+        const chatBtn = document.createElement('button');
+        chatBtn.className = 'btn ok';
+        chatBtn.textContent = '메시지 보내기';
+        chatBtn.onclick = () => {
+          location.href = '/chat.html?booking=' + b.id;
+        };
+
         actions.appendChild(cancelBtn);
+        actions.appendChild(chatBtn);
+
         item.appendChild(thumb); item.appendChild(main); item.appendChild(actions);
         bookingsList.appendChild(item);
       });
@@ -450,7 +457,7 @@
       userName.textContent = user.displayName || 'Guest';
       userEmail.textContent = user.email || '';
 
-      // ✅ 역할 확인 후 버튼 토글
+      // 역할 체크 → Host 버튼 토글
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));
         const role = snap.exists() ? (snap.data().role || 'guest') : 'guest';
@@ -479,14 +486,11 @@
       }
     });
 
-    // logout: 중복 클릭 가드
-    safeClick(logoutBtn, async ()=>{
+    // logout
+    safeClick(document.getElementById('logoutBtn'), async ()=>{
       await signOut(auth);
     }, {cooldownMs:600});
   </script>
   <script type="module" src="/scripts/auth-ui.js"></script>
-</body>
-</html>
-
 </body>
 </html>
