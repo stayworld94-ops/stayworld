@@ -130,38 +130,73 @@
 
 <body>
   <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-row">
-      <div class="logo"><a href="/"><img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo"></a></div>
+  <header class="site-header" style="position:sticky;top:0;z-index:50;background:rgba(11,15,22,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)">
+  <div class="container" style="max-width:1120px;margin:0 auto;padding:0 16px;height:68px;display:flex;align-items:center;gap:14px;justify-content:space-between">
 
-      <nav class="main-nav">
-        <a href="/" data-i18n="nav_home">Home</a>
-        <a href="/membership.html" data-i18n="nav_membership">Membership</a>
-        <div id="hostMenu" class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-i18n="nav_host">Host ▾</a>
-          <div class="dropdown-panel">
-            <a class="dropdown-item" href="/host-login.html" data-host-visible="signedOut" data-i18n="host_login">Host Login</a>
-            <a class="dropdown-item" href="/host-signup.html" data-host-visible="signedOut" data-i18n="host_signup">Host Sign Up</a>
-            <div class="dropdown-divider" data-host-visible="signedOut"></div>
-            <a class="dropdown-item" href="/host-register.html" data-host-visible="signedIn" data-i18n="host_register_property">Register Property</a>
-            <a class="dropdown-item" href="/host-my-listings.html" data-host-visible="signedIn" data-i18n="host_my_listings">My Listings</a>
-            <a class="dropdown-item" href="#" id="hostLogoutBtn" data-host-visible="signedIn" data-i18n="host_logout">Logout</a>
-          </div>
+    <!-- 로고 -->
+    <a href="/" class="brand" style="display:flex;align-items:center;gap:10px">
+      <img src="/assets/img/logo-stayworld.png" alt="StayWorld" style="height:32px;width:auto;display:block">
+      <strong style="font-weight:800;letter-spacing:.4px">STAYWORLD</strong>
+    </a>
+
+    <!-- 내비 (필요하면 페이지별로 링크 추가/수정) -->
+    <nav class="main-nav" style="display:flex;gap:22px;align-items:center;flex:1;justify-content:center">
+      <a href="/"            data-i18n="nav_home">Home</a>
+      <a href="/membership"  data-i18n="nav_membership">Membership</a>
+      <a href="/hotels.html" data-i18n="nav_hotels">Hotels</a>
+    </nav>
+
+    <!-- 우측 툴바: 언어/통화 + 알림 + 인증 -->
+    <div class="toolbar" style="display:flex;align-items:center;gap:10px">
+
+      <!-- 언어 -->
+      <label style="font-size:12px;opacity:.8" data-i18n="language">language</label>
+      <select id="swLang" style="appearance:none;background:#101826;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:6px 10px">
+        <option value="EN">EN</option><option value="KO">KO</option><option value="FR">FR</option><option value="JA">JA</option>
+        <option value="DE">DE</option><option value="ES">ES</option><option value="IT">IT</option><option value="TR">TR</option>
+        <option value="ZH">ZH</option><option value="RU">RU</option>
+      </select>
+
+      <!-- 통화 (언어와 동기화됨, 사용자 직접 선택도 가능) -->
+      <select id="swCurrency" style="appearance:none;background:#101826;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:6px 10px">
+        <option>USD</option><option>EUR</option><option>KRW</option><option>JPY</option><option>TRY</option>
+        <option>GBP</option><option>AED</option><option>CNY</option><option>RUB</option><option>CAD</option>
+      </select>
+
+      <!-- 알림 -->
+      <button id="swNotifBtn" aria-label="Notifications" title="Notifications" style="position:relative;border:0;background:#121a26;border:1px solid rgba(255,255,255,.08);color:#e7e9ee;border-radius:12px;padding:8px 10px;cursor:pointer">🔔
+        <span id="swNotifBadge" hidden style="position:absolute;top:-6px;right:-6px;background:#ffd36e;color:#1a1205;border-radius:999px;padding:0 6px;font-size:11px;line-height:18px;min-width:18px;text-align:center">0</span>
+      </button>
+      <div id="swNotifPanel" class="notif-panel" hidden
+           style="position:absolute;right:16px;top:68px;min-width:280px;background:#0f1520;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:8px;box-shadow:0 16px 40px rgba(0,0,0,.45);">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px 8px;border-bottom:1px solid rgba(255,255,255,.08)">
+          <strong>Notifications</strong>
+          <button id="swNotifMarkAll" class="btn-ghost" style="border:1px solid rgba(255,255,255,.14);background:transparent;color:#cfcfcf;padding:6px 10px;border-radius:10px;cursor:pointer">Mark all read</button>
         </div>
-      </nav>
+        <ul id="swNotifList" style="list-style:none;margin:8px 0 0;padding:0;max-height:300px;overflow:auto"></ul>
+        <div style="padding-top:6px;border-top:1px solid rgba(255,255,255,.08);text-align:right">
+          <a href="/notifications.html" style="font-size:12px;opacity:.8">View all</a>
+        </div>
+      </div>
 
-      <div style="display:flex;align-items:center;gap:10px">
-        <label for="langSel" style="font-size:12px;opacity:.7" data-i18n="language">Language</label>
-        <select id="langSel" class="lang-select">
-          <option value="EN">EN</option><option value="KO">KO</option><option value="JA">JA</option><option value="ZH">ZH</option>
-          <option value="FR">FR</option><option value="ES">ES</option><option value="DE">DE</option><option value="TR">TR</option>
-          <option value="AR">AR</option><option value="RU">RU</option>
-        </select>
-        <a href="/login.html" id="loginBtn" class="btn btn-ghost" data-i18n="nav_login">Login</a>
-        <button id="logoutBtn" class="btn btn-ghost" style="display:none" data-i18n="nav_logout">Logout</button>
+      <!-- 인증: (게스트 전용) 일반 로그인/회원가입 vs 호스트 로그인 분리 -->
+      <div id="authGuest" style="display:flex;gap:8px">
+        <a id="swLogin"     href="/login.html"  class="btn" style="border:0;padding:8px 12px;border-radius:12px;background:#121a26;border:1px solid rgba(255,255,255,.08);color:#e7e9ee">Log in</a>
+        <a id="swSignup"    href="/signup.html" class="btn" style="border:0;padding:8px 12px;border-radius:12px;background:linear-gradient(180deg,#f4d78c,#c9a35b);color:#170f04;font-weight:700">Sign up</a>
+        <a id="swHostLogin" href="/host-login.html" class="btn" style="border:0;padding:8px 12px;border-radius:12px;background:#1b2533;border:1px solid rgba(255,255,255,.1);color:#e7e9ee">Host login</a>
+      </div>
+
+      <!-- 인증: (로그인 사용자 전용) 환영 + 내페이지 + 로그아웃 -->
+      <div id="authUser" style="display:none;align-items:center;gap:10px">
+        <span style="opacity:.9" id="swWelcome" data-i18n="welcome_prefix">Welcome,</span>
+        <strong id="swWelcomeName">Guest</strong> 🎉
+        <a href="/mypage.html" class="btn" style="border:0;padding:8px 12px;border-radius:12px;background:#121a26;border:1px solid rgba(255,255,255,.08);color:#e7e9ee">My Page</a>
+        <button id="swLogout" class="btn" style="border:0;padding:8px 12px;border-radius:12px;background:#1b2533;border:1px solid rgba(255,255,255,.1);color:#e7e9ee;cursor:pointer">Logout</button>
       </div>
     </div>
-  </header>
+  </div>
+</header>
+
 
   <!-- WELCOME BAR + NOTIFS -->
   <div class="welcome-bar">
