@@ -4,20 +4,28 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>예약 완료 — StayWorld</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="/stayworld-logo.png">
+  <style>
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0b0b0c;color:#e8eaed}
+    .wrap{max-width:760px;margin:0 auto;padding:24px}
+    .card{background:#131417;border:1px solid #23252a;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35);padding:20px}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:12px;border:1px solid #2a2f3a;background:#16181f;color:#e8eaed}
+    .btn.ok{border-color:#1f3b23;background:#122015}
+  </style>
 </head>
 <body>
-  <h1>예약이 성공적으로 완료되었습니다 🎉</h1>
-  <p>예약 번호: <span id="bookingId"></span></p>
-
-  <!-- 메시지 버튼 -->
-  <button id="chatBtn">호스트에게 메시지 보내기</button>
+  <main class="wrap">
+    <h1>예약이 성공적으로 완료되었습니다 🎉</h1>
+    <div class="card">
+      <p>예약 번호: <b id="bookingId">—</b></p>
+      <button id="chatBtn" class="btn ok">호스트에게 메시지 보내기</button>
+    </div>
+  </main>
 
   <script>
-    // 서버에서 bookingId 값을 넘겨주거나, URL 파라미터에서 가져오기
+    // 예약완료 페이지는 URL 예: /booking-confirm.html?id=BOOKING_ID
     const bookingId = new URLSearchParams(location.search).get("id") || "SAMPLE123";
     document.getElementById("bookingId").textContent = bookingId;
-
     document.getElementById("chatBtn").onclick = () => {
       location.href = "/chat.html?booking=" + bookingId;
     };
