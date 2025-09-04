@@ -134,113 +134,57 @@
 <body>
   <!-- HEADER -->
 <header class="site-header">
-  <div class="container flex-between">
+  <div class="container flex justify-between items-center h-16">
     <!-- 로고 -->
-    <a href="/" class="logo">
-      <img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo" height="28">
+    <a href="/" class="logo flex items-center gap-2">
+      <img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo" style="height:28px">
       <strong>STAYWORLD</strong>
     </a>
 
-    <!-- 내비 -->
-    <nav class="main-nav">
-      <a href="/"              id="navHome"  data-i18n="nav_home">Home</a>
-      <a href="/membership"    id="navMem"   data-i18n="nav_membership">Membership</a>
-      <a href="/hotels.html"   id="navHotel" data-i18n="nav_hotels">Hotels</a>
+    <!-- 내비게이션 -->
+    <nav class="main-nav flex gap-6">
+      <a href="/index.html" data-i18n="nav_home">Home</a>
+      <a href="/membership.html" data-i18n="nav_membership">Membership</a>
+      <a href="/hotels.html" data-i18n="nav_hotels">Hotels</a>
     </nav>
 
-    <!-- 우측 컨트롤 -->
-    <div class="header-ctrls">
-      <span data-i18n-langlabel style="opacity:.7;margin-right:6px">Language</span>
+    <!-- 컨트롤 영역 -->
+    <div class="header-ctrls flex items-center gap-3">
+      <!-- 언어/통화 선택 -->
       <select id="swLang">
-        <option>EN</option><option>KO</option><option>JA</option><option>ZH</option>
-        <option>FR</option><option>ES</option><option>DE</option><option>IT</option>
-        <option>TR</option><option>AR</option><option>RU</option>
+        <option value="EN">EN</option><option value="KO">KO</option>
+        <option value="FR">FR</option><option value="JA">JA</option>
+        <option value="DE">DE</option><option value="ES">ES</option>
+        <option value="IT">IT</option><option value="TR">TR</option>
+        <option value="ZH">ZH</option><option value="RU">RU</option>
+      </select>
+      <select id="swCur">
+        <option>USD</option><option>KRW</option><option>EUR</option>
+        <option>JPY</option><option>CNY</option><option>TRY</option>
+        <option>RUB</option><option>GBP</option><option>AUD</option>
+        <option>CAD</option>
       </select>
 
-      <select id="swCur" style="margin-left:8px">
-        <option>USD</option><option>KRW</option><option>JPY</option><option>CNY</option>
-        <option>EUR</option><option>TRY</option><option>AED</option><option>GBP</option>
-        <option>RUB</option>
-      </select>
-
-      <!-- 손님 전용 -->
-      <a href="/login.html"  class="btn" data-auth="guest" data-i18n="nav_login">Log in</a>
-      <a href="/signup.html" class="btn" data-auth="guest" data-i18n="nav_signup">Sign up</a>
-      <a href="/host-login.html" class="btn" data-auth="guest" data-i18n="nav_host" data-host="out">Host login</a>
-
-      <!-- 로그인 전용 -->
-      <span class="user" data-auth="user" style="display:none">
-        <b id="welcomeUser"></b>
-        <a href="#" id="logoutBtn" class="btn">Logout</a>
-      </span>
-
-      <!-- 알림: 로그인시에만 표시 -->
-      <div id="notifWrap" style="display:none">
-        <button id="notifBtn" aria-label="Notifications">🔔</button>
+      <!-- 알림 (로그인 후에만 표시) -->
+      <div id="notifWrap" data-auth="user" style="display:none">
+        <button id="notifBtn">🔔</button>
         <div id="notifPanel" hidden></div>
       </div>
+
+      <!-- 게스트 전용 -->
+      <a href="/login.html"  class="btn" data-auth="guest">Log in</a>
+      <a href="/signup.html" class="btn btn-gold" data-auth="guest">Sign up</a>
+      <a href="/host-login.html" class="btn" data-auth="guest">Host login</a>
+
+      <!-- 로그인 후 전용 -->
+      <span data-auth="user" style="display:none">
+        <b id="welcomeUser">Welcome</b>
+        <a href="#" id="logoutBtn" class="btn">Logout</a>
+      </span>
     </div>
   </div>
 </header>
-
-  <!-- WELCOME BAR + NOTIFS -->
-  <div class="welcome-bar">
-    <div class="welcome-wrap">
-      <div class="welcome-text" id="welcomeUser">Welcome, Guest 🎉</div>
-      <button class="notif-btn" id="notifBtn" aria-label="Notifications">🔔<span class="notif-badge" id="notifBadge" hidden>0</span></button>
-      <div class="notif-panel" id="notifPanel" hidden>
-        <div class="notif-header"><span>Notifications</span><button id="markAllReadBtn" class="btn btn-ghost" style="padding:6px 10px">Mark all read</button></div>
-        <ul id="notifList" class="notif-list"></ul>
-        <div class="notif-footer"><a href="/notifications.html">View all</a></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container">
-      <h1 class="hero-title"><span data-i18n="hero_luxury">Luxury stays.</span><br><span class="accent" data-i18n="hero_reach">Global reach.</span></h1>
-      <p class="hero-sub" data-i18n="hero_sub">Cards, bank transfer & crypto (BTC · ETH · USDT).</p>
-
-      <div class="search-bar">
-        <input class="input" id="searchDestination" type="text" placeholder="Paris, Tokyo, Istanbul…" data-i18n-placeholder="placeholder_city">
-        <input class="input" id="checkIn" type="date">
-        <input class="input" id="checkOut" type="date">
-        <button class="btn btn-ghost" id="btnFilters" type="button" data-i18n="filters">Filters</button>
-        <button class="btn btn-gold" id="btnSearch" type="button" data-i18n="search">Search</button>
-      </div>
-      <div id="searchStatus" class="search-status"></div>
-
-      <div class="features">
-        <div class="card"><h3 data-i18n="feat_verified">Verified stays</h3><p data-i18n="feat_verified_sub">Top picks near you.</p></div>
-        <div class="card"><h3 data-i18n="feat_rewards">StayWorld+ Rewards</h3><p data-i18n="feat_rewards_sub">Earn points on every booking.</p></div>
-        <div class="card"><h3 data-i18n="feat_payments">Secure payments</h3><p data-i18n="feat_payments_sub">Visa, Mastercard, Amex & Crypto.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MAP -->
-  <section class="map-section">
-    <div class="container"><div id="map"></div></div>
-  </section>
-
-  <!-- PROMO -->
-  <section class="container" style="margin-top:-24px; margin-bottom:12px">
-    <div style="border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(90deg,#ffd36e22,#ffd36e11)">
-      <strong>🎉 <span data-i18n="promo_title">신규 회원 첫 예약 10% 할인</span></strong>
-      <div style="opacity:.85" data-i18n="promo_sub">멤버십 가입하면 포인트 적립 + 독점 혜택</div>
-    </div>
-  </section>
-
-  <!-- EXPLORE (푸터 위) -->
-  <section class="sw-explore">
-    <div class="sw-wrap">
-      <header class="sw-explore-head">
-        <h2 data-i18n="explore_unique_title">한 번쯤 묵어보고 싶은 숙소</h2>
-        <p data-i18n="explore_unique_sub">캐빈, 빌라, 샬레 등 특별한 숙소를 찾아보세요</p>
-      </header>
-
-      <div class="sw-row">
+<div class="sw-row">
         <button class="sw-nav prev" aria-label="prev">‹</button>
         <div class="sw-track" data-track="unique">
           <article class="sw-card">
