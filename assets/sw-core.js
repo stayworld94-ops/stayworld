@@ -155,4 +155,101 @@
           <span class="dot" style="opacity:${it.read?'.25':'1'}"></span>
           <div class="content">
             <b>${escapeHTML(it.title||'')}</b>
-            <div class="desc">${escapeHTML(it.desc||'')}
+            <div class="desc">${escapeHTML(it.desc||'')}</div>
+          </div>
+          <time class="time">${escapeHTML(it.time||'')}</time>
+        </li>
+      `).join('');
+    }
+    function escapeHTML(s){return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
+
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const open = panel.hasAttribute('hidden');
+      document.querySelectorAll('#swNotifPanel').forEach(p=>p.setAttribute('hidden',''));
+      if (open) panel.removeAttribute('hidden'); else panel.setAttribute('hidden','');
+    });
+    document.addEventListener('click', (e)=>{
+      if (!panel.contains(e.target) && e.target!==btn) panel.setAttribute('hidden','');
+    });
+
+    render(await fetchNotifications());
+    // 주기 업데이트
+    setInterval(async ()=>render(await fetchNotifications()), 30000);
+  }
+
+  // ---------- Map: index에서 제거, hotels에서 토글 ----------
+  function removeMapEverywhere(){
+    // index: 지도 섹션 제거 + Leaflet 리소스 제거
+    const map = document.getElementById('map');
+    if (map){
+      const sec = map.closest('section') || map.parentElement;
+      sec?.remove();
+      document.querySelectorAll('link[href*="leaflet"],script[src*="leaflet"]').forEach(el=>el.remove());
+    }
+  }
+  function hotelsMapToggle(){
+    const toggleBtn = document.getElementById('btnOpenMap') || document.querySelector('[data-role="map-toggle"]');
+    // map 컨테이너 탐지 (id="hotelsMap" 권장). 없으면 leaflet div의 최상위 상자 사용
+    let mapBox = document.getElementById('hotelsMap');
+    if (!mapBox){
+      const lf = document.querySelector('.leaflet-container');
+      mapBox = lf ? lf.closest('div,section') : null;
+    }
+    if (!toggleBtn || !mapBox) return;
+
+    // 닫기 버튼 추가
+    let close = mapBox.querySelector('#btnCloseMap');
+    if (!close){
+      close = document.createElement('button');
+      close.id = 'btnCloseMap';
+      close.textContent = '✕';
+      close.style.cssText = 'position:absolute;right:10px;top:10px;z-index:9999;border:0;border-radius:10px;padding:6px 10px;background:#111;color:#fff;opacity:.8';
+      mapBox.style.position = 'relative';
+      mapBox.appendChild(close);
+    }
+
+    // 기본은 닫힘
+    mapBox.style.display = 'none';
+    toggleBtn.dataset.state = 'closed';
+    toggleBtn.textContent = (toggleBtn.dataset.i18nOpen || 'Open map');
+
+    function open(){
+      mapBox.style.display = '';
+      toggleBtn.dataset.state = 'open';
+      toggleBtn.textContent = (toggleBtn.dataset.i18nClose || 'Close map');
+    }
+    function closeFn(){
+      mapBox.style.display = 'none';
+      toggleBtn.dataset.state = 'closed';
+      toggleBtn.textContent = (toggleBtn.dataset.i18nOpen || 'Open map');
+    }
+    toggleBtn.addEventListener('click', ()=>{
+      (toggleBtn.dataset.state==='open'?closeFn:open)();
+    });
+    close.addEventListener('click', closeFn);
+  }
+
+  // ---------- 부트스트랩 ----------
+  function onReady(fn){ if (document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  onReady(()=>{
+    // 언어 초기화
+    const sel = getLangSel();
+    const saved = localStorage.getItem('sw_lang');
+    if (sel && saved && [...sel.options].some(o=>o.value===saved)) sel.value = saved;
+    sel && sel.addEventListener('change', e=>{ setLang(e.target.value); applyI18N(); });
+
+    applyI18N();
+    syncCurrencyToLang();
+
+    toggleAuthUI();
+    wireAuthButtons();
+    initNotif();
+
+    // index: 지도 제거
+    removeMapEverywhere();
+    // hotels: 지도 토글(있을 때만)
+    hotelsMapToggle();
+  });
+
+})();
