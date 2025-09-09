@@ -349,3 +349,33 @@ button:hover, .btn:hover, .google-btn:hover {
   position: relative;
   justify-content: space-between; /* 좌: Welcome 텍스트 / 우: 알림 버튼 */
 }
+/* === Header right area (fix overlap) === */
+.right{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;   /* 공간 부족 시 줄바꿈 */
+  margin-left:auto;
+}
+.lang-currency{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.auth-buttons,
+.auth-user{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+#authGuest a,
+#authUser a{
+  white-space:nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+}
+
+/* 모바일에서 세로 스택 */
+@media (max-width:768px){
+  .right{ flex-direction:column; align-items:stretch; }
+  .auth-buttons a, .auth-user a{ width:100%; text-align:center; }
+}
