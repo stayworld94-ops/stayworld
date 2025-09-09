@@ -1,18 +1,13 @@
-[functions]
-  directory = "netlify/functions"
+[build]
+  publish = "."
+  command = ""
 
-# (선택) /api 경로로도 접근하고 싶으면 리다이렉트 추가
-[[redirects]]
-  from = "/api/createNowInvoice"
-  to = "/.netlify/functions/createNowInvoice"
-  status = 200
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+  Cache-Control = "no-cache, no-store, must-revalidate"
 
-[[redirects]]
-  from = "/api/paypalCreateOrder"
-  to = "/.netlify/functions/paypalCreateOrder"
-  status = 200
-
-[[redirects]]
-  from = "/api/paypalCaptureOrder"
-  to = "/.netlify/functions/paypalCaptureOrder"
-  status = 200
+[[headers]]
+  for = "/*"
+  [headers.values]
+  Cache-Control = "public, max-age=3600"
