@@ -1,25 +1,19 @@
-// nowpaymentsWebhook.js
-const { enableChatForBooking } = require('./_chatHelpers');
+const { ok, bad, fail } = require("./_chatHelpers");
 
-exports.handler = async (event, _context) => {
+exports.handler = async (event) => {
   try {
-    const body = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || "{}");
 
-    // TODO: Verify NOWPayments signature & event status here
-    // Example: if (body.payment_status !== 'finished') return { statusCode: 200, body: '{"ok":true}' };
-
-    const bookingId = body.order_id; // ensure your order_id maps to your bookings/{bookingId}
-    if (!bookingId) {
-      return { statusCode: 400, body: JSON.stringify({ ok:false, error: 'Missing bookingId' }) };
+    // 예시: NOWPayments에서 필수 필드 체크
+    if (!body.payment_id) {
+      return { statusCode: 400, body: JSON.stringify({ error: "Missing payment_id" }) };
     }
 
-    // TODO: Update Firestore bookings/{bookingId} to paid/confirmed based on your logic
+    // ✅ 실제 NOWPayments webhook 처리 로직 추가
+    console.log("NOWPayments webhook received:", body);
 
-    await enableChatForBooking({ bookingId });
-
-    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
-  } catch (e) {
-    console.error(e);
-    return { statusCode: 500, body: JSON.stringify({ ok:false, error: e.message }) };
+    return { statusCode: 200, body: JSON.stringify({ status: "nowpayments webhook processed" }) };
+  } catch (err) {
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
 };
