@@ -101,55 +101,55 @@
 </head>
 <body>
   <!-- ====== HEADER ====== -->
-  <header>
-    <div class="container hdr">
-      <!-- 좌측: 로고 -->
-      <a class="brand" href="/"><img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo"/><strong>STAYWORLD</strong></a>
+<header>
+  <div class="container hdr">
+    <!-- 좌측: 로고 -->
+    <a class="brand" href="/"><img src="/assets/img/logo-stayworld.png" alt="StayWorld Logo"/><strong>STAYWORLD</strong></a>
 
-      <!-- 내비 -->
-      <nav>
-        <a href="/" data-i18n="nav_home">Home</a>
-        <a href="/membership.html" data-i18n="nav_membership">Membership</a>
-        <a href="/hotels.html" data-i18n="nav_hotels">Hotels</a>
-      </nav>
+    <!-- 내비 -->
+    <nav>
+      <a href="/" data-i18n="nav_home">Home</a>
+      <a href="/membership.html" data-i18n="nav_membership">Membership</a>
+      <a href="/hotels.html" data-i18n="nav_hotels">Hotels</a>
+    </nav>
 
-      <!-- 우측: 언어/통화/알림/인증 -->
-      <div class="right">
+    <!-- 우측: 언어/통화/알림/인증 -->
+    style
+      <div class="lang-currency">
         <label class="pill"><span data-i18n="language">Language</span><select id="lang"></select></label>
         <label class="pill"><span>FX</span><select id="currency"></select></label>
+      </div>
 
-        <!-- 로그인 후에만 보이는 알림 버튼 -->
-        <button class="btn btn-chip notif-btn hide" id="notifBtn" aria-label="Notifications" title="Notifications">
-          🔔 <span class="notif-badge hide" id="notifBadge">0</span>
-        </button>
+      <!-- 로그인 후에만 보이는 알림 버튼 -->
+      <button class="btn btn-chip notif-btn hide" id="notifBtn" aria-label="Notifications" title="Notifications">
+        🔔 <span class="notif-badge hide" id="notifBadge">0</span>
+      </button>
 
-        <!-- 로그인 전 -->
-        <span id="authGuest">
-          <a href="/login.html" class="btn btn-ghost" data-i18n="nav_login">Log in</a>
-          <a href="/signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign up</a>
-          <a href="/host-login.html" class="btn btn-ghost" data-i18n="nav_host_login">Host login</a>
-        </span>
+      <!-- 로그인 전 -->
+      <div id="authGuest" class="auth-buttons">
+        <a href="/login.html" class="btn btn-ghost" data-i18n="nav_login">Log in</a>
+        <a href="/signup.html" class="btn btn-gold" data-i18n="nav_signup">Sign up</a>
+        <a href="/host-login.html" class="btn btn-ghost" data-i18n="nav_host_login">Host login</a>
+      </div>
 
-        <!-- 로그인 후 -->
-        <span id="authUser" class="hide" style="display:inline-flex;gap:8px;align-items:center">
-          <span id="welcomeMini" class="pill"></span>
-          <a href="#" id="logoutBtn" class="btn btn-ghost" data-i18n="nav_logout">Logout</a>
-        </span>
+      <!-- 로그인 후 -->
+      <div id="authUser" class="auth-user hide">
+        <span id="welcomeMini" class="pill"></span>
+        <a href="#" id="logoutBtn" class="btn btn-ghost" data-i18n="nav_logout">Logout</a>
+      </div>
 
-        <!-- 알림 패널 -->
-        <div class="notif-panel" id="notifPanel" role="dialog" aria-modal="true" aria-label="Notifications">
-          <div class="notif-header">
-            <span>Notifications</span>
-            <button id="markAllReadBtn" class="btn btn-ghost">Mark all read</button>
-          </div>
-          <ul id="notifList" class="notif-list"></ul>
-          <div class="notif-footer">
-            <a href="/notifications.html">View all</a>
-          </div>
+      <!-- 알림 패널 -->
+      <div class="notif-panel" id="notifPanel" role="dialog" aria-modal="true" aria-label="Notifications">
+        <div class="notif-header">
+          <span>Notifications</span>
+          <button id="markAllReadBtn" class="btn btn-ghost">Mark all read</button>
         </div>
+        <ul id="notifList" class="notif-list"></ul>
+        <div class="notif-footer"><a href="/notifications.html">View all</a></div>
       </div>
     </div>
-  </header>
+  </div>
+</header>
 
   <!-- 로그인 후에만 뜨는 환영 바 -->
   <div class="welcome-bar" id="welcomeBar">
